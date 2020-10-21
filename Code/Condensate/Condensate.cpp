@@ -81,7 +81,7 @@ for(int i = 0 ; i < a.getsize() ; i++) {
 
 }
 
-void Condensate::run(int runtime, int every) {
+void Condensate::run(int runtime, int every, string strbase = "") {
     int ccc;
 
     int tf = ceil( (double)runtime / (double)every);
@@ -141,8 +141,15 @@ void Condensate::run(int runtime, int every) {
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();
 
-            string poss = "pos_i=";
-            string oris = "orientation_i=";
+            
+            string poss = "pos";
+            poss = poss + strbase;
+            string oris = "orientation";
+            oris = oris + strbase;
+
+            poss += "_i=";
+            oris += "_i=";
+            
             string extension = ".csv";
 
             poss += ss.str();

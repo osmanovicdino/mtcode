@@ -24,7 +24,7 @@ void set_potential_bundle_bivalent(Condensate &a) {
     delete pot4;
 }
 
-void set_potential_bundle_tetrahedral(Condensate &a)
+void set_potential_bundle_tetrahedral(Condensate &a, double str, double dis, double ang)
 {
 
     //vector1<double> v1(3);
@@ -58,7 +58,7 @@ void set_potential_bundle_tetrahedral(Condensate &a)
     int iter = 0;
     for(int i = 0 ; i < 4 ; i++) {
         for(int j = 0 ; j < 4 ; j++) {
-            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), 100.0, 2., pi / 4., 0.75);
+            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), str, dis, ang, 0.75);
 
             pots[iter] = pot1;
            // delete pot1;

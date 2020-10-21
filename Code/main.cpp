@@ -57,10 +57,20 @@ srand (time(NULL));
 Condensate A(25.0, 1000, 2);
 
 
-set_potential_bundle_tetrahedral(A);
+set_potential_bundle_tetrahedral(A, 10.0, 2., pi/4.);
 
 
-A.run(100000,1000);
+for(int kT = 1.0 ; kT > 0.49 ; kT -=0.1) {
+    A.obj->setkT(kT);
+    stringstream ss;
+    ss << kT;
+    
+    string base = "_kT=";
+    base += ss.str();
+    
+
+    A.run(1000000,1000,base);
+}
 
 
 
