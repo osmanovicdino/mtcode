@@ -504,7 +504,7 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
 
 void LangevinNVTR::adv(matrix<int> &pairs) {
 
-cout << "ok" << endl;
+
 
 }
 

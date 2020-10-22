@@ -136,7 +136,7 @@ void Condensate::run(int runtime, int every, string strbase = "") {
 
             stringstream ss;
            
-            ss << setw(tf) << setfill('0') << (i / every);
+            ss << setw(number_of_digits) << setfill('0') << (i / every);
 
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();
