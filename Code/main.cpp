@@ -57,20 +57,27 @@ srand (time(NULL));
 Condensate A(25.0, 1000, 2);
 
 
-set_potential_bundle_tetrahedral(A, 10.0, 2., pi/4.);
+vector1<double> as(16,10.0);
+vector1<double> bs(16,2.);
+vector1<double> cs(16,pi/4.);
 
 
-for(double kT = 1.0 ; kT > 0.49 ; kT -=0.1) {
-    A.obj->setkT(kT);
-    stringstream ss;
-    ss << kT;
+as[0] = 100.0;
+
+set_potential_bundle_tetrahedral(A, as, bs, cs);
+
+double kT = 0.65;
+
+A.obj->setkT(kT);
+stringstream ss;
+ss << as[0];
     
-    string base = "_kT=";
-    base += ss.str();
+string base = "_str=";
+base += ss.str();
     
 
-    A.run(1000000,1000,base);
-}
+A.run(1000000,1000,base);
+
 
 
 

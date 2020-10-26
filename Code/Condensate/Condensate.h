@@ -15,7 +15,6 @@ Condensate(double, int, int);
 
 void set_potential_bundle(vector1<potentialtheta3D*>&);
 
-
 void run(int,int, string strbase);
 
 
