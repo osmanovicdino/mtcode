@@ -3,8 +3,11 @@ string1=$ScriptCommandLine[[2]];
 
 string2=$ScriptCommandLine[[3]];
 
+string4=$ScriptCommandLine[[4]];
+
 x = Import[string1];
-o = Import[string2]
+o = Import[string2];
+v = Import[string3];
 d = Length[x[[1]]];
 l = Length[x];
 If[l==0,Exit[1]];
@@ -21,9 +24,9 @@ Graphics3D[{pars,sur},PlotRange->{{0,sm},{0,sm},{0,sm}}]
 ]
 
 
-vecs = {{1,0,0},{-1,0,0}};
+(* vecs = {{1,0,0},{-1,0,0}}; *)
 
-img =  PlotFrameOri[string1,string2,vecs,s];
+img =  PlotFrameOri[string1,string2,v,s];
 
 dir = DirectoryName[string1];
 

@@ -11,6 +11,14 @@ void set_potential_bundle_bivalent(Condensate &a) {
 
     vector1<potentialtheta3D *> pots(4);
 
+    ofstream myfile;
+    myfile.open("ori.csv");
+
+    myfile << nx << "," << ny << "," << nz << endl;
+    myfile << -nx << "," << ny << "," << nz;
+
+    myfile.close();
+
     pots[0] = pot1;
     pots[1] = pot2;
     pots[2] = pot3;
@@ -65,6 +73,13 @@ void set_potential_bundle_tetrahedral(Condensate &a, double str, double dis, dou
             iter++;
         }
     }
+
+    ofstream myfile;
+    myfile.open("ori.csv");
+
+    myfile <<= v;
+
+    myfile.close();
 
     a.set_potential_bundle(pots);
 
@@ -134,6 +149,13 @@ void set_potential_bundle_tetrahedral(Condensate &a, vector1<double> str, vector
             iter++;
         }
     }
+
+    ofstream myfile;
+    myfile.open("ori.csv");
+
+    myfile <<= v;
+
+    myfile.close();
 
     a.set_potential_bundle(pots);
 

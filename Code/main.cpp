@@ -66,6 +66,8 @@ as[0] = 100.0;
 
 set_potential_bundle_tetrahedral(A, as, bs, cs);
 
+
+
 double kT = 0.65;
 
 A.obj->setkT(kT);
