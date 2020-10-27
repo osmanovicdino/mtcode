@@ -66,7 +66,7 @@ as[0] = 100.0;
 
 set_potential_bundle_tetrahedral(A, as, bs, cs);
 
-
+pausel();
 
 double kT = 0.65;
 
@@ -76,7 +76,7 @@ ss << as[0];
     
 string base = "_str=";
 base += ss.str();
-    
+
 
 A.run(1000000,1000,base);
 
