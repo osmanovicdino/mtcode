@@ -59,27 +59,27 @@ Condensate A(25.0, 1000, 2);
 
 vector1<double> as(16,10.0);
 vector1<double> bs(16,2.);
-vector1<double> cs(16,pi/4.);
+vector1<double> cs(16,pi/3.);
 
 
-as[0] = 100.0;
+//as[0] = 100.0;
+
+
 
 set_potential_bundle_tetrahedral(A, as, bs, cs);
 
-pausel();
-
-double kT = 0.65;
+for(double kT = 1.0 ; kT > 0.49 ; kT -= 0.1) {
 
 A.obj->setkT(kT);
 stringstream ss;
-ss << as[0];
+ss << kT;
     
-string base = "_str=";
+string base = "_kT=";
 base += ss.str();
 
 
 A.run(1000000,1000,base);
-
+}
 
 
 
