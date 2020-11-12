@@ -1,7 +1,7 @@
 #ifndef CONDENSATE_H
 #define CONDENSATE_H
 
-#include "../MDBase/LangevinR.h"
+#include "../MDBase/Rotational/LangevinR.h"
 
 struct Condensate {
 
@@ -9,11 +9,11 @@ int num;
 
 LangevinNVTR *obj;
 
-vector1<potentialtheta3D*> potential_bundle;
+ComboPatch *pots;
 
-Condensate(double, int, int);
+Condensate(double, int);
 
-void set_potential_bundle(vector1<potentialtheta3D*>&);
+void setpots(ComboPatch*);
 
 void run(int,int, string strbase);
 
@@ -22,6 +22,6 @@ void run(int,int, string strbase);
 };
 
 #include "Condensate.cpp"
-#include "GeometricSchemes.cpp"
+//#include "GeometricSchemes.cpp"
 
 #endif

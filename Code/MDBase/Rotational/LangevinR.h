@@ -1,8 +1,13 @@
 #ifndef LANGEVINR_H
 #define LANGEVINR_H
 
-#include "Langevin.h"
-#include "potentialtheta.h"
+#include "../Langevin.h"
+#include "../Potentials/potentialtheta.h"
+#include "../Potentials/combopatch.h"
+#include "../Bindings/GraphAlgorithms.h"
+#include "../Bindings/BinaryBindStore.h"
+#include "../Bindings/BindingModelFull.h"
+#include "../Potentials/combopatch.h"
 
 class LangevinNVTR : public LangevinNVT {
 protected:
@@ -76,9 +81,16 @@ public:
 	vector1<double> genfullmat(int);
 	void rotate();
 
-	void create_forces_and_torques_sphere(matrix<double> &, matrix<double> &);
-	void calculate_forces_and_torques3D(matrix<int> &pairs, potentialtheta3D &, matrix<double> &F, matrix<double> &T);
-	void calculate_forces_and_torques3D(matrix<int> &pairs, vector1<potentialtheta3D*> &, matrix<double> &F, matrix<double> &T);
+	// void one_bond_per_patch_condition(matrix<int> &pairs, vector<potentialtheta3D*> &);
+
+	void create_forces_and_torques_sphere(matrix<double> &, matrix<double> &); //transform between body fixed frame and lab fixed frame
+	void calculate_forces_and_torques3D(matrix<int> &pairs, potentialtheta3D &, matrix<double> &F, matrix<double> &T); //calculation of force for a single angle dependent theta
+	void calculate_forces_and_torques3D(matrix<int> &pairs, vector1<potentialtheta3D*> &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
+	void calculate_forces_and_torques3D(matrix<int> &pairs, ComboPatch &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
+
+	void calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, vector1<potentialtheta3D *> &, BinaryBindStore & , AbstractBindingModel&, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
+	void calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ComboPatch&, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
+
 	//matrix<double> calculateforcestheta_pos(matrix<int> &pairs, potentialtheta &);
 	//matrix<double> calculateforces_ang(matrix<int> &pairs,potentialtheta&);
 	void advancemom_halfstep(matrix<double> &, matrix<double> &);
@@ -91,5 +103,6 @@ public:
 };
 
 #include "LangevinR.cpp"
+#include "LangevinRforce.cpp"
 
 #endif

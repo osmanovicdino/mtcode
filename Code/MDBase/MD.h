@@ -10,8 +10,8 @@
 
 // #include "intmatrix.h"
 #include "geometry.h"
-#include "potential.h"
-#include "potential3.h"
+#include "./Potentials/potential.h"
+#include "./Potentials/potential3.h"
 
 //#include "vec_vec.h"
 

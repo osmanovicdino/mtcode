@@ -105,6 +105,62 @@ void SWAP( T &a, T &b ) { //swap the values of two objects a and b
 	b = c;
 }
 
+void sort_doublet(int ti1, int ti2, int &i1, int &i2) {
+    if (ti1 < ti2)
+    {
+        i1 = ti1;
+        i2 = ti2;
+    }
+    else
+    {
+        i1 = ti2;
+        i2 = ti1;
+    }
+}
+
+void sort_triplet(int t1, int t2, int t3, int &i1, int &i2, int &i3) {
+    if(t1 < t2) {
+        if(t2 < t3) {
+            i1 = t1;
+            i2 = t2;
+            i3 = t3;
+        }
+        else{
+            if(t1<t3) {
+                i1 = t1;
+                i2 = t3;
+                i3 = t2;
+            }
+            else{
+                i1 = t3;
+                i2 = t1;
+                i3 = t2;
+            }
+        }
+
+    }
+    else{
+        if(t3 < t2) {
+            i1 = t3;
+            i2 = t2;
+            i3 = t1;
+        }
+        else{
+            if(t3 > t1) {
+                i1 = t2;
+                i2 = t1;
+                i3 = t3;
+            }
+            else{
+                i1 = t2;
+                i2 = t3;
+                i3 = t1;
+            }
+        }
+
+    }
+}
+
 template <class T>
 int sign(T y) { //return -1 if negative and 1 otherwise
 	if ( y>0 ) return 1;

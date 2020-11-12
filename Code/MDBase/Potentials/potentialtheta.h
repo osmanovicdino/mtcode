@@ -2,7 +2,7 @@
 #define POTENTIALTHETA_H
 
 
-#include "../Basic/basic.h"
+#include "../..//Basic/basic.h"
 
 struct potentialtheta3D
 {            //this is the base constructor for all potentials.
@@ -18,6 +18,7 @@ struct potentialtheta3D
     //virtual double force2mdx(double, double) = 0; //the factor as a function of distance*squared which when multiplied with dx will give the total force
 
     virtual void setparameters(const vector1<double> &) = 0;
+    virtual vector1<double> getparameters() = 0;
     // virtual void printparameters() = 0;
     // virtual void printparameters(ofstream&) = 0;
 };
@@ -256,6 +257,27 @@ struct KernFrenkelOnePatch : potentialtheta3D {
         att = param.gpcons(7);
         thetam = param.gpcons(8);
         v = param.gpcons(9);
+    }
+
+    vector1<double> getparameters()
+    {
+        vector1<double> param(10);
+        param[0] = nxb1;
+        param[1] = nyb1;// = param.gpcons(1);
+        param[2] = nzb1;// = param.gpcons(2);
+        param[3] = nxb2;// = param.gpcons(3);
+        param[4] = nyb2;// = param.gpcons(4);
+        param[5] = nzb2;// = param.gpcons(5);
+        // if (abs(SQR(nxb1) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+        //     error("patch potential should be called with unit vector (vector not normalized)");
+        // if (abs(SQR(nxb2) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+        //     error("patch potential should be called with unit vector (vector not normalized)");
+
+        param[6] = dis;// = param.gpcons(6);
+        param[7] = att;// = param.gpcons(7);
+        param[8] = thetam;// = param.gpcons(8);
+        param[9] = v; // = param.gpcons(9);
+        return param;
     }
 
     KernFrenkelOnePatch *clone() const
@@ -511,6 +533,27 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
         att = param.gpcons(7);
         thetam = param.gpcons(8);
         v = param.gpcons(9);
+    }
+
+    vector1<double> getparameters()
+    {
+        vector1<double> param(10);
+        param[0] = nxb1;
+        param[1] = nyb1; // = param.gpcons(1);
+        param[2] = nzb1; // = param.gpcons(2);
+        param[3] = nxb2; // = param.gpcons(3);
+        param[4] = nyb2; // = param.gpcons(4);
+        param[5] = nzb2; // = param.gpcons(5);
+        // if (abs(SQR(nxb1) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+        //     error("patch potential should be called with unit vector (vector not normalized)");
+        // if (abs(SQR(nxb2) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+        //     error("patch potential should be called with unit vector (vector not normalized)");
+
+        param[6] = dis;    // = param.gpcons(6);
+        param[7] = att;    // = param.gpcons(7);
+        param[8] = thetam; // = param.gpcons(8);
+        param[9] = v;      // = param.gpcons(9);
+        return param;
     }
 
     KernFrenkelOnePatch2 *clone() const

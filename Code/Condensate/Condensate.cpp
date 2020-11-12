@@ -1,9 +1,11 @@
 
 
-Condensate::Condensate(double ll, int N, int M) : potential_bundle(vector1<potentialtheta3D*>(M)) {
+Condensate::Condensate(double ll, int N)  {
     num = floor(ll/4.);
 
     obj = new LangevinNVTR;
+
+    pots = new SingPatch(1.,1.,1.); //initialize abstract base class to be a one patch system
 
     vector1<bool> pb(3,true);
     cube geo(ll,pb,3);
@@ -30,7 +32,7 @@ Condensate::Condensate(double ll, int N, int M) : potential_bundle(vector1<poten
         }
     }
 
-
+   
 
     for(int i = 0 ; i < N ; i++) {
         int randint  =  rand() % (possible_pos_x.size());
@@ -65,19 +67,9 @@ Condensate::Condensate(double ll, int N, int M) : potential_bundle(vector1<poten
 
 }
 
-void Condensate::set_potential_bundle(vector1<potentialtheta3D*> &a) {
+void Condensate::setpots(ComboPatch *a) {
 
-int q =  potential_bundle.getsize();
-for(int i = 0 ; i < q ; i++) {
-    delete potential_bundle[i];
-}
-// cout << "old vals deleted" << endl;
-
-potential_bundle = vector1<potentialtheta3D*>(a.getsize());
-
-for(int i = 0 ; i < a.getsize() ; i++) {
-    potential_bundle[i] = (a[i])->clone();
-}
+pots = a->clone();
 
 }
 
@@ -105,7 +97,7 @@ void Condensate::run(int runtime, int every, string strbase = "") {
     matrix<double> zeromatrix(NN,3);
 
     obj->calculateforces(*pairs, wsa);
-    obj->calculate_forces_and_torques3D(*pairs, potential_bundle, F, T);
+    obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
 
     obj->create_forces_and_torques_sphere(F, T);
 
@@ -121,7 +113,7 @@ void Condensate::run(int runtime, int every, string strbase = "") {
         
         T.reset(0.0);
 
-        obj->calculate_forces_and_torques3D(*pairs, potential_bundle, F, T);
+        obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
 
         obj->create_forces_and_torques_sphere(F, T);
 

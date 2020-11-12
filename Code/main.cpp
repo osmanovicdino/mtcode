@@ -33,10 +33,10 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 #include "DataStructures/vector1.h"
 #include "DataStructures/matrix2.h"
 #include "DataStructures/matrix2.cpp"
-#include "MDBase/potential.h"
+//#include "MDBase/potential.h"
 #include "MDBase/MD.h"
 #include "MDBase/Langevin.h"
-#include "MDBase/LangevinR.h"
+//#include "MDBase/LangevinR.h"
 #include "Condensate/Condensate.h"
 
 // #include "NCGasR.h"
@@ -54,34 +54,75 @@ int main(int argc, char** argv) {
 
 srand (time(NULL));
 
-Condensate A(25.0, 1000, 2);
+Condensate A(5.0, 4); //Create a condensate
+
+cout << A.obj->getdat() << endl;
 
 
-vector1<double> as(16,10.0);
-vector1<double> bs(16,2.);
-vector1<double> cs(16,pi/3.);
+//SAVE CC
+// vector1<bool> already_accounted(200, false);
+// vector1<int> indexes(200,0);
+// int iter = 0;
+// vector1<int> demarkus(200,0);
+// int len_dem = 0;
 
+// int num_con_comp = 0;
 
-//as[0] = 100.0;
+// for (int i = 0; i < 200; i++) {
 
+//     if (already_accounted[i] == false)
+//     {
+//         DFUtilstore(i, already_accounted, adj, lens, indexes, iter, len_dem);
 
+//         demarkus[num_con_comp] = len_dem;
 
-set_potential_bundle_tetrahedral(A, as, bs, cs);
+//         num_con_comp++;
+//         len_dem = 0;
 
-for(double kT = 1.0 ; kT > 0.49 ; kT -= 0.1) {
+//        // cout << "\n";
+//     }
+// }
 
-A.obj->setkT(kT);
-stringstream ss;
-ss << kT;
-    
-string base = "_kT=";
-base += ss.str();
+// cout << indexes << endl;
+// cout << demarkus << endl;
 
+//PRINT CC
+// for (int i = 0; i < 200; i++)
+// {
 
-A.run(1000000,1000,base);
-}
+//     if (already_accounted[i] == false)
+//     {
+//         DFUtil(i, already_accounted, adj, lens);
 
+//         // demarkus[num_con_comp] = len_dem;
 
+//         // num_con_comp++;
+//         // len_dem = 0;
+
+//          cout << "\n";
+//     }
+// }
+// Condensate A(25.0, 1000, 2);
+
+// vector1<double> as(16,10.0);
+// vector1<double> bs(16,1.5);
+// vector1<double> cs(16,pi/3.);
+
+// //as[0] = 100.0;
+
+// set_potential_bundle_tetrahedral(A, as, bs, cs);
+
+// for(double kT = 1.0 ; kT > 0.49 ; kT -= 0.1) {
+
+// A.obj->setkT(kT);
+// stringstream ss;
+// ss << kT;
+
+// string base = "_kT=";
+// base += ss.str();
+
+// A.run(1000000,1000,base);
+// }
 
 // cout << (A.obj)->getdat() << endl;
 
