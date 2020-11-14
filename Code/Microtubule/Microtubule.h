@@ -134,6 +134,8 @@ matrix<double> BindingForcesTest(vector1<int>&,vector1<double>&,matrix<double>&)
 
 matrix<double> constantMTforce(); //propulsion force
 
+matrix<double> constantMTforce(vector1<int>&,vector1<int>&); //propulsion force, in the direction of particles i1 and i2
+
 matrix<double> PositionForcesDueToAngles(); //propulsion force
 
 void PositionForcesDueToAnglesGPU(float2 *, int *, double *, int *&, double *&, double *&, int&);
@@ -181,9 +183,8 @@ void runGPUcheck(int,int,Fun);
 template <typename Fun>
 void runMTONLY(int,int,Fun);
 
-
-
-
+template <typename Fun>
+void runMTONLY_initialstate(int, int, Fun, double, vector1<int>, vector1<int>);
 
 //vector1<double> forcecalc1(double,double,double,double,double,double);
 //void forcecalc2(int, int, vector1<double>&);
@@ -192,6 +193,7 @@ void runMTONLY(int,int,Fun);
 };
 
 #include "Microtubule.cpp"
+#include "MicrotubuleRuns.cpp"
 
 // #include "../MicrotubuleGPU/MicrotubuleGPU.cu"
 

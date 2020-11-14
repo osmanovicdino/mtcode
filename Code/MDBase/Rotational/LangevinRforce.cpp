@@ -9,7 +9,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     //for a given sphere geometry
 
     //int np1 = sqrt(iny.getsize());
-    int total_number_of_patches = iny.get_total_patches(this->getN());
+    int total_number_of_patches = bo.boundto.getsize();//iny.get_total_patches(this->getN());
 
 
     vector1<int> tempbound(total_number_of_patches); //no binding to begin wtih
@@ -73,13 +73,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 int potn = (*(iny.p))[tp];
                 // vector1<double> params = (iny.potential_bundle)[potn]->getparameters();
 
-                int nxb1;// = params[0]; //iny[potn]->nxb1;
-                int nyb1;// = params[1]; //iny[potn]->nyb1;
-                int nzb1;// = params[2]; //iny[potn]->nzb1;
+                double nxb1;// = params[0]; //iny[potn]->nxb1;
+                double nyb1;// = params[1]; //iny[potn]->nyb1;
+                double nzb1;// = params[2]; //iny[potn]->nzb1;
 
-                int nxb2;// = params[3]; //iny[potn]->nxb2;
-                int nyb2;// = params[4]; //iny[potn]->nyb2;
-                int nzb2;// = params[5]; //iny[potn]->nzb2;
+                double nxb2;// = params[3]; //iny[potn]->nxb2;
+                double nyb2;// = params[4]; //iny[potn]->nyb2;
+                double nzb2;// = params[5]; //iny[potn]->nzb2;
 
                 double disp;// = params[6];
 
@@ -98,7 +98,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
                 double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
 
-                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < 1.2 * disp)
+                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < 1.25 * disp)
                 {
                     int wp1,wp2;
                     iny.which_patch(p1,p2,potn,wp1,wp2);
@@ -120,6 +120,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     vector1<int> indexes(total_number_of_patches);
 
     vector1<int> nbins = ConnectedComponents(boindices, tempbound, indexes);
+
+   // cout << tempbound << endl;
 
     //Now we have the clusters. For each of these clusters, there is so some transition rate from one to another
     for (int i = 0; i < nbins.getsize() - 1; i++)
@@ -162,6 +164,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
             else
             {
+
                 bo.isbound[i1] = false;
                 bo.isbound[i2] = false;
             }
@@ -170,6 +173,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         else if (size_of_cluster == 3)
         {
             //is the cluster fully connected or not?
+
+
 
             int ti1 = indexes[nbins[i]];
             int ti2 = indexes[nbins[i] + 1];
@@ -275,7 +280,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         }
         else
         {
-            error("the mythical 4 cluster, get to work, slob!");
+            //error("the mythical 4 cluster, get to work, slob!");
         }
     }
 
@@ -287,6 +292,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     {
         if (bo.isbound[i] == true && visited[i] == false) //only for bound patches we haven't visisted do we calculate forces
         {
+
+
             visited[i] = true; // We have now visisted this patch
             visited[bo.boundto[i]] = true; //we have also visisted the patch that it is bound to
             
@@ -326,6 +333,50 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             double tjz;
 
             (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
+
+
+            //THE FOLLOWING IS ONLY FOR DEBUGGING
+            /*cout << "CALCULATING FORCE" << endl;
+            cout << p1 << " " << p2 << endl;
+            cout << i << " " << bo.boundto[i] << endl;
+            cout << potn << endl;
+
+            cout << dis << endl; //distance
+
+            double nxb1,nyb1,nzb1,nxb2,nyb2,nzb2;
+            double disp,thetam;
+            iny.get_params(p1, p2, potn, nxb1, nyb1, nzb1, nxb2, nyb2, nzb2, disp, thetam);
+
+            vector1<double> v1(3);
+            vector1<double> v2(3);
+
+            v1[0] = nxb1;
+            v1[1] = nyb1;
+            v1[2] = nzb1;
+
+            v2[0] = nxb2;
+            v2[1] = nyb2;
+            v2[2] = nzb2;
+
+            vector1<double> newv1 =  this->transformvector(v1, p1);
+            vector1<double> newv2 = this->transformvector(v2, p2);
+
+            double argthetai = -(newv1[0] * un.gpcons(0) + newv1[1] * un.gpcons(1) + newv1[2] * un.gpcons(2));
+            double argthetaj = (newv2[0] * un.gpcons(0) + newv2[1] * un.gpcons(1) + newv2[2] * un.gpcons(2));
+
+
+            cout << v1 << endl;
+            cout << v2 << endl;
+            
+            cout << newv1 << endl;
+            cout << newv2 << endl;
+            cout << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
+            cout << fx <<  " " << fy << " " << fz << endl;
+            cout << tix << " " << tiy << " " << tiz << endl;
+
+
+            pausel();*/
+            //UP TO HERE
 
             forces(p1, 0) += fx;
             forces(p1, 1) += fy;

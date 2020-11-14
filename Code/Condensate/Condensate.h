@@ -11,11 +11,17 @@ LangevinNVTR *obj;
 
 ComboPatch *pots;
 
+AbstractBindingModel *bm;
+
 Condensate(double, int);
 
-void setpots(ComboPatch*);
+void setpots(ComboPatch&);
+
+void setBindingModel(AbstractBindingModel&);
 
 void run(int,int, string strbase);
+
+void run_singlebond(int,int,string strbase);
 
 
 

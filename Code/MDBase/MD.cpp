@@ -1101,6 +1101,42 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 	return forces;
 }
 
+matrix<double> MD::calculateforces_sp(matrix<int> &pairs, potential &iny, matrix<vector1<double> > &sp)
+{
+
+	matrix<double> forces((*dat).getNsafe(), dimension);
+	//vec_vec<double> outputs(pairs.getn());
+	// ofstream myfile;
+	// myfile.open("forces.csv", ios::out | ios::app);
+	//cout << pairs.getNsafe() << endl;
+	//potential * pot = ints(0,1,0).clone();
+
+#pragma omp parallel for
+	for (int i = 0; i < pairs.getNsafe(); ++i)
+	{
+		int p1 = pairs.mat[i * 2 + 0];
+		int p2 = pairs.mat[i * 2 + 1];
+		//int i1 = pairs(i,2);
+		double dis;
+		//vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+		vector1<double> un(dimension);
+		geo->distance_vector(*dat, p1, p2, un, dis);
+
+		//un = i-j
+		iny.setparameters(sp(p1,p2));
+		double f1 = iny.force(sqrt(dis));
+
+		for (int j = 0; j < dimension; ++j)
+		{
+			double fac = f1 * un[j] / sqrt(dis);
+			(forces).mat[p1 * dimension + j] += fac;
+			(forces).mat[p2 * dimension + j] += -fac;
+		}
+	}
+
+	return forces;
+}
+
 
 matrix<double> MD::calculateforceslist(matrix<int> &pairs,potential &iny) {
 	

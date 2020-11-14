@@ -335,6 +335,7 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
 
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
     {
+            //un is r_i-r_j
         //dpos is the vector of differences of distance in each dimension
         if (rij > 2.5 * (dis + v))
         {
@@ -350,6 +351,8 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
         }
         else
         {
+          
+
             double qtemp0 = orient.gpcons(i, 0);
             double qtemp1 = orient.gpcons(i, 1);
             double qtemp2 = orient.gpcons(i, 2);
@@ -440,19 +443,19 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
 
                 double temp2 = -pot * 2 * f * ((pi / (2 * thetam)) * sin(pi * thetaj / (2. * thetam)) * d2 * cos((pi * thetai) / (2 * thetam)));
 
-                // cout << fx << " " << fy << " " << fz << endl;
+                
 
                 fx += (temp1 / rij) * (nx1 + (argthetai)*un.gpcons(0));
                 fy += (temp1 / rij) * (ny1 + (argthetai)*un.gpcons(1));
                 fz += (temp1 / rij) * (nz1 + (argthetai)*un.gpcons(2));
                 //cout << temp1 * (-nx1 / rij + (argthetai / SQR(rij)) * un.gpcons(0)) << " " << temp1 * (-ny1 / rij + (argthetai / SQR(rij)) * un.gpcons(1)) << " " << fz << endl;
 
-                // cout << fx << " " << fy << " " << fz << endl;
+                
                 fx += -(temp2 / rij) * (nx2 - (argthetaj)*un.gpcons(0));
                 fy += -(temp2 / rij) * (ny2 - (argthetaj)*un.gpcons(1));
                 fz += -(temp2 / rij) * (nz2 - (argthetaj)*un.gpcons(2));
 
-                // cout << fx << " " << fy << " " << fz << endl;
+               
 
                 tix = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(2) * ny1 - un.gpcons(1) * nz1);
                 tiy = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (-un.gpcons(2) * nx1 + un.gpcons(0) * nz1);
@@ -461,18 +464,36 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
                 tjx = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(2) * ny2 + un.gpcons(1) * nz2);
                 tjy = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (un.gpcons(2) * nx2 - un.gpcons(0) * nz2);
                 tjz = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(1) * nx2 + un.gpcons(0) * ny2);
-                // cout << tx << " " << ty << " " << tz << endl;
-                // cout << ttx << " " << tty << " " << ttz << endl;
-                // //cout << fx << " " << fy << " " << fz << endl;
+                
+                // cout << nx1 << " " << ny1 << " " << nz1 << endl;
+                
+                    // cout << nx2 << " " << ny2 << " " << nz2 << endl;
+                    // cout << std::setprecision(10) << argthetai << " " << argthetaj << endl;
+                    // cout << thetai << " " << thetaj << endl;
+                    // cout << d1 << " " << d2 << endl;
+                    // cout << pot << endl;
+                    // cout << potf << endl;
+                    // cout << un << endl;
+                    
+                // cout << un << endl;
+                // cout << nx1 << " " << ny1 << " " << nz1 << endl;
+                // cout << nx2 << " " << ny2 << " " << nz2 << endl;
+                // cout << tix << "," << tiy << "," << tiz << endl;
+                // cout << tjx << "," << tjy << "," << tjz << endl;
 
-                //     double rf1x = -rij * un.gpcons(2) * fy + rij * un.gpcons(1) * fz;
-                //     double rf1y =  rij * un.gpcons(2) * fx - rij * un.gpcons(0) * fz;
-                //     double rf1z =  -rij * un.gpcons(1)*fx + rij * un.gpcons(0)*fy;
+                // cout << fx << "," << fy << "," << fz << endl;
+                // pausel();
 
-                //     cout << rf1x << " " << rf1y << " " << rf1z << endl;
-                // cout << fx << " " << fy <<  " " << fz << endl;
-                //     cout << rf1x + tix + tjx << "  " << rf1y + tiy + tjy << "  " << rf1z + tiz + tjz << endl;
-                //     pausel();
+                //pausel();
+
+                    // double rf1x = -rij * un.gpcons(2) * fy + rij * un.gpcons(1) * fz;
+                    // double rf1y =  rij * un.gpcons(2) * fx - rij * un.gpcons(0) * fz;
+                    // double rf1z =  -rij * un.gpcons(1)*fx + rij * un.gpcons(0)*fy;
+
+                    // cout << rf1x << " " << rf1y << " " << rf1z << endl;
+                    // cout << fx << " " << fy <<  " " << fz << endl;
+                    // cout << rf1x + tix + tjx << "  " << rf1y + tiy + tjy << "  " << rf1z + tiz + tjz << endl;
+                    // pausel();
 
                 // pausel();
 

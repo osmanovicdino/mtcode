@@ -18,7 +18,7 @@ virtual int get_total_patches(const int &) = 0;
 virtual void which_patch(const int&, const int&, const int &, int&, int & ) = 0; //get patch numbers from particle numbers
 virtual void which_particle(const int&, const int&, int&, int&)=0; //get particle numbers from patch numbers
 virtual int which_potential(const int&, const int&, const int&, const int& )= 0;
-virtual void get_params(const int&,const int&, const int&, int&, int&, int&, int&, int&, int& , double&, double&) = 0;
+virtual void get_params(const int&,const int&, const int&, double&, double&, double&, double&, double&, double& , double&, double&) = 0;
 
 virtual ComboPatch *clone() const = 0;
 
@@ -56,8 +56,8 @@ struct SingPatch : ComboPatch {//single patch
     int which_potential(const int &i, const int &j, const int &wpi, const int &wpj) {
         return 0;
     }
-    
-    void get_params(const int &i, const int &j, const int &potn, int &nxb1, int &nyb1, int &nzb1, int &nxb2, int &nyb2, int &nzb2, double &d12, double &ang12)
+
+    void get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12)
     {
         nxb1  =  nx;
         nyb1  =  ny;

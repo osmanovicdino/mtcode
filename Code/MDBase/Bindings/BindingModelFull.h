@@ -10,12 +10,21 @@ int N;
 matrix<double> doubrates;
 matrix<double> triprates;
 
+BindingModelFull(int);
+
 void doublet(bool before, int index1, int index2, bool &after);
 
-void triplet(bool fc, bool bef1, bool bef2, bool bef3, int index1, int index2, int index3, bool &after1, bool after2, bool &after3);
+void triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &after1, bool &after2, bool &after3);
 
 void nlet(vector1<bool> &befores, vector1<int> indices, vector1<bool> &afters) ;
 
+BindingModelFull *clone() const {
+    return new BindingModelFull(*this);
 };
+
+};
+
+
+#include "BindingModelFull.cpp"
 
 #endif /* BINDINGMODELFULL_H */

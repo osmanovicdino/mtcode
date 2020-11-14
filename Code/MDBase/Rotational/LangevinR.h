@@ -61,6 +61,17 @@ public:
 	// genmatx(const vector1<double> &arg);
 	// genmaty(const vector1<double> &arg);
 	// genmatz(const vector1<double> &arg);
+	void setorientation(matrix<double> &ort)  {
+		matrix<double> *res = ort.clone();
+		orient = res;
+		int jdimension = orient->getncols();
+		if (jdimension != 3*(*(this->geo)).dimension)
+		{
+			cout << dimension << " " << (*(this->geo)).dimension << endl;
+			error("set orient dimensions must match in MD");
+		}
+	}
+	
 	matrix<double> &getorientation()
 	{
 		return *(this->orient);
@@ -76,6 +87,29 @@ public:
 			o(0) * o(5) * o(7) - o(1) * o(3) * o(8) + o(0) * o(4) * o(8);
 	}
 
+	vector1<double> transformvector(vector1<double> &v, int p1) {
+		double qtemp0 = orient->gpcons(p1, 0);
+		double qtemp1 = orient->gpcons(p1, 1);
+		double qtemp2 = orient->gpcons(p1, 2);
+		double qtemp3 = orient->gpcons(p1, 3);
+		double qtemp4 = orient->gpcons(p1, 4);
+		double qtemp5 = orient->gpcons(p1, 5);
+		double qtemp6 = orient->gpcons(p1, 6);
+		double qtemp7 = orient->gpcons(p1, 7);
+		double qtemp8 = orient->gpcons(p1, 8);
+
+		vector1<double> newv(3);
+
+		double nxb1 = v[0];
+		double nyb1 = v[1];
+		double nzb1 = v[2];
+
+		newv[0] = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+		newv[1] = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+		newv[2] = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+		return newv;
+	}
+	void measured_temperature();
 	void measured_temperature(ofstream&);
 
 	vector1<double> genfullmat(int);

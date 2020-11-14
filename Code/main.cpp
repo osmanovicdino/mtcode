@@ -54,81 +54,309 @@ int main(int argc, char** argv) {
 
 srand (time(NULL));
 
-Condensate A(5.0, 4); //Create a condensate
+vector1<double> b(3);
+matrix<vector1<double>> a(3,3);
 
-cout << A.obj->getdat() << endl;
+{
+for(int i = 0  ; i < 3 ; i++) {
+    for(int j = 0 ; j < 3 ; j++) {
+        vector1<double> p(i+1,(double)j);
+        a(i,j) = p;
+    }
+}
+}
+
+cout << a(1,1) << endl;
+
+/* 
+int n = 4;
+
+Condensate A(5.0, n); //Create a condensate
 
 
-//SAVE CC
-// vector1<bool> already_accounted(200, false);
-// vector1<int> indexes(200,0);
-// int iter = 0;
-// vector1<int> demarkus(200,0);
-// int len_dem = 0;
+BindingModelFull b(n);
 
-// int num_con_comp = 0;
 
-// for (int i = 0; i < 200; i++) {
+matrix<double> matb(n*n,4);
 
-//     if (already_accounted[i] == false)
-//     {
-//         DFUtilstore(i, already_accounted, adj, lens, indexes, iter, len_dem);
+for(int i = 0  ; i < n ; i++) {
+    for(int j = i+1  ; j < n ; j++) {
+        int index1 = i*n+j;
+        if(i == 0) { //we define particle 0 as the promiscuous particle (can bind to anything)
+            matb(index1,0) = 0.0; //unbound->unbound
+            matb(index1,1) = 1.0; //unbound->bound
+            matb(index1,2) = 0.0; //bound -> unbound
+            matb(index1,3) = 1.0; //bound -> bound
+        }
+        else{ //no other particles can bind
+            matb(index1, 0) = 1.0; //unbound->unbound
+            matb(index1, 1) = 0.0; //unbound->bound
+            matb(index1, 2) = 1.0; //bound -> unbound
+            matb(index1, 3) = 0.0; //bound -> bound
+        }
+    }
+}
 
-//         demarkus[num_con_comp] = len_dem;
 
-//         num_con_comp++;
-//         len_dem = 0;
 
-//        // cout << "\n";
-//     }
-// }
 
-// cout << indexes << endl;
-// cout << demarkus << endl;
 
-//PRINT CC
-// for (int i = 0; i < 200; i++)
-// {
+b.doubrates = matb;
 
-//     if (already_accounted[i] == false)
-//     {
-//         DFUtil(i, already_accounted, adj, lens);
 
-//         // demarkus[num_con_comp] = len_dem;
 
-//         // num_con_comp++;
-//         // len_dem = 0;
+matrix<double> mat1(4, 4);
+matrix<double> mat2(4, 4);
+matrix<double> mat3(4, 4);
+matrix<double> mat4(4, 4);
 
-//          cout << "\n";
-//     }
-// }
-// Condensate A(25.0, 1000, 2);
 
-// vector1<double> as(16,10.0);
-// vector1<double> bs(16,1.5);
-// vector1<double> cs(16,pi/3.);
+//i ==0  j ==1 k == 2
+mat1(0,0) = 0.001;
+mat1(0,1) = 0.001;
+mat1(0,2) = 0.998;
+mat1(0,3) = 0.0;
+mat1(1,0) = 0.001;
+mat1(1,1) = 0.001;
+mat1(1,2) = 0.098;
+mat1(1,3) = 0.00;
+mat1(2,0) = 0.001;
+mat1(2,1) = 0.001;
+mat1(2,2) = 0.998;
+mat1(2,3) = 0.0;
+mat1(3,0) = 0.001;
+mat1(3,1) = 0.001;
+mat1(3,2) = 0.998;
+mat1(3,3) = 0.0;
 
-// //as[0] = 100.0;
+//i ==0  j ==1 k == 3
+mat2(0, 0) = 0.998;
+mat2(0, 1) = 0.001;
+mat2(0, 2) = 0.001;
+mat2(0, 3) = 0.0;
+mat2(1, 0) = 0.998;
+mat2(1, 1) = 0.001;
+mat2(1, 2) = 0.001;
+mat2(1, 3) = 0.00;
+mat2(2, 0) = 0.998;
+mat2(2, 1) = 0.001;
+mat2(2, 2) = 0.001;
+mat2(2, 3) = 0.0;
+mat2(3, 0) = 0.998;
+mat2(3, 1) = 0.001;
+mat2(3, 2) = 0.001;
+mat2(3, 3) = 0.0;
 
-// set_potential_bundle_tetrahedral(A, as, bs, cs);
 
-// for(double kT = 1.0 ; kT > 0.49 ; kT -= 0.1) {
+//i ==0  j ==2 k == 3
+mat3(0, 0) = 0.001;
+mat3(0, 1) = 0.001;
+mat3(0, 2) = 0.998;
+mat3(0, 3) = 0.0;
+mat3(1, 0) = 0.001;
+mat3(1, 1) = 0.001;
+mat3(1, 2) = 0.998;
+mat3(1, 3) = 0.00;
+mat3(2, 0) = 0.001;
+mat3(2, 1) = 0.001;
+mat3(2, 2) = 0.998;
+mat3(2, 3) = 0.0;
+mat3(3, 0) = 0.001;
+mat3(3, 1) = 0.001;
+mat3(3, 2) = 0.998;
+mat3(3, 3) = 0.0;
 
-// A.obj->setkT(kT);
-// stringstream ss;
-// ss << kT;
+//i ==1  j ==2 k == 3
+mat4(0, 0) = 0.0;
+mat4(0, 1) = 0.0;
+mat4(0, 2) = 0.0;
+mat4(0, 3) = 1.0;
+mat4(1, 0) = 0.0;
+mat4(1, 1) = 0.0;
+mat4(1, 2) = 0.0;
+mat4(1, 3) = 1.0;
+mat4(2, 0) = 0.0;
+mat4(2, 1) = 0.0;
+mat4(2, 2) = 0.0;
+mat4(2, 3) = 1.0;
+mat4(3, 0) = 0.0;
+mat4(3, 1) = 0.0;
+mat4(3, 2) = 0.0;
+mat4(3, 3) = 1.0;
 
-// string base = "_kT=";
-// base += ss.str();
+matrix<double> triprates(n*n*n,16);
+for(int i  = 0  ; i < n ; i++) {
+    for(int j = i+1 ; j < n ; j++) {
+        for(int k = j+1 ; k < n ; k++) {
+          //  cout << i << " " << j << " " << k << endl;
+            int indx = i*n*n+j*n+k;
+            //cout << indx << endl;
+            if(i == 0 && j ==1 && k == 2) {
+                triprates(indx, 0) =  mat1(0, 0); //from i,j tp i,j
+                triprates(indx, 1) =  mat1(0, 1);  //from i,j to j,k
+                triprates(indx, 2) =  mat1(0, 2);  //from i,j to i,k
+                triprates(indx, 3) =  mat1(0, 3);  //from i,j to nothing
+                triprates(indx, 4) =  mat1(1, 0);  //from j,k to i,j
+                triprates(indx, 5) =  mat1(1, 1);  //from j,k to j,k
+                triprates(indx, 6) =  mat1(1, 2);  //from j,k to i,k
+                triprates(indx, 7) =  mat1(1, 3);  //from j,k to nothing
+                triprates(indx, 8) =  mat1(2, 0);  //from i,k to i,j
+                triprates(indx, 9) =  mat1(2, 1);  //from i,k to j,k
+                triprates(indx, 10) = mat1(2, 2); //from i,k to i,k
+                triprates(indx, 11) = mat1(2, 3); //from i,k to nothing
+                triprates(indx, 12) = mat1(3, 0); //from nothing to i,j
+                triprates(indx, 13) = mat1(3, 1); //from nothing to j,k
+                triprates(indx, 14) = mat1(3, 2); //from nothing to i,k
+                triprates(indx, 15) = mat1(3, 3); //from nothing to nothing
+            }
+            else if(i==0 && j==1 && k ==3) 
+            {
+                triprates(indx, 0) = mat2(0, 0);  //from i,j tp i,j
+                triprates(indx, 1) = mat2(0, 1);  //from i,j to j,k
+                triprates(indx, 2) = mat2(0, 2);  //from i,j to i,k
+                triprates(indx, 3) = mat2(0, 3);  //from i,j to nothing
+                triprates(indx, 4) = mat2(1, 0);  //from j,k to i,j
+                triprates(indx, 5) = mat2(1, 1);  //from j,k to j,k
+                triprates(indx, 6) = mat2(1, 2);  //from j,k to i,k
+                triprates(indx, 7) = mat2(1, 3);  //from j,k to nothing
+                triprates(indx, 8) = mat2(2, 0);  //from i,k to i,j
+                triprates(indx, 9) = mat2(2, 1);  //from i,k to j,k
+                triprates(indx, 10) = mat2(2, 2); //from i,k to i,k
+                triprates(indx, 11) = mat2(2, 3); //from i,k to nothing
+                triprates(indx, 12) = mat2(3, 0); //from nothing to i,j
+                triprates(indx, 13) = mat2(3, 1); //from nothing to j,k
+                triprates(indx, 14) = mat2(3, 2); //from nothing to i,k
+                triprates(indx, 15) = mat2(3, 3); //from nothing to nothing
+            }
+            else if (i == 0 && j == 2 && k == 3)
+            {
+                triprates(indx, 0) = mat3(0, 0);  //from i,j tp i,j
+                triprates(indx, 1) = mat3(0, 1);  //from i,j to j,k
+                triprates(indx, 2) = mat3(0, 2);  //from i,j to i,k
+                triprates(indx, 3) = mat3(0, 3);  //from i,j to nothing
+                triprates(indx, 4) = mat3(1, 0);  //from j,k to i,j
+                triprates(indx, 5) = mat3(1, 1);  //from j,k to j,k
+                triprates(indx, 6) = mat3(1, 2);  //from j,k to i,k
+                triprates(indx, 7) = mat3(1, 3);  //from j,k to nothing
+                triprates(indx, 8) = mat3(2, 0);  //from i,k to i,j
+                triprates(indx, 9) = mat3(2, 1);  //from i,k to j,k
+                triprates(indx, 10) = mat3(2, 2); //from i,k to i,k
+                triprates(indx, 11) = mat3(2, 3); //from i,k to nothing
+                triprates(indx, 12) = mat3(3, 0); //from nothing to i,j
+                triprates(indx, 13) = mat3(3, 1); //from nothing to j,k
+                triprates(indx, 14) = mat3(3, 2); //from nothing to i,k
+                triprates(indx, 15) = mat3(3, 3); //from nothing to nothing
+            }
+            else if (i == 1 && j == 2 && k == 3)
+            {
+                triprates(indx, 0) = mat4(0, 0);  //from i,j tp i,j
+                triprates(indx, 1) = mat4(0, 1);  //from i,j to j,k
+                triprates(indx, 2) = mat4(0, 2);  //from i,j to i,k
+                triprates(indx, 3) = mat4(0, 3);  //from i,j to nothing
+                triprates(indx, 4) = mat4(1, 0);  //from j,k to i,j
+                triprates(indx, 5) = mat4(1, 1);  //from j,k to j,k
+                triprates(indx, 6) = mat4(1, 2);  //from j,k to i,k
+                triprates(indx, 7) = mat4(1, 3);  //from j,k to nothing
+                triprates(indx, 8) = mat4(2, 0);  //from i,k to i,j
+                triprates(indx, 9) = mat4(2, 1);  //from i,k to j,k
+                triprates(indx, 10) = mat4(2, 2); //from i,k to i,k
+                triprates(indx, 11) = mat4(2, 3); //from i,k to nothing
+                triprates(indx, 12) = mat4(3, 0); //from nothing to i,j
+                triprates(indx, 13) = mat4(3, 1); //from nothing to j,k
+                triprates(indx, 14) = mat4(3, 2); //from nothing to i,k
+                triprates(indx, 15) = mat4(3, 3); //from nothing to nothing
+            }
+            else{
+                //
+            }
+        }
+    }
+}
 
-// A.run(1000000,1000,base);
-// }
 
-// cout << (A.obj)->getdat() << endl;
 
-// cout << (A.obj)->getorientation() << endl;
+b.triprates =  triprates;
 
-/*
+SingPatch c(100.0,2.,pi/3.);
+
+A.setBindingModel(b);
+
+A.setpots(c);
+
+A.obj->setkT(1.0);
+
+
+A.run_singlebond( 100000,  100); */
+    //SAVE CC
+    // vector1<bool> already_accounted(200, false);
+    // vector1<int> indexes(200,0);
+    // int iter = 0;
+    // vector1<int> demarkus(200,0);
+    // int len_dem = 0;
+
+    // int num_con_comp = 0;
+
+    // for (int i = 0; i < 200; i++) {
+
+    //     if (already_accounted[i] == false)
+    //     {
+    //         DFUtilstore(i, already_accounted, adj, lens, indexes, iter, len_dem);
+
+    //         demarkus[num_con_comp] = len_dem;
+
+    //         num_con_comp++;
+    //         len_dem = 0;
+
+    //        // cout << "\n";
+    //     }
+    // }
+
+    // cout << indexes << endl;
+    // cout << demarkus << endl;
+
+    //PRINT CC
+    // for (int i = 0; i < 200; i++)
+    // {
+
+    //     if (already_accounted[i] == false)
+    //     {
+    //         DFUtil(i, already_accounted, adj, lens);
+
+    //         // demarkus[num_con_comp] = len_dem;
+
+    //         // num_con_comp++;
+    //         // len_dem = 0;
+
+    //          cout << "\n";
+    //     }
+    // }
+    // Condensate A(25.0, 1000, 2);
+
+    // vector1<double> as(16,10.0);
+    // vector1<double> bs(16,1.5);
+    // vector1<double> cs(16,pi/3.);
+
+    // //as[0] = 100.0;
+
+    // set_potential_bundle_tetrahedral(A, as, bs, cs);
+
+    // for(double kT = 1.0 ; kT > 0.49 ; kT -= 0.1) {
+
+    // A.obj->setkT(kT);
+    // stringstream ss;
+    // ss << kT;
+
+    // string base = "_kT=";
+    // base += ss.str();
+
+    // A.run(1000000,1000,base);
+    // }
+
+    // cout << (A.obj)->getdat() << endl;
+
+    // cout << (A.obj)->getorientation() << endl;
+
+    /*
 vector1<bool> pb(3,true);
 cube geo(5.1,pb,3);
 
@@ -436,5 +664,5 @@ if(i%every== 0) {
 
 */
 
-return 0;
+    return 0;
 }

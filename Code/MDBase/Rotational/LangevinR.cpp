@@ -87,6 +87,31 @@ void LangevinNVTR::measured_temperature(ofstream& myfile) {
     myfile << angav[2] << "\n";
 }
 
+void LangevinNVTR::measured_temperature()
+{
+    int ds = this->getdimension();
+    vector1<double> momav(ds);
+    vector1<double> angav(ds);
+    for (int i = 0; i < (*mom).getNsafe(); i++)
+    {
+        for (int i1 = 0; i1 < ds; i1++)
+        {
+            momav[i1] += ((*mom)(i, i1) * (*mom)(i, i1)) / (2. * m);
+            angav[i1] += ((*angmom)(i, i1) * (*angmom)(i, i1)) / (2. * im[0]);
+        }
+    }
+    momav /= ((double)(mom->getNsafe()));
+    angav /= ((double)(angmom->getNsafe()));
+
+    cout << momav[0] << ",";
+    cout << momav[1] << ",";
+    cout << momav[2] << ",";
+
+    cout << angav[0] << ",";
+    cout << angav[1] << ",";
+    cout << angav[2] << "\n";
+}
+
 void LangevinNVTR::initialize(matrix<double> &positions)
 {
     this->setdat(positions);
@@ -152,6 +177,9 @@ void LangevinNVTR::initialize(matrix<double> &positions, matrix<double> &momenta
 }
 
 void LangevinNVTR::advancemom_halfstep(matrix<double> &F, matrix<double> &T)  {
+
+    //where F is in LAB FRAME
+    //and T is in BODY FRAME
     #pragma omp parallel for
     for (int i = 0; i < (*mom).getNsafe(); i++)
     {
@@ -181,6 +209,7 @@ void LangevinNVTR::advance_pos() {
     }
     (*this->geo).correct_position_and_momentum(*dat, *mom);
 }
+
 
 vector1<double> LangevinNVTR::genfullmat(int i) {
     double ix = im[0];
@@ -224,6 +253,95 @@ vector1<double> LangevinNVTR::genfullmat(int i) {
     return up;
 }
 
+void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel)
+{ //adds friction and noise
+
+    //NO TRANSLATIONAL/ROTATIONAL COUPLING
+
+    //calculate forces and torques in lab frame:
+
+    int Ns = angmom->getNsafe();
+
+#pragma omp parallel for
+    for (int i = 0; i < Ns; i++)
+    {
+        double qtemp0 = orient->operator()(i, 0);
+        double qtemp1 = orient->operator()(i, 1);
+        double qtemp2 = orient->operator()(i, 2);
+        double qtemp3 = orient->operator()(i, 3);
+        double qtemp4 = orient->operator()(i, 4);
+        double qtemp5 = orient->operator()(i, 5);
+        double qtemp6 = orient->operator()(i, 6);
+        double qtemp7 = orient->operator()(i, 7);
+        double qtemp8 = orient->operator()(i, 8);
+
+        double plx = mom->operator()(i, 0);
+        double ply = mom->operator()(i, 1);
+        double plz = mom->operator()(i, 2);
+
+        double llx = angmom->operator()(i, 0);
+        double lly = angmom->operator()(i, 1);
+        double llz = angmom->operator()(i, 2);
+
+        double pbx = qtemp0 * plx + qtemp1 * ply + qtemp2 * plz;
+        double pby = qtemp3 * plx + qtemp4 * ply + qtemp5 * plz;
+        double pbz = qtemp6 * plx + qtemp7 * ply + qtemp8 * plz;
+
+        double fbrfx = (-gamma / m) * pbx;
+        double fbrfy = (-gamma / m) * pby;
+        double fbrfz = (-gamma / m) * pbz;
+
+        double tbrfx = (-gammar / im[0]) * llx;
+        double tbrfy = (-gammar / im[4]) * lly;
+        double tbrfz = (-gammar / im[8]) * llz;
+
+        double fbrrx = Rt * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrry = Rt * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrrz = Rt * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrrx = Rr * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrry = Rr * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrrz = Rr * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+
+        double fx = forcel(i, 0) + (fbrfx + fbrrx) * qtemp0 + (fbrfy + fbrry) * qtemp3 + (fbrfz + fbrrz) * qtemp6;
+        double fy = forcel(i, 1) + (fbrfx + fbrrx) * qtemp1 + (fbrfy + fbrry) * qtemp4 + (fbrfz + fbrrz) * qtemp7;
+        double fz = forcel(i, 2) + (fbrfx + fbrrx) * qtemp2 + (fbrfy + fbrry) * qtemp5 + (fbrfz + fbrrz) * qtemp8;
+
+        //double tx = torquel(i, 0) + (tbrfx + tbrrx) * qtemp0 + (tbrfy + tbrry) * qtemp3 + (tbrfz + tbrrz) * qtemp6;
+        //double ty = torquel(i, 1) + (tbrfx + tbrrx) * qtemp1 + (tbrfy + tbrry) * qtemp4 + (tbrfz + tbrrz) * qtemp7;
+        //double tz = torquel(i, 2) + (tbrfx + tbrrx) * qtemp2 + (tbrfy + tbrry) * qtemp5 + (tbrfz + tbrrz) * qtemp8;
+        double tbx = tbrfx + tbrrx + torquel(i, 0) * qtemp0 + torquel(i, 1) * qtemp1 + torquel(i, 2) * qtemp2;
+        double tby = tbrfy + tbrry + torquel(i, 0) * qtemp3 + torquel(i, 1) * qtemp4 + torquel(i, 2) * qtemp5;
+        double tbz = tbrfz + tbrrz + torquel(i, 0) * qtemp6 + torquel(i, 1) * qtemp7 + torquel(i, 2) * qtemp8;
+
+        // cout << "before" << endl;
+        // cout << Rt <<  " " << Rr << endl;
+        // cout << forcel(i,0) << " " << torquel(i, 0) << endl;
+        // cout << forcel(i, 1) << " " << torquel(i, 1) << endl;
+        // cout << forcel(i, 2) << " " << torquel(i, 2) << endl;
+        // cout << "after" << endl;
+        // cout << fx << " " << tbx << endl;
+        // cout << fy << " " << tby << endl;
+        // cout << fz << " " << tbz << endl;
+
+        // pausel();
+
+        forcel(i, 0) = fx;
+        forcel(i, 1) = fy;
+        forcel(i, 2) = fz;
+
+        torquel(i, 0) = tbx;
+        torquel(i, 1) = tby;
+        torquel(i, 2) = tbz;
+        // mom->operator()(i, 0) = mom->operator()(i, 0) + (dt / 2.) * fx;
+        // mom->operator()(i, 1) = mom->operator()(i, 1) + (dt / 2.) * fy;
+        // mom->operator()(i, 2) = mom->operator()(i, 2) + (dt / 2.) * fz;
+
+        // angmom->operator()(i, 0) = angmom->operator()(i, 0) + (dt / 2.) * tbx;
+        // angmom->operator()(i, 1) = angmom->operator()(i, 1) + (dt / 2.) * tby;
+        // angmom->operator()(i, 2) = angmom->operator()(i, 2) + (dt / 2.) * tbz;
+    }
+    //in the following, we assume the centre of resistance is the same as the centre of mass
+}
 
 void LangevinNVTR::rotate() {
     // updates the matrices q and qt;
@@ -242,29 +360,76 @@ void LangevinNVTR::rotate() {
         double jtemp1 = jx * rr[3] + jy * rr[4] + jz * rr[5];
         double jtemp2 = jx * rr[6] + jy * rr[7] + jz * rr[8];
 
-        double qtemp0 = orient->operator()(i, 0) * rr[0] + orient->operator()(i, 1) * rr[1] + orient->operator()(i, 2) * rr[2];
-        double qtemp1 = orient->operator()(i, 0) * rr[3] + orient->operator()(i, 1) * rr[4] + orient->operator()(i, 2) * rr[5];
-        double qtemp2 = orient->operator()(i, 0) * rr[6] + orient->operator()(i, 1) * rr[7] + orient->operator()(i, 2) * rr[8];
-        double qtemp3 = orient->operator()(i, 3) * rr[0] + orient->operator()(i, 4) * rr[1] + orient->operator()(i, 5) * rr[2];
-        double qtemp4 = orient->operator()(i, 3) * rr[3] + orient->operator()(i, 4) * rr[4] + orient->operator()(i, 5) * rr[5];
-        double qtemp5 = orient->operator()(i, 3) * rr[6] + orient->operator()(i, 4) * rr[7] + orient->operator()(i, 5) * rr[8];
-        double qtemp6 = orient->operator()(i, 6) * rr[0] + orient->operator()(i, 7) * rr[1] + orient->operator()(i, 8) * rr[2];
-        double qtemp7 = orient->operator()(i, 6) * rr[3] + orient->operator()(i, 7) * rr[4] + orient->operator()(i, 8) * rr[5];
-        double qtemp8 = orient->operator()(i, 6) * rr[6] + orient->operator()(i, 7) * rr[7] + orient->operator()(i, 8) * rr[8];
+        // cout << "particle " << i << endl;
 
-        angmom->operator()(i, 0) = jtemp0;
-        angmom->operator()(i, 1) = jtemp1;
-        angmom->operator()(i, 2) = jtemp2;
+        // cout << "Rotate matrix" << endl;
 
-        orient->operator()(i, 0) = qtemp0;
-        orient->operator()(i, 1) = qtemp1;
-        orient->operator()(i, 2) = qtemp2;
-        orient->operator()(i, 3) = qtemp3;
-        orient->operator()(i, 4) = qtemp4;
-        orient->operator()(i, 5) = qtemp5;
-        orient->operator()(i, 6) = qtemp6;
-        orient->operator()(i, 7) = qtemp7;
-        orient->operator()(i, 8) = qtemp8;
+        // cout << rr[0] << " " << rr[1] << " " << rr[2] << endl;
+        // cout << rr[3] << " " << rr[4] << " " << rr[5] << endl;
+        // cout << rr[6] << " " << rr[7] << " " << rr[8] << endl;
+
+        // cout << endl;
+
+        // cout << "Ang before: " << endl;
+        // cout << jx << " " << jy << " " << jz << endl;
+        // cout << "Ang after: " << endl;
+        // cout << jtemp0 << " " << jtemp1 << " " << jtemp2 << endl;
+        // cout << endl;
+        
+
+        // double qtemp0 = orient->operator()(i, 0) * rr[0] + orient->operator()(i, 1) * rr[1] + orient->operator()(i, 2) * rr[2];
+        // double qtemp1 = orient->operator()(i, 0) * rr[3] + orient->operator()(i, 1) * rr[4] + orient->operator()(i, 2) * rr[5];
+        // double qtemp2 = orient->operator()(i, 0) * rr[6] + orient->operator()(i, 1) * rr[7] + orient->operator()(i, 2) * rr[8];
+        // double qtemp3 = orient->operator()(i, 3) * rr[0] + orient->operator()(i, 4) * rr[1] + orient->operator()(i, 5) * rr[2];
+        // double qtemp4 = orient->operator()(i, 3) * rr[3] + orient->operator()(i, 4) * rr[4] + orient->operator()(i, 5) * rr[5];
+        // double qtemp5 = orient->operator()(i, 3) * rr[6] + orient->operator()(i, 4) * rr[7] + orient->operator()(i, 5) * rr[8];
+        // double qtemp6 = orient->operator()(i, 6) * rr[0] + orient->operator()(i, 7) * rr[1] + orient->operator()(i, 8) * rr[2];
+        // double qtemp7 = orient->operator()(i, 6) * rr[3] + orient->operator()(i, 7) * rr[4] + orient->operator()(i, 8) * rr[5];
+        // double qtemp8 = orient->operator()(i, 6) * rr[6] + orient->operator()(i, 7) * rr[7] + orient->operator()(i, 8) * rr[8];
+
+double qtemp0 = orient->operator()(i,0)* rr[0]+orient->operator()(i,3)* rr[3]+orient->operator()(i,6)* rr[6];
+
+double qtemp1 = orient->operator()(i, 1) * rr[0] + orient->operator()(i, 4) * rr[3] + orient->operator()(i, 7) * rr[6];
+
+double qtemp2 = orient->operator()(i, 2) * rr[0] + orient->operator()(i, 5) * rr[3] + orient->operator()(i, 8) * rr[6];
+
+double qtemp3 = orient->operator()(i, 0) * rr[1] + orient->operator()(i, 3) * rr[4] + orient->operator()(i, 6) * rr[7];
+
+double qtemp4 = orient->operator()(i, 1) * rr[1] + orient->operator()(i, 4) * rr[4] + orient->operator()(i, 7) * rr[7];
+
+double qtemp5 = orient->operator()(i, 2) * rr[1] + orient->operator()(i, 5) * rr[4] + orient->operator()(i, 8) * rr[7];
+
+double qtemp6 = orient->operator()(i, 0) * rr[2] + orient->operator()(i, 3) * rr[5] + orient->operator()(i, 6) * rr[8];
+
+double qtemp7 = orient->operator()(i, 1) * rr[2] + orient->operator()(i, 4) * rr[5] + orient->operator()(i, 7) * rr[8];
+
+double qtemp8 = orient->operator()(i, 2) * rr[2] + orient->operator()(i, 5) * rr[5] + orient->operator()(i, 8) * rr[8];
+
+// cout << "Q before: " << endl;
+// cout << orient->operator()(i, 0) << " " << orient->operator()(i, 1) << " " << orient->operator()(i, 2) << endl;
+// cout << orient->operator()(i, 3) << " " << orient->operator()(i, 4) << " " << orient->operator()(i, 5) << endl;
+// cout << orient->operator()(i, 6) << " " << orient->operator()(i, 7) << " " << orient->operator()(i, 8) << endl;
+// cout << endl;
+// cout << "Q after: " << endl;
+// cout << qtemp0 << " " << qtemp1 << " " << qtemp2 << endl;
+// cout << qtemp3 << " " << qtemp4 << " " << qtemp5 << endl;
+// cout << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
+
+// pausel();
+
+angmom->operator()(i, 0) = jtemp0;
+angmom->operator()(i, 1) = jtemp1;
+angmom->operator()(i, 2) = jtemp2;
+
+orient->operator()(i, 0) = qtemp0;
+orient->operator()(i, 1) = qtemp1;
+orient->operator()(i, 2) = qtemp2;
+orient->operator()(i, 3) = qtemp3;
+orient->operator()(i, 4) = qtemp4;
+orient->operator()(i, 5) = qtemp5;
+orient->operator()(i, 6) = qtemp6;
+orient->operator()(i, 7) = qtemp7;
+orient->operator()(i, 8) = qtemp8;
     }
 
 }
@@ -411,6 +576,13 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
                 double tjz;
 
                 (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
+
+
+                // cout << fx <<" " << fy << " " << fz << endl;
+                // cout << dis << endl;
+                // cout << un << endl;
+                // cout << iny.potential_bundle[potn]->getparameters() << endl;
+                // if(fx>1E-5) pausel();
 
                 forces(p1, 0) += fx;
                 forces(p1, 1) += fy;
@@ -814,97 +986,6 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ve
     // }
 
 
-void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel) { //adds friction and noise
-
-
-    //NO TRANSLATIONAL/ROTATIONAL COUPLING
-
-    //calculate forces and torques in lab frame:
-
-    int Ns =  angmom->getNsafe();
-
-    #pragma omp parallel for
-    for (int i = 0; i < Ns ; i++) {
-        double qtemp0 = orient->operator()(i, 0);
-        double qtemp1 = orient->operator()(i, 1);
-        double qtemp2 = orient->operator()(i, 2);
-        double qtemp3 = orient->operator()(i, 3);
-        double qtemp4 = orient->operator()(i, 4);
-        double qtemp5 = orient->operator()(i, 5);
-        double qtemp6 = orient->operator()(i, 6);
-        double qtemp7 = orient->operator()(i, 7);
-        double qtemp8 = orient->operator()(i, 8);
-
-        double plx = mom->operator()(i, 0);
-        double ply = mom->operator()(i, 1);
-        double plz = mom->operator()(i, 2);
-
-        double llx = angmom->operator()(i, 0);
-        double lly = angmom->operator()(i, 1);
-        double llz = angmom->operator()(i, 2);
-
-        double pbx = qtemp0 * plx + qtemp1 * ply + qtemp2 * plz;
-        double pby = qtemp3 * plx + qtemp4 * ply + qtemp5 * plz;
-        double pbz = qtemp6 * plx + qtemp7 * ply + qtemp8 * plz;
-
-        double fbrfx = (-gamma/m) * pbx;
-        double fbrfy = (-gamma/m) * pby;
-        double fbrfz = (-gamma/m) * pbz;
-
-
-    
-        double tbrfx = (-gammar / im[0]) * llx;
-        double tbrfy = (-gammar / im[4]) * lly;
-        double tbrfz = (-gammar / im[8]) * llz;
-
-        double fbrrx = Rt * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double fbrry = Rt * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double fbrrz = Rt * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrrx = Rr * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrry = Rr * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrrz = Rr * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-
-        double fx = forcel(i,0) + (fbrfx + fbrrx) * qtemp0 + (fbrfy + fbrry) * qtemp3 + (fbrfz + fbrrz) * qtemp6;
-        double fy = forcel(i,1) + (fbrfx + fbrrx) * qtemp1 + (fbrfy + fbrry) * qtemp4 + (fbrfz + fbrrz) * qtemp7;
-        double fz = forcel(i, 2) + (fbrfx + fbrrx) * qtemp2 + (fbrfy + fbrry) * qtemp5 + (fbrfz + fbrrz) *qtemp8;
-
-        //double tx = torquel(i, 0) + (tbrfx + tbrrx) * qtemp0 + (tbrfy + tbrry) * qtemp3 + (tbrfz + tbrrz) * qtemp6;
-        //double ty = torquel(i, 1) + (tbrfx + tbrrx) * qtemp1 + (tbrfy + tbrry) * qtemp4 + (tbrfz + tbrrz) * qtemp7;
-        //double tz = torquel(i, 2) + (tbrfx + tbrrx) * qtemp2 + (tbrfy + tbrry) * qtemp5 + (tbrfz + tbrrz) * qtemp8;
-        double tbx = tbrfx + tbrrx + torquel(i,0)* qtemp0 + torquel(i,1)* qtemp1 + torquel(i,2)*qtemp2;
-        double tby = tbrfy + tbrry + torquel(i, 0) * qtemp3 + torquel(i, 1) * qtemp4 + torquel(i, 2) * qtemp5;
-        double tbz = tbrfz + tbrrz + torquel(i, 0) * qtemp6 + torquel(i, 1) * qtemp7 + torquel(i, 2) * qtemp8;
-
-        // cout << "before" << endl;
-        // cout << Rt <<  " " << Rr << endl;
-        // cout << forcel(i,0) << " " << torquel(i, 0) << endl;
-        // cout << forcel(i, 1) << " " << torquel(i, 1) << endl;
-        // cout << forcel(i, 2) << " " << torquel(i, 2) << endl;
-        // cout << "after" << endl;
-        // cout << fx << " " << tbx << endl;
-        // cout << fy << " " << tby << endl;
-        // cout << fz << " " << tbz << endl;
-
-        // pausel();
-
-        forcel(i, 0) = fx;
-        forcel(i, 1) = fy;
-        forcel(i, 2) = fz;
-
-        torquel(i, 0) = tbx;
-        torquel(i, 1) = tby;
-        torquel(i, 2) = tbz;
-        // mom->operator()(i, 0) = mom->operator()(i, 0) + (dt / 2.) * fx;
-        // mom->operator()(i, 1) = mom->operator()(i, 1) + (dt / 2.) * fy;
-        // mom->operator()(i, 2) = mom->operator()(i, 2) + (dt / 2.) * fz;
-
-        // angmom->operator()(i, 0) = angmom->operator()(i, 0) + (dt / 2.) * tbx;
-        // angmom->operator()(i, 1) = angmom->operator()(i, 1) + (dt / 2.) * tby;
-        // angmom->operator()(i, 2) = angmom->operator()(i, 2) + (dt / 2.) * tbz;
-    }
-    //in the following, we assume the centre of resistance is the same as the centre of mass
-
-}
 
 
 

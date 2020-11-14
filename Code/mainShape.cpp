@@ -70,11 +70,11 @@ int particles_of_typeB = 0; //set to 0 for 1 liquid
 
 //SET NUMBER OF MICROTUBULES
 
-int number_of_mircrotubules = 3;
+int number_of_mircrotubules = 1;
 
 //SET LENGTH OF MICROTUBULE IN MONOMERS
 
-int length_of_microtubule = 50;
+int length_of_microtubule = 50; //SET THIS TO BE THE TOTAL NUMBER OF PARTICLES IN THE SYSTEM
 
 //Call the microtubule constructor;
 
@@ -227,7 +227,22 @@ spatial_viscosity q;
 
 cout << "start" << endl;
 
-a.runMTONLY(10000,1000,q);
+//This is the distance we create bonds up tp
+double distance_to_create_bonds_up_to = 2.0;
+
+//the following vectors define the orientation of the active force:
+
+vector1<int> p1(3);
+
+vector1<int> p2(3);
+
+//these define the directions of the active forces, going along the axis of p1 to p2.
+p1[0] = 0; p2[0] = 1;
+p1[1] = 2; p2[1] = 3;
+p1[2] = 4; p2[2] = 5;
+
+
+a.runMTONLY_initialstate(10000,1000,q,distance_to_create_bonds_up_to,p1,p2);
 
 
 return 0;

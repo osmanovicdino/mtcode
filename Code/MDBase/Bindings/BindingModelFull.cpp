@@ -1,8 +1,10 @@
 #ifndef BINDINGMODELFULL_CPP
 #define BINDINGMODELFULL_CPP
 
-BindingModelFull::BindingModelFull(int n) : N(n), doubrates(matrix<double>(n * n,2)), triprates(matrix<double>(n * n * n,16))
+BindingModelFull::BindingModelFull(int n) : N(n), doubrates(matrix<double>(n * n,4)), triprates(matrix<double>(n * n * n,16))
 {
+
+//this sets up the initial model, however the rates are zero
 
 }
 
@@ -19,33 +21,50 @@ void BindingModelFull::doublet(bool before, int index1, int index2, bool &after)
     }
 
     int ing = index1*N+index2;
-    // int rate_index = index1*N+index2;
-    // if(before = true) {
-    // double rate = doubrates_off[rate_index];
-    
-    // double r1 = (double)rand()/(double)(RAND_MAX)
-    // if(rate > r1 ) {
-    //     after = true;
-    // }
-    // else {
-    //     after = false;
-    // }
-    // }
-    // else {
-    // double rate =  doubrates_on[rate_index];
 
-    // double r1 = (double)rand()(double)(RAND_MAX);
+    double r1 = doubrates(ing, i1 * 2 + 0); //rate to unbound
+    double r2 = doubrates(ing, i1 * 2 + 1); //rate to bound
 
-    // if(rate > r1 ) {
-    //     after = true;
-    // }
-    // else{
-    //     after = false;
-    // }
+    double totalr = r1 + r2 ;
 
-    // }
-}
+    double rr = totalr * ((double)rand() / (double)(RAND_MAX));
 
+    if (rr < r1)
+    {
+        after = false;
+    }
+    else {
+        after = true; //becomes bound
+    }
+
+        //there are no constraints here;
+
+        // int rate_index = index1*N+index2;
+        // if(before = true) {
+        // double rate = doubrates_off[rate_index];
+
+        // double r1 = (double)rand()/(double)(RAND_MAX)
+        // if(rate > r1 ) {
+        //     after = true;
+        // }
+        // else {
+        //     after = false;
+        // }
+        // }
+        // else {
+        // double rate =  doubrates_on[rate_index];
+
+        // double r1 = (double)rand()(double)(RAND_MAX);
+
+        // if(rate > r1 ) {
+        //     after = true;
+        // }
+        // else{
+        //     after = false;
+        // }
+
+        // }
+    }
 
 //FULL CHARACERITZATION WOULD NEED US TO DEFINE 16 matrices for every possible combo here
 void BindingModelFull::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13)
@@ -91,7 +110,7 @@ void BindingModelFull::triplet(bool b12, bool b23, bool b13, bool c12, bool c23,
 
     double totalr = r1+r2+r3+r4;
 
-    double rr = totalr*(double)rand()/(double)(RAND_MAX);
+    double rr = totalr*((double)rand()/(double)(RAND_MAX));
 
     if(rr < r1) {
         a12 = true;
@@ -144,5 +163,7 @@ void BindingModelFull::nlet(vector1<bool> &befores, vector1<int> indices, vector
     error("nlets are too hard without simplifications");
 
 }
+
+
 
 #endif /* BINDINGMODELFULL_CPP */
