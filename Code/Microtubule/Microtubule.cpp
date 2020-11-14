@@ -458,7 +458,11 @@ void Microtubule::set_initial_conditions(string filename1, string filename2, str
 
 	if(particleA.getNsafe() != na ) error("size of data in filename A not correct");
 	if(particleB.getNsafe() != nb ) error("size of data in filename B not correct");
-	if(microt.getNsafe() != nc ) error("size of data in filename C not correct");
+	if(microt.getNsafe() != nc ) {
+		cout << "number of microtubules defined in simulator: " << nc << endl;
+		cout << "length of file: " << microt.getNsafe() << endl;
+		error("size of data in filename C not correct");
+	} 
 
 	if(err1) error("error in importing file 1");
 	if(err2) error("error in importing file 2");
