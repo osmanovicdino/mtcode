@@ -1127,6 +1127,8 @@ void Microtubule::runMTONLY_initialstate(int runtime, int every, Fun func, doubl
 
     cout << 2 << endl;
 
+
+
     cout << "all set up" << endl;
 
     int i;

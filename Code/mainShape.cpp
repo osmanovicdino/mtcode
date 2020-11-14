@@ -70,12 +70,18 @@ int particles_of_typeB = 0; //set to 0 for 1 liquid
 
 //SET NUMBER OF MICROTUBULES
 
+string filename1 = "/home/dino/Desktop/tylercollab/LegacyCode/config_files/pa.csv";  //FULL FILE PATH TO INITIAL A PARTICLE DATA
+string filename2 = "/home/dino/Desktop/tylercollab/LegacyCode/config_files/pb.csv"; //FULL FILE PATH TO INITIAL B PARTICLE DATA
+string filename3 = "/home/dino/Desktop/tylercollab/LegacyCode/config_files/pc.csv"; //FULL FILE PATH TO INITIAL MIRCROTUBULE DATA
+
 int number_of_mircrotubules = 1;
 
 //SET LENGTH OF MICROTUBULE IN MONOMERS
 
-int length_of_microtubule = 50; //SET THIS TO BE THE TOTAL NUMBER OF PARTICLES IN THE SYSTEM
-
+// int length_of_microtubule = 150; //SET THIS TO BE THE TOTAL NUMBER OF PARTICLES IN THE SYSTEM
+bool err1;
+double tg;
+int length_of_microtubule = (importcsv(filename3, tg, err1)).getnrows();
 //Call the microtubule constructor;
 
 Microtubule a(simulation_box_length,particles_of_typeA,particles_of_typeB,number_of_mircrotubules,length_of_microtubule);
@@ -129,9 +135,6 @@ a.set_excess_force_distance(excess_force_distance);
 
 //UNCOMMENT THE FOLLOWING FOR SETTING UP AN INITIAL SYSTEM
 
-string filename1 = "/home/dino/Desktop/tylercollab/LegacyCode/config_files/pa.csv"; //FULL FILE PATH TO INITIAL A PARTICLE DATA
-string filename2 = "/home/dino/Desktop/tylercollab/LegacyCode/config_files/pb.csv"; //FULL FILE PATH TO INITIAL B PARTICLE DATA
-string filename3 = "/home/dino/Desktop/tylercollab/LegacyCode/config_files/pc.csv"; //FULL FILE PATH TO INITIAL MIRCROTUBULE DATA
 
 a.set_initial_conditions(filename1,filename2,filename3); //THE ROUTINE TO IMPORT STRING FILENAMES IS IN MATRIX2.CPP (importcsv) if there are architectural differences you need to modify the function
 
