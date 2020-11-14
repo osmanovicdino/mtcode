@@ -131,10 +131,9 @@ Microtubule::Microtubule(double ll, int Na, int Nb, int nmic, int LL) : pai(vect
 	//cout << totalN << endl;
 	matrix<double> store(totalN,dimension);
 	int gh = (int)((double)(L-1.)/(2.*sigma));
-	//double b = 1.0;
-	//cout << gh << endl;
-//	cout << gh << endl;
-	//double orient  = 0;
+
+	if(L< 0.5*ll) {
+
 	for(int i = 0 ; i < number_of_microtubules ; i++) { //SET UP POLYMERS
 		//cout << i << endl;
 		int randint =(rand() % (possible_pos_x.size())); //position of middle point
@@ -147,29 +146,10 @@ Microtubule::Microtubule(double ll, int Na, int Nb, int nmic, int LL) : pai(vect
 		store(i*L+na+nb+j,0) =  possible_pos_x[randint];
 		store(i*L+na+nb+j,1) =  possible_pos_y[randint]-gh+j;
 		}
-		// cout << i << endl;
-		// cout << possible_pos_x[randint] << ", " << possible_pos_y[randint] << endl; 
-		//cout << randint << endl;
-		//cout << possible_pos_x[randint] << ", " << possible_pos_y[randint] << endl;
-		//store(i,1) =  possible_pos[randint][1];
-		//store(i,2) =  possible_pos[randint][2];
-		// for(int j = 0 ; j < 2*gh+1 ; j++) {
-		// //cout << j << endl;
-		// 	possible_pos_x
 
 
 		} while ( !(possible_pos_x[randint]>L? true : false) && !(possible_pos_x[randint]<l-L ? true : false) && !(possible_pos_y[randint]>L ? true : false) && !(possible_pos_y[randint]<l-L ? true : false) );
-		// }
-		//cout << possible_pos_x.size() << endl;
 
-		// cout << randint << endl;
-		// for(int k = randint-gh ;  k <= randint+gh ; k++) {
-		// cout << possible_pos_x[k] << " " << possible_pos_y[k] << endl;
-		// }
-		// for(int k =na+nb ; k < totalN ; k++) {
-		// cout << store(k,'r') << endl;
-		// }
-		// pausel();
 
 		vector<double>::iterator it1,it2;
 		it1 = possible_pos_x.begin();
@@ -186,6 +166,7 @@ Microtubule::Microtubule(double ll, int Na, int Nb, int nmic, int LL) : pai(vect
 		possible_pos_y.erase(it3,it4);
 
 	}	
+	}
 
 
 		// for(int j = 0 ; j < dimension ; j++) {

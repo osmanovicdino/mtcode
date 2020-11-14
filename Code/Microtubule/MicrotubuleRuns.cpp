@@ -1145,7 +1145,7 @@ void Microtubule::runMTONLY_initialstate(int runtime, int every, Fun func, doubl
 
         //	cout << "active forces" << endl;
         //cout << "pos forces" << endl;
-        matrix<double> F6((*obj).calculateforces_sp(*bindpairs, *bindm, params));
+        matrix<double> F6((*obj).calculateforces_sp(*bindpairs, *bindp, params));
 
         matrix<double> F = ftemp1 + F5 + F6; //+F4+F5;
 
