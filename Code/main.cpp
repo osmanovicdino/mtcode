@@ -54,19 +54,34 @@ int main(int argc, char** argv) {
 
 srand (time(NULL));
 
-vector1<double> b(3);
-matrix<vector1<double>> a(3,3);
+int n = 1000;
 
+Condensate A(25.0, n);
+
+TetrahedralPatch c(10.0, 1.5, pi / 3.);
+
+BindingModelSingle b(1.0,0.0);
+
+A.setBindingModel(b);
+
+A.setpots(c);
+
+for (double kT = 1.0; kT > 0.49; kT -= 0.1)
 {
-for(int i = 0  ; i < 3 ; i++) {
-    for(int j = 0 ; j < 3 ; j++) {
-        vector1<double> p(i+1,(double)j);
-        a(i,j) = p;
-    }
-}
+
+    A.obj->setkT(kT);
+    stringstream ss;
+    ss << kT;
+
+    string base = "_kT=";
+    base += ss.str();
+
+    A.run_singlebond(100000, 100);
 }
 
-cout << a(1,1) << endl;
+
+
+
 
 /* 
 int n = 4;

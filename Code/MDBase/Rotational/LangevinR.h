@@ -7,6 +7,7 @@
 #include "../Bindings/GraphAlgorithms.h"
 #include "../Bindings/BinaryBindStore.h"
 #include "../Bindings/BindingModelFull.h"
+#include "../Bindings/BindingModelSingle.h"
 #include "../Potentials/combopatch.h"
 
 class LangevinNVTR : public LangevinNVT {

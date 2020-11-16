@@ -124,6 +124,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
    // cout << tempbound << endl;
 
     //Now we have the clusters. For each of these clusters, there is so some transition rate from one to another
+
+    #pragma omp parallel for
     for (int i = 0; i < nbins.getsize() - 1; i++)
     {
 
@@ -281,6 +283,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         else
         {
             //error("the mythical 4 cluster, get to work, slob!");
+            
         }
     }
 
