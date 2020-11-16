@@ -14,7 +14,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     vector1<int> tempbound(total_number_of_patches); //no binding to begin wtih
 
-    int depth_of_matrix = 4; //Choose this value to be deep enough such that all values can be stored
+    int depth_of_matrix = 5; //Choose this value to be deep enough such that all values can be stored
 
     matrix<int> boindices(total_number_of_patches, depth_of_matrix);
 
@@ -98,7 +98,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
                 double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
 
-                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < 1.25 * disp)
+                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < 1. * disp)
                 {
                     int wp1,wp2;
                     iny.which_patch(p1,p2,potn,wp1,wp2);
