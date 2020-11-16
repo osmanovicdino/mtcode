@@ -9,7 +9,7 @@ Condensate::Condensate(double ll, int N)  {
 
     this->setpots(temp_patch);
 
-    BindingModelFull temp_bind(N);
+    BindingModelSingle temp_bind(1.0,0.0);
 
     this->setBindingModel(temp_bind);
 

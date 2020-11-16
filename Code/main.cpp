@@ -58,6 +58,8 @@ int n = 1000;
 
 Condensate A(25.0, n);
 
+
+
 TetrahedralPatch c(10.0, 1.5, pi / 3.);
 
 BindingModelSingle b(1.0,0.0);
@@ -65,6 +67,7 @@ BindingModelSingle b(1.0,0.0);
 A.setBindingModel(b);
 
 A.setpots(c);
+
 
 for (double kT = 1.0; kT > 0.49; kT -= 0.1)
 {
@@ -76,7 +79,7 @@ for (double kT = 1.0; kT > 0.49; kT -= 0.1)
     string base = "_kT=";
     base += ss.str();
 
-    A.run_singlebond(100000, 100);
+    A.run_singlebond(1000000, 100);
 }
 
 
