@@ -388,7 +388,12 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
 
             if (argthetai > cos(thetam) && argthetaj > cos(thetam))
             {
+                if(argthetai>1.) 
+                argthetai = 0.999999;
 
+                if (argthetaj > 1.)
+                    argthetaj = 0.999999;
+                
                 double thetai = acos(argthetai);
 
                 double thetaj = acos(argthetaj);
@@ -481,6 +486,24 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
                 // cout << tix << "," << tiy << "," << tiz << endl;
                 // cout << tjx << "," << tjy << "," << tjz << endl;
 
+
+                // if ((fx != fx) || (fy != fy) || (fz != fz) || (tix != tix) || (tiy != tiy) || (tiz != tiz))
+                // {
+                //     // cout << (*dat)(p1, 'r') << endl;
+                //     // cout << (*dat)(p2, 'r') << endl;
+                //     // cout << (iny.potential_bundle)[potn]->getparameters() << endl;
+                //     cout << rij << endl;
+                //     cout << i << endl;
+                //     cout << j << endl;
+                //     cout << fx << " " << fy << " " << fz << endl;
+                //     cout << tix << " " << tiy << " " << tiz << endl;
+                //     cout << un << endl;
+                //     cout << nx1 << " " << ny1 << " " << nz1 << endl;
+                //     cout << nx2 << " " << ny2 << " " << nz2 << endl;
+                //     cout << thetai << " " << thetaj << endl;
+                //     cout << argthetai << " " << argthetaj << endl;
+                //     error("error in force found");
+                // }
                 // cout << fx << "," << fy << "," << fz << endl;
                 // pausel();
 

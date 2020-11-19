@@ -357,3 +357,57 @@ A.obj->setkT(1.0);
 A.run_singlebond( 100000,  100);
 
 </code></pre>
+
+Working Binding Model:
+
+<pre><code>
+int n = 125;
+
+Condensate A(21.5443, n);
+
+
+//for one hundeed twenty five 
+double basex =  10.0;
+double basey =  10.0;
+double basez =  10.0;
+
+double dx =1.0;
+
+int iter  = 0;
+matrix<double> initialpos(n,3);
+
+for(int i = 0  ; i < 5 ; i++) {
+    for(int j =  0 ; j < 5 ; j ++) {
+        for(int k = 0 ; k < 5 ; k++ ) {
+            initialpos(iter, 0) = basex + i * dx;
+            initialpos(iter, 1) = basey + j * dx;
+            initialpos(iter, 2) = basez + k * dx;
+            iter++;
+        }
+    }
+}
+
+A.obj->setdat(initialpos);
+
+TetrahedralPatch c(30.0, 1.4, pi / 4.);
+
+BindingModelSingle b(1.0,0.0);
+
+A.setBindingModel(b);
+
+A.setpots(c);
+
+
+for (double kT = 1.0; kT > 0.49; kT -= 0.1)
+{
+    A.obj->setkT(kT);
+    stringstream ss;
+    ss << kT;
+
+    string base = "_kT=";
+    base += ss.str();
+
+    A.run_singlebond(1000000, 1000);
+}
+
+</code></pre>

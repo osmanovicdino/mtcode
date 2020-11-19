@@ -168,6 +168,9 @@ void reset(T);
         // multiply matrix by a constant
         template <class Y>
 	friend matrix<Y> operator*(const Y,const matrix<Y> &m1);
+
+        template <class Y>
+        friend bool operator!=(const matrix<Y>&, const matrix<Y>&);
         
 
         // return a matrix whose values are equal to the multiplication of the correspong multiplication

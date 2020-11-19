@@ -54,24 +54,176 @@ int main(int argc, char** argv) {
 
 srand (time(NULL));
 
-int n = 1000;
 
-Condensate A(25.0, n);
+/* 
+BindingModelBinary b(4*125);
 
 
 
-TetrahedralPatch c(10.0, 1.5, pi / 3.);
 
-BindingModelSingle b(1.0,0.0);
+//particles type 1 and 2 can bind to each other;
+
+vector1<double> r11(4);
+r11[0] = 0.0;
+r11[1] = 1.0;
+r11[2] = 0.0;
+r11[3] = 1.0;
+
+vector1<double> r12(r11);
+
+vector1<double> r22(4);
+r22[0] = 1.0;
+r22[1] = 0.0;
+r22[2] = 1.0;
+r22[3] = 0.0;
+
+vector1<double> t111(16);
+vector1<double> t112(16);
+vector1<double> t122(16);
+vector1<double> t222(16);
+
+
+
+t111[0]=0.998;//fromi,jtpi,j
+t111[1]=0.001;//fromi,jtoj,k
+t111[2]=0.001;//fromi,jtoi,k
+t111[3]=0.000;//fromi,jtonothing
+t111[4]=0.001;//fromj,ktoi,j
+t111[5]=0.998;//fromj,ktoj,k
+t111[6]=0.001;//fromj,ktoi,k
+t111[7]=0.000;//fromj,ktonothing
+t111[8]=0.001;//fromi,ktoi,j
+t111[9]=0.001;//fromi,ktoj,k
+t111[10]=0.998;//fromi,ktoi,k
+t111[11]=0.000;//fromi,ktonothing
+t111[12]=0.33;//fromnothingtoi,j
+t111[13]=0.33;//fromnothingtoj,k
+t111[14]=0.33;//fromnothingtoi,k
+t111[15]=0.01;//fromnothingtonothing
+
+//particle 2 does not interact
+
+t112[0] = 0.001;  //fromi,jtpi,j
+t112[1] = 0.499;  //fromi,jtoj,k
+t112[2] = 0.499;  //fromi,jtoi,k
+t112[3] = 0.000;  //fromi,jtonothing
+t112[4] = 0.000;  //fromj,ktoi,j
+t112[5] = 0.998;  //fromj,ktoj,k
+t112[6] = 0.100;  //fromj,ktoi,k
+t112[7] = 0.001;  //fromj,ktonothing
+t112[8] = 0.000;  //fromi,ktoi,j
+t112[9] = 0.100;  //fromi,ktoj,k
+t112[10] = 0.998; //fromi,ktoi,k
+t112[11] = 0.001; //fromi,ktonothing
+t112[12] = 0.001; //fromnothingtoi,j
+t112[13] = 0.499; //fromnothingtoj,k
+t112[14] = 0.499; //fromnothingtoi,k
+t112[15] = 0.000; //fromnothingtonothing
+
+t122[0] = 0.998;  //fromi,jtpi,j
+t122[1] = 0.000;  //fromi,jtoj,k
+t122[2] = 0.100;  //fromi,jtoi,k
+t122[3] = 0.001;  //fromi,jtonothing
+t122[4] = 0.499;  //fromj,ktoi,j
+t122[5] = 0.000;  //fromj,ktoj,k
+t122[6] = 0.499;  //fromj,ktoi,k
+t122[7] = 0.001;  //fromj,ktonothing
+t122[8] = 0.100;  //fromi,ktoi,j
+t122[9] = 0.000;  //fromi,ktoj,k
+t122[10] = 0.998; //fromi,ktoi,k
+t122[11] = 0.001; //fromi,ktonothing
+t122[12] = 0.499; //fromnothingtoi,j
+t122[13] = 0.000; //fromnothingtoj,k
+t122[14] = 0.499; //fromnothingtoi,k
+t122[15] = 0.001; //fromnothingtonothing
+
+t222[0] = 0.000;  //fromi,jtpi,j
+t222[1] = 0.000;  //fromi,jtoj,k
+t222[2] = 0.000;  //fromi,jtoi,k
+t222[3] = 1.0;    //fromi,jtonothing
+t222[4] = 0.000;  //fromj,ktoi,j
+t222[5] = 0.000;  //fromj,ktoj,k
+t222[6] = 0.000;  //fromj,ktoi,k
+t222[7] = 1.000;  //fromj,ktonothing
+t222[8] = 0.000;  //fromi,ktoi,j
+t222[9] = 0.000;  //fromi,ktoj,k
+t222[10] = 0.000; //fromi,ktoi,k
+t222[11] = 1.000; //fromi,ktonothing
+t222[12] = 0.000; //fromnothingtoi,j
+t222[13] = 0.000; //fromnothingtoj,k
+t222[14] = 0.000; //fromnothingtoi,k
+t222[15] = 1.000; //fromnothingtonothing
+
+b.doubr11 = r11;
+b.doubr12 = r12;
+b.doubr22 = r22;
+
+b.tripr111 = t111;
+b.tripr112 = t112;
+b.tripr122 = t122;
+b.tripr222 = t222;
+
+TetrahedralWithSingle c(30.0,1.4,pi/4.,100.,1.4,pi/3.,0.0,1.,pi/6.,125 , 400);
+
+double T;
+bool err1,err2;
+matrix<double> initpos = importcsv("./Basic/InitialConditions/initpos.csv", T, err1);
+matrix<double> initori = importcsv("./Basic/InitialConditions/initori.csv", T, err2);
+
+
+
+
+Condensate A(21.5443,525);
+
+A.obj->setdat(initpos);
+A.obj->setorientation(initori);
 
 A.setBindingModel(b);
 
 A.setpots(c);
 
 
+
+A.run_singlebond(1000000, 1000);
+ */
+
+int n = 1000;
+
+Condensate A(27.144, n);
+
+//for one hundeed twenty five
+// double basex =  10.0;
+// double basey =  10.0;
+// double basez =  10.0;
+
+// double dx =1.0;
+
+// int iter  = 0;
+// matrix<double> initialpos(n,3);
+
+// for(int i = 0  ; i < 5 ; i++) {
+//     for(int j =  0 ; j < 5 ; j ++) {
+//         for(int k = 0 ; k < 5 ; k++ ) {
+//             initialpos(iter, 0) = basex + i * dx;
+//             initialpos(iter, 1) = basey + j * dx;
+//             initialpos(iter, 2) = basez + k * dx;
+//             iter++;
+//         }
+//     }
+// }
+
+// A.obj->setdat(initialpos);
+
+TetrahedralPatch c(10.0, 1.4, pi / 4.);
+
+BindingModelSingle b(0.99,0.01);
+
+A.setBindingModel(b);
+
+A.setpots(c);
+
 for (double kT = 1.0; kT > 0.49; kT -= 0.1)
 {
-
     A.obj->setkT(kT);
     stringstream ss;
     ss << kT;
@@ -81,10 +233,6 @@ for (double kT = 1.0; kT > 0.49; kT -= 0.1)
 
     A.run_singlebond(1000000, 1000);
 }
-
-
-
-
 
 /* 
 int n = 4;
@@ -305,76 +453,76 @@ A.obj->setkT(1.0);
 
 
 A.run_singlebond( 100000,  100); */
-    //SAVE CC
-    // vector1<bool> already_accounted(200, false);
-    // vector1<int> indexes(200,0);
-    // int iter = 0;
-    // vector1<int> demarkus(200,0);
-    // int len_dem = 0;
+//SAVE CC
+// vector1<bool> already_accounted(200, false);
+// vector1<int> indexes(200,0);
+// int iter = 0;
+// vector1<int> demarkus(200,0);
+// int len_dem = 0;
 
-    // int num_con_comp = 0;
+// int num_con_comp = 0;
 
-    // for (int i = 0; i < 200; i++) {
+// for (int i = 0; i < 200; i++) {
 
-    //     if (already_accounted[i] == false)
-    //     {
-    //         DFUtilstore(i, already_accounted, adj, lens, indexes, iter, len_dem);
+//     if (already_accounted[i] == false)
+//     {
+//         DFUtilstore(i, already_accounted, adj, lens, indexes, iter, len_dem);
 
-    //         demarkus[num_con_comp] = len_dem;
+//         demarkus[num_con_comp] = len_dem;
 
-    //         num_con_comp++;
-    //         len_dem = 0;
+//         num_con_comp++;
+//         len_dem = 0;
 
-    //        // cout << "\n";
-    //     }
-    // }
+//        // cout << "\n";
+//     }
+// }
 
-    // cout << indexes << endl;
-    // cout << demarkus << endl;
+// cout << indexes << endl;
+// cout << demarkus << endl;
 
-    //PRINT CC
-    // for (int i = 0; i < 200; i++)
-    // {
+//PRINT CC
+// for (int i = 0; i < 200; i++)
+// {
 
-    //     if (already_accounted[i] == false)
-    //     {
-    //         DFUtil(i, already_accounted, adj, lens);
+//     if (already_accounted[i] == false)
+//     {
+//         DFUtil(i, already_accounted, adj, lens);
 
-    //         // demarkus[num_con_comp] = len_dem;
+//         // demarkus[num_con_comp] = len_dem;
 
-    //         // num_con_comp++;
-    //         // len_dem = 0;
+//         // num_con_comp++;
+//         // len_dem = 0;
 
-    //          cout << "\n";
-    //     }
-    // }
-    // Condensate A(25.0, 1000, 2);
+//          cout << "\n";
+//     }
+// }
+// Condensate A(25.0, 1000, 2);
 
-    // vector1<double> as(16,10.0);
-    // vector1<double> bs(16,1.5);
-    // vector1<double> cs(16,pi/3.);
+// vector1<double> as(16,10.0);
+// vector1<double> bs(16,1.5);
+// vector1<double> cs(16,pi/3.);
 
-    // //as[0] = 100.0;
+// //as[0] = 100.0;
 
-    // set_potential_bundle_tetrahedral(A, as, bs, cs);
+// set_potential_bundle_tetrahedral(A, as, bs, cs);
 
-    // for(double kT = 1.0 ; kT > 0.49 ; kT -= 0.1) {
+// for(double kT = 1.0 ; kT > 0.49 ; kT -= 0.1) {
 
-    // A.obj->setkT(kT);
-    // stringstream ss;
-    // ss << kT;
+// A.obj->setkT(kT);
+// stringstream ss;
+// ss << kT;
 
-    // string base = "_kT=";
-    // base += ss.str();
+// string base = "_kT=";
+// base += ss.str();
 
-    // A.run(1000000,1000,base);
-    // }
+// A.run(1000000,1000,base);
+// }
 
-    // cout << (A.obj)->getdat() << endl;
+// cout << (A.obj)->getdat() << endl;
 
-    // cout << (A.obj)->getorientation() << endl;
+// cout << (A.obj)->getorientation() << endl;
 
-    /*
+/*
 vector1<bool> pb(3,true);
 cube geo(5.1,pb,3);
 
@@ -682,5 +830,5 @@ if(i%every== 0) {
 
 */
 
-    return 0;
+return 0;
 }

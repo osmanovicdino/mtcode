@@ -697,7 +697,27 @@ matrix<T> operator*(matrix<T> &m, Q a) {
     return a*m;
 }
 
+template <class T>
+bool operator!=(const matrix<T> &m1, const matrix<T> &m2)
+{
+   // bool res = true;
+    int n1 = m1.nrows;
+    int n2 = m2.nrows;
 
+    int c1 =  m1.ncols;
+    int c2 =  m2.ncols;
+    if(n1!=n2 || c1 != c2) { 
+        return true; 
+        }
+    for(int i = 0 ; i < m1.nrows ; i++) {
+        for(int j =0 ; j < m1.ncols ; j++) {
+            if(m1.mat[i*c1+j] != m2.mat[i*c1+j]){
+                return true;
+                }
+        }
+    }
+    return false;
+}
 
 template <class T>
 ostream& operator<<(ostream &s, const matrix<T> &a) {

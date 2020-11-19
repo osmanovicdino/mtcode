@@ -206,11 +206,6 @@ void LangevinNVT::advance_mom_spatial_dependence(matrix<double> &F,matrix<double
 		double t_c4 = (1.0/(1.0+(t_d)))*t_r;
 		double t_c5 = (1-(t_d));
 		for(int i1 = 0 ;  i1 < ds ; i1++ ) {
-			//(mom)->operator()(i,i1) = c5*((mom)->operator()(i,i1))+(q)*F(i,i1)+(r)*R(i,i1);
-				
-
-
-
 			(mom)->operator()(i,i1) = t_c5*t_c2*((mom)->operator()(i,i1)) + (t_c5*(t_c3)+t_q)*F(i,i1) + (t_c5*(t_c4)+t_r)*R(i,i1);
 		}
 	}

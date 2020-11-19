@@ -14,7 +14,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     vector1<int> tempbound(total_number_of_patches,0); //no binding to begin wtih
 
-    int depth_of_matrix = 5; //Choose this value to be deep enough such that all values can be stored
+    int depth_of_matrix = 10; //Choose this value to be deep enough such that all values can be stored
 
     matrix<int> boindices(total_number_of_patches, depth_of_matrix);
 
@@ -102,7 +102,18 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 {
                     int wp1,wp2;
                     iny.which_patch(p1,p2,potn,wp1,wp2);
+                    // if((wp1 > 500 ||wp2 > 500) && !(wp1>500&&wp2>500)) {
                     
+                    //     cout << "possible patch" << endl;
+                    //     cout << p1 << " " << p2 << endl;
+                    //     cout << wp1 << " " << wp2 << endl;
+                    //     cout <<  dis << " " << disp << endl;
+                    //     cout << argthetai << " " << argthetaj << " " <<cos(thetam) << endl;
+                    //     cout << potn << endl;
+                    //     cout << bo.isbound[wp1] << " " << bo.isbound[wp2] << endl;
+                    //     cout << bo.boundto[wp1] << " " << bo.boundto[wp2] << endl;
+                    //     pausel();
+                    // }
                     boindices(wp1, tempbound[wp1]) = wp2;
                     boindices(wp2, tempbound[wp2]) = wp1;
 
@@ -114,16 +125,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         // }
     }
 
-
     //Calculate all the bindings for all the patches
 
     vector1<int> indexes(total_number_of_patches);
 
     vector1<int> nbins = ConnectedComponents(boindices, tempbound, indexes);
 
-   // cout << tempbound << endl;
-
-    //Now we have the clusters. For each of these clusters, there is so some transition rate from one to another
+   // cout << "got cc" << endl;
+    //if things are bound outside their clusters, unbind them:
 
     #pragma omp parallel for
     for (int i = 0; i < nbins.getsize() - 1; i++)
@@ -131,161 +140,352 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
         int size_of_cluster = nbins[i + 1] - nbins[i];
 
-        if (size_of_cluster == 1)
-        {
-            //do nothing
-            int i1 = indexes[nbins[i]];
-            //isbound[i1]=false;
+        if(size_of_cluster > 2) {
+            
+            for (int j = nbins[i]; j < nbins[i + 1]; j++)
+            { //for all clusters
+            int ind =  indexes[j];
+                if( (bo.isbound[ind])== true ) {
+                    int bt = bo.boundto[ind];
+                    bool outside  = true;
+                    for(int k = 0 ; k < tempbound[ind] ; k++) {
+                        int pbt = boindices(ind,k);
+                        if(bt == pbt) { outside = false; break;}
+                    }
+                    if(outside) {
+                        
+                        // if(ind > 500) { 
+                            
+                        //     cout << "unbinding due to move" << endl;
+                        //     cout << "size of cluster: " << size_of_cluster << endl;
+                        //     cout << ind << endl;
+                        //     cout << tempbound[ind] << endl;
+                        //     cout << "possible binders: ";
+                        //     for (int k = 0; k < tempbound[ind]; k++)
+                        //     {
+                        //         int pbt = boindices(ind, k);
+                        //         cout << pbt << " ";
+                        //     }
+                        //     cout << endl;
+                        //     cout <<"bound to: " << bt << endl;
+                        //     pausel();
+                        // }
+                        bo.isbound[ind] = false;
+                    }
 
-            bo.isbound[i1] = false;
-
-            //not bound to anything.
-        }
-        else if (size_of_cluster == 2)
-        {
-            //all fine, bindings
-            int ti1 = indexes[nbins[i]];
-            int ti2 = indexes[nbins[i] + 1];
-
-            int i1;
-            int i2;
-            sort_doublet(ti1,ti2,i1,i2);
-
-            bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.isbound[i1] && bo.isbound[i2];
-
-            bool aft;
-
-            bm.doublet(alreadybound_to_eachother, i1, i2, aft);
-
-            if (aft)
-            {
-                bo.boundto[i1] = i2;
-                bo.boundto[i2] = i1;
-                bo.isbound[i1] = true;
-                bo.isbound[i2] = true;
+                }
             }
-            else
+        }
+
+    }
+   // cout << "unbound" << endl;
+        //     cout << "cluster size distribution" << endl;
+        //    // cout << tempbound << endl;
+        //     for (int i = 0; i < nbins.getsize() - 1; i++)
+        //     {
+        //         cout << nbins[i + 1] - nbins[i] << " ";
+        //     }
+        //     pausel();
+        //Now we have the clusters. For each of these clusters, there is so some transition rate from one to another
+
+#pragma omp parallel for
+        for (int i = 0; i < nbins.getsize() - 1; i++)
+        {
+
+            int size_of_cluster = nbins[i + 1] - nbins[i];
+
+            if (size_of_cluster == 1)
             {
+                //do nothing
+                int i1 = indexes[nbins[i]];
+                //isbound[i1]=false;
 
                 bo.isbound[i1] = false;
-                bo.isbound[i2] = false;
+
+                //not bound to anything.
             }
-            //bool already_bound = prebound(i1,i2);
-        }
-        else if (size_of_cluster == 3)
-        {
-            //is the cluster fully connected or not?
-
-
-
-            int ti1 = indexes[nbins[i]];
-            int ti2 = indexes[nbins[i] + 1];
-            int ti3 = indexes[nbins[i] + 2];
-
-            //SORT THE INDICES (IMPORTANT)
-
-            int i1;
-            int i2;
-            int i3;
-
-            sort_triplet(ti1, ti2, ti3, i1, i2, i3);
-
-            //bool b12,b23,b13;
-
-            //DETERMINE WHETHER THEY ARE BOUND
-            bool b12 = bo.boundto[i1] == i2 && bo.isbound[i1] && bo.isbound[i2];
-            bool b23 = bo.boundto[i2] == i3 && bo.isbound[i2] && bo.isbound[i3];
-            bool b13 = bo.boundto[i1] == i3 && bo.isbound[i1] && bo.isbound[i3];
-
-            //DETERMINE THE CONNECTIVENESS OF THE GRAPH
-            //remember, that in order to count as a triplet
-            bool c12 = false;
-            bool c23 = false;
-            bool c13 = false;
-
-            int nb1 = tempbound[i1];
-            if (nb1 == 1)
+            else if (size_of_cluster == 2)
             {
-                int tempi = boindices(i1, 0);
-                if (tempi == i2)
+                //all fine, bindings
+                int ti1 = indexes[nbins[i]];
+                int ti2 = indexes[nbins[i] + 1];
+
+                int i1;
+                int i2;
+                sort_doublet(ti1, ti2, i1, i2);
+
+                bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+
+                bool aft;
+
+                bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+
+                if (aft)
                 {
-                    c12 = true;
-                    c13 = false;
-                    c23 = true; //in order to be a triplet
-                }
-                else if (tempi == i3)
-                {
-                    c13 = true;
-                    c12 = false;
-                    c23 = true;
+                    bo.boundto[i1] = i2;
+                    bo.boundto[i2] = i1;
+                    bo.isbound[i1] = true;
+                    bo.isbound[i2] = true;
+
                 }
                 else
-                    error("something weird");
+                {
 
-                //check the other
+                    bo.isbound[i1] = false;
+                    bo.isbound[i2] = false;
+
+                }
+                //bool already_bound = prebound(i1,i2);
             }
-            else if (nb1 == 2)
+            else if (size_of_cluster == 3)
             {
-                c12 = true;
-                c13 = true;
+                //is the cluster fully connected or not?
+              //  cout << "triplet!" << endl;
 
-                int nb2 = tempbound[i2];
+                int ti1 = indexes[nbins[i]];
+                int ti2 = indexes[nbins[i] + 1];
+                int ti3 = indexes[nbins[i] + 2];
+
+                //SORT THE INDICES (IMPORTANT)
+
+                int i1;
+                int i2;
+                int i3;
+
+                sort_triplet(ti1, ti2, ti3, i1, i2, i3);
+
+               // int totb = (int)bo.isbound[i1] + (int)bo.isbound[i2] + (int)bo.isbound[i3];
+                // cout << "triplet! " << totb << endl;
+                // //bool b12,b23,b13;
+                // if (totb == 3)
+                // {
+                //     cout << "what's going on here" << endl;
+                //     pausel();
+                // }
+
+                //DETERMINE WHETHER THEY ARE BOUND
+                bool b12 = bo.boundto[i1] == i2 && bo.isbound[i1] && bo.isbound[i2];
+                bool b23 = bo.boundto[i2] == i3 && bo.isbound[i2] && bo.isbound[i3];
+                bool b13 = bo.boundto[i1] == i3 && bo.isbound[i1] && bo.isbound[i3];
+
+                //DETERMINE THE CONNECTIVENESS OF THE GRAPH
+                //remember, that in order to count as a triplet
+                bool c12 = false;
+                bool c23 = false;
+                bool c13 = false;
+
+                int nb1 = tempbound[i1];
                 if (nb1 == 1)
                 {
-                    c23 = false;
+                    int tempi = boindices(i1, 0);
+                    if (tempi == i2)
+                    {
+                        c12 = true;
+                        c13 = false;
+                        c23 = true; //in order to be a triplet
+                    }
+                    else if (tempi == i3)
+                    {
+                        c13 = true;
+                        c12 = false;
+                        c23 = true;
+                    }
+                    else
+                        error("something weird");
+
+                    //check the other
+                }
+                else if (nb1 == 2)
+                {
+                    c12 = true;
+                    c13 = true;
+
+                    int nb2 = tempbound[i2];
+                    if (nb1 == 1)
+                    {
+                        c23 = false;
+                    }
+                    else
+                    {
+                        c23 = true;
+                    }
                 }
                 else
                 {
-                    c23 = true;
+                    error("error in clustering algorithm");
+                }
+
+                bool a12;
+                bool a23;
+                bool a13;
+                bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+
+                if (a12)
+                {
+                    bo.boundto[i1] = i2;
+                    bo.boundto[i2] = i1;
+                    bo.isbound[i1] = true;
+                    bo.isbound[i2] = true;
+                    bo.isbound[i3] = false;
+                }
+                else if (a23)
+                {
+                    bo.boundto[i2] = i3;
+                    bo.boundto[i3] = i2;
+                    bo.isbound[i1] = false;
+                    bo.isbound[i2] = true;
+                    bo.isbound[i3] = true;
+                }
+                else if (a13)
+                {
+                    bo.boundto[i1] = i3;
+                    bo.boundto[i3] = i1;
+                    bo.isbound[i1] = true;
+                    bo.isbound[i2] = false;
+                    bo.isbound[i3] = true;
+                }
+                else
+                {
+                    bo.isbound[i1] = false;
+                    bo.isbound[i2] = false;
+                    bo.isbound[i3] = false;
                 }
             }
-            else
+            else if (size_of_cluster == 4)
             {
-                error("error in clustering algorithm");
-            }
 
-            bool a12;
-            bool a23;
-            bool a13;
-            bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+                //if all the particles are already bound, skip;
 
-            if (a12)
-            {
-                bo.boundto[i1] = i2;
-                bo.boundto[i2] = i1;
-                bo.isbound[i1] = true;
-                bo.isbound[i2] = true;
-                bo.isbound[i3] = false;
+                int i1 = 0;
+                for (int j = nbins[i]; j < nbins[i + 1]; j++)
+                {
+                    i1 += (int)(bo.isbound[indexes[j]]);
+                }
+                if (i1 == 0)
+                {
+                }
+                else if (i1 == 2)
+                {
+                }
+                else if (i1 == 4)
+                {
+                }
+                else{
+
             }
-            else if (a23)
-            {
-                bo.boundto[i2] = i3;
-                bo.boundto[i3] = i2;
-                bo.isbound[i1] = false;
-                bo.isbound[i2] = true;
-                bo.isbound[i3] = true;
-            }
-            else if (a13)
-            {
-                bo.boundto[i1] = i3;
-                bo.boundto[i3] = i1;
-                bo.isbound[i1] = true;
-                bo.isbound[i2] = false;
-                bo.isbound[i3] = true;
-            }
-            else
-            {
-                bo.isbound[i1] = false;
-                bo.isbound[i2] = false;
-                bo.isbound[i3] = false;
-            }
+            cout << "4 patch " << i1 << endl; 
+            // cout << "4 patch!" << endl;
+            // cout << nbins[i + 1] - nbins[i] << endl;
+            // cout << nbins[i] << " " << nbins[i + 1] << endl;
+            // cout << "done" << endl;
+            // vector<int> ind;
+
+            // for (int j = nbins[i]; j < nbins[i + 1]; j++)
+            // {
+            //     cout << j << " " << indexes[j] << " " << endl;
+            //     ;
+            //     int p1, p2;
+            //     int temp;
+            //     iny.which_particle(indexes[j], temp, p1, p2);
+            //     ind.push_back(p1);
+            // }
+
+            // cout << endl;
+            // cout << endl;
+
+            // for (int j = nbins[i]; j < nbins[i + 1]; j++)
+            // {
+            //     cout << "patch : " << indexes[j] << " is it bound: " << bo.isbound[indexes[j]] << " bound to: " << bo.boundto[indexes[j]] << endl;
+            //     cout << endl;
+            //     cout << "potential partners: " << endl;
+            //     for (int k = 0; k < tempbound[indexes[j]]; k++)
+            //     {
+            //         int p1, p2;
+            //         iny.which_particle(indexes[j], boindices(indexes[j], k), p1, p2);
+            //         cout << boindices(indexes[j], k) << " dis:" << this->distance(p1,p2) << "\t";
+            //     }
+            //     cout << endl;
+            //     cout << endl;
+            //     //cout << << endl;
+            // }
+
+            // pausel();
         }
         else
         {
-            //error("the mythical 4 cluster, get to work, slob!");
+            cout << "big clust: " << size_of_cluster << endl;
+            /* cout << "big clust: " << size_of_cluster << endl;
+           cout << "nlet!" << endl;
+            //for larger patches, find which bonds are yet to be realized
+
+
+            // cout << "n patch!" << endl;
+            // cout << nbins[i+1]-nbins[i] << endl;
+            // cout << nbins[i] << " " << nbins[i+1] << endl;
+            // cout << "done" << endl;
+            // vector<int> ind;
+
+            // for (int j = nbins[i]; j < nbins[i+1]; j++)
+            // {
+            //     cout << j << " " << indexes[j] << " " << endl;;
+            //     int p1,p2;
+            //     int temp;
+            //     iny.which_particle(indexes[j], temp, p1, p2);
+            //     ind.push_back(p1);
+            // }
+
+            // cout << endl;
+            // cout << endl;
+
+            for (int j = nbins[i]; j < nbins[i+1]; j++)
+            {
+                cout << "patch : " << indexes[j] << " is it bound: " << bo.isbound[indexes[j]] << " bound to: " << bo.boundto[indexes[j]] << endl;
+                cout << endl;
+                cout << "potential partners: " << endl;
+                for(int k = 0 ; k < tempbound[indexes[j]]; k++) {
+                cout << boindices(indexes[j], k) << " ";
+                }
+                cout << endl;
+                cout << endl;
+                //cout << << endl;
+            } 
+
+            pausel();      */
+            // cout << endl;
+            // sort(ind.begin(), ind.end());
+            // ind.erase(unique(ind.begin(), ind.end()), ind.end());
+
+            // int newn = ind.size();
+
+            // matrix<double> minipos(newn, 3);
+            // matrix<double> miniori(newn, 9);
+
+            // for(int j = 0  ; j < newn ; j++) {
+            //     for(int k  = 0 ; k < 3 ; k++) {
+            //     minipos(j,k) =  (*dat)(ind[j],k);
+            //     }
+            //     for (int k = 0; k < 9; k++)
+            //     {
+            //         miniori(j, k) = (*orient)(ind[j], k);
+            //     }
+            // }
+            // for(int j = 0  ; j < newn  ; j++)
+            // cout << ind[j] << " ";
+
+            
+           
+            // cout << endl;
+            // outfunc(minipos, "minipos");
+            // outfunc(miniori, "miniori");
+            // cout << endl;
+            // pausel();
+
+        //if the depth is greater than 3, choose a random cluster
+        //error("the mythical 4 cluster, get to work, slob!");
             
         }
     }
+    //cout << "calc patches" << endl;
 
     //Having gone through all the patches to determine the bindings, we can now calculate the forces
 
@@ -337,9 +537,37 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
             (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
 
+            // if ((i> 500 || bo.boundto[i] > 500) && !(i > 500 && bo.boundto[i]> 500)) {
+               
+            //     cout << "one patch forces" << endl;
+                
+            //     cout << p1 << " " << p2 << endl;
+            //     cout << i << " " << bo.boundto[i] << endl;
+            //     cout << potn << endl;
+            //     cout << dis << endl; 
+            //     cout << fx <<  " " << fy << " " << fz << endl;
+            //     pausel();
 
-            //THE FOLLOWING IS ONLY FOR DEBUGGING
-            /*cout << "CALCULATING FORCE" << endl;
+            // }
+
+                // if ((fx != fx) || (fy != fy) || (fz != fz) || (tix != tix) || (tiy != tiy) || (tiz != tiz))
+                // {
+                //     cout << (*dat)(p1, 'r') << endl;
+                //     cout << (*dat)(p2, 'r') << endl;
+                //     cout << (iny.potential_bundle)[potn]->getparameters() << endl;
+                //     cout << dis << endl;
+                //     cout << p1 << endl;
+                //     cout << p2 << endl;
+                //     cout << potn << endl;
+                //     cout << fx << " " << fy << " " << fz << endl;
+                //     cout << tix << " " << tiy << " " << tiz << endl;
+                //     cout << un << endl;
+                //     cout << (*orient)(p1, 'r') << endl;
+                //     cout << (*orient)(p2, 'r') << endl;
+                //     error("error in force found");
+                // }
+                //THE FOLLOWING IS ONLY FOR DEBUGGING
+                /*cout << "CALCULATING FORCE" << endl;
             cout << p1 << " " << p2 << endl;
             cout << i << " " << bo.boundto[i] << endl;
             cout << potn << endl;
@@ -379,7 +607,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
 
             pausel();*/
-            //UP TO HERE
+                //UP TO HERE
 
             forces(p1, 0) += fx;
             forces(p1, 1) += fy;
@@ -402,8 +630,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             //do nothing
         }
     }
+   // cout << "calc forces" << endl;
 
     //now we have only the real forces, we no longer need to calculate the forces for the non-bound particles:
-}
+    }
 
 #endif /* LANGEVINRFORCE_CPP */

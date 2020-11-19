@@ -61,7 +61,7 @@ Condensate::Condensate(double ll, int N)  {
     double dt = 0.005;
     b.setdt(dt);
 
-    double viscosity = 10.0;
+    double viscosity = 1.0;
 
     double hdradius = 0.5;
 
@@ -266,6 +266,8 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     
     int nh  = (*pots).get_total_patches(NN);
 
+ 
+
     vector1<bool>isbound(nh);
 
     vector1<int> boundto(nh);
@@ -273,7 +275,10 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     bbs.isbound = isbound;
     bbs.boundto =  boundto;
 
+
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+
 
     matrix<int> *pairs = obj->calculatepairs(boxes, 3.5);
 
@@ -285,7 +290,11 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     matrix<double> T(NN, 3);
     matrix<double> zeromatrix(NN, 3);
 
+
+
     obj->calculateforces(*pairs, wsa);
+
+
     obj->calculate_forces_and_torques3D_onlyone(*pairs, *pots, bbs , *bm, F, T);
 
     obj->create_forces_and_torques_sphere(F, T);
@@ -293,11 +302,21 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     for (int i = 0; i < runtime; i++)
     {
         cout << i << endl;
+        if (i>0 && i % 20 == 0)
+        {
+            cout << "pairs recalculated" << endl;
+            delete pairs;
+            pairs = obj->calculatepairs(boxes, 3.5);
+        }
+
+       
         //obj->measured_temperature();
 
-        cout << endl;
+      
         obj->advancemom_halfstep(F, T);
+
         obj->advance_pos();
+
         obj->rotate();
 
         F = obj->calculateforces(*pairs, wsa);
@@ -311,12 +330,14 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
         obj->create_forces_and_torques_sphere(F, T);
 
+
+
         obj->advancemom_halfstep(F, T);
+
 
         if (i % every == 0)
         {
-            delete pairs;
-            pairs = obj->calculatepairs(boxes, 3.5);
+
 
             //cout << i << endl;
 
@@ -358,7 +379,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
             myfile3.open(bins.c_str());
 
             myfile <<= pos;
-            myfile2 <<= orient;
+            myfile2 << setprecision(10) <<= orient;
             myfile3 <<= bbs.isbound;
             myfile3 << "\n";
             myfile3 <<= bbs.boundto;

@@ -40,6 +40,8 @@ struct SingPatch : ComboPatch {//single patch
 
     SingPatch(double strr, double disss, double angg);
 
+    ~SingPatch() {delete i1;}
+
     int num_patches(const int&) {return 1;}
     void UpdateIterator(const int &i,const int &j) {
     //do nothing (only one patch)
@@ -107,7 +109,11 @@ struct TetrahedralPatch : ComboPatch {
 
     TetrahedralPatch(double strr, double disss, double angg);
 
-    int num_patches(const int &)
+    ~TetrahedralPatch() {
+        delete i1;
+    }
+
+    int num_patches(const int &i)
     {
         return 4;
     }
@@ -142,6 +148,146 @@ struct TetrahedralPatch : ComboPatch {
     }
 };
 
+
+struct TetrahedralWithSingle : ComboPatch {
+    double nx1 = sqrt(8. / 9.);
+    double ny1 = 0.;
+    double nz1 = -1. / 3.;
+
+    double nx2 = -sqrt(2. / 9.);
+    double ny2 = sqrt(2. / 3.);
+    double nz2 = -1. / 3.;
+
+    double nx3 = -sqrt(2. / 9.);
+    double ny3 = -sqrt(2. / 3.);
+    double nz3 = -1. / 3.;
+
+    double nx4 = 0;
+    double ny4 = 0;
+    double nz4 = 1.;
+
+    double angtt;
+    double distt;
+    double strtt;
+
+    double angts;
+    double dists;
+    double strts;
+
+    double angss;
+    double disss;
+    double strss;
+
+    int *i1; // t<-> t
+    int *i2;//  t<-> s
+    int *i3;//  t<-> s
+    
+    int nt; //number of tetrahedra
+    int ns; //number of singles
+
+    TetrahedralWithSingle(double, double, double, double, double, double, double, double, double, int nt, int ns);
+
+    ~TetrahedralWithSingle() {
+        delete i1;
+        delete i2;
+        delete i3;
+    }
+
+    int num_patches(const int &i)
+    {
+        if(i < nt ) {
+            return 4;
+        }
+        else if(i >= nt ) { 
+            return 1;
+        }
+        else{
+            error("out of bounds");
+        }
+    }
+    void UpdateIterator(const int &i, const int &j)
+    {
+     if(i < nt && j < nt ) {
+         p = &i1;
+     }
+     else if (i >= nt && j >= nt ) {
+         p = &i3;
+     }
+     else {
+         p = &i2;
+     }
+    }
+    int get_total_patches(const int &N) { return 4*nt+ns; }
+
+    void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
+    {
+        if(i < nt && j < nt ) {
+        int k1 = potn / 4;
+        int k2 = potn % 4;
+        // i*4 + k1;
+        // j*4 + k2;
+        wpi = i * 4 + k1;
+        wpj = j * 4 + k2;
+        }
+        else if(i >= nt && j >= nt) {
+            wpi = nt * 4 + (i - nt);
+            wpj = nt * 4 + (j - nt);
+        }
+        else if(i < nt && j >= nt) {
+            int k1 = potn % 4;
+            wpi = i * 4 + k1;
+            wpj = nt * 4 + (j - nt);
+        }
+        else {
+            int k2 =  potn % 4;
+            wpi = nt *4 + (i - nt);
+            wpj = j*4 + k2;
+        }
+    }
+    void which_particle(const int &wpi, const int &wpj, int &i, int &j)
+    {
+        if(wpi < 4*nt && wpj < 4*nt) {
+            i = wpi / 4;
+            j = wpj / 4;
+        }
+        else if(wpi >= 4*nt && wpj >= 4*nt ) {
+            i = wpi - 4*nt;
+            j = wpj - 4*nt;
+        }
+        else if(wpi < 4*nt && wpj >= 4*nt ){
+            i = wpi/4;
+            j = wpj - 4*nt + nt;
+        }
+        else{
+            i = wpi - 4*nt + nt;
+            j = wpj/4;
+        }
+    }
+    int which_potential(const int &i, const int &j, const int &wpi, const int &wpj)
+    {
+        if (wpi < 4 * nt && wpj < 4 * nt)
+        {
+            return (wpi % 4) * 4 + (wpj % 4);
+        }
+        else if (wpi >= 4 * nt && wpj >= 4 * nt)
+        {
+            return 0;
+        }
+        else if (wpi < 4 * nt && wpj >= 4 * nt)
+        {
+            return 16+ wpi % 4;
+        }
+        else{
+            return 16+ wpj % 4;
+        }
+    }
+    void get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12);
+
+    TetrahedralWithSingle *clone() const
+    {
+        return new TetrahedralWithSingle(*this);
+    }
+};
 
 #include "combopatch.cpp"
 
