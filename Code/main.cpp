@@ -231,7 +231,7 @@ for (double kT = 1.0; kT > 0.49; kT -= 0.1)
     string base = "_kT=";
     base += ss.str();
 
-    A.run_singlebond(1000000, 1000);
+    A.run_singlebond(1000000, 1000, base);
 }
 
 /* 
