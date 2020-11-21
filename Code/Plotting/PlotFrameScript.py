@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import matplotlib.pyplot as plt
-import numpy as np
-import csv
+# import matplotlib.pyplot as plt
+# import numpy as np
+# import csv
 import sys
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
-import os
+# from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+# import os
 from PlotFrameFunction import graph
 
 
