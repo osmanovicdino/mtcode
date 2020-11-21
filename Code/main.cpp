@@ -187,9 +187,9 @@ A.setpots(c);
 A.run_singlebond(1000000, 1000);
  */
 
-int n = 1000;
+int n = 2000;
 
-Condensate A(27.144, n);
+Condensate A(cbrt(2)*27.144, n);
 
 //for one hundeed twenty five
 // double basex =  10.0;
@@ -214,13 +214,17 @@ Condensate A(27.144, n);
 
 // A.obj->setdat(initialpos);
 
-TetrahedralPatch c(10.0, 1.4, pi / 4.);
+//TetrahedralPatch c(10.0, 1.4, pi / 4.);
+
+TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
 
 BindingModelSingle b(0.99,0.01);
 
 A.setBindingModel(b);
 
 A.setpots(c);
+
+int a = system("python3 ./Plotting/FigureMonitor.py ./ >filecreationlog &");
 
 for (double kT = 1.0; kT > 0.49; kT -= 0.1)
 {

@@ -289,6 +289,133 @@ struct TetrahedralWithSingle : ComboPatch {
     }
 };
 
+struct TwoTetrahedral : ComboPatch
+{
+    double nx1 = sqrt(8. / 9.);
+    double ny1 = 0.;
+    double nz1 = -1. / 3.;
+
+    double nx2 = -sqrt(2. / 9.);
+    double ny2 = sqrt(2. / 3.);
+    double nz2 = -1. / 3.;
+
+    double nx3 = -sqrt(2. / 9.);
+    double ny3 = -sqrt(2. / 3.);
+    double nz3 = -1. / 3.;
+
+    double nx4 = 0;
+    double ny4 = 0;
+    double nz4 = 1.;
+
+    double angtt;
+    double distt;
+    double strtt;
+
+    double angts;
+    double dists;
+    double strts;
+
+    double angss;
+    double disss;
+    double strss;
+
+    int nt;
+    int ns;
+
+    int *i1;
+    int *i2;
+    int *i3;
+
+    TwoTetrahedral(double, double, double, double, double, double, double, double, double, int nt, int ns);
+
+    ~TwoTetrahedral()
+    {
+        delete i1;
+        delete i2;
+        delete i3;
+    }
+
+    int num_patches(const int &i)
+    {
+        return 4;
+    }
+    void UpdateIterator(const int &i, const int &j)
+    {
+        if (i < nt && j < nt)
+        {
+            p = &i1;
+        }
+        else if (i >= nt && j >= nt)
+        {
+            p = &i3;
+        }
+        else
+        {
+            p = &i2;
+        }
+    }
+
+    int get_total_patches(const int &N) { return 4 * nt + 4*ns; }
+
+    void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
+    {
+        if(i< nt && j < nt) {
+            int k1 = potn / 4;
+            int k2 = potn % 4;
+            // i*4 + k1;
+            // j*4 + k2;
+            wpi = i * 4 + k1;
+            wpj = j * 4 + k2;
+        }
+        else if(j >= nt && j >= nt) {
+            int potn2 = potn - 32;
+            int k1 = potn2 / 4;
+            int k2 = potn2 % 4;
+            // i*4 + k1;
+            // j*4 + k2;
+            wpi = i * 4 + k1;
+            wpj = j * 4 + k2;
+        }
+        else
+        {
+            int potn2 = potn - 16;
+            int k1 = potn2 / 4;
+            int k2 = potn2 % 4;
+            // i*4 + k1;
+            // j*4 + k2;
+            wpi = i * 4 + k1;
+            wpj = j * 4 + k2;
+        }
+    }
+
+    void which_particle(const int &wpi, const int &wpj, int &i, int &j)
+    {
+
+            i = wpi / 4;
+            j = wpj / 4;
+    }
+    int which_potential(const int &i, const int &j, const int &wpi, const int &wpj)
+    {
+        if (wpi < 4 * nt && wpj < 4 * nt)
+        {
+            return (wpi % 4) * 4 + (wpj % 4);
+        }
+        else if (wpi >= 4 * nt && wpj >= 4 * nt)
+        {
+            return 32+(wpi % 4) * 4 + (wpj % 4);
+        }
+        else
+        {
+            return 16 + (wpi % 4) * 4 + (wpj % 4);
+        }
+    }
+    void get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12);
+
+    TwoTetrahedral *clone() const
+    {
+        return new TwoTetrahedral(*this);
+    }
+};
 #include "combopatch.cpp"
 
 #endif /* COMBOPATCH_H */
