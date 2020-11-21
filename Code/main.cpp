@@ -224,7 +224,7 @@ A.setBindingModel(b);
 
 A.setpots(c);
 
-int a = system("python3 ./Plotting/FigureMonitor.py ./ >filecreationlog &");
+int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ >filecreationlog &");
 
 for (double kT = 1.0; kT > 0.49; kT -= 0.1)
 {
