@@ -516,16 +516,41 @@ return (*this->geo).distance(*dat,i,j);
 // }
 
 matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist, double cut_off) {
-	vector<int> index1;
-	vector<int> index2;
+
+
+	//estimate the total number
 
 
 	int ss = boxlist.getncols();
+	int totn = 0;
+	for(int c1 = 0 ; c1 < boxlist.getNsafe() ; c1++ ) {
+		for(int c2  = 0 ; c2 < ss ; c2++) {
+			int box1 = c1;
+			int box2 = boxlist(c1,c2);
+			if(box1==box2) {
+				totn += ((b[box1].size()) * (b[box1].size()-1)) / 2;
+			}
+			else{
+				totn += (b[box1]).size() * (b[box2]).size();
+			}
+		}
+	}
+
+	//estimate the total number
+	vector<int> index1;
+	vector<int> index2;
+
+	index1.reserve(totn);
+	index2.reserve(totn);
+
 
 	#pragma omp parallel
 	{
 	vector<int> index1_private;
 	vector<int> index2_private;
+
+	index1_private.reserve(totn);
+	index2_private.reserve(totn);
 	//vector<int> index3_private;
 	#pragma omp for nowait schedule(static)
 	for(int c1 = 0 ; c1 < boxlist.getNsafe() ; c1++)
@@ -648,9 +673,11 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, double cut_off) {
 	int cubes_per_length = (int)round(exp(log(total_cubes)/dims));
 
 	vector<vector<int> > b;
+	int ressize = pow((int)ceil(cut_off),dimension);
 	b.reserve(total_cubes);
     for(int j = 0 ; j < total_cubes ; j++) {
         vector<int> temp;
+		temp.reserve(ressize);
         b.push_back(temp);
     }
     //int dimension = this->getdimension();

@@ -410,7 +410,7 @@ struct TwoTetrahedral : ComboPatch
             wpi = i * 4 + k1;
             wpj = j * 4 + k2;
         }
-        else if(j >= nt && j >= nt) {
+        else if(i >= nt && j >= nt) {
             int potn2 = potn - 32;
             int k1 = potn2 / 4;
             int k2 = potn2 % 4;
