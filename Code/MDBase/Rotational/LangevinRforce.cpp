@@ -25,7 +25,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     //vector1<int> nump(this->getN(),0); //this is the number of bound particles per particle
 
-    //#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < pairs.getNsafe(); ++i)
     {
         int p1 = pairs(i, 0);
@@ -68,13 +68,20 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                 //int potn = np1 * j + k;
 
+            int **q = new int*;
+            if(iny.safe) {
             iny.UpdateIterator(p1,p2);
+            q = iny.p;
+            }
+            else{
+            iny.UpdateIteratorSafe(p1,p2,q);
+            }
             //int **q = new int*;//iny.p;
             //int **q = iny.p;
 
-            for (int tp = 1; tp < (*iny.p)[0] + 1; tp++)
+            for (int tp = 1; tp < (*q)[0] + 1; tp++)
             {
-                int potn = (*iny.p)[tp];
+                int potn = (*q)[tp];
                 // vector1<double> params = (iny.potential_bundle)[potn]->getparameters();
 
                 double nxb1;// = params[0]; //iny[potn]->nxb1;
@@ -126,6 +133,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     tempbound[wp2] += 1;
                 }
             }
+            delete q;
             
         //     }
         // }

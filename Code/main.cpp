@@ -240,55 +240,55 @@ TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1
 // delete q;
 
 // pausel();
-/* 
-#pragma omp parallel for
-for(int i = 0  ; i < 10000 ; i++) {
-int p1 = rand() % 2000;
-int p2 = rand() % 2000;
 
-int **q = new int *;
-//c.UpdateIterator(p1,p2);
-//*q = *(c.p);
-//c.assign_pointer(p1,p2,q);
+// #pragma omp parallel for
+// for(int i = 0  ; i < 10000 ; i++) {
+// int p1 = rand() % 2000;
+// int p2 = rand() % 2000;
 
-//cout << p1 << " " << p2 << " " << (*(c.p))[1] << endl
-    for (int tp = 1; tp < (*q)[0] + 1; tp++)
-    {
+// int **q = new int *;
+// c.UpdateIteratorSafe(p1,p2,q);
+// //*q = *(c.p);
+// //c.assign_pointer(p1,p2,q);
 
-    int potn = (*q)[tp];
-    // std::stringstream stream;
-    // stream << p1 << " " << p2 << " " << potn << endl;
-    if(p1 < 1000 && p2 < 1000 && potn > 15) {
-        //cout << stream.str();
-        error("found error");
-    }
-    else if(p1>1000 && p2 > 1000 && potn< 32) {
-        //cout << stream.str();
-        std::stringstream stream;
-        stream << p1 << " " << p2 << " " << potn << endl;
-        cout << stream.str();
-        error("found error");
+// //cout << p1 << " " << p2 << " " << (*(c.p))[1] << endl
+//     for (int tp = 1; tp < (*q)[0] + 1; tp++)
+//     {
+
+//     int potn = (*q)[tp];
+//     // std::stringstream stream;
+//     // stream << p1 << " " << p2 << " " << potn << endl;
+//     if(p1 < 1000 && p2 < 1000 && potn > 15) {
+//         //cout << stream.str();
+//         error("found error");
+//     }
+//     else if(p1>1000 && p2 > 1000 && potn< 32) {
+//         //cout << stream.str();
+//         std::stringstream stream;
+//         stream << p1 << " " << p2 << " " << potn << endl;
+//         cout << stream.str();
+//         error("found error");
         
-    }
-    else if(p1 > 1000 && p2 <1000 && (potn <16 || potn>31) ) {
-        //cout << stream.str();
-        error("found error");
-    }
-    else if (p1 < 1000 && p2 > 1000 && (potn < 16 || potn > 31))
-    {
-        //cout << stream.str();
-        error("found error");
-    }
-    else{
+//     }
+//     else if(p1 > 1000 && p2 <1000 && (potn <16 || potn>31) ) {
+//         //cout << stream.str();
+//         error("found error");
+//     }
+//     else if (p1 < 1000 && p2 > 1000 && (potn < 16 || potn > 31))
+//     {
+//         //cout << stream.str();
+//         error("found error");
+//     }
+//     else{
 
-    }
-    //cout << stream.str();
-    }
-    delete q;
-}
- */
-//pausel();
-//pausel(); 
+//     }
+//     //cout << stream.str();
+//     }
+//     delete q;
+// }
+
+// //pausel();
+// pausel(); 
 
 BindingModelSingle b(0.99,0.01);
 

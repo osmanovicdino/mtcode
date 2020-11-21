@@ -11,18 +11,20 @@ int **p;
 bool safe;
 vector1<potentialtheta3D*> potential_bundle; //list of potentials
 
-ComboPatch(int n) : potential_bundle(vector1<potentialtheta3D*>(n)), safe(true) { }
+ComboPatch(int n) : potential_bundle(vector1<potentialtheta3D*>(n)), safe(true) { p = new int*;}
 
 virtual int num_patches(const int&) = 0; //return the number of patches on particle int
 virtual void UpdateIterator(const int&, const int&) = 0; //reassign the pointer to point to something else
-//virtual void UpdateIteratorSafe() =0 ;
+virtual void UpdateIteratorSafe(const int&, const int&, int**) =0 ;
 virtual int get_total_patches(const int &) = 0;
 virtual void which_patch(const int&, const int&, const int &, int&, int & ) = 0; //get patch numbers from particle numbers
 virtual void which_particle(const int&, const int&, int&, int&)=0; //get particle numbers from patch numbers
 virtual int which_potential(const int&, const int&, const int&, const int& )= 0;
 virtual void get_params(const int&,const int&, const int&, double&, double&, double&, double&, double&, double& , double&, double&) = 0;
-
 virtual ComboPatch *clone() const = 0;
+
+//~ComboPatch() {delete p;}
+
 
 };
 
@@ -47,6 +49,9 @@ struct SingPatch : ComboPatch {//single patch
     int num_patches(const int&) {return 1;}
     void UpdateIterator(const int &i,const int &j) {
     //do nothing (only one patch)
+    }
+    void UpdateIteratorSafe(const int &i,const int &j, int **q) {
+        *q =  i1;
     }
 
     int get_total_patches(const int &N) { return N;}
@@ -124,7 +129,11 @@ struct TetrahedralPatch : ComboPatch {
     {
         //do nothing (only one patch)
     }
-
+    void UpdateIteratorSafe(const int &i, const int &j, int **q)
+    {
+        *q = i1;
+    }
+    
     int get_total_patches(const int &N) { return 4*N; }
     void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
     {
@@ -221,7 +230,21 @@ struct TetrahedralWithSingle : ComboPatch {
          p = &i2;
      }
     }
-
+    void UpdateIteratorSafe(const int &i, const int &j, int **q)
+    {
+        if (i < nt && j < nt)
+        {
+            *q = i1;
+        }
+        else if (i >= nt && j >= nt)
+        {
+            *q = i3;
+        }
+        else
+        {
+            *q = i2;
+        }
+    }
     int get_total_patches(const int &N) { return 4*nt+ns; }
 
     void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
@@ -359,7 +382,21 @@ struct TwoTetrahedral : ComboPatch
             p = &i2;
         }
     }
-
+    void UpdateIteratorSafe(const int &i, const int &j, int **q)
+    {
+        if (i < nt && j < nt)
+        {
+            *q = i1;
+        }
+        else if (i >= nt && j >= nt)
+        {
+            *q = i3;
+        }
+        else
+        {
+            *q = i2;
+        }
+    }
 
     int get_total_patches(const int &N) { return 4 * nt + 4*ns; }
 
