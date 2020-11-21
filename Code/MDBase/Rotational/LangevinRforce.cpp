@@ -25,7 +25,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     //vector1<int> nump(this->getN(),0); //this is the number of bound particles per particle
 
-#pragma omp parallel for
+    //#pragma omp parallel for
     for (int i = 0; i < pairs.getNsafe(); ++i)
     {
         int p1 = pairs(i, 0);
@@ -67,10 +67,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //     {
 
                 //int potn = np1 * j + k;
+
             iny.UpdateIterator(p1,p2);
-            for (int tp = 1; tp < (*(iny.p))[0] + 1; tp++)
+            //int **q = new int*;//iny.p;
+            //int **q = iny.p;
+
+            for (int tp = 1; tp < (*iny.p)[0] + 1; tp++)
             {
-                int potn = (*(iny.p))[tp];
+                int potn = (*iny.p)[tp];
                 // vector1<double> params = (iny.potential_bundle)[potn]->getparameters();
 
                 double nxb1;// = params[0]; //iny[potn]->nxb1;
@@ -85,7 +89,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                 double thetam;// = params[8];
 
-                //cout << p1 << " " << p2 << " " << potn << endl;
+//                cout << p1 << " " << p2 << " " << potn << endl;
                 iny.get_params(p1,p2,potn,nxb1,nyb1,nzb1,nxb2,nyb2,nzb2,disp,thetam); //for this potential, get all the parameters
 
                 double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
@@ -122,6 +126,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     tempbound[wp2] += 1;
                 }
             }
+            
         //     }
         // }
     }
@@ -189,7 +194,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //     pausel();
         //Now we have the clusters. For each of these clusters, there is so some transition rate from one to another
 
-#pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < nbins.getsize() - 1; i++)
         {
 
@@ -492,6 +497,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     vector1<bool> visited(total_number_of_patches); //keep track of patches that we already calculated
 
+    #pragma omp parallel for
     for (int i = 0; i < total_number_of_patches ; ++i)
     {
         if (bo.isbound[i] == true && visited[i] == false) //only for bound patches we haven't visisted do we calculate forces

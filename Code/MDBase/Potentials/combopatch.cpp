@@ -26,6 +26,8 @@ TetrahedralPatch::TetrahedralPatch(double strr, double disss, double angg) : Com
         i1[i+1] = i;
     p = &i1;
 
+ 
+
     matrix<double> v(4, 3);
     v(0, 0) = nx1;
     v(0, 1) = ny1;
@@ -239,6 +241,8 @@ TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, doubl
    
         i3[1] = 20;
     p = &i1;
+
+    safe = false;
 
     strtt = strrtt;
     strts = strrts;
@@ -591,6 +595,8 @@ TwoTetrahedral::TwoTetrahedral(double strrtt, double disstt, double anggtt, doub
     angtt = anggtt;
     angts = anggts;
     angss = anggss;
+
+    safe = false;
 
     matrix<double> v(4, 3);
     v(0, 0) = nx1;

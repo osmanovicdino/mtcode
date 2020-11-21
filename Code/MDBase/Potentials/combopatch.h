@@ -8,12 +8,14 @@
 
 struct ComboPatch {
 int **p;
+bool safe;
 vector1<potentialtheta3D*> potential_bundle; //list of potentials
 
-ComboPatch(int n) : potential_bundle(vector1<potentialtheta3D*>(n)) { }
+ComboPatch(int n) : potential_bundle(vector1<potentialtheta3D*>(n)), safe(true) { }
 
 virtual int num_patches(const int&) = 0; //return the number of patches on particle int
 virtual void UpdateIterator(const int&, const int&) = 0; //reassign the pointer to point to something else
+//virtual void UpdateIteratorSafe() =0 ;
 virtual int get_total_patches(const int &) = 0;
 virtual void which_patch(const int&, const int&, const int &, int&, int & ) = 0; //get patch numbers from particle numbers
 virtual void which_particle(const int&, const int&, int&, int&)=0; //get particle numbers from patch numbers
@@ -46,6 +48,7 @@ struct SingPatch : ComboPatch {//single patch
     void UpdateIterator(const int &i,const int &j) {
     //do nothing (only one patch)
     }
+
     int get_total_patches(const int &N) { return N;}
     void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj) {
         wpi = i;
@@ -121,6 +124,7 @@ struct TetrahedralPatch : ComboPatch {
     {
         //do nothing (only one patch)
     }
+
     int get_total_patches(const int &N) { return 4*N; }
     void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
     {
@@ -217,6 +221,7 @@ struct TetrahedralWithSingle : ComboPatch {
          p = &i2;
      }
     }
+
     int get_total_patches(const int &N) { return 4*nt+ns; }
 
     void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
@@ -354,6 +359,7 @@ struct TwoTetrahedral : ComboPatch
             p = &i2;
         }
     }
+
 
     int get_total_patches(const int &N) { return 4 * nt + 4*ns; }
 
