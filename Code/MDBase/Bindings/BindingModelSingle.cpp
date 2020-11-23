@@ -99,7 +99,79 @@ void BindingModelSingle::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
     }
 }
 
-void BindingModelSingle::nlet(vector1<bool> &befores, vector1<int> indices, vector1<bool> &afters)
+void BindingModelSingle::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool>> &possibles, vector1<bool> &afters)
 {
-    error("nlets are too hard without simplifications");
+    int bb = 0;
+
+    for(int i = 0  ; i < befores.getsize() ; i++) {
+        bb += (int)befores.gpcons(i);
+    }
+
+    vector1<double> possible_rates(possibles.size());
+
+    for(int i = 0 ; i < possibles.size() ; i++) {
+        
+        int ab = 0;
+        for (int j = 0; j < befores.getsize(); j++)
+        {
+            ab += (int)possibles[i].gpcons(j);
+        }
+
+        if(ab > bb || bb == 0)
+        {
+            possible_rates[i] = SQR(ab - bb) * on_rate; //transition to more boundedness
+         } 
+        else if(bb < ab){
+             possible_rates[i] = (bb - ab)*off_rate; //less boundedness
+        }
+        else {
+            if(befores == possibles[i] ) {
+                possible_rates[i] =  on_rate; //if the same state
+            }
+            else{
+                possible_rates[i] = off_rate; //if different state
+            }
+        }
+    }
+
+    double totalrate = 0.0;
+    vector1<double> well_defined_rates(possible_rates.getsize());
+    for(int i = 0  ; i < possible_rates.getsize() ; i++) {
+        totalrate += possible_rates[i];
+        double vertexrate = 0.0;
+        for(int k = 0 ; k < i+1 ; k++) {
+        vertexrate += possible_rates[k];
+        }
+        well_defined_rates[i] = vertexrate;
+    }
+
+    double rr = totalrate*(double)rand()/(double)(RAND_MAX);
+
+    // for(int i = 0  ; i < well_defined_rates.getsize() ; i++) {
+    // cout << well_defined_rates[i] << " ";
+    // cout << possibles[i] << endl;
+    // }
+
+    // cout << totalrate << endl;
+    // cout << rr << endl;
+    
+
+
+    int whichto;
+    if(rr < well_defined_rates[0]) {
+        whichto = 0;
+    }
+    else{
+        for(int i = 1 ; i < possible_rates.getsize() ; i++) {
+            if(rr > well_defined_rates[i-1] && rr < well_defined_rates[i] ) {
+                whichto = i;
+                break;
+            }
+        }
+    }
+    
+
+
+    afters = possibles[whichto];
+    //error("nlets are too hard without simplifications");
 }

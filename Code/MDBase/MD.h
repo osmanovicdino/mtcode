@@ -8,6 +8,8 @@
 #include "../DataStructures/matrix2.cpp"
 //#include "matrix.cpp"
 
+#include "../DataStructures/mdpair.h"
+
 // #include "intmatrix.h"
 #include "geometry.h"
 #include "./Potentials/potential.h"
@@ -103,25 +105,7 @@ virtual void adv(matrix<int>&)=0; //advance the system one timestep with the pai
 
 };
 
-struct mdpair {
-	int a;
-	int b;
-	mdpair() : a(0), b(0) {}
-	mdpair(const int &aa,const int &bb) : a(aa), b(bb) {}
-	bool operator<(mdpair const &rhs) const {
-		return a < rhs.a || (a==rhs.a && b < rhs.b);
-	} 
-};
 
-struct dispair {
-	int a;
-	double b;
-	dispair() : a(0), b(0.) {}
-	dispair(const int &aa,const double &bb) : a(aa), b(bb) {}
-	bool operator<(dispair const &rhs) const {
-		return b < rhs.b || (b==rhs.b && a < rhs.a);
-	} 
-};
 
 #include "MD.cpp"
 

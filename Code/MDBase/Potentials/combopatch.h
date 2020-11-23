@@ -23,6 +23,7 @@ virtual int which_potential(const int&, const int&, const int&, const int& )= 0;
 virtual void get_params(const int&,const int&, const int&, double&, double&, double&, double&, double&, double& , double&, double&) = 0;
 virtual ComboPatch *clone() const = 0;
 
+virtual void CreateFiles();
 //~ComboPatch() {delete p;}
 
 
@@ -154,6 +155,8 @@ struct TetrahedralPatch : ComboPatch {
         return (wpi % 4) * 4 + (wpj % 4);   
     }
     void get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12);
+
+    void CreateFiles();
 
     TetrahedralPatch *clone() const
     {
@@ -311,6 +314,8 @@ struct TetrahedralWithSingle : ComboPatch {
     }
     void get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12);
 
+    void CreateFiles();
+
     TetrahedralWithSingle *clone() const
     {
         return new TetrahedralWithSingle(*this);
@@ -454,11 +459,14 @@ struct TwoTetrahedral : ComboPatch
     }
     void get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12);
 
+    void CreateFiles();
+
     TwoTetrahedral *clone() const
     {
         return new TwoTetrahedral(*this);
     }
 };
 #include "combopatch.cpp"
+#include "combopatchoutput.cpp"
 
 #endif /* COMBOPATCH_H */

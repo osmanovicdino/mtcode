@@ -77,7 +77,7 @@ Condensate::Condensate(double ll, int N)  {
 void Condensate::setpots(ComboPatch &a) {
     ComboPatch *q = a.clone();
     pots = q;
-
+    (*pots).CreateFiles();
 }
 
 void Condensate::setBindingModel(AbstractBindingModel &a) { 
@@ -227,6 +227,7 @@ void Condensate::run(int runtime, int every, string strbase = "")
 
 void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 {
+
     int ccc;
 
     int tf = ceil((double)runtime / (double)every);
@@ -237,26 +238,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
         tf /= 10;
     } while (tf);
 
-    ofstream myfileori;
-    myfileori.open("ori.csv");
 
-    double nxb1; // = params[0]; //iny[potn]->nxb1;
-    double nyb1; // = params[1]; //iny[potn]->nyb1;
-    double nzb1; // = params[2]; //iny[potn]->nzb1;
-
-    double nxb2; // = params[3]; //iny[potn]->nxb2;
-    double nyb2; // = params[4]; //iny[potn]->nyb2;
-    double nzb2; // = params[5]; //iny[potn]->nzb2;
-
-    double disp; // = params[6];
-
-    double thetam; // = params[8];
-
-    pots->get_params(0, 0, 1, nxb1, nyb1, nzb1, nxb2, nyb2, nzb2, disp, thetam);
-
-    myfileori << nxb1 << "," << nyb1 << "," << nzb1 << endl;
-
-    myfileori.close();
 
     int NN = obj->getN();
 

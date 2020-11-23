@@ -2,7 +2,7 @@
 
 # import matplotlib.pyplot as plt
 # import numpy as np
-# import csv
+import csv
 import sys
 # from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 # import os
@@ -15,16 +15,22 @@ cmdargs = list(map(str,sys.argv))
 filename =  cmdargs[1]
 
 
-colarray='red'
+colarraytemp='red'
 
+data=[]
 
 if(len(cmdargs)> 2):
     x= False
-    colarray = cmdargs[2]
+    colarraystring = cmdargs[2]
+    with open(colarraystring, newline='') as csvfile:
+        data = list(csv.reader(csvfile,quoting=csv.QUOTE_NONNUMERIC))
 else:
     x= True
+    data.append(colarraytemp)
 
-graph(filename,colarray)
+print(data[0])
+
+graph(filename,data)
 
 # outputfilename = os.path.splitext(filename)[0]+'.jpg'
 

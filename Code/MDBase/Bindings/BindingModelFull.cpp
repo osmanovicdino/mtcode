@@ -158,9 +158,9 @@ void BindingModelFull::triplet(bool b12, bool b23, bool b13, bool c12, bool c23,
 
 }
 
-void BindingModelFull::nlet(vector1<bool> &befores, vector1<int> indices, vector1<bool> &afters)
+void BindingModelFull::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters)
 {
-    error("nlets are too hard without simplifications");
+    error("nlets are too hard without simplifications for a Full system");
 
 }
 

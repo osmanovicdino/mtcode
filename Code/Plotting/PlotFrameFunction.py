@@ -46,16 +46,20 @@ def graph(filename,colarray):
     ax = fig.add_subplot(111,projection='3d')
     outputfilename = os.path.splitext(filename)[0]+'.jpg'
     with open(filename, newline='') as csvfile:
+        it = 0
         spamreader = csv.reader(csvfile, delimiter=',',quoting=csv.QUOTE_NONNUMERIC)
         for eachLine in spamreader:
             xpos = eachLine[0]
             ypos = eachLine[1]
             zpos = eachLine[2]
+            if(it>=len(colarray)) :
+                it = 0
 
-            ax.scatter(xpos,ypos,zpos,color=colarray)
+            ax.scatter(xpos,ypos,zpos,c=colarray[it])
+            it = it + 1
 
-            ax.set_xlabel('x')
-            ax.set_ylabel('y')
-            ax.set_zlabel('z')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
 
     plt.savefig(outputfilename, format='jpg')

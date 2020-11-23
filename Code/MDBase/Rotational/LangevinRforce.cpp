@@ -71,7 +71,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             int **q = new int*;
             if(iny.safe) {
             iny.UpdateIterator(p1,p2);
-            q = iny.p;
+            *q = *(iny.p);
             }
             else{
             iny.UpdateIteratorSafe(p1,p2,q);
@@ -141,63 +141,88 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     }
 
 
+    #pragma omp parallel for
+    for(int i = 0  ; i <total_number_of_patches ; i++) { //check bindings
+        if(bo.isbound[i]) { //if it is bound
+            int bt = bo.boundto[i]; //it is bound to what
+
+            int outside = true;
+            for(int k = 0 ; k < tempbound[i] ; k++) {
+                int pbt  = boindices(i,k);
+                if(bt  == pbt ) {
+                    outside = false;
+                    break;
+                }
+            }
+            if(outside) {
+                bo.isbound[i]= false;
+            }
+            
+        }
+    }
     //Calculate all the bindings for all the patches
 
     vector1<int> indexes(total_number_of_patches);
 
     vector1<int> nbins = ConnectedComponents(boindices, tempbound, indexes);
 
+    // #pragma omp parallel for
+    // for (int i = 0; i < nbins.getsize() - 1; i++)
+    // {
 
+    //     int size_of_cluster = nbins[i + 1] - nbins[i];
+
+    //     if (size_of_cluster > 2)
+    //     {
+
+    //         for (int j = nbins[i]; j < nbins[i + 1]; j++)
+    //         { //for all clusters
+    //             int ind = indexes[j];
+    //             if ((bo.isbound[ind]) == true)
+    //             {
+    //                 int bt = bo.boundto[ind];
+    //                 bool outside = true;
+    //                 for (int k = 0; k < tempbound[ind]; k++)
+    //                 {
+    //                     int pbt = boindices(ind, k);
+    //                     if (bt == pbt)
+    //                     {
+    //                         outside = false;
+    //                         break;
+    //                     }
+    //                 }
+    //                 if (outside)
+    //                 {
+
+    //                     // if(ind > 500) {
+
+    //                     //     cout << "unbinding due to move" << endl;
+    //                     //     cout << "size of cluster: " << size_of_cluster << endl;
+    //                     //     cout << ind << endl;
+    //                     //     cout << tempbound[ind] << endl;
+    //                     //     cout << "possible binders: ";
+    //                     //     for (int k = 0; k < tempbound[ind]; k++)
+    //                     //     {
+    //                     //         int pbt = boindices(ind, k);
+    //                     //         cout << pbt << " ";
+    //                     //     }
+    //                     //     cout << endl;
+    //                     //     cout <<"bound to: " << bt << endl;
+    //                     //     pausel();
+    //                     // }
+    //                     bo.isbound[ind] = false;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
     // cout << nbins.getsize() << endl;
     // cout << total_number_of_patches << endl;
     // pausel();
    // cout << "got cc" << endl;
     //if things are bound outside their clusters, unbind them:
 
-    #pragma omp parallel for
-    for (int i = 0; i < nbins.getsize() - 1; i++)
-    {
 
-        int size_of_cluster = nbins[i + 1] - nbins[i];
-
-        if(size_of_cluster > 2) {
-            
-            for (int j = nbins[i]; j < nbins[i + 1]; j++)
-            { //for all clusters
-            int ind =  indexes[j];
-                if( (bo.isbound[ind])== true ) {
-                    int bt = bo.boundto[ind];
-                    bool outside  = true;
-                    for(int k = 0 ; k < tempbound[ind] ; k++) {
-                        int pbt = boindices(ind,k);
-                        if(bt == pbt) { outside = false; break;}
-                    }
-                    if(outside) {
-                        
-                        // if(ind > 500) { 
-                            
-                        //     cout << "unbinding due to move" << endl;
-                        //     cout << "size of cluster: " << size_of_cluster << endl;
-                        //     cout << ind << endl;
-                        //     cout << tempbound[ind] << endl;
-                        //     cout << "possible binders: ";
-                        //     for (int k = 0; k < tempbound[ind]; k++)
-                        //     {
-                        //         int pbt = boindices(ind, k);
-                        //         cout << pbt << " ";
-                        //     }
-                        //     cout << endl;
-                        //     cout <<"bound to: " << bt << endl;
-                        //     pausel();
-                        // }
-                        bo.isbound[ind] = false;
-                    }
-
-                }
-            }
-        }
-
-    }
 
    // cout << "unbound" << endl;
         //     cout << "cluster size distribution" << endl;
@@ -291,9 +316,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
 
                     //DETERMINE WHETHER THEY ARE BOUND
-                    bool b12 = bo.boundto[i1] == i2 && bo.isbound[i1] && bo.isbound[i2];
-                    bool b23 = bo.boundto[i2] == i3 && bo.isbound[i2] && bo.isbound[i3];
-                    bool b13 = bo.boundto[i1] == i3 && bo.isbound[i1] && bo.isbound[i3];
+                    bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+                    bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
+                    bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1&& bo.isbound[i1] && bo.isbound[i3];
 
                     //DETERMINE THE CONNECTIVENESS OF THE GRAPH
                     //remember, that in order to count as a triplet
@@ -384,35 +409,122 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i3] = false;
                     }
                 }
-                else if (size_of_cluster == 4)
-                {
-
-                    //if all the particles are already bound, skip;
-
-                    int i1 = 0;
-                    for (int j = nbins[i]; j < nbins[i + 1]; j++)
-                    {
-                        i1 += (int)(bo.isbound[indexes[j]]);
-                    }
-                    if (i1 == 0)
-                    {
-                    }
-                    else if (i1 == 2)
-                    {
-                    }
-                    else if (i1 == 4)
-                    {
-                    }
-                    else{
-
-                    }
-
-                }
                 else
                 {
-                    cout << "big clust: " << size_of_cluster << endl;
 
+                    //firstly, obtain the graph of edges;
+                    vector<mdpair> matched;
+                    matched.reserve(size_of_cluster*(size_of_cluster-1)/2);
+                    
+                    for (int j = nbins[i]; j < nbins[i + 1]; j++)
+                    {
+                        for (int k = 0; k < tempbound[indexes[j]]; k++)
+                        {
+                            mdpair m1;
+                            int f1 = indexes[j];
+                            int f2 = boindices(indexes[j], k);
+                            
+                            if(f1<f2) {
+                                m1.a = f1;
+                                m1.b = f2;
+                            }
+                            else{
+                                m1.a = f2;
+                                m1.b = f1;
+                            }
+                            matched.push_back(m1);
+                        }
+                    }
+
+                    
+
+                    //next, remove duplicate edges
+
+                    sort(matched.begin(), matched.end());
+                    matched.erase(unique(matched.begin(), matched.end()), matched.end());
+
+
+                    //get the initial state
+                    vector1<bool> bounded(matched.size());
+
+                    for(int j = 0 ; j < matched.size() ; j++) {
+                        int i1  = matched[j].a;
+                        int i2  = matched[j].b;
+                        bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+                        bounded[j] = b12;
+                    }
+
+                    //find all complimentary patterns
+
+                    //cout << bounded << endl;
+                    
+                    //get the set of all possible bools to move to
+                    vector< vector1<bool> > possible_states;
+                    int m = 1 << matched.size();
+                    possible_states.reserve(m);
+
+                    //cout << pow(2,matched.size()) << endl;
+   
+
+                    for(int j = 0 ; j < m ; j++) {
+                        vector1<bool> binaryNum(matched.size());
+                        int n = j;
+                        int k = 0;
+                        while(n > 0) {
+                            binaryNum[k] = n % 2;
+                            n = n/2;
+                            k++;
+                        }
+
+                        if(IndependentEdge(matched,binaryNum)) {
+                           // cout << binaryNum << endl;
+                            possible_states.push_back(binaryNum);
+                        }
+                    }
+                    
+                    vector1<bool> afters(matched.size());
+                    
+                    bm.nlet(bounded, matched, possible_states, afters);
+
+
+                    for(int j =  0 ; j < afters.getsize() ; j++) {
+                        if(!afters[j]) {
+                            int i1 = matched[j].a;
+                            int i2 = matched[j].b;
+
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = false;
+                        }
+                    }
+                    // need to do it this way because of collisions
+
+                    for (int j = 0; j < afters.getsize(); j++)
+                    {
+                        if (afters[j])
+                        {
+                            int i1 = matched[j].a;
+                            int i2 = matched[j].b;
+
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = true;
+                            bo.boundto[i1] = i2;
+                            bo.boundto[i2] = i1;
+
+                            mypairs_private.push_back(mdpair(i1, i2));
+                        }
+                    }
+                    //cout << possible_states.capacity() << endl;
+                    //cout << i1 << " " << size_of_cluster << endl;
+
+                    //i1 is the number bound already
+                // cout << bounded << endl;
+                // for(int j  = 0  ; j < matched.size() ; j++) {
+                // cout << matched[j] << endl;
+                // }
+                // cout << afters << endl;
+                // pausel();
                 }
+
             }
             #pragma omp for schedule(static) ordered
             for (int i = 0; i < omp_get_num_threads(); i++)

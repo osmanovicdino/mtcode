@@ -173,6 +173,7 @@ matrix<double> initori = importcsv("./Basic/InitialConditions/initori.csv", T, e
 
 
 
+
 Condensate A(21.5443,525);
 
 A.obj->setdat(initpos);
@@ -187,6 +188,8 @@ A.setpots(c);
 A.run_singlebond(1000000, 1000);
  */
 
+
+
 int n = 2000;
 
 Condensate A(cbrt(2)*27.144, n);
@@ -195,8 +198,6 @@ Condensate A(cbrt(2)*27.144, n);
 // double basex =  10.0;
 // double basey =  10.0;
 // double basez =  10.0;
-
-// double dx =1.0;
 
 // int iter  = 0;
 // matrix<double> initialpos(n,3);
@@ -214,9 +215,9 @@ Condensate A(cbrt(2)*27.144, n);
 
 // A.obj->setdat(initialpos);
 
-//TetrahedralPatch c(10.0, 1.4, pi / 4.);
+TetrahedralPatch c(10.0, 1.5, pi / 3.);
 
-TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
+//TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
 
 // int i = 2;
 
@@ -296,7 +297,11 @@ A.setBindingModel(b);
 
 A.setpots(c);
 
-int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ >filecreationlog &");
+//int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ >filecreationlog &");
+
+//int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+
+
 
 for (double kT = 1.0; kT > 0.49; kT -= 0.1)
 {

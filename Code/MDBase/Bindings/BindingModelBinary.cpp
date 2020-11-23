@@ -329,9 +329,43 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
 
 }
 
-void BindingModelBinary::nlet(vector1<bool> &befores, vector1<int> indices, vector1<bool> &afters)
+void BindingModelBinary::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters)
 {
-    error("nlets are too hard without simplifications");
+   /*  int bb = 0;
+
+    for (int i = 0; i < befores.getsize(); i++)
+    {
+        bb += (int)befores.gpcons(i);
+    }
+
+    vector1<double> possible_rates(possibles.size());
+
+    for (int i = 0; i < possibles.size(); i++)
+    {
+
+        int ab = 0;
+        for (int j = 0; j < befores.getsize(); j++)
+        {
+            ab += (int)possibles[i].gpcons(j);
+        }
+
+
+        if (ab > bb)
+            possible_rates[i] = (ab - bb) * on_rate; //transition to more boundedness
+        else if (bb < ab)
+            possible_rates[i] = (bb - ab) * off_rate; //less boundedness
+        else
+        {
+            if (befores == possibles[i])
+            {
+                possible_rates[i] = on_rate; //if the same state
+            }
+            else
+            {
+                possible_rates[i] = off_rate; //if different state
+            }
+        }
+    } */
 }
 
 #endif /* BINARYMODELBINARY_CPP */
