@@ -297,19 +297,19 @@ A.setBindingModel(b);
 
 A.setpots(c);
 
-//int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ >filecreationlog &");
+int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
 //int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
 
 
-for (double kT = 1.0; kT > 0.49; kT -= 0.1)
+for (double beta = 1.0; beta <  2.01; beta  += 0.2)
 {
-    A.obj->setkT(kT);
+    A.obj->setkT(1./beta);
     stringstream ss;
-    ss << kT;
+    ss << beta;
 
-    string base = "_kT=";
+    string base = "_beta=";
     base += ss.str();
 
     A.run_singlebond(1000000, 1000, base);
