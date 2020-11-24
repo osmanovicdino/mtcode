@@ -433,7 +433,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 }
                 else
                 {
-
+                    cout << "n cluster begins" << endl;
                     //firstly, obtain the graph of edges;
                     vector<mdpair> matched;
                     matched.reserve(size_of_cluster*(size_of_cluster-1)/2);
@@ -545,6 +545,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 // }
                 // cout << afters << endl;
                 // pausel();
+                cout << "ncluster done" << endl;
                 }
 
             }
