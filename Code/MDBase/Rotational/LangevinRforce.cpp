@@ -318,7 +318,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     //DETERMINE WHETHER THEY ARE BOUND
                     bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
                     bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
-                    bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1&& bo.isbound[i1] && bo.isbound[i3];
+                    bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
 
                     //DETERMINE THE CONNECTIVENESS OF THE GRAPH
                     //remember, that in order to count as a triplet
@@ -364,6 +364,28 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     }
                     else
                     {
+                        cout << size_of_cluster << endl;
+                        cout << b12 <<  " " << b23 << " " << b13 << endl;
+                        cout << i1 << " " << i2 << " " << i3 << endl;
+                        cout << tempbound[i1] << " " << tempbound[i2] << " " << tempbound[i3] << endl;
+                        
+                        for(int k = 0 ; k < tempbound[i1] ; k++) {
+                            cout << boindices(i1,k) << " ";
+                        }
+                        cout << endl;
+
+                        for (int k = 0; k < tempbound[i2]; k++)
+                        {
+                            cout << boindices(i2, k) << " ";
+                        }
+                        cout << endl;
+
+                        for (int k = 0; k < tempbound[i3]; k++)
+                        {
+                            cout << boindices(i3, k) << " ";
+                        }
+                        cout << endl;
+
                         error("error in clustering algorithm");
                     }
 

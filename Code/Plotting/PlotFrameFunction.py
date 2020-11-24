@@ -38,7 +38,7 @@ def graph(filename):
             ax.set_zlabel('z')
 
     plt.savefig(outputfilename, format='jpg')
-    #plt.show()
+    plt.close(fig)
 
 
 def graph(filename,colarray):
@@ -63,3 +63,4 @@ def graph(filename,colarray):
         ax.set_zlabel('z')
 
     plt.savefig(outputfilename, format='jpg')
+    plt.close(fig)
