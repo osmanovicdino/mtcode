@@ -133,6 +133,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                     tempbound[wp1]++;
                     tempbound[wp2]++;
+                    std:: stringstream ss;
+
+                    ss << "patches added: " << wp1 << " " << wp2 << "\n";
+                    cout << ss.str();
                 }
             }
             delete q;
