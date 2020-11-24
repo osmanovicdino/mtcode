@@ -24,9 +24,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     // }
 
     //vector1<int> nump(this->getN(),0); //this is the number of bound particles per particle
+    unsigned int i;
 
-    #pragma omp parallel for
-    for (int i = 0; i < pairs.getNsafe(); ++i)
+    #pragma omp parallel for shared(tempbound, boindices) private(i) schedule(static)
+    for (i = 0; i < pairs.getNsafe(); ++i)
     {
         int p1 = pairs(i, 0);
         int p2 = pairs(i, 1);
@@ -130,8 +131,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     boindices(wp1, tempbound[wp1]) = wp2;
                     boindices(wp2, tempbound[wp2]) = wp1;
 
-                    tempbound[wp1] += 1;
-                    tempbound[wp2] += 1;
+                    tempbound[wp1]++;
+                    tempbound[wp2]++;
                 }
             }
             delete q;
@@ -327,6 +328,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     bool c13 = false;
 
                     int nb1 = tempbound[i1];
+
+
                     if (nb1 == 1)
                     {
                         int tempi = boindices(i1, 0);
@@ -433,7 +436,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 }
                 else
                 {
-                    cout << "n cluster begins" << endl;
+                    //cout << "n cluster begins" << endl;
                     //firstly, obtain the graph of edges;
                     vector<mdpair> matched;
                     matched.reserve(size_of_cluster*(size_of_cluster-1)/2);
@@ -479,10 +482,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     //find all complimentary patterns
 
                     //cout << bounded << endl;
-                    
+                    int m = 1 << matched.size();
+
+                    if(m<1000) { //if the states are too big, don't do it
+
                     //get the set of all possible bools to move to
                     vector< vector1<bool> > possible_states;
-                    int m = 1 << matched.size();
+                    
                     possible_states.reserve(m);
 
                     //cout << pow(2,matched.size()) << endl;
@@ -535,6 +541,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                             mypairs_private.push_back(mdpair(i1, i2));
                         }
                     }
+                }
                     //cout << possible_states.capacity() << endl;
                     //cout << i1 << " " << size_of_cluster << endl;
 
@@ -545,7 +552,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 // }
                 // cout << afters << endl;
                 // pausel();
-                cout << "ncluster done" << endl;
+               // cout << "ncluster done" << endl;
                 }
 
             }
