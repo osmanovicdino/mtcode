@@ -22,11 +22,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     // {
     //     error("number of patches and size of potential bundle incorrect");
     // }
+    //vector<array<int, depth_of_matrix> > boindices2(total_number_of_patches);
+
+    //std::array<vector<int> , total_number_of_patches> ind;
 
     //vector1<int> nump(this->getN(),0); //this is the number of bound particles per particle
+
     unsigned int i;
 
-    #pragma omp parallel for shared(tempbound, boindices) private(i) schedule(static)
     for (i = 0; i < pairs.getNsafe(); ++i)
     {
         int p1 = pairs(i, 0);
@@ -69,20 +72,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                 //int potn = np1 * j + k;
 
-            int **q = new int*;
-            if(iny.safe) {
+ 
             iny.UpdateIterator(p1,p2);
-            *q = *(iny.p);
-            }
-            else{
-            iny.UpdateIteratorSafe(p1,p2,q);
-            }
-            //int **q = new int*;//iny.p;
+
             //int **q = iny.p;
 
-            for (int tp = 1; tp < (*q)[0] + 1; tp++)
+            for (int tp = 1; tp < (*iny.p)[0] + 1; tp++)
             {
-                int potn = (*q)[tp];
+                int potn = (*iny.p)[tp];
                 // vector1<double> params = (iny.potential_bundle)[potn]->getparameters();
 
                 double nxb1;// = params[0]; //iny[potn]->nxb1;
@@ -127,24 +124,61 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     //     cout << bo.boundto[wp1] << " " << bo.boundto[wp2] << endl;
                     //     pausel();
                     // }
+                    int iterator1 = tempbound[wp1];
+                    int iterator2 = tempbound[wp2];
 
-                    boindices(wp1, tempbound[wp1]) = wp2;
-                    boindices(wp2, tempbound[wp2]) = wp1;
-
+                    #pragma omp atomic update
                     tempbound[wp1]++;
+                    #pragma omp atomic update
                     tempbound[wp2]++;
-                    std:: stringstream ss;
+                    
+                    boindices(wp1, iterator1) = wp2;
+                    boindices(wp2, iterator2) = wp1;
 
-                    ss << "patches added: " << wp1 << " " << wp2 << "\n";
-                    cout << ss.str();
+
                 }
             }
-            delete q;
+            //delete q;
             
         //     }
         // }
-    }
+        }
+    
 
+    // for(int i =  0 ; i <total_number_of_patches ; i++) {
+    //     for(int j = 0 ; j < tempbound[i] ; j++) {
+    //         if(tempbound[i] >0 && tempbound[boindices(i,j)] == 0) {
+                
+    //             int bk = boindices(i,j);
+    //             cout << "parts" << endl;
+    //             cout << i << endl;
+    //             cout << bk << endl;
+    //             cout << "lens" << endl;
+    //             cout << tempbound[i] << endl;
+    //             cout << tempbound[bk] << endl;
+
+    //             for(int l1 = 0  ; l1 < tempbound[i] ; l1++)
+    //                 cout << boindices(i,l1) <<  " ";
+    //             cout << endl;
+
+    //             for(int l2 = 0  ; l2 < tempbound[bk] ; l2++)
+    //                 cout << boindices(bk, l2) << " ";
+    //             cout << endl;
+
+    //             for (int l1 = 0; l1 < depth_of_matrix; l1++)
+    //                 cout << boindices(i, l1) << " ";
+    //             cout << endl;
+
+    //             for (int l2 = 0; l2 < depth_of_matrix; l2++)
+    //                 cout << boindices(bk, l2) << " ";
+    //             cout << endl;
+
+    //             error("asymmetry in bond list");
+    //         }
+    //     }
+    // }
+
+//   
 
     #pragma omp parallel for
     for(int i = 0  ; i <total_number_of_patches ; i++) { //check bindings
@@ -241,7 +275,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
        // int tbt = 0;
 
-        
+
+
+
         int number_to_reserve = MIN(2*(total_number_of_patches- nbins.getsize()),total_number_of_patches/2 );
 
         vector<mdpair> mypairs;//(number_to_reserve);
@@ -333,6 +369,19 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                     int nb1 = tempbound[i1];
 
+                    int nb2 = tempbound[i2];
+                    int nb3 = tempbound[i3];
+
+                    if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
+                        
+                        cout << i1 << " " << i2 << " " << i3 << endl;
+
+                        outfunc(tempbound, "t1");
+                        outfunc(boindices, "t2");
+
+                        pausel();
+                        error("something weird in code");
+                    }
 
                     if (nb1 == 1)
                     {
@@ -658,6 +707,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
             torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
         }
+
 
         /* 
         #pragma omp parallel for
