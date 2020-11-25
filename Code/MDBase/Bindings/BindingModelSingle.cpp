@@ -102,17 +102,20 @@ void BindingModelSingle::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
 void BindingModelSingle::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool>> &possibles, vector1<bool> &afters)
 {
     int bb = 0;
+    int nb =  befores.getsize();
 
-    for(int i = 0  ; i < befores.getsize() ; i++) {
+    for(int i = 0  ; i < nb ; i++) {
         bb += (int)befores.gpcons(i);
     }
 
-    vector1<double> possible_rates(possibles.size());
+    int nst = possibles.size();
 
-    for(int i = 0 ; i < possibles.size() ; i++) {
+    vector1<double> possible_rates(nst);
+
+    for(int i = 0 ; i < nst ; i++) {
         
         int ab = 0;
-        for (int j = 0; j < befores.getsize(); j++)
+        for (int j = 0; j < nb; j++)
         {
             ab += (int)possibles[i].gpcons(j);
         }
@@ -135,8 +138,8 @@ void BindingModelSingle::nlet(const vector1<bool> &befores, const vector<mdpair>
     }
 
     double totalrate = 0.0;
-    vector1<double> well_defined_rates(possible_rates.getsize());
-    for(int i = 0  ; i < possible_rates.getsize() ; i++) {
+    vector1<double> well_defined_rates(nst);
+    for(int i = 0  ; i < nst ; i++) {
         totalrate += possible_rates[i];
         double vertexrate = 0.0;
         for(int k = 0 ; k < i+1 ; k++) {
@@ -162,7 +165,7 @@ void BindingModelSingle::nlet(const vector1<bool> &befores, const vector<mdpair>
         whichto = 0;
     }
     else{
-        for(int i = 1 ; i < possible_rates.getsize() ; i++) {
+        for(int i = 1 ; i < nst ; i++) {
             if(rr > well_defined_rates[i-1] && rr < well_defined_rates[i] ) {
                 whichto = i;
                 break;

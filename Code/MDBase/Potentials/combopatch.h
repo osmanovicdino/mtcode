@@ -116,6 +116,8 @@ struct TetrahedralPatch : ComboPatch {
 
     int *i1;
 
+    matrix<double> v;
+
     TetrahedralPatch(double strr, double disss, double angg);
 
     ~TetrahedralPatch() {
@@ -200,6 +202,7 @@ struct TetrahedralWithSingle : ComboPatch {
     
     int nt; //number of tetrahedra
     int ns; //number of singles
+    matrix<double> v;
 
     TetrahedralWithSingle(double, double, double, double, double, double, double, double, double, int nt, int ns);
 

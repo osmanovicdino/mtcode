@@ -20,6 +20,8 @@ using namespace std;
 #ifndef VECTOR1_H
 #define	VECTOR1_H
 
+#include "mdpair.h"
+
 
 template <class T>
 class matrix;
@@ -62,6 +64,7 @@ public:
 	void delete_element(int); //delete an element;
 	inline T& operator[](int i);// {return data[i];}
 	inline T& operator()(int i) {return data[i];} // equivalent to above
+        
     inline T& gpcons(int) const;
     inline T& periodicselect(int); //move boundry conditions periodically.
     vector1& operator+(); // unary plus
@@ -104,7 +107,7 @@ public:
         friend bool operator==(const vector1<Y>&, const vector1<Y>&); //tests
 
 
-	int getsize() const { return size; }
+	inline int getsize() const { return size; }
 	T* getdat() {return data; }
 	void setval(T a); //set all the values in the vector to a
 	void swap(int,int); // swap
@@ -248,6 +251,11 @@ public:
         
         template <class Y>
         friend vector1<Y> smooth(const vector1<Y>&, int, bool);
+
+
+        friend mdpair get_two_values(const vector1<int>&,const int &i1,const int &i2);
+
+        friend void iterator_update(vector1<int> &v, mdpair temp);
 };
 
 

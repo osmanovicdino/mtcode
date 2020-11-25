@@ -18,6 +18,7 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <random>
+#include <mutex>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -188,7 +189,91 @@ A.setpots(c);
 A.run_singlebond(1000000, 1000);
  */
 
+/*
+vector1<int> indexes(1000);
+vector1<int> indexes_np(1000);
+int T;
+bool er;
 
+matrix<int> pairs = importcsv("./Basic/InitialConditions/pairs.csv",T,er);
+
+matrix<int> possibles(1000, 100);
+matrix<int> possibles_np(1000, 100);
+
+
+std::mutex mtx;
+
+#pragma omp parallel for
+for(int i = 0 ; i < pairs.getNsafe() ; i++ ) {
+    int i1 =  pairs(i,0);
+    int i2 =  pairs(i,1);
+
+
+    // #pragma atomic read 
+    // int iterator1 = indexes[i1];
+    // #pragma atomic read
+    // int iterator2 = indexes[i2];
+  
+
+    mtx.lock();
+    int iterator1 = indexes[i1];
+    int iterator2 = indexes[i2];
+
+    indexes[i1]++;
+    indexes[i2]++;
+    mtx.unlock();
+
+
+    possibles(i1, iterator1) = i2;
+    possibles(i2, iterator2) = i1;
+
+    // #pragma atomic write
+    // possibles(i2, temp.b) = i1;
+
+
+
+    //    indexes[i2]++;
+    
+
+}
+
+
+
+for (int i = 0; i < pairs.getNsafe(); i++)
+{
+    int i1 = pairs(i, 0);
+    int i2 = pairs(i, 1);
+
+
+    possibles_np(i1, indexes_np[i1]) = i2;
+    possibles_np(i2, indexes_np[i2]) = i1;
+
+    indexes_np[i1]++;
+    indexes_np[i2]++;
+}
+
+
+
+cout << (indexes == indexes_np) << endl;
+
+// cout << possibles(0,'r') << endl;
+// cout << possibles_np(0,'r') << endl;
+
+
+
+for(int i = 0  ; i < possibles.getNsafe() ; i++) {
+    if(meanish(possibles_np(i,'r')) == meanish(possibles(i,'r'))) {
+
+    }
+    else {
+        cout << possibles(i, 'r') << endl;
+        cout << possibles_np(i, 'r') << endl;
+        pausel();
+    }
+}
+cout << "done" << endl;
+pausel();
+*/
 
 int n = 2000;
 
@@ -231,19 +316,19 @@ int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMoni
 
 //int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
+A.run_singlebond(10000, 1000);
 
+// for (double beta = 1.0; beta <  2.01; beta  += 0.2)
+// {
+//     A.obj->setkT(1./beta);
+//     stringstream ss;
+//     ss << beta;
 
-for (double beta = 1.0; beta <  2.01; beta  += 0.2)
-{
-    A.obj->setkT(1./beta);
-    stringstream ss;
-    ss << beta;
+//     string base = "_beta=";
+//     base += ss.str();
 
-    string base = "_beta=";
-    base += ss.str();
-
-    A.run_singlebond(2000000, 1000, base);
-}
+//     A.run_singlebond(2000000, 1000, base);
+// }
 
 /* 
 int n = 4;

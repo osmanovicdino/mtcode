@@ -19,7 +19,7 @@ SingPatch::SingPatch(double strr, double disss, double angg) : ComboPatch(1), an
     //vector1<potentialtheta3D *> pots(1);
 }
 
-TetrahedralPatch::TetrahedralPatch(double strr, double disss, double angg) : ComboPatch(16), ang(angg), dis(disss), str(strr) {
+TetrahedralPatch::TetrahedralPatch(double strr, double disss, double angg) : ComboPatch(16), ang(angg), dis(disss), str(strr) ,v(matrix<double>(4,3)) {
     i1 = new int[17];
     i1[0] = 16;
     for(int i = 0 ; i < 16 ; i++)
@@ -28,7 +28,7 @@ TetrahedralPatch::TetrahedralPatch(double strr, double disss, double angg) : Com
 
  
 
-    matrix<double> v(4, 3);
+    //matrix<double> v(4, 3);
     v(0, 0) = nx1;
     v(0, 1) = ny1;
     v(0, 2) = nz1;
@@ -67,164 +67,175 @@ TetrahedralPatch::TetrahedralPatch(double strr, double disss, double angg) : Com
 
 }
 
-void TetrahedralPatch::get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12)
+inline void TetrahedralPatch::get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12)
     {
-        if (potn == 0)
-        {
+        // int i1= potn/4;
+        // int i2 =potn%4;
+        // nxb1 = v(i1,0);
+        // nyb1 = v(i1, 1);
+        // nzb1 = v(i1, 2);
+        // nxb2 = v(i2, 0);
+        // nyb2 = v(i2, 1);
+        // nzb2 = v(i2, 2);
+        d12 = dis;
+        ang12 = ang;
+
+        switch(potn) {
+        case 0:
             nxb1 = nx1;
             nyb1 = ny1;
             nzb1 = nz1;
             nxb2 = nx1;
             nyb2 = ny1;
             nzb2 = nz1;
-        }
-        else if (potn == 1)
-        {
+            break;
+
+        case 1:
             nxb1 = nx1;
             nyb1 = ny1;
             nzb1 = nz1;
             nxb2 = nx2;
             nyb2 = ny2;
             nzb2 = nz2;
-        }
-        else if (potn == 2)
-        {
+            break;
+
+        case 2:
             nxb1 = nx1;
             nyb1 = ny1;
             nzb1 = nz1;
             nxb2 = nx3;
             nyb2 = ny3;
             nzb2 = nz3;
-        }
-        else if (potn == 3)
-        {
+            break;
+
+        case 3:
             nxb1 = nx1;
             nyb1 = ny1;
             nzb1 = nz1;
             nxb2 = nx4;
             nyb2 = ny4;
             nzb2 = nz4;
-        }
-        else if (potn == 4)
-        {
+            break;
+
+        case 4:
             nxb1 = nx2;
             nyb1 = ny2;
             nzb1 = nz2;
             nxb2 = nx1;
             nyb2 = ny1;
             nzb2 = nz1;
-        }
-        else if (potn == 5)
-        {
+            break;
+
+        case 5:
             nxb1 = nx2;
             nyb1 = ny2;
             nzb1 = nz2;
             nxb2 = nx2;
             nyb2 = ny2;
             nzb2 = nz2;
-        }
-        else if (potn == 6)
-        {
+            break;
+
+        case 6:
             nxb1 = nx2;
             nyb1 = ny2;
             nzb1 = nz2;
             nxb2 = nx3;
             nyb2 = ny3;
             nzb2 = nz3;
-        }
-        else if (potn == 7)
-        {
+            break;
+
+        case 7:
             nxb1 = nx2;
             nyb1 = ny2;
             nzb1 = nz2;
             nxb2 = nx4;
             nyb2 = ny4;
             nzb2 = nz4;
-        }
-        else if (potn == 8)
-        {
+            break;
+
+        case 8:
             nxb1 = nx3;
             nyb1 = ny3;
             nzb1 = nz3;
             nxb2 = nx1;
             nyb2 = ny1;
             nzb2 = nz1;
-        }
-        else if (potn == 9)
-        {
+            break;
+
+        case 9:
             nxb1 = nx3;
             nyb1 = ny3;
             nzb1 = nz3;
             nxb2 = nx2;
             nyb2 = ny2;
             nzb2 = nz2;
-        }
-        else if (potn == 10)
-        {
+            break;
+
+        case 10:
             nxb1 = nx3;
             nyb1 = ny3;
             nzb1 = nz3;
             nxb2 = nx3;
             nyb2 = ny3;
             nzb2 = nz3;
-        }
-        else if (potn == 11)
-        {
+            break;
+
+        case 11:
             nxb1 = nx3;
             nyb1 = ny3;
             nzb1 = nz3;
             nxb2 = nx4;
             nyb2 = ny4;
             nzb2 = nz4;
-        }
-        else if (potn == 12)
-        {
+            break;
+
+        case 12:
             nxb1 = nx4;
             nyb1 = ny4;
             nzb1 = nz4;
             nxb2 = nx1;
             nyb2 = ny1;
             nzb2 = nz1;
-        }
-        else if (potn == 13)
-        {
+            break;
+
+        case 13:
             nxb1 = nx4;
             nyb1 = ny4;
             nzb1 = nz4;
             nxb2 = nx4;
             nyb2 = ny2;
             nzb2 = nz2;
-        }
-        else if (potn == 14)
-        {
+            break;
+
+        case 14:
             nxb1 = nx4;
             nyb1 = ny4;
             nzb1 = nz4;
             nxb2 = nx3;
             nyb2 = ny3;
             nzb2 = nz3;
-        }
-        else if (potn == 15)
-        {
+            break;
+
+        case 15:
             nxb1 = nx4;
             nyb1 = ny4;
             nzb1 = nz4;
             nxb2 = nx4;
             nyb2 = ny4;
             nzb2 = nz4;
-        }
-        else
-        {
+            break;
+
+        default:
             cout << i << " " << j << endl;
             cout << "potential number: " << potn << endl;
             error("potn out of bounds in tetrahedral get_params");
+            break;
+
         }
-        d12 = dis;
-        ang12 = ang;
     
 }
 
-TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, double anggtt, double strrts, double dissts, double anggts, double strrss, double dissss, double anggss, int ntt, int nss) : ComboPatch(21) 
+TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, double anggtt, double strrts, double dissts, double anggts, double strrss, double dissss, double anggss, int ntt, int nss) : ComboPatch(21) , v(matrix<double>(4,3))
 {
     nt = ntt;
     ns = nss;

@@ -28,8 +28,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     //vector1<int> nump(this->getN(),0); //this is the number of bound particles per particle
 
+    std::mutex mtx;
+
     unsigned int i;
 
+    #pragma omp parallel for
     for (i = 0; i < pairs.getNsafe(); ++i)
     {
         int p1 = pairs(i, 0);
@@ -71,15 +74,20 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //     {
 
                 //int potn = np1 * j + k;
-
- 
+            int **q = new int*;
+            if(iny.safe) {
             iny.UpdateIterator(p1,p2);
+            *q= *iny.p;
+            }
+            else{
+            iny.UpdateIteratorSafe(p1,p2,q);
 
+            }
             //int **q = iny.p;
 
-            for (int tp = 1; tp < (*iny.p)[0] + 1; tp++)
+            for (int tp = 1; tp < (*q)[0] + 1; tp++)
             {
-                int potn = (*iny.p)[tp];
+                int potn = (*q)[tp];
                 // vector1<double> params = (iny.potential_bundle)[potn]->getparameters();
 
                 double nxb1;// = params[0]; //iny[potn]->nxb1;
@@ -124,21 +132,32 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     //     cout << bo.boundto[wp1] << " " << bo.boundto[wp2] << endl;
                     //     pausel();
                     // }
+
+                    
+                    
+                    //#pragma omp atomic read
+                    //mtx.lock();
+
+                    const std::lock_guard<std::mutex> lock(mtx);
+                    
                     int iterator1 = tempbound[wp1];
+                    //#pragma omp atomic read
                     int iterator2 = tempbound[wp2];
 
-                    #pragma omp atomic update
-                    tempbound[wp1]++;
-                    #pragma omp atomic update
-                    tempbound[wp2]++;
-                    
-                    boindices(wp1, iterator1) = wp2;
-                    boindices(wp2, iterator2) = wp1;
 
+                    tempbound[wp1]++;
+                    tempbound[wp2]++;
+
+                    //mtx.unlock();
+                   
+                    boindices(wp1, iterator1) = wp2;
+                    
+                    boindices(wp2, iterator2) = wp1;
+                    
 
                 }
             }
-            //delete q;
+            delete q;
             
         //     }
         // }
@@ -372,16 +391,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     int nb2 = tempbound[i2];
                     int nb3 = tempbound[i3];
 
-                    if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
+                    // if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
                         
-                        cout << i1 << " " << i2 << " " << i3 << endl;
+                    //     cout << i1 << " " << i2 << " " << i3 << endl;
 
-                        outfunc(tempbound, "t1");
-                        outfunc(boindices, "t2");
+                    //     outfunc(tempbound, "t1");
+                    //     outfunc(boindices, "t2");
 
-                        pausel();
-                        error("something weird in code");
-                    }
+                    //     pausel();
+                    //     error("something weird in code");
+                    // }
 
                     if (nb1 == 1)
                     {

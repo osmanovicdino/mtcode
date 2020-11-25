@@ -262,7 +262,7 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
 
     int Ns = angmom->getNsafe();
 
-#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < Ns; i++)
     {
         double qtemp0 = orient->operator()(i, 0);

@@ -80,13 +80,14 @@ vector1<int> ConnectedComponents(matrix<int> &adj, vector1<int> &lens, vector1<i
 }
 
 bool IndependentEdge(const vector<mdpair> &pairs, const vector1<bool> &bonds) {
-    if(pairs.size() != bonds.getsize()) error("error in independent edge calculation");
+    int bs = bonds.getsize();
+    if(pairs.size() != bs) error("error in independent edge calculation");
 
     bool result = true;
     vector<int> iterators;
     //int k=0;
-    iterators.reserve(bonds.getsize()*2);
-    for(int i  = 0 ; i < bonds.getsize() ; i++) {
+    iterators.reserve(bs*2);
+    for(int i  = 0 ; i < bs ; i++) {
         if(bonds.gpcons(i)) {
             iterators.push_back(pairs[i].a);
             iterators.push_back(pairs[i].b);

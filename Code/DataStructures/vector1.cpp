@@ -841,6 +841,18 @@ vector1<Y> smooth(const vector1<Y> &a, int s, bool open) {
 	
 
 }*/
+mdpair get_two_values(const vector1<int> &v, const int &i1, const int &i2) {
+    mdpair res;
+    res.a = v.data[i1];
+    res.b = v.data[i2];
+    return res;
+}
+
+void iterator_update(vector1<int> &v, mdpair temp)
+{
+    v.data[temp.a]++;
+    v.data[temp.b]++;
+}
 
 #endif
 

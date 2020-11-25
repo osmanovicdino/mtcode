@@ -328,6 +328,23 @@ matrix<T>& matrix<T>::operator*=(T a) {
         return *this;
 }
 
+
+template <class T>
+bool matrix<T>::operator==(const matrix<T> &x)
+{
+    if (ncols != x.ncols || nrows != x.nrows)
+        return false;
+    else
+    {
+        for (int i = 0; i < datapoints; i++)
+        {
+            if (abs(mat[i] - x.mat[i]) > 1E-10)
+                return false;
+        }
+        return true;
+    }
+}
+
 template <class T>
 matrix<T>& matrix<T>::operator*=(const matrix<T> &a) {
         if (nrows != a.nrows || ncols != a.ncols) error("diff size matrics in *= operator");

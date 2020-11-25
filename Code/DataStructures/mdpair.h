@@ -34,6 +34,15 @@ struct mdpair
     }
 };
 
+struct mdtriplet {
+    int a;
+    int b;
+    int c;
+
+    mdtriplet() : a(0), b(0), c(0) {}
+    mdtriplet(const int &aa, const int &bb, const int &cc) : a(aa), b(bb), c(cc) {}
+};
+
 struct dispair
 {
     int a;

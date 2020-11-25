@@ -65,6 +65,7 @@ public:
 	matrix& operator/=(T); //divide a matrix by T
 	matrix& operator*=(T); //multiply a matrix by T
 	matrix& operator*=(const matrix&); // multiply the matrix by another
+        bool operator==(const matrix&);
 
     matrix* clone() const { return new matrix(*this); } 
 
