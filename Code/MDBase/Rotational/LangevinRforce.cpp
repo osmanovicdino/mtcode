@@ -556,7 +556,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     //cout << bounded << endl;
                     int m = 1 << matched.size();
 
-                    if(m<1000) { //if the states are too big, don't do it
+                    if(abs(m)<1000) { //if the states are too big, don't do it
 
                     //get the set of all possible bools to move to
                     vector< vector1<bool> > possible_states;
