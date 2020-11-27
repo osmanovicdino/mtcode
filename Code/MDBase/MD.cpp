@@ -543,6 +543,8 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 	index1.reserve(totn);
 	index2.reserve(totn);
 
+	cout << "reserved: " << totn << endl;
+
 
 	#pragma omp parallel
 	{
