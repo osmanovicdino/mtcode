@@ -318,8 +318,7 @@ int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMoni
 
 //A.run_singlebond(10000, 1000);
 
-for (double beta = 1.0; beta <  2.01; beta  += 0.2)
-{
+    double beta = 1.2;
     A.obj->setkT(1./beta);
     stringstream ss;
     ss << beta;
@@ -327,8 +326,8 @@ for (double beta = 1.0; beta <  2.01; beta  += 0.2)
     string base = "_beta=";
     base += ss.str();
 
-    A.run_singlebond(2000000, 1000, base);
-}
+    A.run_singlebond(10000000, 1000, base);
+
 
 /* 
 int n = 4;
