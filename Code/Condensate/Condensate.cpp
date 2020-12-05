@@ -62,8 +62,8 @@ Condensate::Condensate(double ll, int N)  {
     b.setdt(dt);
 
     double viscosity = 1.0;
-
     double hdradius = 0.5;
+    
 
     b.setgamma(6.*pi*viscosity*hdradius);
     b.setgammar(8.*pi*viscosity*hdradius*hdradius*hdradius);
@@ -72,6 +72,17 @@ Condensate::Condensate(double ll, int N)  {
 
     *obj = b;
 
+}
+
+void Condensate::setviscosity(double a)
+{
+    double hdradius = 0.5;
+    obj->setgamma(6. * pi * a * hdradius);
+    obj->setgammar(8. * pi * a * hdradius * hdradius * hdradius);
+}
+
+void Condensate::setkT(double a) {
+    obj->setkT(a);
 }
 
 void Condensate::setpots(ComboPatch &a) {
@@ -91,26 +102,7 @@ void Condensate::run(int runtime, int every, string strbase = "")
 
 
 
-    ofstream myfileori;
-    myfileori.open("ori.csv");
 
-    double nxb1; // = params[0]; //iny[potn]->nxb1;
-    double nyb1; // = params[1]; //iny[potn]->nyb1;
-    double nzb1; // = params[2]; //iny[potn]->nzb1;
-
-    double nxb2; // = params[3]; //iny[potn]->nxb2;
-    double nyb2; // = params[4]; //iny[potn]->nyb2;
-    double nzb2; // = params[5]; //iny[potn]->nzb2;
-
-    double disp; // = params[6];
-
-    double thetam; // = params[8];
-
-    pots->get_params(0,0,1, nxb1, nyb1, nzb1, nxb2, nyb2, nzb2, disp, thetam);
-
-    myfileori << nxb1 << "," << nyb1 << "," << nzb1 << endl;
-
-    myfileori.close();
 
     int tf = ceil( (double)runtime / (double)every);
     int number_of_digits = 0;
@@ -147,13 +139,24 @@ void Condensate::run(int runtime, int every, string strbase = "")
     obj->create_forces_and_torques_sphere(F, T);
 
 
-
+    vector1<double> tottemp(6);
 
     for (int i = 0; i < runtime; i++)
     {
         //cout << i << endl;
-        //obj->measured_temperature();
+        // vector1<double> meas(6);
+        // obj->measured_temperature(meas);
+        // tottemp += meas;
+        // cout << tottemp/(double)(i+1) << endl;
 
+
+        cout << i << endl;
+        if (i > 0 && i % 20 == 0)
+        {
+            // cout << "pairs recalculated" << endl;
+            delete pairs;
+            pairs = obj->calculatepairs(boxes, 3.5);
+        }
 
         obj->advancemom_halfstep(F, T);
    
@@ -181,9 +184,6 @@ void Condensate::run(int runtime, int every, string strbase = "")
         obj->advancemom_halfstep(F, T);
         if (i % every == 0)
         {
-            cout << i << endl;
-            delete pairs;
-            pairs = obj->calculatepairs(boxes, 3.5);
 
             //cout << i << endl;
 
@@ -286,7 +286,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
         cout << i << endl;
         if (i>0 && i % 20 == 0)
         {
-            cout << "pairs recalculated" << endl;
+           // cout << "pairs recalculated" << endl;
             delete pairs;
             pairs = obj->calculatepairs(boxes, 3.5);
         }
@@ -306,7 +306,6 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
         T.reset(0.0);
 
         obj->calculate_forces_and_torques3D_onlyone(*pairs, *pots, bbs, *bm, F, T);
-
 
 
 

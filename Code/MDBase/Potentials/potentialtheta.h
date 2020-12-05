@@ -51,7 +51,7 @@ struct KernFrenkelOnePatch : potentialtheta3D {
         nxb2 = nxx2;
         nyb2 = nyy2;
         nzb2 = nzz2;
-        if (abs(SQR(nxb1) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+        if (abs(SQR(nxb1) + SQR(nyb1) + SQR(nzb1) - 1) > 1E-5)
             error("patch potential should be called with unit vector (vector not normalized)");
         if (abs(SQR(nxb2) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
             error("patch potential should be called with unit vector (vector not normalized)");
@@ -59,7 +59,7 @@ struct KernFrenkelOnePatch : potentialtheta3D {
         dl = false;
         dis = diss;
         att = attt;
-        interaction_distance =  2*dis;
+        interaction_distance =  2.5*dis;
         thetam = thetamm;
         //v = vv;
         v =  vv;
@@ -68,7 +68,7 @@ struct KernFrenkelOnePatch : potentialtheta3D {
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
     {
         //dpos is the vector of differences of distance in each dimension
-        if(rij > 2.5*(dis+v) ) {
+        if(rij > interaction_distance ) {
             fx = 0.0;
             fy = 0.0;
             fz = 0.0;
@@ -124,21 +124,22 @@ struct KernFrenkelOnePatch : potentialtheta3D {
 
             f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
 
-            double fac = (dis/(rij+v*dis));
+            double fac = (dis/(rij));
             double fac2 = SQR(fac);
             double fac6 = CUB(fac2);
             double fac12 = SQR(fac6);
 
-            double potf = ((24*att)/dis)*(2*fac*fac12-fac*fac6);
+           // double potf = ((24*att)/dis)*(2*fac*fac12-fac*fac6);
 
-            double pot =  4*att*((fac12)-(fac6));
+            //double pot =  4*att*((fac12)-(fac6));
+
+            double potf = ((24 * att) / dis) * (- fac * fac6);
+            double pot =  4*att*(-fac6);
 
 
-
-
-            fx =  SQR(f) * potf * un.gpcons(0);
-            fy =  SQR(f) * potf * un.gpcons(1);
-            fz =  SQR(f) * potf * un.gpcons(2);
+            fx =  f * potf * un.gpcons(0);
+            fy =  f * potf * un.gpcons(1);
+            fz =  f * potf * un.gpcons(2);
 
             //cout << fx << " " << fy << " " << fz << endl;
 
@@ -161,9 +162,9 @@ struct KernFrenkelOnePatch : potentialtheta3D {
             // double factor = ((rij/dis)-SQR(rij/dis));
            // cout << "DONE" << endl;
 
-            double temp1  = -pot*2*f*((pi/(2*thetam))*sin(pi * thetai / (2. * thetam))*d1*cos((pi*thetaj)/(2*thetam)));
+            double temp1  = -pot*((pi/(2*thetam))*sin(pi * thetai / (2. * thetam))*d1*cos((pi*thetaj)/(2*thetam)));
 
-            double temp2  = -pot*2*f*((pi/(2*thetam))*sin(pi * thetaj / (2. * thetam))*d2*cos((pi*thetai)/(2*thetam)));
+            double temp2  = -pot*((pi/(2*thetam))*sin(pi * thetaj / (2. * thetam))*d2*cos((pi*thetai)/(2*thetam)));
 
            // cout << fx << " " << fy << " " << fz << endl;
 
@@ -179,13 +180,13 @@ struct KernFrenkelOnePatch : potentialtheta3D {
 
             // cout << fx << " " << fy << " " << fz << endl;
 
-            tix = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(2) * ny1 - un.gpcons(1) * nz1);
-            tiy = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (-un.gpcons(2) * nx1 + un.gpcons(0) * nz1);
-            tiz = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(1) * nx1 - un.gpcons(0) * ny1);
+            tix = -(pi / (2. * thetam)) * pot *  sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(2) * ny1 - un.gpcons(1) * nz1);
+            tiy = -(pi / (2. * thetam)) * pot *  sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (-un.gpcons(2) * nx1 + un.gpcons(0) * nz1);
+            tiz = -(pi / (2. * thetam)) * pot *  sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(1) * nx1 - un.gpcons(0) * ny1);
             // cout << tx << " " << ty << " " << tz << endl;
-            tjx = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(2) * ny2 + un.gpcons(1) * nz2);
-            tjy = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (un.gpcons(2) * nx2 - un.gpcons(0) * nz2);
-            tjz = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(1) * nx2 + un.gpcons(0) * ny2);
+            tjx = -(pi / (2. * thetam)) * pot *  sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(2) * ny2 + un.gpcons(1) * nz2);
+            tjy = -(pi / (2. * thetam)) * pot *  sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (un.gpcons(2) * nx2 - un.gpcons(0) * nz2);
+            tjz = -(pi / (2. * thetam)) * pot *  sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(1) * nx2 + un.gpcons(0) * ny2);
             // cout << tx << " " << ty << " " << tz << endl;
             // cout << ttx << " " << tty << " " << ttz << endl;
             // //cout << fx << " " << fy << " " << fz << endl;
@@ -254,6 +255,7 @@ struct KernFrenkelOnePatch : potentialtheta3D {
             error("patch potential should be called with unit vector (vector not normalized)");
 
         dis = param.gpcons(6);
+        interaction_distance = 2.5*dis;
         att = param.gpcons(7);
         thetam = param.gpcons(8);
         v = param.gpcons(9);
@@ -276,7 +278,7 @@ struct KernFrenkelOnePatch : potentialtheta3D {
         param[6] = dis;// = param.gpcons(6);
         param[7] = att;// = param.gpcons(7);
         param[8] = thetam;// = param.gpcons(8);
-        param[9] = v; // = param.gpcons(9);
+        param[9] = interaction_distance; // = param.gpcons(9);
         return param;
     }
 
@@ -327,7 +329,7 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
         dl = false;
         dis = diss;
         att = attt;
-        interaction_distance = 2 * dis;
+        interaction_distance = 1.4 * dis;
         thetam = thetamm;
         //v = vv;
         v = vv;
@@ -337,7 +339,7 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
     {
             //un is r_i-r_j
         //dpos is the vector of differences of distance in each dimension
-        if (rij > 2.5 * (dis + v))
+        if (rij > interaction_distance)
         {
             fx = 0.0;
             fy = 0.0;
@@ -416,9 +418,9 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
 
                 
 
-                fx = SQR(f) * potf * un.gpcons(0);
-                fy = SQR(f) * potf * un.gpcons(1);
-                fz = SQR(f) * potf * un.gpcons(2);
+                fx = f * potf * un.gpcons(0);
+                fy = f * potf * un.gpcons(1);
+                fz = f * potf * un.gpcons(2);
 
                 //cout << fx << " " << fy << " " << fz << endl;
 
@@ -444,9 +446,9 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
                 // double factor = ((rij/dis)-SQR(rij/dis));
                 // cout << "DONE" << endl;
 
-                double temp1 = -pot * 2 * f * ((pi / (2 * thetam)) * sin(pi * thetai / (2. * thetam)) * d1 * cos((pi * thetaj) / (2 * thetam)));
+                double temp1 = -pot  * ((pi / (2 * thetam)) * sin(pi * thetai / (2. * thetam)) * d1 * cos((pi * thetaj) / (2 * thetam)));
 
-                double temp2 = -pot * 2 * f * ((pi / (2 * thetam)) * sin(pi * thetaj / (2. * thetam)) * d2 * cos((pi * thetai) / (2 * thetam)));
+                double temp2 = -pot  * ((pi / (2 * thetam)) * sin(pi * thetaj / (2. * thetam)) * d2 * cos((pi * thetai) / (2 * thetam)));
 
                 
 
@@ -462,13 +464,13 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
 
                
 
-                tix = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(2) * ny1 - un.gpcons(1) * nz1);
-                tiy = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (-un.gpcons(2) * nx1 + un.gpcons(0) * nz1);
-                tiz = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(1) * nx1 - un.gpcons(0) * ny1);
+                tix = -(pi / (2. * thetam)) * pot  * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(2) * ny1 - un.gpcons(1) * nz1);
+                tiy = -(pi / (2. * thetam)) * pot  * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (-un.gpcons(2) * nx1 + un.gpcons(0) * nz1);
+                tiz = -(pi / (2. * thetam)) * pot  * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(1) * nx1 - un.gpcons(0) * ny1);
                 // cout << tx << " " << ty << " " << tz << endl;
-                tjx = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(2) * ny2 + un.gpcons(1) * nz2);
-                tjy = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (un.gpcons(2) * nx2 - un.gpcons(0) * nz2);
-                tjz = -(pi / (2. * thetam)) * pot * 2 * f * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(1) * nx2 + un.gpcons(0) * ny2);
+                tjx = -(pi / (2. * thetam)) * pot  * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(2) * ny2 + un.gpcons(1) * nz2);
+                tjy = -(pi / (2. * thetam)) * pot  * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (un.gpcons(2) * nx2 - un.gpcons(0) * nz2);
+                tjz = -(pi / (2. * thetam)) * pot  * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(1) * nx2 + un.gpcons(0) * ny2);
                 
                 // cout << nx1 << " " << ny1 << " " << nz1 << endl;
                 
@@ -574,6 +576,7 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
             error("patch potential should be called with unit vector (vector not normalized)");
 
         dis = param.gpcons(6);
+        interaction_distance = 1.4*dis;
         att = param.gpcons(7);
         thetam = param.gpcons(8);
         v = param.gpcons(9);
@@ -596,7 +599,7 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
         param[6] = dis;    // = param.gpcons(6);
         param[7] = att;    // = param.gpcons(7);
         param[8] = thetam; // = param.gpcons(8);
-        param[9] = v;      // = param.gpcons(9);
+        param[9] = interaction_distance;      // = param.gpcons(9);
         return param;
     }
 

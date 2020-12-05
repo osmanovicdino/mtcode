@@ -1,6 +1,8 @@
 #ifndef COMBOPATCH_CPP
 #define COMBOPATCH_CPP
 
+typedef KernFrenkelOnePatch2 mypot;
+
 SingPatch::SingPatch(double strr, double disss, double angg) : ComboPatch(1), ang(angg), dis(disss), str(strr)
 {
     i1 = new int[2];
@@ -9,7 +11,7 @@ SingPatch::SingPatch(double strr, double disss, double angg) : ComboPatch(1), an
     p = &i1;
 
 
-    KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(nx, ny, nz, nx, ny, nz, str, dis, ang, 0.75);
+    mypot *pot1 = new mypot(nx, ny, nz, nx, ny, nz, str, dis, ang, 0.75);
 
     potential_bundle[0] = pot1->clone();
 
@@ -56,7 +58,7 @@ TetrahedralPatch::TetrahedralPatch(double strr, double disss, double angg) : Com
     {
         for (int j = 0; j < 4; j++)
         {
-            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), str, dis, ang, 0.75);
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), str, dis, ang, 0.75);
 
             potential_bundle[iter] = pot1->clone();
             delete pot1;
@@ -77,7 +79,7 @@ inline void TetrahedralPatch::get_params(const int &i, const int &j, const int &
         // nxb2 = v(i2, 0);
         // nyb2 = v(i2, 1);
         // nzb2 = v(i2, 2);
-        d12 = dis;
+        d12 = potential_bundle[potn]->interaction_distance;
         ang12 = ang;
 
         switch(potn) {
@@ -295,7 +297,7 @@ TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, doubl
     {
         for (int j = 0; j < 4; j++)
         {
-            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strtt, distt, angtt, 0.75);
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strtt, distt, angtt, 0.75);
 
             potential_bundle[iter] = pot1->clone();
             delete pot1;
@@ -306,7 +308,7 @@ TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, doubl
     {
         for (int j = 0; j < 1; j++)
         {
-            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strts, dists, angts, 0.75);
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strts, dists, angts, 0.75);
 
             potential_bundle[iter] = pot1->clone();
             delete pot1;
@@ -317,7 +319,7 @@ TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, doubl
     {
         for (int j = 0; j < 1; j++)
         {
-            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strss, disss, angss, 0.75);
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strss, disss, angss, 0.75);
 
             potential_bundle[iter] = pot1->clone();
             delete pot1;
@@ -479,7 +481,7 @@ void TetrahedralWithSingle::get_params(const int &i, const int &j, const int &po
             cout << "potential number: " << potn << endl;
             error("potn out of bounds in tetrahedral get_params");
         }
-        d12 = distt;
+        d12 = potential_bundle[potn]->interaction_distance;
         ang12 = angtt;
     }
     else if(i >= nt && j >= nt) {
@@ -529,7 +531,7 @@ void TetrahedralWithSingle::get_params(const int &i, const int &j, const int &po
             nyb1 = ny4;
             nzb1 = nz4;
         }
-        d12 = dists;
+        d12 =  potential_bundle[potn]->interaction_distance;
         ang12 = angts;
 
     }
@@ -637,7 +639,7 @@ TwoTetrahedral::TwoTetrahedral(double strrtt, double disstt, double anggtt, doub
     {
         for (int j = 0; j < 4; j++)
         {
-            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strtt, distt, angtt, 0.75);
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strtt, distt, angtt, 0.75);
 
             potential_bundle[iter] = pot1->clone();
             delete pot1;
@@ -648,7 +650,7 @@ TwoTetrahedral::TwoTetrahedral(double strrtt, double disstt, double anggtt, doub
     {
         for (int j = 0; j < 4; j++)
         {
-            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strts, dists, angts, 0.75);
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strts, dists, angts, 0.75);
 
             potential_bundle[iter] = pot1->clone();
             delete pot1;
@@ -659,7 +661,7 @@ TwoTetrahedral::TwoTetrahedral(double strrtt, double disstt, double anggtt, doub
     {
         for (int j = 0; j < 4; j++)
         {
-            KernFrenkelOnePatch2 *pot1 = new KernFrenkelOnePatch2(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strss, disss, angss, 0.75);
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strss, disss, angss, 0.75);
 
             potential_bundle[iter] = pot1->clone();
             delete pot1;
@@ -841,15 +843,15 @@ void TwoTetrahedral::get_params(const int &i, const int &j, const int &potn2, do
             error("potn out of bounds in tetrahedral get_params");
         }
     if(n == 0) {
-        d12 = distt;
+        d12 = potential_bundle[potn2]->interaction_distance;
         ang12 = angtt;
     }
     else if(n ==1 ) {
-        d12 = dists;
+        d12 = potential_bundle[potn2]->interaction_distance;
         ang12 = angts;
     }
     else if(n ==2) {
-        d12 = disss;
+        d12 = potential_bundle[potn2]->interaction_distance;
         ang12 = angss;
     }
     else{

@@ -15,6 +15,9 @@ AbstractBindingModel *bm;
 
 Condensate(double, int);
 
+void setviscosity(double);
+void setkT(double);
+
 void setpots(ComboPatch&);
 
 void setBindingModel(AbstractBindingModel&);

@@ -87,6 +87,31 @@ void LangevinNVTR::measured_temperature(ofstream& myfile) {
     myfile << angav[2] << "\n";
 }
 
+void LangevinNVTR::measured_temperature(vector1<double> &ret)
+{
+    int ds = this->getdimension();
+    vector1<double> momav(ds);
+    vector1<double> angav(ds);
+    for (int i = 0; i < (*mom).getNsafe(); i++)
+    {
+        for (int i1 = 0; i1 < ds; i1++)
+        {
+            momav[i1] += ((*mom)(i, i1) * (*mom)(i, i1)) / (2. * m);
+            angav[i1] += ((*angmom)(i, i1) * (*angmom)(i, i1)) / (2. * im[0]);
+        }
+    }
+    momav /= ((double)(mom->getNsafe()));
+    angav /= ((double)(angmom->getNsafe()));
+
+    ret[0] =  momav[0];
+    ret[1] = momav[1];
+    ret[2] = momav[2];
+
+    ret[3] = angav[0];
+    ret[4] = angav[1];
+    ret[5] = angav[2];
+}
+
 void LangevinNVTR::measured_temperature()
 {
     int ds = this->getdimension();
@@ -582,8 +607,7 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
                 // cout << dis << endl;
                 // cout << un << endl;
                 // cout << iny.potential_bundle[potn]->getparameters() << endl;
-                // if(fx>1E-5) pausel();
-
+                
                 forces(p1, 0) += fx;
                 forces(p1, 1) += fy;
                 forces(p1, 2) += fz;

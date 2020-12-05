@@ -55,7 +55,67 @@ int main(int argc, char** argv) {
 
 srand (time(NULL));
 
+/*
+Condensate A(4.0,2);
 
+matrix<double> dat(2,3);
+
+dat(0, 0) = 2.0;
+dat(0, 1) = 2.0;
+dat(0, 2) = 2.0;
+
+dat(1,0) = 2.0;
+dat(1,1) = 2.0;
+dat(1,2) = 3.4;
+
+A.obj->setdat(dat);
+
+TetrahedralPatch c(10.0, 1.0, pi / 3.);
+A.setpots(c);
+
+vector1<double> v1(3);
+
+v1[0] = 0.;
+v1[1] = 0.;
+v1[2] = 1.;
+
+vector1<double> v12(3);
+
+double dy = 0.6;
+double dz = 0.6;
+
+v12[0] = dy;
+v12[1] = dz;
+v12[2] = sqrt(SQR(1.) - SQR(dy) - SQR(dz));
+
+vector1<double> v2(3);
+
+v2[0] = -sqrt(2. / 9.);
+v2[1] = sqrt(2. / 3.);
+v2[2] = -1. / 3.;
+
+vector1<double> v3(3);
+
+v3[0] = -dy;
+v3[1] = -dz;
+v3[2] = -sqrt(SQR(1.) - SQR(dy) - SQR(dz));
+
+A.obj->setorientation(v1, v12, 0);
+A.obj->setorientation(v2, v3, 1);
+
+// cout << A.obj->getorientation() << endl;
+
+BindingModelSingle b(0.99, 0.00);
+
+A.setBindingModel(b);
+
+A.setviscosity(0.0);
+A.setkT(0.0);
+
+A.run(1000,1); 
+
+
+*/
 /* 
 BindingModelBinary b(4*125);
 
@@ -275,32 +335,16 @@ cout << "done" << endl;
 pausel();
 */
 
-int n = 2000;
 
-Condensate A(cbrt(2)*27.144, n);
+int n = 100;
+double packing_fraction = 0.05;
 
-//for one hundeed twenty five
-// double basex =  10.0;
-// double basey =  10.0;
-// double basez =  10.0;
+double l = cbrt(pi*(double)n/(6.*packing_fraction));
 
-// int iter  = 0;
-// matrix<double> initialpos(n,3);
+Condensate A(l, n);
 
-// for(int i = 0  ; i < 5 ; i++) {
-//     for(int j =  0 ; j < 5 ; j ++) {
-//         for(int k = 0 ; k < 5 ; k++ ) {
-//             initialpos(iter, 0) = basex + i * dx;
-//             initialpos(iter, 1) = basey + j * dx;
-//             initialpos(iter, 2) = basez + k * dx;
-//             iter++;
-//         }
-//     }
-// }
 
-// A.obj->setdat(initialpos);
-
-TetrahedralPatch c(10.0, 1.5, pi / 3.);
+TetrahedralPatch c(1.0, 1.4, 0.927);
 
 //TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
 
@@ -312,21 +356,27 @@ A.setBindingModel(b);
 
 A.setpots(c);
 
-int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+//int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
 //int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
 //A.run_singlebond(10000, 1000);
 
-    double beta = 1.2;
-    A.obj->setkT(1./beta);
-    stringstream ss;
-    ss << beta;
+A.setviscosity(1.0);
 
-    string base = "_beta=";
-    base += ss.str();
+for(double beta = 5.0; beta < 11.5 ; beta+=1.0) {
+A.obj->setkT(1./beta);
 
-    A.run_singlebond(10000000, 1000, base);
+
+
+stringstream ss;
+ss << beta;
+
+string base = "_beta=";
+base += ss.str();
+
+A.run(10000000, 1000, base);
+}
 
 
 /* 

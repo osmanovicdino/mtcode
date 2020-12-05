@@ -18,15 +18,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     matrix<int> boindices(total_number_of_patches, depth_of_matrix);
 
-    // if (SQR(np1) != iny.getsize())
-    // {
-    //     error("number of patches and size of potential bundle incorrect");
-    // }
-    //vector<array<int, depth_of_matrix> > boindices2(total_number_of_patches);
 
-    //std::array<vector<int> , total_number_of_patches> ind;
-
-    //vector1<int> nump(this->getN(),0); //this is the number of bound particles per particle
 
     std::mutex mtx;
 
@@ -89,7 +81,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             {
                 int potn = (*q)[tp];
                 // vector1<double> params = (iny.potential_bundle)[potn]->getparameters();
-
+                //cout << potn << endl;
                 double nxb1;// = params[0]; //iny[potn]->nxb1;
                 double nyb1;// = params[1]; //iny[potn]->nyb1;
                 double nzb1;// = params[2]; //iny[potn]->nzb1;
@@ -116,8 +108,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
                 double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
 
-                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < 1. * disp)
+                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp)
                 {
+                    //cout << argthetai <<  " " << argthetaj << endl;
                     int wp1,wp2;
                     iny.which_patch(p1,p2,potn,wp1,wp2);
                     // if((wp1 > 500 ||wp2 > 500) && !(wp1>500&&wp2>500)) {
@@ -132,7 +125,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     //     cout << bo.boundto[wp1] << " " << bo.boundto[wp2] << endl;
                     //     pausel();
                     // }
-
+                   // cout << potn << endl;
                     
                     
                     //#pragma omp atomic read
@@ -157,11 +150,15 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                 }
             }
+            //pausel();
             delete q;
             
         //     }
         // }
         }
+
+        // cout << "which patch" << endl;
+        //pausel();
     
 
     // for(int i =  0 ; i <total_number_of_patches ; i++) {
@@ -214,16 +211,22 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
             if(outside) {
                 bo.isbound[i]= false;
+             //   cout << "unbind event" << endl;
+               // cout << bo.isbound << endl;
+               
+                //cout << bo.isbound << endl;
             }
             
         }
     }
+    // cout << "calc unbind" << endl;
     //Calculate all the bindings for all the patches
 
     vector1<int> indexes(total_number_of_patches);
 
     vector1<int> nbins = ConnectedComponents(boindices, tempbound, indexes);
 
+    // cout << "connectded components" << endl;
     // #pragma omp parallel for
     // for (int i = 0; i < nbins.getsize() - 1; i++)
     // {
@@ -279,8 +282,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     // pausel();
    // cout << "got cc" << endl;
     //if things are bound outside their clusters, unbind them:
-
-
+    // cout << nbins << endl;
+    // vector<int> v(nbins.getsize()-1);
+    // for(int i = 0  ; i < nbins.getsize()-1 ;  i++) {
+    //     v[i] = nbins[i+1]-nbins[i];
+    // }
+    // std::sort(v.begin(),v.end());
+    // for(int i = 0  ; i < v.size() ; i++)
+    //     cout << v[i] <<",";
+    // cout << endl;
+    // pausel();
 
    // cout << "unbound" << endl;
         //     cout << "cluster size distribution" << endl;
@@ -297,11 +308,18 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
 
 
-        int number_to_reserve = MIN(2*(total_number_of_patches- nbins.getsize()),total_number_of_patches/2 );
-
+        int number_to_reserve = MIN(2*((total_number_of_patches+1)- nbins.getsize()),total_number_of_patches/2 );
+       // cout << number_to_reserve << endl;
         vector<mdpair> mypairs;//(number_to_reserve);
-
         mypairs.reserve(number_to_reserve);
+
+        // cout << boindices << endl;
+        // cout << tempbound << endl;
+        // cout << nbins << endl;
+        // cout << indexes << endl;
+
+        // cout << nbins.getsize() << " " << number_to_reserve << endl;
+        // mypairs.reserve(number_to_reserve);
 
 
         #pragma omp parallel 
@@ -312,9 +330,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             #pragma omp for nowait schedule(static) 
             for (int i = 0; i < nbins.getsize() - 1; i++)
             {
-
+                
                 int size_of_cluster = nbins[i + 1] - nbins[i];
-
+                //cout << "nbins: " << i << " " << size_of_cluster << endl;
                 if (size_of_cluster == 1)
                 {
                     //do nothing
@@ -508,7 +526,26 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 }
                 else
                 {
-                    //cout << "n cluster begins" << endl;
+                    // cout << size_of_cluster << endl;
+                    // for(int j = 0 ; j < size_of_cluster ; j++) {
+                    //     for(int k = 0  ; k <tempbound[indexes[j]] ; k++ ) {
+                    //         vector1<double> un(dimension);
+                    //         double dis;
+                    //         int p1,p2;
+                    //         iny.which_particle(indexes[j], boindices(indexes[j],k), p1, p2);
+                    //         geo->distance_vector(*dat, p1,p2, un, dis);
+
+
+                    //         //un = i-j
+                    //         dis = sqrt(dis);
+                    //         cout << "{{" << indexes[j] << "\\" <<"[UndirectedEdge]" << boindices(indexes[j], k) <<"}," << dis << "},";
+                                             
+                    //     }
+                    // }
+                    // cout << endl;
+                    // //for large clusters, repeat the partitioning 
+                    // pausel();
+                    if(size_of_cluster < 10) {
                     //firstly, obtain the graph of edges;
                     vector<mdpair> matched;
                     matched.reserve(size_of_cluster*(size_of_cluster-1)/2);
@@ -540,6 +577,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     sort(matched.begin(), matched.end());
                     matched.erase(unique(matched.begin(), matched.end()), matched.end());
 
+                    //cout << "removed duplicates" << endl;
 
                     //get the initial state
                     vector1<bool> bounded(matched.size());
@@ -555,6 +593,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                     //cout << bounded << endl;
                     int m = 1 << matched.size();
+                   // cout << m << endl;
 
                     if(abs(m)<1000) { //if the states are too big, don't do it
 
@@ -626,6 +665,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 // pausel();
                // cout << "ncluster done" << endl;
                 }
+                }
 
             }
             #pragma omp for schedule(static) ordered
@@ -636,7 +676,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
         }
 
-        //cout << "calc patches" << endl;
+    //    cout << "calc patches" << endl;
 
         //Having gone through all the patches to determine the bindings, we can now calculate the forces
 
@@ -678,6 +718,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         cout << tb2 << endl;
         cout << tb << endl;
         pausel(); */
+
+
+
+
         #pragma omp parallel for
         for(int i = 0  ; i < mypairs.size() ; i++) {
             int p1;
@@ -691,10 +735,12 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             geo->distance_vector(*dat, p1, p2, un, dis);
 
             int potn = iny.which_potential(p1, p2, wp1, wp2);
-            // int potn = (i % np1) * np1 + (bo.boundto[i] % np1);
+
             dis = sqrt(dis);
 
             un /= dis;
+
+
 
             double fx;
             double fy;
@@ -709,6 +755,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             double tjz;
 
             (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
+
+            // cout << fx << " " << fy << " " << fz << endl;
+            // cout << tix << " " << tiy << " " << tiz << endl;
 
             forces(p1, 0) += fx;
             forces(p1, 1) += fy;
@@ -726,8 +775,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
             torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
         }
-
-
+        //pausel();
+       // cout << "forces" << endl;
         /* 
         #pragma omp parallel for
         for (int i = 0; i < total_number_of_patches; ++i)

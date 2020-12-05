@@ -73,6 +73,28 @@ public:
 			error("set orient dimensions must match in MD");
 		}
 	}
+
+	void setorientation(vector1<double> &a, vector1<double> &b, int i) {
+		//maps a to b
+		// (*orient)(i,0) = 1 - (SQR(a(1)*b(0) - a(0)*b(1) + SQR(a(2)*b(0) - a(0)*b(2))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		// (*orient)(i,1) = -(a(1)*b(0)) + a(0)*b(1) + ((-(a(2)*b(0)) + a(0)*b(2))*(a(2)*b(1) - a(1)*b(2)))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		// (*orient)(i,2) = -(a(2)*b(0)) + a(0)*b(2) + ((-(a(1)*b(0)) + a(0)*b(1))*(-(a(2)*b(1)) + a(1)*b(2)))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		// (*orient)(i,3) = a(1)*b(0) - a(0)*b(1) + ((a(2)*b(0) - a(0)*b(2))*(-(a(2)*b(1)) + a(1)*b(2)))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		// (*orient)(i,4) = 1 - ((SQR(a(0) + SQR(a(2))*SQR(b(1) - 2*a(1)*b(1)*(a(0)*b(0) + a(2)*b(2)) + SQR(a(1)*(SQR(b(0) + SQR(b(2)))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		// (*orient)(i,5) = -(a(2)*b(1)) + a(1)*b(2) + ((a(1)*b(0) - a(0)*b(1))*(-(a(2)*b(0)) + a(0)*b(2)))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		// (*orient)(i,6) = a(2)*b(0) - a(0)*b(2) + ((a(1)*b(0) - a(0)*b(1))*(a(2)*b(1) - a(1)*b(2)))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		// (*orient)(i,7) = a(2)*b(1) - a(1)*b(2) + ((-(a(1)*b(0)) + a(0)*b(1))*(a(2)*b(0) - a(0)*b(2)))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		// (*orient)(i,8) = 1 - (SQR(a(2)*(SQR(b(0) + SQR(b(1)) - 2*a(2)*(a(0)*b(0) + a(1)*b(1))*b(2) + (SQR(a(0) + SQR(a(1))*SQR(b(2))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));
+		(*orient)(i, 0) = 1 - (SQR(a[1] * b[0] - a[0] * b[1]) + SQR(a[2] * b[0] - a[0] * b[2])) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+		(*orient)(i, 1) = -(a[1] * b[0]) + a[0] * b[1] + ((-(a[2] * b[0]) + a[0] * b[2]) * (a[2] * b[1] - a[1] * b[2])) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+		(*orient)(i, 2) = -(a[2] * b[0]) + a[0] * b[2] + ((-(a[1] * b[0]) + a[0] * b[1]) * (-(a[2] * b[1]) + a[1] * b[2])) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+		(*orient)(i, 3) = a[1] * b[0] - a[0] * b[1] + ((a[2] * b[0] - a[0] * b[2]) * (-(a[2] * b[1]) + a[1] * b[2])) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+		(*orient)(i, 4) = 1 - ((SQR(a[0]) + SQR(a[2])) * SQR(b[1]) - 2 * a[1] * b[1] * (a[0] * b[0] + a[2] * b[2]) + SQR(a[1]) * (SQR(b[0]) + SQR(b[2]))) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+		(*orient)(i, 5) = -(a[2] * b[1]) + a[1] * b[2] + ((a[1] * b[0] - a[0] * b[1]) * (-(a[2] * b[0]) + a[0] * b[2])) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+		(*orient)(i, 6) = a[2] * b[0] - a[0] * b[2] + ((a[1] * b[0] - a[0] * b[1]) * (a[2] * b[1] - a[1] * b[2])) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+		(*orient)(i, 7) = a[2] * b[1] - a[1] * b[2] + ((-(a[1] * b[0]) + a[0] * b[1]) * (a[2] * b[0] - a[0] * b[2])) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+		(*orient)(i, 8) = 1 - (SQR(a[2]) * (SQR(b[0]) + SQR(b[1])) - 2 * a[2] * (a[0] * b[0] + a[1] * b[1]) * b[2] + (SQR(a[0]) + SQR(a[1])) * SQR(b[2])) / (1 + a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+	}
 	
 	matrix<double> &getorientation()
 	{
@@ -113,9 +135,11 @@ public:
 	}
 	void measured_temperature();
 	void measured_temperature(ofstream&);
+	void measured_temperature(vector1<double>&);
 
 	vector1<double> genfullmat(int);
 	void rotate();
+
 
 	// void one_bond_per_patch_condition(matrix<int> &pairs, vector<potentialtheta3D*> &);
 
