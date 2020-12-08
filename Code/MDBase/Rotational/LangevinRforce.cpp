@@ -108,11 +108,39 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
                 double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
 
-                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp)
+                int wp1, wp2;
+                iny.which_patch(p1, p2, potn, wp1, wp2);
+
+
+                //different conditions depending on whether there is binding or not.
+                double disp2;
+                bool cond1 =  bo.boundto[wp1] == wp2;
+                bool b1,b2;
+                b1 = bo.isbound[wp1];
+                b2 = bo.isbound[wp2];
+
+                if(b1 && b2 && cond1) { //both bound and to each other
+                    disp2 = disp;
+                }
+                else if (b1  && b2 && !cond1) //both bound and not to each other
+                {
+                    disp2 = 0.8*disp; //if both bound, make the conditions more onerous
+                }
+                else if (!b1 != !b2) //only one bound
+                {
+                    disp2 = 0.8*disp;
+                }
+                else{
+                    //neither bound
+                    disp2 = disp;
+
+                }
+
+
+                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp2)
                 {
                     //cout << argthetai <<  " " << argthetaj << endl;
-                    int wp1,wp2;
-                    iny.which_patch(p1,p2,potn,wp1,wp2);
+
                     // if((wp1 > 500 ||wp2 > 500) && !(wp1>500&&wp2>500)) {
                     
                     //     cout << "possible patch" << endl;
@@ -146,7 +174,6 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     boindices(wp1, iterator1) = wp2;
                     
                     boindices(wp2, iterator2) = wp1;
-                    
 
                 }
             }
@@ -287,9 +314,12 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     // for(int i = 0  ; i < nbins.getsize()-1 ;  i++) {
     //     v[i] = nbins[i+1]-nbins[i];
     // }
-    // std::sort(v.begin(),v.end());
+    // //std::sort(v.begin(),v.end());
     // for(int i = 0  ; i < v.size() ; i++)
     //     cout << v[i] <<",";
+
+    // cout << indexes << endl;
+    // cout << bo.isbound << endl;
     // cout << endl;
     // pausel();
 
