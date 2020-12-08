@@ -365,7 +365,7 @@ A.setpots(c);
 A.setviscosity(1.0);
 
 
-for(beta = 1.0 ; beta < 11.5 ; beta +=1.0) {
+for(double beta = 1.0 ; beta < 11.5 ; beta +=1.0) {
 A.obj->setkT(1./beta);
 
 
