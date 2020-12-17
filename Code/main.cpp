@@ -455,7 +455,7 @@ ss << beta;
 string base = "_beta=";
 base += ss.str();
 
-A.run_singlebond(1000000, 1000, base);
+A.run_singlebond(10000000, 1000, base);
 
 
 /* 
