@@ -247,6 +247,24 @@ vector1<double> LangevinNVTR::genfullmat(int i) {
 
     vector1<double> up(9);
 
+    double tempx = dt * jx / ix;
+
+    double tempy = dt * jy / iy;
+
+    double tempz = dt * jz / iz;
+
+    double fac1 = (1-SQR(tempx/4.))/(1+SQR(tempx/4.));
+
+    double fac2 = tempx/(2.*(1+SQR(tempx/4.)));
+
+    double fac3 = (1 - SQR(tempy / 4.)) / (1 + SQR(tempy / 4.));
+
+    double fac4 = tempy / (2. * (1 + SQR(tempy / 4.)));
+
+    double fac5 = (1 - SQR(tempz / 2.)) / (1 + SQR(tempz / 2.));
+
+    double fac6 = (tempz)/ (1 + SQR(tempz / 2.));
+
     // up[0] = -(SQR(dt) * SQR(jy)) / (4. * SQR(iy) * SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) + (SQR(1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 - (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) / (SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz))));
     // up[1] = -((dt * (1 - (SQR(dt) * SQR(jx)) / (16. * SQR(ix))) * (1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * jz) / (iz * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(ix))) * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz))))) + (dt * jx * (-(dt * jy * (1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) / (2. * iy * SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) - (dt * jy * (1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 - (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) / (2. * iy * SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))))) / (2. * ix * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(ix))));
     // up[2] = (SQR(dt) * jx * (1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * jz) / (2. * ix * iz * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(ix))) * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) + ((1 - (SQR(dt) * SQR(jx)) / (16. * SQR(ix))) * (-(dt * jy * (1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) / (2. * iy * SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) - (dt * jy * (1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 - (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) / (2. * iy * SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))))) / (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(ix)));
@@ -256,7 +274,7 @@ vector1<double> LangevinNVTR::genfullmat(int i) {
     // up[6] = (dt * (1 - (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * jy * (1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) / (2. * iy * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) + ((1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * ((SQR(dt) * jx * jz) / (2. * SQR(iz) * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) + (dt * (1 - (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * jy * (1 - (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) / (2. * iy * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))))) / (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)));
     // up[7] = ((1 - (SQR(dt) * SQR(jx)) / (16. * SQR(ix))) * (-(SQR(dt) * (1 - (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * jy * jz) / (2. * iy * iz * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) + (dt * jx * (1 - (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) / (2. * iz * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))))) / (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(ix))) + (dt * jx * (((1 - (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * SQR(1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) / ((1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) - (dt * jy * ((SQR(dt) * jx * jz) / (2. * SQR(iz) * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) + (dt * (1 - (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * jy * (1 - (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) / (2. * iy * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))))) / (2. * iy * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))))) / (2. * ix * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(ix))));
     // up[8] = -(dt * jx * (-(SQR(dt) * (1 - (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * jy * jz) / (2. * iy * iz * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) + (dt * jx * (1 - (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) / (2. * iz * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))))) / (2. * ix * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(ix)))) + ((1 - (SQR(dt) * SQR(jx)) / (16. * SQR(ix))) * (((1 - (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * SQR(1 - (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) / ((1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * SQR(1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))) - (dt * jy * ((SQR(dt) * jx * jz) / (2. * SQR(iz) * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) + (dt * (1 - (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * jy * (1 - (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))) / (2. * iy * (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(iz))) * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy))) * (1 + (SQR(dt) * SQR(jz)) / (4. * SQR(iz)))))) / (2. * iy * (1 + (SQR(dt) * SQR(jy)) / (16. * SQR(iy)))))) / (1 + (SQR(dt) * SQR(jx)) / (16. * SQR(ix)));
-
+    /*
     double sqrdt = SQR(dt);
     double sqrix = SQR(ix);
     double sqriy = SQR(iy);
@@ -274,6 +292,17 @@ vector1<double> LangevinNVTR::genfullmat(int i) {
     up[6] = -(dt * (1 - (sqrdt * sqrjx) / (16. * sqriz)) * jy * (1 - (sqrdt * sqrjy) / (16. * sqriy))) / (2. * iy * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * SQR(1 + (sqrdt * sqrjy) / (16. * sqriy))) + ((1 - (sqrdt * sqrjy) / (16. * sqriy)) * ((sqrdt * jx * jz) / (2. * sqriz * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))) - (dt * (1 - (sqrdt * sqrjx) / (16. * sqriz)) * jy * (1 - (sqrdt * sqrjz) / (4. * sqriz))) / (2. * iy * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjy) / (16. * sqriy)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))))) / (1 + (sqrdt * sqrjy) / (16. * sqriy));
     up[7] = ((1 - (sqrdt * sqrjx) / (16. * sqrix)) * ((sqrdt * (1 - (sqrdt * sqrjx) / (16. * sqriz)) * jy * jz) / (2. * iy * iz * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjy) / (16. * sqriy)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))) + (dt * jx * (1 - (sqrdt * sqrjz) / (4. * sqriz))) / (2. * iz * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))))) / (1 + (sqrdt * sqrjx) / (16. * sqrix)) + (dt * jx * (((1 - (sqrdt * sqrjx) / (16. * sqriz)) * SQR(1 - (sqrdt * sqrjy) / (16. * sqriy))) / ((1 + (sqrdt * sqrjx) / (16. * sqriz)) * SQR(1 + (sqrdt * sqrjy) / (16. * sqriy))) + (dt * jy * ((sqrdt * jx * jz) / (2. * sqriz * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))) - (dt * (1 - (sqrdt * sqrjx) / (16. * sqriz)) * jy * (1 - (sqrdt * sqrjz) / (4. * sqriz))) / (2. * iy * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjy) / (16. * sqriy)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))))) / (2. * iy * (1 + (sqrdt * sqrjy) / (16. * sqriy))))) / (2. * ix * (1 + (sqrdt * sqrjx) / (16. * sqrix)));
     up[8] = -(dt * jx * ((sqrdt * (1 - (sqrdt * sqrjx) / (16. * sqriz)) * jy * jz) / (2. * iy * iz * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjy) / (16. * sqriy)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))) + (dt * jx * (1 - (sqrdt * sqrjz) / (4. * sqriz))) / (2. * iz * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))))) / (2. * ix * (1 + (sqrdt * sqrjx) / (16. * sqrix))) + ((1 - (sqrdt * sqrjx) / (16. * sqrix)) * (((1 - (sqrdt * sqrjx) / (16. * sqriz)) * SQR(1 - (sqrdt * sqrjy) / (16. * sqriy))) / ((1 + (sqrdt * sqrjx) / (16. * sqriz)) * SQR(1 + (sqrdt * sqrjy) / (16. * sqriy))) + (dt * jy * ((sqrdt * jx * jz) / (2. * sqriz * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))) - (dt * (1 - (sqrdt * sqrjx) / (16. * sqriz)) * jy * (1 - (sqrdt * sqrjz) / (4. * sqriz))) / (2. * iy * (1 + (sqrdt * sqrjx) / (16. * sqriz)) * (1 + (sqrdt * sqrjy) / (16. * sqriy)) * (1 + (sqrdt * sqrjz) / (4. * sqriz))))) / (2. * iy * (1 + (sqrdt * sqrjy) / (16. * sqriy))))) / (1 + (sqrdt * sqrjx) / (16. * sqrix));
+    */    
+
+    up[0] = -SQR(fac4) + SQR(fac3) * fac5;
+    up[1] = fac3 * (fac2 * fac4 * (1 + fac5) - fac1 * fac6);
+    up[2] = fac3 * (fac1 * fac4 * (1 + fac5) + fac2 * fac6);
+    up[3] = fac3 * (fac2 * fac4 * (1 + fac5) + fac1 * fac6);
+    up[4] = SQR(fac1) * fac5 + SQR(fac2) * (-SQR(fac3) + SQR(fac4) * fac5);
+    up[5] = -(fac1 * fac2 * (SQR(fac3) + fac5 - SQR(fac4) * fac5)) + (SQR(fac1) + SQR(fac2)) * fac4 * fac6;
+    up[6] = -(fac1 * fac3 * fac4 * (1 + fac5)) + fac2 * fac3 * fac6;
+    up[7] = fac1 * fac2 * (SQR(fac3) + fac5 - SQR(fac4) * fac5) + (SQR(fac1) + SQR(fac2)) * fac4 * fac6;
+    up[8] = -(SQR(fac2) * fac5) + SQR(fac1) * (SQR(fac3) - SQR(fac4) * fac5);
 
     return up;
 }

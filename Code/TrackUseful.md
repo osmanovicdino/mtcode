@@ -411,3 +411,53 @@ for (double kT = 1.0; kT > 0.49; kT -= 0.1)
 }
 
 </code></pre>
+
+Tetrahedral liquid:
+
+<pre><code>
+
+int n = 2000;
+double packing_fraction = 0.01;
+
+double l = cbrt(pi*(double)n/(6.*packing_fraction));
+
+Condensate A(l, n);
+
+
+TetrahedralPatch c(1.0, 1.4, 0.927);
+
+//TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
+
+
+
+BindingModelSingle b(0.99,0.01);
+
+A.setBindingModel(b);
+
+A.setpots(c);
+
+//int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+
+//int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+
+//A.run_singlebond(10000, 1000);
+
+A.setviscosity(1.0);
+
+
+double beta = 1.0;
+
+A.obj->setkT(1./beta);
+
+
+
+stringstream ss;
+ss << beta;
+
+string base = "_beta=";
+base += ss.str();
+
+A.run_singlebond(10000, 1000, base);
+
+
+</code></pre>

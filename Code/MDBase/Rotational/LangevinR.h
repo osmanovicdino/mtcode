@@ -9,6 +9,7 @@
 #include "../Bindings/BindingModelFull.h"
 #include "../Bindings/BindingModelSingle.h"
 #include "../Bindings/BindingModelBinary.h"
+#include "../Bindings/BindingModelTernary.h"
 #include "../Potentials/combopatch.h"
 
 class LangevinNVTR : public LangevinNVT {

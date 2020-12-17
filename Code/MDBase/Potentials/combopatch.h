@@ -7,8 +7,8 @@
 
 
 struct ComboPatch {
-int **p;
-bool safe;
+int **p; //pointer to array where potentials are
+bool safe; // is this combo patch parallel safe?
 vector1<potentialtheta3D*> potential_bundle; //list of potentials
 
 ComboPatch(int n) : potential_bundle(vector1<potentialtheta3D*>(n)), safe(true) { p = new int*;}
@@ -285,8 +285,8 @@ struct TetrahedralWithSingle : ComboPatch {
             j = wpj / 4;
         }
         else if(wpi >= 4*nt && wpj >= 4*nt ) {
-            i = wpi - 4*nt;
-            j = wpj - 4*nt;
+            i = wpi - 4*nt + nt;
+            j = wpj - 4*nt + nt;
         }
         else if(wpi < 4*nt && wpj >= 4*nt ){
             i = wpi/4;
@@ -305,7 +305,7 @@ struct TetrahedralWithSingle : ComboPatch {
         }
         else if (wpi >= 4 * nt && wpj >= 4 * nt)
         {
-            return 0;
+            return 20;
         }
         else if (wpi < 4 * nt && wpj >= 4 * nt)
         {
@@ -469,6 +469,415 @@ struct TwoTetrahedral : ComboPatch
         return new TwoTetrahedral(*this);
     }
 };
+
+struct TwoTetrahedralAndSingle : ComboPatch
+{
+    double nx1 = sqrt(8. / 9.);
+    double ny1 = 0.;
+    double nz1 = -1. / 3.;
+
+    double nx2 = -sqrt(2. / 9.);
+    double ny2 = sqrt(2. / 3.);
+    double nz2 = -1. / 3.;
+
+    double nx3 = -sqrt(2. / 9.);
+    double ny3 = -sqrt(2. / 3.);
+    double nz3 = -1. / 3.;
+
+    double nx4 = 0;
+    double ny4 = 0;
+    double nz4 = 1.;
+
+    // double angt1t1;
+    // double dist1t1;
+    // double strt1t1;
+
+    // double angt1t2;
+    // double dist1t2;
+    // double strt1t2;
+
+    // double angt1s;
+    // double dist1s;
+    // double strt1s;
+
+    // double angt2t2;
+    // double dist2t2;
+    // double strt2t2;
+
+    // double angt2s;
+    // double dist2s;
+    // double strt2s;
+
+    // double angss;
+    // double disss;
+    // double strss;
+
+    matrix<double> params;
+
+    int nt;
+    int ns;
+    int nf;
+
+    int *i1; //p1 p1
+    int *i2; //p1 p2
+    int *i3; //p1 p3
+    int *i4; //p2 p2
+    int *i5; //p2 p3
+    int *i6; //p3 p3
+
+    matrix<double> v;
+
+    TwoTetrahedralAndSingle(matrix<double>&, int nt, int ns, int nf);
+
+    ~TwoTetrahedralAndSingle()
+    {
+        delete i1;
+        delete i2;
+        delete i3;
+        delete i4;
+        delete i5;
+        delete i6;
+    }
+
+    int num_patches(const int &i)
+    {
+        if(i<ns) return 4;
+        else return 1;
+    }
+
+    inline int mapping_funcion_particles(int i, int j) {
+        if (i < nt)
+        {
+            if (j < nt)
+            {
+               return 1;
+            }
+            else if (j < ns)
+            {
+                return 2;
+            }
+            else
+            {
+                return 3;
+            }
+        }
+        else if (i < ns)
+        {
+            if (j < nt)
+            {
+                return 2;
+            }
+            else if (j < ns)
+            {
+                return 4;
+            }
+            else
+            {
+                return 5;
+            }
+        }
+        else
+        {
+            if (j < nt)
+            {
+                return 3;
+            }
+            else if (j < ns)
+            {
+                return 5;
+            }
+            else
+            {
+                return 6;
+            }
+        }
+    }
+    void UpdateIterator(const int &i, const int &j)
+    {
+        int we_are = mapping_funcion_particles(i,j);
+
+        switch(we_are) {
+            case 1:
+                p = &i1;
+                break;
+
+            case 2:
+                p = &i2;
+                break;
+
+            case 3:
+                p = &i3;
+                break;
+
+            case 4:
+                p = &i4;
+                break;
+
+            case 5:
+                p = &i5;
+                break;
+
+            case 6:
+                p = &i6;
+                break;
+        }
+    }
+    void UpdateIteratorSafe(const int &i, const int &j, int **q)
+    {
+        int we_are = mapping_funcion_particles(i, j);
+
+        switch (we_are)
+        {
+        case 1:
+            *q = i1;
+            break;
+
+        case 2:
+            *q = i2;
+            break;
+
+        case 3:
+            *q = i3;
+            break;
+
+        case 4:
+            *q = i4;
+            break;
+
+        case 5:
+            *q = i5;
+            break;
+
+        case 6:
+            *q = i6;
+            break;
+        }
+    }
+
+    int get_total_patches(const int &N) { return 4 * nt + 4 * ns + nf; }
+
+    void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
+    {
+        int we_are = mapping_funcion_particles(i, j);
+
+        switch (we_are)
+        {
+        case 1: {
+            int k1 = potn / 4;
+            int k2 = potn % 4;
+            wpi = i * 4 + k1;
+            wpj = j * 4 + k2;
+            break;
+        }
+        case 2: {
+            int potn2 = potn - 16;
+            int k1 = potn2 / 4;
+            int k2 = potn2 % 4;
+            wpi = i * 4 + k1;
+            wpj = j * 4 + k2;
+            break;
+        }
+        case 3: {
+            int k1 = (potn - 32) % 4;
+            if(i<j) {
+            wpi = i * 4 + k1;
+            wpj = ns * 4 + (j - ns);
+            }
+            else{
+                wpj = j * 4 + k1;
+                wpi = ns * 4 + (i - ns);
+            }
+            break;
+        }
+        case 4: {
+            int potn2 = potn - 36;
+            int k1 = potn2 / 4;
+            int k2 = potn2 % 4;
+            wpi = i * 4 + k1;
+            wpj = j * 4 + k2;
+            break;
+        }
+        case 5: {
+            int k1 = (potn - 52) % 4;
+            if (i < j)
+            {
+                wpi = i * 4 + k1;
+                wpj = ns * 4 + (j - ns);
+            }
+            else
+            {
+                wpj = j * 4 + k1;
+                wpi = ns * 4 + (i - ns);
+            }
+            break;
+        }
+        case 6: {
+            wpi = ns * 4 + (i - ns);
+            wpj = ns * 4 + (j - ns);
+            break;
+        }
+        
+        }
+        // if (i < nt && j < nt)
+        // {
+        //     int k1 = potn / 4;
+        //     int k2 = potn % 4;
+        //     // i*4 + k1;
+        //     // j*4 + k2;
+        //     wpi = i * 4 + k1;
+        //     wpj = j * 4 + k2;
+        // }
+        // else if (i >= nt && j >= nt)
+        // {
+        //     wpi = nt * 4 + (i - nt);
+        //     wpj = nt * 4 + (j - nt);
+        // }
+        // else if (i < nt && j >= nt)
+        // {
+        //     int k1 = potn % 4;
+        //     wpi = i * 4 + k1;
+        //     wpj = nt * 4 + (j - nt);
+        // }
+        // else
+        // {
+        //     int k2 = potn % 4;
+        //     wpi = nt * 4 + (i - nt);
+        //     wpj = j * 4 + k2;
+        // }
+
+        // if (i < nt && j < nt)
+        // {
+        //     int k1 = potn / 4;
+        //     int k2 = potn % 4;
+        //     // i*4 + k1;
+        //     // j*4 + k2;
+        //     wpi = i * 4 + k1;
+        //     wpj = j * 4 + k2;
+        // }
+        // else if (i >= nt && j >= nt)
+        // {
+        //     int potn2 = potn - 32;
+        //     int k1 = potn2 / 4;
+        //     int k2 = potn2 % 4;
+        //     // i*4 + k1;
+        //     // j*4 + k2;
+        //     wpi = i * 4 + k1;
+        //     wpj = j * 4 + k2;
+        // }
+        // else
+        // {
+        //     int potn2 = potn - 16;
+        //     int k1 = potn2 / 4;
+        //     int k2 = potn2 % 4;
+        //     // i*4 + k1;
+        //     // j*4 + k2;
+        //     wpi = i * 4 + k1;
+        //     wpj = j * 4 + k2;
+        // }
+    }
+
+    void which_particle(const int &wpi, const int &wpj, int &i, int &j)
+    {
+        if (wpi < 4 * ns && wpj < 4 * ns)
+        {
+            i = wpi / 4;
+            j = wpj / 4;
+        }
+        else if (wpi >= 4 * ns && wpj >= 4 * ns)
+        {
+            i = wpi - 4 * ns + ns;
+            j = wpj - 4 * ns + ns;
+        }
+        else if (wpi < 4 * ns && wpj >= 4 * ns)
+        {
+            i = wpi / 4;
+            j = wpj - 4 * ns + ns;
+        }
+        else
+        {
+            i = wpi - 4 * ns + ns;
+            j = wpj / 4;
+        }
+    }
+    int which_potential(const int &i, const int &j, const int &wpi, const int &wpj)
+    {
+        int we_are = mapping_funcion_particles(i, j);
+        switch (we_are)
+        {
+        case 1:
+            return (wpi % 4) * 4 + (wpj % 4);
+            break;
+
+        case 2:
+            return 16 + (wpi % 4) * 4 + (wpj % 4);
+            break;
+
+        case 3:
+            if(i<j) return  32 + wpi % 4;
+            else return 32 + wpj % 4;
+            break;
+
+        case 4:
+            return 36 + (wpi % 4) * 4 + (wpj % 4);
+            break;
+
+        case 5:
+            if (i < j)
+                return 52 + wpi % 4;
+            else
+                return 52 + wpj % 4;
+            break;
+
+        case 6:
+            return 56;
+            break;
+        }
+
+        // if (wpi < 4 * nt && wpj < 4 * nt)
+        // {
+        //     return (wpi % 4) * 4 + (wpj % 4);
+        // }
+        // else if (wpi >= 4 * nt && wpj >= 4 * nt)
+        // {
+        //     return 20;
+        // }
+        // else if (wpi < 4 * nt && wpj >= 4 * nt)
+        // {
+        //     return 16 + wpi % 4;
+        // }
+        // else
+        // {
+        //     return 16 + wpj % 4;
+        // }
+
+        // if (wpi < 4 * nt && wpj < 4 * nt)
+        // {
+        //     return (wpi % 4) * 4 + (wpj % 4);
+        // }
+        // else if (wpi >= 4 * nt && wpj >= 4 * nt)
+        // {
+        //     return 0;
+        // }
+        // else if (wpi < 4 * nt && wpj >= 4 * nt)
+        // {
+        //     return 16 + wpi % 4;
+        // }
+        // else
+        // {
+        //     return 16 + wpj % 4;
+        // }
+
+    }
+    void get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12);
+
+    void CreateFiles();
+
+    TwoTetrahedralAndSingle *clone() const
+    {
+        return new TwoTetrahedralAndSingle(*this);
+    }
+};
+
 #include "combopatch.cpp"
 #include "combopatchoutput.cpp"
 

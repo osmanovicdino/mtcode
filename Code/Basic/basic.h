@@ -105,7 +105,7 @@ void SWAP( T &a, T &b ) { //swap the values of two objects a and b
 	b = c;
 }
 
-void sort_doublet(int ti1, int ti2, int &i1, int &i2) {
+inline void sort_doublet(int ti1, int ti2, int &i1, int &i2) {
     if (ti1 < ti2)
     {
         i1 = ti1;
@@ -118,7 +118,7 @@ void sort_doublet(int ti1, int ti2, int &i1, int &i2) {
     }
 }
 
-void sort_triplet(int t1, int t2, int t3, int &i1, int &i2, int &i3) {
+inline void sort_triplet(int t1, int t2, int t3, int &i1, int &i2, int &i3) {
     if(t1 < t2) {
         if(t2 < t3) {
             i1 = t1;

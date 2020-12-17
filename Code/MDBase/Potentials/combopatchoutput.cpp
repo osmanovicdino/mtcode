@@ -148,4 +148,64 @@ void TwoTetrahedral::CreateFiles()
     outfunc(col, "col");
 }
 
+void TwoTetrahedralAndSingle::CreateFiles()
+{
+    matrix<double> v(4, 3);
+    v(0, 0) = nx1;
+    v(0, 1) = ny1;
+    v(0, 2) = nz1;
+
+    //vector1<double> v2(3);
+
+    v(1, 0) = nx2;
+    v(1, 1) = ny2;
+    v(1, 2) = nz2;
+
+    //vector1<double> v3(3);
+
+    v(2, 0) = nx3;
+    v(2, 1) = ny3;
+    v(2, 2) = nz3;
+
+    //vector1<double> v4(3);
+
+    v(3, 0) = nx4;
+    v(3, 1) = ny4;
+    v(3, 2) = nz4;
+
+    matrix<double> v2(1,3);
+
+    v2(0, 0) = nx1;
+    v2(0, 1) = ny1;
+    v2(0, 2) = nz1;
+
+    outfunc(v, "ori");
+
+    outfunc(v, "ori2");
+
+    outfunc(v, "ori3");
+
+    matrix<double> col(nf, 3);
+    for (int i = 0; i < nt; i++)
+    {
+        col(i, 0) = 0.;
+        col(i, 1) = 0.5;
+        col(i, 2) = 0.5;
+    }
+    for (int i = nt; i < ns; i++)
+    {
+        col(i, 0) = 1.;
+        col(i, 1) = 0.5;
+        col(i, 2) = 0.;
+    }
+    for (int i = ns; i < nf; i++)
+    {
+        col(i, 0) = 1.;
+        col(i, 1) = 0.5;
+        col(i, 2) = 0.5;
+    }
+
+    outfunc(col, "col");
+}
+
 #endif /* COMBOPATCHOUTPUT_CPP */

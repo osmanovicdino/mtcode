@@ -859,4 +859,262 @@ void TwoTetrahedral::get_params(const int &i, const int &j, const int &potn2, do
     }
 }
 
+TwoTetrahedralAndSingle::TwoTetrahedralAndSingle(matrix<double> &paramss, int ntt, int nss, int nff) : ComboPatch(57), params(paramss), v(matrix<double>(4,3))
+{
+
+    if(params.getnrows() != 6)
+        error("number of rows in parameter matrix is incorrect");
+    if (params.getncols() != 3)
+        error("number of cols in parameter matrix is incorrect");
+    nt = ntt;
+    ns = nss;
+    nf = nff;
+    i1 = new int[17];
+    i2 = new int[17];
+    i3 = new int[5];
+    i4 = new int[17];
+    i5 = new int[5];
+    i6 = new int[2];
+    
+    i1[0] = 16;
+    i2[0] = 16;
+    i3[0] = 4;
+    i4[0] = 16;
+    i5[0] = 4;
+    i6[0] = 1;
+
+    int iter = 0;
+    for (int i = 0; i < 16; i++) 
+        i1[i + 1] = iter+i;
+    
+    iter += 16;
+
+    for (int i = 0; i < 16; i++)
+        i2[i + 1] = iter + i;
+    
+    iter += 16;
+
+    for (int i = 0; i < 4; i++)
+        i3[i + 1] = iter + i;
+
+    iter += 4;
+
+    for (int i = 0; i < 16; i++)
+        i4[i + 1] = iter + i;
+
+    iter += 16;
+
+    for (int i = 0; i < 4; i++)
+        i5[i + 1] = iter + i;
+
+    iter += 4;
+
+    for (int i = 0; i < 1; i++)
+        i6[i + 1] = iter + i;
+
+    p = &i1;
+
+
+
+    safe = false;
+
+    //matrix<double> v(4, 3);
+    v(0, 0) = nx1;
+    v(0, 1) = ny1;
+    v(0, 2) = nz1;
+
+    //vector1<double> v2(3);
+
+    v(1, 0) = nx2;
+    v(1, 1) = ny2;
+    v(1, 2) = nz2;
+
+    //vector1<double> v3(3);
+
+    v(2, 0) = nx3;
+    v(2, 1) = ny3;
+    v(2, 2) = nz3;
+
+    //vector1<double> v4(3);
+
+    v(3, 0) = nx4;
+    v(3, 1) = ny4;
+    v(3, 2) = nz4;
+
+
+
+    
+    iter = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(0,0), params(0,1), params(0,2), 0.75);
+
+            potential_bundle[iter] = pot1->clone();
+            delete pot1;
+            iter++;
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(1, 0), params(1, 1), params(1, 2), 0.75);
+
+            potential_bundle[iter] = pot1->clone();
+            delete pot1;
+            iter++;
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 1; j++)
+        {
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(2,0),params(2,1), params(2,2), 0.75);
+
+            potential_bundle[iter] = pot1->clone();
+            delete pot1;
+            iter++;
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(3, 0), params(3, 1), params(3, 2), 0.75);
+
+            potential_bundle[iter] = pot1->clone();
+            delete pot1;
+            iter++;
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 1; j++)
+        {
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(4, 0), params(4, 1), params(4, 2), 0.75);
+
+            potential_bundle[iter] = pot1->clone();
+            delete pot1;
+            iter++;
+        }
+    }
+    for (int i = 0; i < 1; i++)
+    {
+        for (int j = 0; j < 1; j++)
+        {
+            mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(5, 0), params(5, 1), params(5, 2), 0.75);
+
+            potential_bundle[iter] = pot1->clone();
+            delete pot1;
+            iter++;
+        }
+    }
+
+    
+}
+
+void TwoTetrahedralAndSingle::get_params(const int &i, const int &j, const int &potn2, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12) {
+
+    int we_are = mapping_funcion_particles(i, j);
+    int i1;
+    int i2;
+    int potn;
+
+    switch (we_are)
+    {
+    case 1:
+        i1 = potn2 /4;
+        i2 = potn2 %4;
+        d12 = potential_bundle[potn2]->interaction_distance;
+        ang12 = params(0,2);
+        nxb1 = v(i1, 0);
+        nyb1 = v(i1, 1);
+        nzb1 = v(i1, 2);
+        nxb2 = v(i2, 0);
+        nyb2 = v(i2, 1);
+        nzb2 = v(i2, 2);
+        break;
+
+    case 2:
+        potn = potn2 - 16;
+        i1 = potn / 4;
+        i2 = potn % 4;
+        d12 = potential_bundle[potn2]->interaction_distance;
+        ang12 = params(1, 2);
+        nxb1 = v(i1, 0);
+        nyb1 = v(i1, 1);
+        nzb1 = v(i1, 2);
+        nxb2 = v(i2, 0);
+        nyb2 = v(i2, 1);
+        nzb2 = v(i2, 2);
+        break;
+
+    case 3:
+        potn = potn2 - 32;
+        if(i<j) { i1 = potn % 4 ; i2 = 0 ; }
+        else{ i2 = potn % 4 ; i1 = 0 ;  }
+        d12 = potential_bundle[potn2]->interaction_distance;;
+        ang12 = params(2, 2);
+        nxb1 = v(i1, 0);
+        nyb1 = v(i1, 1);
+        nzb1 = v(i1, 2);
+        nxb2 = v(i2, 0);
+        nyb2 = v(i2, 1);
+        nzb2 = v(i2, 2);
+        break;
+
+    case 4:
+        potn = potn2 - 36;
+        i1 = potn / 4;
+        i2 = potn % 4;
+        d12 = potential_bundle[potn2]->interaction_distance;
+        ang12 = params(3, 2);
+        nxb1 = v(i1, 0);
+        nyb1 = v(i1, 1);
+        nzb1 = v(i1, 2);
+        nxb2 = v(i2, 0);
+        nyb2 = v(i2, 1);
+        nzb2 = v(i2, 2);
+        break;
+
+    case 5:
+        potn = potn2 - 52;
+        if (i < j)
+        {
+            i1 = potn % 4;
+            i2 = 0;
+        }
+        else
+        {
+            i2 = potn % 4;
+            i1 = 0;
+        }
+        d12 = potential_bundle[potn2]->interaction_distance;
+        ang12 = params(4, 2);
+        nxb1 = v(i1, 0);
+        nyb1 = v(i1, 1);
+        nzb1 = v(i1, 2);
+        nxb2 = v(i2, 0);
+        nyb2 = v(i2, 1);
+        nzb2 = v(i2, 2);
+        break;
+
+    case 6:
+        potn = potn2 - 56;
+        i1 = 0;
+        i2 = 0;
+        d12 = potential_bundle[potn2]->interaction_distance;
+        ang12 = params(5, 2);
+        nxb1 = v(i1, 0);
+        nyb1 = v(i1, 1);
+        nzb1 = v(i1, 2);
+        nxb2 = v(i2, 0);
+        nyb2 = v(i2, 1);
+        nzb2 = v(i2, 2);
+        break;
+    }
+}
+
 #endif /* COMBOPATCH_CPP */

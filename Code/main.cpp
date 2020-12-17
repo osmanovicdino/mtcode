@@ -336,21 +336,99 @@ pausel();
 */
 
 
-int n = 2000;
-double packing_fraction = 0.01;
+
+BindingModelTernary b(2000*4,4*4000);
+
+
+b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
+0.,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0);
+
+/*
+b.setup(0.99,0.01,0.01,0.01,0.99,0.2,
+0.,
+0.8,
+0.0,
+0.0,
+0.0,
+1.0,
+0.0,
+0.0,
+0.0);
+*/
+
+matrix<double> params(6,3);
+params(0, 0) = 10.0; // 1<->1
+params(0, 1) = 1.4;
+params(0, 2) = 0.927;
+
+params(1, 0) = 0.0; //1 <->2
+params(1, 1) = 1.0;
+params(1, 2) = 0.927;
+
+params(2, 0) = 10.0; //1 <-> 3
+params(2, 1) = 1.4;
+params(2, 2) = 0.927;
+
+params(3, 0) = 0.0; // 2 <-> 2
+params(3, 1) = 1.0;
+params(3, 2) = 0.927;
+
+params(4, 0) = 10.0; // 2<-> 3
+params(4, 1) = 1.4;
+params(4, 2) = 0.927;
+
+params(5, 0) = 0.0; //3 <-> 3
+params(5, 1) = 1.0;
+params(5, 2) = 0.927;
+
+TwoTetrahedralAndSingle c(params, 2000, 4000, 6000);
+
+
+
+
+
+int n = 6000;
+int n2 = 100;
+double packing_fraction = 0.05;
 
 double l = cbrt(pi*(double)n/(6.*packing_fraction));
 
 Condensate A(l, n);
 
 
-TetrahedralPatch c(1.0, 1.4, 0.927);
-
 //TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
 
+// string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
+// string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
 
 
-BindingModelSingle b(0.99,0.01);
+
+// double T;
+// bool err1;
+// matrix<double> temppos = importcsv(filp, T, err1);
+// matrix<double> tempori = importcsv(filo, T, err1);
+
+
+// A.obj->setdat(temppos);
+// A.obj->setorientation(tempori);
+
+
+// cout << b.tripr111 << endl;
+// cout << b.doubr11 << endl;
+// cout << b.doubr22 << endl;
+// cout << b2.on_rate << endl;
+// cout << b2.off_rate << endl;
+// pausel();
+
+//TetrahedralPatch c2(10.0,1.4,0.927);
 
 A.setBindingModel(b);
 
@@ -365,7 +443,8 @@ A.setpots(c);
 A.setviscosity(1.0);
 
 
-for(double beta = 1.0 ; beta < 11.5 ; beta +=1.0) {
+double beta = 1.0;
+
 A.obj->setkT(1./beta);
 
 
@@ -376,9 +455,62 @@ ss << beta;
 string base = "_beta=";
 base += ss.str();
 
-A.run_singlebond(10000000, 1000, base);
-}
+A.run_singlebond(1000000, 1000, base);
 
+
+/* 
+int ccc;
+matrix<int> boxes = A.obj->getgeo().generate_boxes_relationships(A.num, ccc);
+matrix<int> *pairs = A.obj->calculatepairs(boxes, 3.5);
+
+int NN = A.obj->getN();
+BinaryBindStore bbs;
+
+int nh = (A.pots)->get_total_patches(NN);
+
+vector1<bool> isbound(nh);
+
+vector1<int> boundto(nh);
+
+bbs.isbound = isbound;
+bbs.boundto = boundto;
+
+matrix<double> F(NN, 3);
+matrix<double> F2(NN, 3);
+matrix<double> T(NN, 3);
+
+
+A.obj->calculate_forces_and_torques3D_onlyone(*pairs, c2, bbs, b2, F,T);
+
+//cout << F << endl;
+//cout << T << endl;
+
+vector1<int> ty =  bbs.boundto;
+//F.reset(0.0);
+T.reset(0.0);
+
+bbs.isbound = isbound;
+bbs.boundto = boundto;
+
+A.obj->calculate_forces_and_torques3D_onlyone(*pairs, c, bbs, b, F2, T);
+
+// pausel();
+
+// for(int i = 0  ; i < NN ; i++) {
+//     cout << ty[i] << " " << bbs.boundto[i] << endl;
+// }
+
+
+
+for(int i = 0  ; i < NN ; i++) {
+    cout << F(i, 0) << " " << F(i, 1) << " " << F(i, 2) << "\t" << F2(i, 0) << " " << F2(i, 1) << " " << F2(i, 2) << endl;
+}
+ */
+
+// pausel();
+
+//cout << T << endl;
+//A.run_singlebond(1000000, 1000, base);
 
 /* 
 int n = 4;

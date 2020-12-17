@@ -29,7 +29,7 @@ struct BindingModelBinary : AbstractBindingModel
     BindingModelBinary *clone() const
     {
         return new BindingModelBinary(*this);
-    };
+    }
 };
 
 #include "BindingModelBinary.cpp"
