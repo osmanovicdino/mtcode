@@ -1,3 +1,6 @@
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
+
 struct geometry {
 	int dimension;
 
@@ -818,3 +821,5 @@ struct cuboid : geometry {
 // 		return new freespace(*this);
 // 	}	
 // };
+
+#endif

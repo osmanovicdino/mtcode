@@ -409,16 +409,18 @@ Condensate A(l, n);
 // string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
 // string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
 
+string filp = "/home/dino/Documents/Condensate/TernaryFluid1/pos_beta=1_i=00998.csv";
+string filo = "/home/dino/Documents/Condensate/TernaryFluid1/orientation_beta=1_i=00998.csv";
+
+double T;
+bool err1;
+bool err2;
+matrix<double> temppos = importcsv(filp, T, err1);
+matrix<double> tempori = importcsv(filo, T, err1);
 
 
-// double T;
-// bool err1;
-// matrix<double> temppos = importcsv(filp, T, err1);
-// matrix<double> tempori = importcsv(filo, T, err1);
-
-
-// A.obj->setdat(temppos);
-// A.obj->setorientation(tempori);
+A.obj->setdat(temppos);
+A.obj->setorientation(tempori);
 
 
 // cout << b.tripr111 << endl;
