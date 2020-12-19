@@ -340,18 +340,18 @@ pausel();
 BindingModelTernary b(2000*4,4*4000);
 
 
-b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
-0.,
-0.0,
-0.0,
-0.0,
-0.0,
-0.0,
-0.0,
-0.0,
-0.0);
+// b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
+// 0.,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0);
 
-/*
+
 b.setup(0.99,0.01,0.01,0.01,0.99,0.2,
 0.,
 0.8,
@@ -362,7 +362,7 @@ b.setup(0.99,0.01,0.01,0.01,0.99,0.2,
 0.0,
 0.0,
 0.0);
-*/
+
 
 matrix<double> params(6,3);
 params(0, 0) = 10.0; // 1<->1
@@ -409,8 +409,8 @@ Condensate A(l, n);
 // string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
 // string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
 
-string filp = "/home/dino/Documents/Condensate/TernaryFluid1/pos_beta=1_i=00998.csv";
-string filo = "/home/dino/Documents/Condensate/TernaryFluid1/orientation_beta=1_i=00998.csv";
+string filp = "/home/dino/Documents/Condensate/TernaryFluid2/pos_beta=1_i=02097.csv";
+string filo = "/home/dino/Documents/Condensate/TernaryFluid2/orientation_beta=1_i=02097.csv";
 
 double T;
 bool err1;
