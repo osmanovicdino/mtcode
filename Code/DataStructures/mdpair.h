@@ -11,7 +11,7 @@ struct mdpair
     {
         return a < rhs.a || (a == rhs.a && b < rhs.b);
     }
-    bool operator==(const mdpair &rhs)
+    bool operator==(const mdpair &rhs) const
     {
         if (a == rhs.a && b == rhs.b)
         {

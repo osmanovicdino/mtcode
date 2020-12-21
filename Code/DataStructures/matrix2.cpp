@@ -1263,7 +1263,7 @@ for(i=0;i<n;i++) {
 			d=-d;
 			vv.data[imax]=vv.data[j];
 		}
-		indx.data[j]=imax;
+		indx[j]=imax;
 		if ( a.mat[j*m+j] == 0.0 ) a.mat[j*m+j] = TINY;
 		if ( j != n-1 ) {
 			dum = 1.0/(a.mat[j*m+j]);
