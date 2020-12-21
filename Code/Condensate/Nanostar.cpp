@@ -153,8 +153,8 @@ matrix<int> Nanostar::gets(matrix<int> &pairs, matrix<int> &specials, matrix<int
 
         mdpair temp(p1,p2);
 
-        int which_nanostar =  floor(p1/(num_branches*length_of_branch+1)));
-        int which_nanostar2 =  floor(p2/(num_branches*length_of_branch+1)));
+        int which_nanostar =  floor(p1/(num_branches*length_of_branch+1));
+        int which_nanostar2 =  floor(p2/(num_branches*length_of_branch+1));
 
         bool endp1 = ((p1 - 1) % 10 == 0);
         bool endp2 = ((p2 - 1) % 10 == 0);
@@ -163,7 +163,7 @@ matrix<int> Nanostar::gets(matrix<int> &pairs, matrix<int> &specials, matrix<int
             special_pairs.push_back(temp);
         }
         else{
-            not_special_pairs.push_back(pairs);
+            not_special_pairs.push_back(temp);
         }
 
 
@@ -219,7 +219,7 @@ void Nanostar::run(int runtime, int every, string strbase = "")
 
     // *possible_stickers = new matrix<int>;
     matrix<int> possible_stickers;
-    matrix<int< hs_pairs;
+    matrix<int> hs_pairs;
     this->gets(*froyo1,possible_stickers,hs_pairs);
 
      //matrix<int> *hs_pairs = new matrix<int>;

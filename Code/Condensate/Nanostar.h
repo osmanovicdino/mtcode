@@ -40,7 +40,7 @@ struct Nanostar {
 
     void set_initial_state(string s);
 
-    matrix<int> gets(matrix<int> &pairs);
+    matrix<int> gets(matrix<int> &pairs, matrix<int> &specials, matrix<int> &not_specials);
 
     void run(int total, int every, string);
     
