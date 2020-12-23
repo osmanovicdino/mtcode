@@ -389,13 +389,13 @@ params(5, 0) = 0.0; //3 <-> 3
 params(5, 1) = 1.0;
 params(5, 2) = 0.927;
 
-TwoTetrahedralAndSingle c(params, 2000, 4000, 6000);
+TwoTetrahedralAndSingle c(params, 2000, 4000, 8000);
 
 
 
 
 
-int n = 6000;
+int n = 8000;
 int n2 = 100;
 double packing_fraction = 0.05;
 
@@ -409,18 +409,20 @@ Condensate A(l, n);
 // string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
 // string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
 
-string filp = "/home/dino/Documents/Condensate/TernaryFluid2/pos_beta=1_i=02097.csv";
-string filo = "/home/dino/Documents/Condensate/TernaryFluid2/orientation_beta=1_i=02097.csv";
+// string filp = "/home/dino/Documents/Condensate/TernaryFluid2/pos_beta=1_i=02097.csv";
+// string filo = "/home/dino/Documents/Condensate/TernaryFluid2/orientation_beta=1_i=02097.csv";
 
-double T;
-bool err1;
-bool err2;
-matrix<double> temppos = importcsv(filp, T, err1);
-matrix<double> tempori = importcsv(filo, T, err1);
+// double T;
+// bool err1;
+// bool err2;
+// matrix<double> temppos = importcsv(filp, T, err1);
+// matrix<double> tempori = importcsv(filo, T, err1);
 
+// matrix<double> newpos(2000,3);
+// matrix<double> newori(2000,3);
 
-A.obj->setdat(temppos);
-A.obj->setorientation(tempori);
+// A.obj->setdat(temppos);
+// A.obj->setorientation(tempori);
 
 
 // cout << b.tripr111 << endl;
