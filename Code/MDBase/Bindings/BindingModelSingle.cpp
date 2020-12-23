@@ -99,7 +99,7 @@ void BindingModelSingle::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
     }
 }
 
-void BindingModelSingle::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool>> &possibles, vector1<bool> &afters)
+void BindingModelSingle::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters)
 {
     int bb = 0;
     int nb =  befores.getsize();
