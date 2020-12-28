@@ -389,13 +389,15 @@ params(5, 0) = 0.0; //3 <-> 3
 params(5, 1) = 1.0;
 params(5, 2) = 0.927;
 
-TwoTetrahedralAndSingle c(params, 2000, 4000, 8000);
 
 
 
 
 
-int n = 8000;
+
+int n = 7000;
+
+TwoTetrahedralAndSingle c(params, 2000, 4000, n);
 int n2 = 100;
 double packing_fraction = 0.05;
 
