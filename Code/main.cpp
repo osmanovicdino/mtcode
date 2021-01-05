@@ -395,7 +395,7 @@ params(5, 2) = 0.927;
 
 
 
-int n = 7000;
+int n = 7500;
 
 TwoTetrahedralAndSingle c(params, 2000, 4000, n);
 int n2 = 100;

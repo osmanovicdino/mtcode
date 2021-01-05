@@ -654,7 +654,7 @@ struct TwoTetrahedralAndSingle : ComboPatch
         }
     }
 
-    int get_total_patches(const int &N) { return 4 * nt + 4 * ns + nf; }
+    int get_total_patches(const int &N) { return 4 * nt + 4 * (ns-nt) + nf; }
 
     void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
     {
