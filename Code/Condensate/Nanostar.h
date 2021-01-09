@@ -6,10 +6,10 @@
 
 struct Nanostar {
 
-    LangevinNVT *obj;
+    LangevinNVT *obj; //integrator
 
-    double l;
-    int dimension;
+    double l; //size of the system
+    int dimension; //dimension = 3
 
     int num_nanostars;
 
@@ -34,7 +34,9 @@ struct Nanostar {
     void create_nanostar();
 
 
+    void Nanostar::Passa_set_nanostar();
 
+    
     matrix<double> create_initial_state();
     matrix<double> create_initial_state(string s);
 

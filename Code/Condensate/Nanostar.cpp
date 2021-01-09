@@ -93,6 +93,16 @@ matrix<double> Nanostar::create_initial_state(string s)
     return store;
 }
 
+void Nanostar::Passa_set_nanostar() {
+    matrix<double> store(3,3);
+    
+    /*
+    insert code
+    */
+
+    (*obj).setdat(store);
+}
+
 void Nanostar::set_initial_state(string s)
 {
 
@@ -145,29 +155,29 @@ void Nanostar::create_nanostar() {
 
 matrix<int> Nanostar::gets(matrix<int> &pairs, matrix<int> &specials, matrix<int> &not_specials){
     //return pairs;
-    vector<mdpair> special_pairs;
-    vector<mdpair> not_special_pairs;
-    for(int i = 0 ; i < pairs.getNsafe() ; i++) {
-        int p1 = pairs(i,0);
-        int p2 = pairs(i,1);
+    // vector<mdpair> special_pairs;
+    // vector<mdpair> not_special_pairs;
+    // for(int i = 0 ; i < pairs.getNsafe() ; i++) {
+    //     int p1 = pairs(i,0);
+    //     int p2 = pairs(i,1);
 
-        mdpair temp(p1,p2);
+    //     mdpair temp(p1,p2);
 
-        int which_nanostar =  floor(p1/(num_branches*length_of_branch+1));
-        int which_nanostar2 =  floor(p2/(num_branches*length_of_branch+1));
+    //     int which_nanostar =  floor(p1/(num_branches*length_of_branch+1));
+    //     int which_nanostar2 =  floor(p2/(num_branches*length_of_branch+1));
 
-        bool endp1 = ((p1 - 1) % 10 == 0);
-        bool endp2 = ((p2 - 1) % 10 == 0);
+    //     bool endp1 = ((p1 - 1) % 10 == 0);
+    //     bool endp2 = ((p2 - 1) % 10 == 0);
 
-        if(which_nanostar != which_nanostar2  && endp1 && endp2) {
-            special_pairs.push_back(temp);
-        }
-        else{
-            not_special_pairs.push_back(temp);
-        }
+    //     if(which_nanostar != which_nanostar2  && endp1 && endp2) {
+    //         special_pairs.push_back(temp);
+    //     }
+    //     else{
+    //         not_special_pairs.push_back(temp);
+    //     }
 
 
-    }
+    // }
 
 }
 

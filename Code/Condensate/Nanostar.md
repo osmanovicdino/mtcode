@@ -23,3 +23,10 @@ where there are n nanostars with 4 branches
 each branch will be a list of 3 dimensional positions of length length_of_nanostar
 central particle will be a position of a single particle
 
+Current tasks:
+
+Simulation that sets up nanostars
+
+Function that looks at pair list and identifies whether they are both stickers or not
+
+

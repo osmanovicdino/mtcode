@@ -65,9 +65,9 @@ public:
 	inline T& operator[](int i);// {return data[i];}
 	inline T& operator()(int i) {return data[i];} // equivalent to above
         
-    inline T& gpcons(int) const;
-    inline T& periodicselect(int); //move boundry conditions periodically.
-    vector1& operator+(); // unary plus
+        inline T& gpcons(int) const;
+        inline T& periodicselect(int); //move boundry conditions periodically.
+        vector1& operator+(); // unary plus
 	vector1& operator=(const vector1&); // assignment operator
 	vector1& operator+=(const vector1&); // add another vector
 	vector1& operator-=(const vector1&); // minus another vector
@@ -79,7 +79,7 @@ public:
 
 
         template <class Y>
-	   friend vector1<Y> operator-(const vector1<Y>&); // unary minus a = -a
+	friend vector1<Y> operator-(const vector1<Y>&); // unary minus a = -a
 
         template <class Y>
         friend vector1<Y> operator+(const vector1<Y>& , const vector1<Y>&); // add 2 vectors

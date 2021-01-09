@@ -56,6 +56,10 @@ int main(int argc, char **argv)
 
     cout << "everything seems to work" << endl;
 
+    A.Passa_set_nanostar();
+
+    A.run(10000,100);
+
     // string filename ="./";
 
     //int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");

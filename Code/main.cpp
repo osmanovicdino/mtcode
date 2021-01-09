@@ -336,8 +336,8 @@ pausel();
 */
 
 
-
-BindingModelTernary b(2000*4,4*4000);
+int m = 100;
+BindingModelTernary b(m*4,4*2*m);
 
 
 // b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
@@ -395,9 +395,9 @@ params(5, 2) = 0.927;
 
 
 
-int n = 7500;
+int n = 300;
 
-TwoTetrahedralAndSingle c(params, 2000, 4000, n);
+TwoTetrahedralAndSingle c(params, m, 2*m, n);
 int n2 = 100;
 double packing_fraction = 0.05;
 
