@@ -34,9 +34,9 @@ struct Nanostar {
     void create_nanostar();
 
 
-    void Nanostar::Passa_set_nanostar();
+    void Passa_set_nanostar(double theta, double phi, int arms, int armLength, double boxLength, string fileName);
 
-    
+
     matrix<double> create_initial_state();
     matrix<double> create_initial_state(string s);
 
@@ -45,7 +45,7 @@ struct Nanostar {
     matrix<int> gets(matrix<int> &pairs, matrix<int> &specials, matrix<int> &not_specials);
 
     void run(int total, int every, string);
-    
+
 };
 
 #include "Nanostar.cpp"

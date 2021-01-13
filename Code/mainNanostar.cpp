@@ -34,12 +34,15 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 #include "DataStructures/vector1.h"
 #include "DataStructures/matrix2.h"
 #include "DataStructures/matrix2.cpp"
+#include "MathHelper/Helper.h"
+#include "MathHelper/Helper.cpp"
 //#include "MDBase/potential.h"
 #include "MDBase/MD.h"
 #include "MDBase/Langevin.h"
 //#include "MDBase/LangevinR.h"
 #include "Condensate/Condensate.h"
 #include "Condensate/Nanostar.h"
+
 // #include "NCGasR.h"
 // #include "Microtubule.h"
 
@@ -56,9 +59,9 @@ int main(int argc, char **argv)
 
     cout << "everything seems to work" << endl;
 
-    A.Passa_set_nanostar();
-
-    A.run(10000,100);
+    // A.Passa_set_nanostar(20, 30, 5, 8, 10);
+    //
+    // A.run(10000,100);
 
     // string filename ="./";
 

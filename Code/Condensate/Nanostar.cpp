@@ -93,14 +93,56 @@ matrix<double> Nanostar::create_initial_state(string s)
     return store;
 }
 
-void Nanostar::Passa_set_nanostar() {
-    matrix<double> store(3,3);
-    
-    /*
-    insert code
-    */
+void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLength, double boxLength, string fileName) {
+    // matrix<double> store(3,3);
+    double pi = 2*acos(0.0);
+    double maxCoord = boxLength / 2; // center the box at (0, 0, 0)
 
-    (*obj).setdat(store);
+    theta = convertToRadians(theta);
+    phi = convertToRadians(phi);
+
+    double incrementAngle = 2*pi / arms;
+
+    matrix<double> I (3,3); // declaring 3x3 identity matrix
+    I(0, 0) = 1;
+    I(1, 1) = 1;
+    I(2, 2) = 1;
+
+
+    matrix<double> K (3,3); // rotating about z-axis
+    K(0, 1) = -1;
+    K(1, 0) = 0;
+
+    matrix<double> R = I + sin(incrementAngle/2)*K + (1 - cos(incrementAngle))*(K * K); // Rodrigues formula
+
+    vector1 <double> currentMaxArmCoords(3);
+    currentMaxArmCoords[0] = maxCoord * sin(phi) * cos(theta);
+    currentMaxArmCoords[1] = maxCoord * sin(theta) * cos(theta);
+    currentMaxArmCoords[2] = maxCoord*cos(phi);
+
+    // init file i/o for csv file
+
+    std::ofstream myFile(fileName);
+    for (int i = 0; i < arms; i++)
+    {
+      std::vector<double> x = linspace(currentMaxArmCoords[0], maxCoord, armLength);
+      std::vector<double> y = linspace(currentMaxArmCoords[1], maxCoord, armLength);
+      std::vector<double> z = linspace(currentMaxArmCoords[2], maxCoord, armLength);
+      for (int l = 0; l < armLength; l++)
+      {
+        string coordinateToPrint = string(x[l]) + ',' + string(y[l]) + ',' + string(z[l]) + '\n';
+        myFile << coordinateToPrint;
+      }
+
+      currentMaxArmCoords = R * currentMaxArmCoords;
+    }
+
+    myFile.close();
+
+    // storing csv output to file
+    // matrix<double> store = importcsv(fileName, T, err);
+    // (*obj).setdat(store);
+
 }
 
 void Nanostar::set_initial_state(string s)
@@ -196,7 +238,7 @@ void Nanostar::run(int runtime, int every, string strbase = "")
 
     matrix<int> bp2(bindpairs.size(),2);
 
- 
+
     matrix<int> bep2(bendpairs.size(), 3);
 
     //Collect all the interactions
@@ -224,7 +266,7 @@ void Nanostar::run(int runtime, int every, string strbase = "")
     int num = floor(l/4.);
 
     matrix<int> boxes = (obj)->getgeo().generate_boxes_relationships(num, ccc);
-   
+
     matrix<int> *froyo1 = obj->calculatepairs(boxes, 3.5);
 
     // *possible_stickers = new matrix<int>;
