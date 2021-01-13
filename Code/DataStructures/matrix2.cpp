@@ -693,26 +693,26 @@ return p;
 
 
 
-template <class T, class Q>
-matrix<T> operator*(Q a, matrix<T> &m) {
+// template <class T, class Q>
+// matrix<T> operator*(Q a, matrix<T> &m) {
 
-    T ss = T(a);
-int numrows = m.getnrows();
-int numcols = m.getncols();
-T *q = m.getdata();
-matrix<T> p(numrows,numcols);
-int n = m.getdatapoints();
-for ( int i = 0 ; i < n ; i++ ) {
-        p[i] = ss*q[i];
-}
-delete q;
-return p;
-}
+//     T ss = T(a);
+// int numrows = m.getnrows();
+// int numcols = m.getncols();
+// T *q = m.getdata();
+// matrix<T> p(numrows,numcols);
+// int n = m.getdatapoints();
+// for ( int i = 0 ; i < n ; i++ ) {
+//         p[i] = ss*q[i];
+// }
+// delete q;
+// return p;
+// }
 
-template <class T, class Q>
-matrix<T> operator*(matrix<T> &m, Q a) {
-    return a*m;
-}
+// template <class T, class Q>
+// matrix<T> operator*(matrix<T> &m, Q a) {
+//     return a*m;
+// }
 
 template <class T>
 bool operator!=(const matrix<T> &m1, const matrix<T> &m2)

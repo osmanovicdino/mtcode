@@ -160,11 +160,11 @@ void reset(T);
         template<class Y>
         friend matrix<Y> operator+(const matrix<Y> &m1,const matrix<Y> &m2);
         //multiplication by a scalar of a different type
-        template <class Y, class Q>
-        friend matrix<Y> operator*(Q, matrix<Y> &m1 );
+        // template <class Y, class Q>
+        // friend matrix<Y> operator*(Q, matrix<Y> &m1 );
 
-        template <class Y, class Q>
-        friend matrix<Y> operator*(matrix<Y> &m1, Q);
+        // template <class Y, class Q>
+        // friend matrix<Y> operator*(matrix<Y> &m1, Q);
 
         // multiply matrix by a constant
         template <class Y>

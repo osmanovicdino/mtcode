@@ -50,15 +50,20 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-    srand(time(NULL));
+    matrix<double> K(3,3);
 
-    Nanostar A(2,11.0);
+    matrix<double> K2 = K*K;
 
-    cout << "everything seems to work" << endl;
+    cout << endl;
+    // srand(time(NULL));
 
-    A.Passa_set_nanostar();
+    // Nanostar A(2,11.0);
 
-    A.run(10000,100);
+    // cout << "everything seems to work" << endl;
+
+    // A.Passa_set_nanostar();
+
+    // A.run(10000,100);
 
     // string filename ="./";
 

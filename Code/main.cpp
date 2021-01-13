@@ -336,8 +336,9 @@ pausel();
 */
 
 
-int m = 100;
-BindingModelTernary b(m*4,4*2*m);
+int m1 = 250;
+int m2 = m1+100;
+BindingModelTernary b(m1*4,4*m2);
 
 
 // b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
@@ -395,11 +396,11 @@ params(5, 2) = 0.927;
 
 
 
-int n = 300;
+int n = 600;
 
-TwoTetrahedralAndSingle c(params, m, 2*m, n);
+TwoTetrahedralAndSingle c(params, m1, m2, n);
 int n2 = 100;
-double packing_fraction = 0.05;
+double packing_fraction = 0.01;
 
 double l = cbrt(pi*(double)n/(6.*packing_fraction));
 

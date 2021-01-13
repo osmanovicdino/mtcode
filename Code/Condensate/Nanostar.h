@@ -34,7 +34,7 @@ struct Nanostar {
     void create_nanostar();
 
 
-    void Nanostar::Passa_set_nanostar();
+    void Passa_set_nanostar();
 
     
     matrix<double> create_initial_state();
