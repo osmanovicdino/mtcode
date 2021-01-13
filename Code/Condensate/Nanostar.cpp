@@ -113,7 +113,9 @@ void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLen
     K(0, 1) = -1;
     K(1, 0) = 0;
 
-    matrix<double> R = I + sin(incrementAngle/2)*K + (1 - cos(incrementAngle))*(K * K); // Rodrigues formula
+    matrix <double> K2 = K*K;
+
+    matrix<double> R = I + sin(incrementAngle/2)*K + (1 - cos(incrementAngle))*K2; // Rodrigues formula
 
     vector1 <double> currentMaxArmCoords(3);
     currentMaxArmCoords[0] = maxCoord * sin(phi) * cos(theta);
@@ -130,7 +132,7 @@ void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLen
       std::vector<double> z = linspace(currentMaxArmCoords[2], maxCoord, armLength);
       for (int l = 0; l < armLength; l++)
       {
-        string coordinateToPrint = string(x[l]) + ',' + string(y[l]) + ',' + string(z[l]) + '\n';
+        string coordinateToPrint = to_string(x[l]) + ',' + to_string(y[l]) + ',' + to_string(z[l]) + '\n';
         myFile << coordinateToPrint;
       }
 
