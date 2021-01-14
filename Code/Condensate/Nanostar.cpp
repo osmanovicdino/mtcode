@@ -94,6 +94,7 @@ matrix<double> Nanostar::create_initial_state(string s)
 }
 
 void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLength, double boxLength, string fileName) {
+    int totalParticles = arms * armLength;
     matrix<double> store(3,3);
     double pi = 2*acos(0.0);
     double maxCoord = boxLength / 2; // center the box at (0, 0, 0)
@@ -146,7 +147,24 @@ void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLen
     bool err;
     store = importcsv(fileName, T, err);
     (*obj).setdat(store);
+}
 
+void Nanostar::sortPairsTriplets(matrix<double> particles, int arms, int armLength)
+{
+  // sorting the pairs
+  vector1 <double> nanostarCenter (3);
+  // plug in values
+  for (int i = 0; i < 3; i++)
+  {
+    nanostarCenter(i) = particles(0, i);
+  }
+
+  for (int i = 0; i < arms; i++)
+  {
+    for (int i = )
+
+
+  }
 }
 
 void Nanostar::set_initial_state(string s)
@@ -165,9 +183,10 @@ void Nanostar::set_initial_state(string s)
         error("IMPORT FILE NOT FOUND!");
 
     (*obj).setdat(store);
+
 }
 
-void Nanostar::create_nanostar(vector1 <double> centerPosition, double theta, double phi) {
+void Nanostar::create_nanostar() {
 
 
     int initial = total_particles;
@@ -201,7 +220,9 @@ void Nanostar::create_nanostar(vector1 <double> centerPosition, double theta, do
 
 // matrix<int> &pairs, matrix<int> &specials, matrix<int> &not_specials
 
-matrix<int> Nanostar::gets(){
+matrix<int> Nanostar::gets(vector1<double> particles){
+
+
     //return pairs;
     // vector<mdpair> special_pairs;
     // vector<mdpair> not_special_pairs;
