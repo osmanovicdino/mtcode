@@ -36,7 +36,6 @@ struct Nanostar {
 
     void Passa_set_nanostar(double theta, double phi, int arms, int armLength, double boxLength, string fileName);
 
-
     matrix<double> create_initial_state();
     matrix<double> create_initial_state(string s);
 

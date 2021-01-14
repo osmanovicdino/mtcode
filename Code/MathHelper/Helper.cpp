@@ -25,8 +25,6 @@ std::vector<double> linspace(T start_in, T end_in, int num_in)
   return linspaced;
 }
 
-
-
   double convertToRadians(double angle)
   {
     double pi = 2*acos(0.0);
