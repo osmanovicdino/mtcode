@@ -128,9 +128,9 @@ void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLen
     std::ofstream myFile(fileName);
     for (int i = 0; i < arms; i++)
     {
-      std::vector<double> x = linspace(currentMaxArmCoords[0], maxCoord, armLength);
-      std::vector<double> y = linspace(currentMaxArmCoords[1], maxCoord, armLength);
-      std::vector<double> z = linspace(currentMaxArmCoords[2], maxCoord, armLength);
+      std::vector<double> x = linspace(currentMaxArmCoords[0], maxCoord, armLength + 1);
+      std::vector<double> y = linspace(currentMaxArmCoords[1], maxCoord, armLength + 1);
+      std::vector<double> z = linspace(currentMaxArmCoords[2], maxCoord, armLength + 1);
       for (int l = 0; l < armLength; l++)
       {
         string coordinateToPrint = to_string(x[l]) + ',' + to_string(y[l]) + ',' + to_string(z[l]) + '\n';
@@ -156,15 +156,35 @@ void Nanostar::sortPairsTriplets(matrix<double> particles, int arms, int armLeng
   // plug in values
   for (int i = 0; i < 3; i++)
   {
-    nanostarCenter(i) = particles(0, i);
+    nanostarCenter(i) = particles(0, i);  //there might be a better way to do this
+                                          // but I would just like stuff to work
   }
+
+  // iterate through the pairs
 
   for (int i = 0; i < arms; i++)
   {
-    for (int i = )
+    int currentParticleIndex = i*armLength + 1;
+    vector1 <double> prevParticle = nanostarCenter;
+    for (int z = 0; z < armLength - 1; z++)
+    {
+        md currentPair;
+        currentPair.firstParticle = prevParticle;
+        currentPair.secondParticle = particles.getrowvector(currentParticleIndex);
+        bindpairs.push_back(currentPair);
 
-
+        md currentTriplet;
+        currentTriplet.leftParticle = prevParticle;
+        currentTriplet.centerParticle = particles.getrowvector(currentParticleIndex);
+        currentTriplet.rightParticle = particles.getrowvector(currentParticleIndex + 1);
+        bendpairs.push_back(currentTriplet);
+        prevParticle = particles.getrowvector(currentParticleIndex); // update the current iteration
+        currentParticleIndex++; //this is probably redundant
+        z++;
+    }
   }
+
+
 }
 
 void Nanostar::set_initial_state(string s)
