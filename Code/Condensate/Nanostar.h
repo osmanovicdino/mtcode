@@ -24,10 +24,13 @@ struct Nanostar {
 
     vector<mdtriplet> bendpairs;
 
+    vector<int> save_sticky;
+
     potential *faa;
     potential *hs;
     potential *bindp;
     potential3 *bendp;
+
 
     Nanostar(int N, double ll);
 

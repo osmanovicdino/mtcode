@@ -1,7 +1,7 @@
 #ifndef NANOSTAR_CPP
 #define NANOSTAR_CPP
 
-Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendpairs(vector<mdtriplet>()) {
+Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendpairs(vector<mdtriplet>()), save_sticky(vector<int>()){
     obj = new LangevinNVT;
     dimension = 3;
     l = ll;
@@ -96,6 +96,8 @@ matrix<double> Nanostar::create_initial_state(string s)
 void Nanostar::Passa_set_nanostar() {
     matrix<double> store(3,3);
     
+    int index1  = 54;
+    save_sticky.push_back(index1);
     /*
     insert code
     */

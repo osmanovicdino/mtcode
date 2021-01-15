@@ -3,14 +3,13 @@
 
 #include "../Langevin.h"
 #include "../Potentials/potentialtheta.h"
-#include "../Potentials/combopatch.h"
 #include "../Bindings/GraphAlgorithms.h"
 #include "../Bindings/BinaryBindStore.h"
 #include "../Bindings/BindingModelFull.h"
 #include "../Bindings/BindingModelSingle.h"
 #include "../Bindings/BindingModelBinary.h"
 #include "../Bindings/BindingModelTernary.h"
-#include "../Potentials/combopatch.h"
+#include "../Potentials/ComboPatch/combopatch.h"
 
 class LangevinNVTR : public LangevinNVT {
 protected:

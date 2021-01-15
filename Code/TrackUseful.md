@@ -2,7 +2,7 @@ https://github.blog/2020-12-15-token-authentication-requirements-for-git-operati
 
 
 
-Connected components example
+# Connected components example
 
 <pre><code>
 matrix<int> adj(200,4);
@@ -40,7 +40,7 @@ for(int i = 0 ; i < nbins.getsize()-1 ; i++) {
 
 This will print out all the connected components for the defined adjacency graph
 
-Apparently working model with single binding condition (equilibrium)
+# Apparently working model with single binding condition (equilibrium)
 
 <pre><code>
 
@@ -362,7 +362,7 @@ A.run_singlebond( 100000,  100);
 
 </code></pre>
 
-Working Binding Model:
+# Working Binding Model:
 
 <pre><code>
 int n = 125;
@@ -462,6 +462,141 @@ string base = "_beta=";
 base += ss.str();
 
 A.run_singlebond(10000, 1000, base);
+
+
+</code></pre>
+
+# Two Tetrahedrals and A Singleton Simulation
+
+<pre><code>
+
+int m1 = 250;
+int m2 = m1+100;
+BindingModelTernary b(m1*4,4*m2);
+
+
+// b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
+// 0.,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0);
+
+
+b.setup(0.99,0.01,0.01,0.01,0.99,0.2,
+0.,
+8.,
+0.0,
+0.0,
+0.0,
+1.0,
+0.0,
+0.0,
+0.0);
+
+
+matrix<double> params(6,3);
+params(0, 0) = 10.0; // 1<->1
+params(0, 1) = 1.4;
+params(0, 2) = 0.927;
+
+params(1, 0) = 0.0; //1 <->2
+params(1, 1) = 1.0;
+params(1, 2) = 0.927;
+
+params(2, 0) = 10.0; //1 <-> 3
+params(2, 1) = 1.4;
+params(2, 2) = 0.927;
+
+params(3, 0) = 0.0; // 2 <-> 2
+params(3, 1) = 1.0;
+params(3, 2) = 0.927;
+
+params(4, 0) = 10.0; // 2<-> 3
+params(4, 1) = 1.4;
+params(4, 2) = 0.927;
+
+params(5, 0) = 0.0; //3 <-> 3
+params(5, 1) = 1.0;
+params(5, 2) = 0.927;
+
+
+
+
+
+
+
+int n = 600;
+
+TwoTetrahedralAndSingle c(params, m1, m2, n);
+int n2 = 100;
+double packing_fraction = 0.01;
+
+double l = cbrt(pi*(double)n/(6.*packing_fraction));
+
+Condensate A(l, n);
+
+
+//TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
+
+// string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
+// string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
+
+// string filp = "/home/dino/Documents/Condensate/TernaryFluid2/pos_beta=1_i=02097.csv";
+// string filo = "/home/dino/Documents/Condensate/TernaryFluid2/orientation_beta=1_i=02097.csv";
+
+// double T;
+// bool err1;
+// bool err2;
+// matrix<double> temppos = importcsv(filp, T, err1);
+// matrix<double> tempori = importcsv(filo, T, err1);
+
+// matrix<double> newpos(2000,3);
+// matrix<double> newori(2000,3);
+
+// A.obj->setdat(temppos);
+// A.obj->setorientation(tempori);
+
+
+// cout << b.tripr111 << endl;
+// cout << b.doubr11 << endl;
+// cout << b.doubr22 << endl;
+// cout << b2.on_rate << endl;
+// cout << b2.off_rate << endl;
+// pausel();
+
+//TetrahedralPatch c2(10.0,1.4,0.927);
+
+A.setBindingModel(b);
+
+A.setpots(c);
+
+//int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+
+//int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+
+//A.run_singlebond(10000, 1000);
+
+A.setviscosity(1.0);
+
+
+double beta = 1.0;
+
+A.obj->setkT(1./beta);
+
+
+
+stringstream ss;
+ss << beta;
+
+string base = "_beta=";
+base += ss.str();
+
+A.run_singlebond(10000000, 1000, base);
 
 
 </code></pre>

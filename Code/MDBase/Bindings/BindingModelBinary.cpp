@@ -6,6 +6,10 @@ BindingModelBinary::BindingModelBinary(int divv) : doubr11(vector1<double>(4)), 
     div = divv;
 }
 
+BindingModelBinary::setup_equilibrium() {
+
+}
+
 void BindingModelBinary::doublet(bool before, int index1, int index2, bool &after)
 {
 

@@ -20,6 +20,8 @@ struct BindingModelBinary : AbstractBindingModel
 
     BindingModelBinary(int);
 
+    void setup_equilibrium();
+
     void doublet(bool before, int index1, int index2, bool &after);
 
     void triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &after1, bool &after2, bool &after3);
