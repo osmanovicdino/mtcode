@@ -60,11 +60,15 @@ int main(int argc, char **argv)
     cout << endl;
     // srand(time(NULL));
 
-    // Nanostar A(2,11.0);
+    Nanostar A(2,11.0);
 
-    // cout << "everything seems to work" << endl;
+    vector1<double> start(3);
 
-    // A.Passa_set_nanostar();
+    A.Passa_set_nanostar(start, 30, 20, 4, 3, 5, "test.csv");
+
+    cout << "runtime seems to work" << endl;
+
+    return 0;
 
     // A.run(10000,100);
 

@@ -93,7 +93,7 @@ matrix<double> Nanostar::create_initial_state(string s)
     return store;
 }
 
-void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLength, double boxLength, string fileName) {
+void Nanostar::Passa_set_nanostar(vector1<double> initCoord, double theta, double phi, int arms, int armLength, double boxLength, string fileName) {
     int totalParticles = arms * armLength;
     matrix<double> store(3,3);
     double pi = 2*acos(0.0);
@@ -116,11 +116,11 @@ void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLen
 
     matrix <double> K2 = K*K;
 
-    matrix<double> R = I + sin(incrementAngle/2)*K + (1 - cos(incrementAngle))*K2; // Rodrigues formula
+    matrix<double> R = I + sin(incrementAngle)*K + (1 - cos(incrementAngle))*K2; // Rodrigues formula
 
     vector1 <double> currentMaxArmCoords(3);
     currentMaxArmCoords[0] = maxCoord * sin(phi) * cos(theta);
-    currentMaxArmCoords[1] = maxCoord * sin(theta) * cos(theta);
+    currentMaxArmCoords[1] = maxCoord * sin(theta) * cos(theta); // verify later
     currentMaxArmCoords[2] = maxCoord*cos(phi);
 
     // init file i/o for csv file
@@ -128,16 +128,21 @@ void Nanostar::Passa_set_nanostar(double theta, double phi, int arms, int armLen
     std::ofstream myFile(fileName);
     for (int i = 0; i < arms; i++)
     {
-      std::vector<double> x = linspace(currentMaxArmCoords[0], maxCoord, armLength + 1);
-      std::vector<double> y = linspace(currentMaxArmCoords[1], maxCoord, armLength + 1);
-      std::vector<double> z = linspace(currentMaxArmCoords[2], maxCoord, armLength + 1);
-      for (int l = 0; l < armLength; l++)
+      std::vector<double> x = linspace(initCoord[0], currentMaxArmCoords[0], armLength + 1);
+      std::vector<double> y = linspace(initCoord[1], currentMaxArmCoords[1], armLength + 1);
+      std::vector<double> z = linspace(initCoord[2], currentMaxArmCoords[2], armLength + 1);
+      for (int l = 0; l < armLength + 1; l++)
       {
+        if (i != 0 && l == 0)
+        {
+          l = 1;
+        }
         string coordinateToPrint = to_string(x[l]) + ',' + to_string(y[l]) + ',' + to_string(z[l]) + '\n';
         myFile << coordinateToPrint;
       }
 
-      currentMaxArmCoords = R * currentMaxArmCoords;
+      currentMaxArmCoords = R*currentMaxArmCoords; // problem here
+      // check if generalized to non origin points
     }
 
     myFile.close();
@@ -173,7 +178,7 @@ void Nanostar::sortPairsTriplets(matrix<double> particles, int arms, int armLeng
         currentPair.secondParticle = particles.getrowvector(currentParticleIndex);
         bindpairs.push_back(currentPair);
 
-        md currentTriplet;
+        md currentTriplet; // different loop for out of bounds 
         currentTriplet.leftParticle = prevParticle;
         currentTriplet.centerParticle = particles.getrowvector(currentParticleIndex);
         currentTriplet.rightParticle = particles.getrowvector(currentParticleIndex + 1);
@@ -240,156 +245,156 @@ void Nanostar::create_nanostar() {
 
 // matrix<int> &pairs, matrix<int> &specials, matrix<int> &not_specials
 
-matrix<int> Nanostar::gets(vector1<double> particles){
-
-
-    //return pairs;
-    // vector<mdpair> special_pairs;
-    // vector<mdpair> not_special_pairs;
-    // for(int i = 0 ; i < pairs.getNsafe() ; i++) {
-    //     int p1 = pairs(i,0);
-    //     int p2 = pairs(i,1);
-
-    //     mdpair temp(p1,p2);
-
-    //     int which_nanostar =  floor(p1/(num_branches*length_of_branch+1));
-    //     int which_nanostar2 =  floor(p2/(num_branches*length_of_branch+1));
-
-    //     bool endp1 = ((p1 - 1) % 10 == 0);
-    //     bool endp2 = ((p2 - 1) % 10 == 0);
-
-    //     if(which_nanostar != which_nanostar2  && endp1 && endp2) {
-    //         special_pairs.push_back(temp);
-    //     }
-    //     else{
-    //         not_special_pairs.push_back(temp);
-    //     }
-
-
-    // }
-
-}
-
-
-
-void Nanostar::run(int runtime, int every, string strbase = "")
-{
-    int tf = ceil((double)runtime / (double)every);
-    int number_of_digits = 0;
-    do
-    {
-        ++number_of_digits;
-        tf /= 10;
-    } while (tf);
-
-
-    matrix<int> bp2(bindpairs.size(),2);
-
-
-    matrix<int> bep2(bendpairs.size(), 3);
-
-    //Collect all the interactions
-
-    for(int i = 0 ; i < bindpairs.size() ; i++ ) {
-        mdpair temp =  bindpairs[i];
-        bp2(i, 0 ) = temp.a;
-        bp2(i, 1) = temp.b;
-    }
-
-    for (int i = 0; i < bendpairs.size(); i++)
-    {
-        mdtriplet temp = bendpairs[i];
-        bep2(i, 0) = temp.a;
-        bep2(i, 1) = temp.b;
-        bep2(i, 2) = temp.c;
-    }
+// matrix<int> Nanostar::gets(vector1<double> particles){
+//
+//
+//     //return pairs;
+//     // vector<mdpair> special_pairs;
+//     // vector<mdpair> not_special_pairs;
+//     // for(int i = 0 ; i < pairs.getNsafe() ; i++) {
+//     //     int p1 = pairs(i,0);
+//     //     int p2 = pairs(i,1);
+//
+//     //     mdpair temp(p1,p2);
+//
+//     //     int which_nanostar =  floor(p1/(num_branches*length_of_branch+1));
+//     //     int which_nanostar2 =  floor(p2/(num_branches*length_of_branch+1));
+//
+//     //     bool endp1 = ((p1 - 1) % 10 == 0);
+//     //     bool endp2 = ((p2 - 1) % 10 == 0);
+//
+//     //     if(which_nanostar != which_nanostar2  && endp1 && endp2) {
+//     //         special_pairs.push_back(temp);
+//     //     }
+//     //     else{
+//     //         not_special_pairs.push_back(temp);
+//     //     }
+//
+//
+//     // }
+//
+// }
 
 
 
-
-    int totalN = obj->getN();
-    //int sibdiv = floor(ll/4.0);
-    int ccc;
-    int num = floor(l/4.);
-
-    matrix<int> boxes = (obj)->getgeo().generate_boxes_relationships(num, ccc);
-
-    matrix<int> *froyo1 = obj->calculatepairs(boxes, 3.5);
-
-    // *possible_stickers = new matrix<int>;
-    matrix<int> possible_stickers;
-    matrix<int> hs_pairs;
-    this->gets(*froyo1,possible_stickers,hs_pairs);
-
-     //matrix<int> *hs_pairs = new matrix<int>;
-    //matrix<int> hs_pairs = this->get_non_s(*froyo1);
-
-    unsigned int i;
-     for (i = 0; i < runtime; i++)
-     {
-         cout << i << endl;
-         if (i % 25 == 0)
-         {
-             delete froyo1;
-
-             // cout << "updated after: " << i << endl;
-             // state = obj->getdat();
-             froyo1 = obj->calculatepairs(boxes, 3.5);
-             this->gets(*froyo1, possible_stickers, hs_pairs);
-         }
-
-         matrix<double> F1((*obj).calculateforces(bp2, *bindp));
-
-         matrix<double> F2((*obj).calculateforces_threebody(bep2, *bendp));
-
-         matrix<double> F3((*obj).calculateforces(possible_stickers, *faa));
-
-         matrix<double> F4((*obj).calculateforces(hs_pairs, *hs));
-
-         matrix<double> F = F1 + F2 + F3 + F4;
-
-         matrix<double> R(totalN, dimension);
-         for (int i1 = 0; i1 < totalN; i1++)
-         {
-             for (int j = 0; j < dimension; j++)
-             {
-                 R(i1, j) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-             }
-         }
-         if (i % every == 0)
-         {
-
-             //cout << i << endl;
-
-             stringstream ss;
-
-             ss << setw(number_of_digits) << setfill('0') << (i / every);
-
-             matrix<double> pos = obj->getdat();
-
-             string poss = "pos";
-             poss = poss + strbase;
-
-             poss += "_i=";
-
-             string extension = ".csv";
-
-             poss += ss.str();
-
-             poss += extension;
-
-             ofstream myfile;
-             myfile.open(poss.c_str());
-
-             myfile <<= pos;
-
-             myfile.close();
-         }
-
-         (*obj).advance_mom(F, R);
-
-         (*obj).advance_pos();
-    }
-}
+// void Nanostar::run(int runtime, int every, string strbase = "")
+// {
+//     int tf = ceil((double)runtime / (double)every);
+//     int number_of_digits = 0;
+//     do
+//     {
+//         ++number_of_digits;
+//         tf /= 10;
+//     } while (tf);
+//
+//
+//     matrix<int> bp2(bindpairs.size(),2);
+//
+//
+//     matrix<int> bep2(bendpairs.size(), 3);
+//
+//     //Collect all the interactions
+//
+//     for(int i = 0 ; i < bindpairs.size() ; i++ ) {
+//         mdpair temp =  bindpairs[i];
+//         bp2(i, 0 ) = temp.a;
+//         bp2(i, 1) = temp.b;
+//     }
+//
+//     for (int i = 0; i < bendpairs.size(); i++)
+//     {
+//         mdtriplet temp = bendpairs[i];
+//         bep2(i, 0) = temp.a;
+//         bep2(i, 1) = temp.b;
+//         bep2(i, 2) = temp.c;
+//     }
+//
+//
+//
+//
+//     int totalN = obj->getN();
+//     //int sibdiv = floor(ll/4.0);
+//     int ccc;
+//     int num = floor(l/4.);
+//
+//     matrix<int> boxes = (obj)->getgeo().generate_boxes_relationships(num, ccc);
+//
+//     matrix<int> *froyo1 = obj->calculatepairs(boxes, 3.5);
+//
+//     // *possible_stickers = new matrix<int>;
+//     matrix<int> possible_stickers;
+//     matrix<int> hs_pairs;
+//     this->gets(*froyo1,possible_stickers,hs_pairs);
+//
+//      //matrix<int> *hs_pairs = new matrix<int>;
+//     //matrix<int> hs_pairs = this->get_non_s(*froyo1);
+//
+//     unsigned int i;
+//      for (i = 0; i < runtime; i++)
+//      {
+//          cout << i << endl;
+//          if (i % 25 == 0)
+//          {
+//              delete froyo1;
+//
+//              // cout << "updated after: " << i << endl;
+//              // state = obj->getdat();
+//              froyo1 = obj->calculatepairs(boxes, 3.5);
+//              this->gets(*froyo1, possible_stickers, hs_pairs);
+//          }
+//
+//          matrix<double> F1((*obj).calculateforces(bp2, *bindp));
+//
+//          matrix<double> F2((*obj).calculateforces_threebody(bep2, *bendp));
+//
+//          matrix<double> F3((*obj).calculateforces(possible_stickers, *faa));
+//
+//          matrix<double> F4((*obj).calculateforces(hs_pairs, *hs));
+//
+//          matrix<double> F = F1 + F2 + F3 + F4;
+//
+//          matrix<double> R(totalN, dimension);
+//          for (int i1 = 0; i1 < totalN; i1++)
+//          {
+//              for (int j = 0; j < dimension; j++)
+//              {
+//                  R(i1, j) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+//              }
+//          }
+//          if (i % every == 0)
+//          {
+//
+//              //cout << i << endl;
+//
+//              stringstream ss;
+//
+//              ss << setw(number_of_digits) << setfill('0') << (i / every);
+//
+//              matrix<double> pos = obj->getdat();
+//
+//              string poss = "pos";
+//              poss = poss + strbase;
+//
+//              poss += "_i=";
+//
+//              string extension = ".csv";
+//
+//              poss += ss.str();
+//
+//              poss += extension;
+//
+//              ofstream myfile;
+//              myfile.open(poss.c_str());
+//
+//              myfile <<= pos;
+//
+//              myfile.close();
+//          }
+//
+//          (*obj).advance_mom(F, R);
+//
+//          (*obj).advance_pos();
+//     }
+// }
 
 #endif /* NANOSTAR_CPP */

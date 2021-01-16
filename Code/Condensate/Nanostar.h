@@ -2,7 +2,8 @@
 #define NANOSTAR_H
 
 #include "../MDBase/Langevin.h"
-
+#include <vector>
+#include "../MathHelper/Helper.h"
 
 struct Nanostar {
 
@@ -34,7 +35,7 @@ struct Nanostar {
     void create_nanostar();
 
 
-    void Passa_set_nanostar(double theta, double phi, int arms, int armLength, double boxLength, string fileName);
+    void Passa_set_nanostar(vector1<double> initCoord, double theta, double phi, int arms, int armLength, double boxLength, string fileName);
 
     matrix<double> create_initial_state();
     matrix<double> create_initial_state(string s);
