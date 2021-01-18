@@ -67,6 +67,8 @@ struct TetrahedralWithSingle : ComboPatch
     }
 };
 
+#include "TetrahedralWithSingle.cpp"
+
 
 
 #endif /* TETRAHEDRALWITHSINGLE_H */

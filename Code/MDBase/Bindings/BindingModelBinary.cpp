@@ -6,8 +6,106 @@ BindingModelBinary::BindingModelBinary(int divv) : doubr11(vector1<double>(4)), 
     div = divv;
 }
 
-BindingModelBinary::setup_equilibrium() {
+void BindingModelBinary::setup_equilibrium() {
 
+    //particles type 1 and 2 can bind to each other;
+
+    vector1<double> r11(4);
+    r11[0] = 0.0;
+    r11[1] = 1.0;
+    r11[2] = 0.0;
+    r11[3] = 1.0;
+
+    vector1<double> r12(r11);
+
+    vector1<double> r22(r11);
+    // r22[0] = 1.0;
+    // r22[1] = 0.0;
+    // r22[2] = 1.0;
+    // r22[3] = 0.0;
+
+    vector1<double> t111(16);
+    vector1<double> t112(16);
+    vector1<double> t122(16);
+    vector1<double> t222(16);
+
+    t111[0] = 0.998;  //fromi,jtpi,j
+    t111[1] = 0.001;  //fromi,jtoj,k
+    t111[2] = 0.001;  //fromi,jtoi,k
+    t111[3] = 0.000;  //fromi,jtonothing
+    t111[4] = 0.001;  //fromj,ktoi,j
+    t111[5] = 0.998;  //fromj,ktoj,k
+    t111[6] = 0.001;  //fromj,ktoi,k
+    t111[7] = 0.000;  //fromj,ktonothing
+    t111[8] = 0.001;  //fromi,ktoi,j
+    t111[9] = 0.001;  //fromi,ktoj,k
+    t111[10] = 0.998; //fromi,ktoi,k
+    t111[11] = 0.000; //fromi,ktonothing
+    t111[12] = 0.33;  //fromnothingtoi,j
+    t111[13] = 0.33;  //fromnothingtoj,k
+    t111[14] = 0.33;  //fromnothingtoi,k
+    t111[15] = 0.01;  //fromnothingtonothing
+
+    //particle 2 does not interact
+    t112[0] = 0.998;  //fromi,jtpi,j
+    t112[1] = 0.001;  //fromi,jtoj,k
+    t112[2] = 0.001;  //fromi,jtoi,k
+    t112[3] = 0.000;  //fromi,jtonothing
+    t112[4] = 0.001;  //fromj,ktoi,j
+    t112[5] = 0.998;  //fromj,ktoj,k
+    t112[6] = 0.001;  //fromj,ktoi,k
+    t112[7] = 0.000;  //fromj,ktonothing
+    t112[8] = 0.001;  //fromi,ktoi,j
+    t112[9] = 0.001;  //fromi,ktoj,k
+    t112[10] = 0.998; //fromi,ktoi,k
+    t112[11] = 0.000; //fromi,ktonothing
+    t112[12] = 0.33;  //fromnothingtoi,j
+    t112[13] = 0.33;  //fromnothingtoj,k
+    t112[14] = 0.33;  //fromnothingtoi,k
+    t112[15] = 0.01;  //fromnothingtonothing
+
+    t122[0] = 0.998;  //fromi,jtpi,j
+    t122[1] = 0.001;  //fromi,jtoj,k
+    t122[2] = 0.001;  //fromi,jtoi,k
+    t122[3] = 0.000;  //fromi,jtonothing
+    t122[4] = 0.001;  //fromj,ktoi,j
+    t122[5] = 0.998;  //fromj,ktoj,k
+    t122[6] = 0.001;  //fromj,ktoi,k
+    t122[7] = 0.000;  //fromj,ktonothing
+    t122[8] = 0.001;  //fromi,ktoi,j
+    t122[9] = 0.001;  //fromi,ktoj,k
+    t122[10] = 0.998; //fromi,ktoi,k
+    t122[11] = 0.000; //fromi,ktonothing
+    t122[12] = 0.33;  //fromnothingtoi,j
+    t122[13] = 0.33;  //fromnothingtoj,k
+    t122[14] = 0.33;  //fromnothingtoi,k
+    t122[15] = 0.01;  //fromnothingtonothing
+
+    t222[0] = 0.998;  //fromi,jtpi,j
+    t222[1] = 0.001;  //fromi,jtoj,k
+    t222[2] = 0.001;  //fromi,jtoi,k
+    t222[3] = 0.000;  //fromi,jtonothing
+    t222[4] = 0.001;  //fromj,ktoi,j
+    t222[5] = 0.998;  //fromj,ktoj,k
+    t222[6] = 0.001;  //fromj,ktoi,k
+    t222[7] = 0.000;  //fromj,ktonothing
+    t222[8] = 0.001;  //fromi,ktoi,j
+    t222[9] = 0.001;  //fromi,ktoj,k
+    t222[10] = 0.998; //fromi,ktoi,k
+    t222[11] = 0.000; //fromi,ktonothing
+    t222[12] = 0.33;  //fromnothingtoi,j
+    t222[13] = 0.33;  //fromnothingtoj,k
+    t222[14] = 0.33;  //fromnothingtoi,k
+    t222[15] = 0.01;  //fromnothingtonothing
+   
+    doubr11 = r11;
+    doubr12 = r12;
+    doubr22 = r22;
+
+    tripr111 = t111;
+    tripr112 = t112;
+    tripr122 = t122;
+    tripr222 = t222;
 }
 
 void BindingModelBinary::doublet(bool before, int index1, int index2, bool &after)

@@ -148,8 +148,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 {
                     //cout << argthetai <<  " " << argthetaj << endl;
 
-                    // if((wp1 < 400 &&wp2 < 400)) {
-                    
+                    // if((wp1 > 400 &&wp2 > 400)) {
+                    //     cout << "\n\n\n";
                     //     cout << "possible patch" << endl;
                     //     cout << p1 << " " << p2 << endl;
                     //     cout << wp1 << " " << wp2 << endl;
@@ -158,6 +158,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     //     cout << potn << endl;
                     //     cout << bo.isbound[wp1] << " " << bo.isbound[wp2] << endl;
                     //     cout << bo.boundto[wp1] << " " << bo.boundto[wp2] << endl;
+                    //     cout << "\n\n\n next";
                     //     pausel();
                     // }
                    // cout << potn << endl;
@@ -181,6 +182,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     boindices(wp1, iterator1) = wp2;
                     
                     boindices(wp2, iterator2) = wp1;
+
 
                 }
             }

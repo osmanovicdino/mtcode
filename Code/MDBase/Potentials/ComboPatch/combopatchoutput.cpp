@@ -86,14 +86,14 @@ void TetrahedralWithSingle::CreateFiles()
 
     outfunc(v2, "ori2");
 
-    matrix<double> col(nt+ns, 3);
+    matrix<double> col(ns, 3);
     for(int i = 0 ; i < nt ; i++)
     {
     col(i, 0) = 0.0;
     col(i, 1) = 0.5;
     col(i, 2) = 0.5;
     }
-    for(int i = nt  ; i < nt+ns ; i++) {
+    for(int i = nt  ; i < ns ; i++) {
     col(i, 0) = 1.;
     col(i, 1) = 0.5;
     col(i, 2) = 0.;
@@ -247,14 +247,14 @@ void TetrahedralWithBivalent::CreateFiles()
 
     outfunc(v2, "ori2");
 
-    matrix<double> col(nt + nb, 3);
+    matrix<double> col(nb, 3);
     for (int i = 0; i < nt; i++)
     {
         col(i, 0) = 0.0;
         col(i, 1) = 0.5;
         col(i, 2) = 0.5;
     }
-    for (int i = nt; i < nt + nb; i++)
+    for (int i = nt; i <  nb; i++)
     {
         col(i, 0) = 1.;
         col(i, 1) = 0.5;

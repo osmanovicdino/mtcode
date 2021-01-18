@@ -3,6 +3,7 @@
 
 TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt, int nbb) : ComboPatch(28), v(matrix<double>(4, 3)), v2(matrix<double>(2,3)),params2(params)
 {
+    if(params.getNsafe()!=28) error("param list for Tetrahedron with Bivalent not of correct dimension (should be 28)");
     nt = ntt;
     nb = nbb;
     i1 = new int[17];
@@ -16,7 +17,7 @@ TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt
     for (int i = 0; i < 8; i++)
         i2[i + 1] = 16 + i;
     for (int i = 0; i < 4; i++)
-        i3[1] = 24 + i;
+        i3[i + 1] = 24 + i;
 
     p = &i1;
 
@@ -167,10 +168,10 @@ void TetrahedralWithBivalent::which_patch(const int &i, const int &j, const int 
     }
     else
     {
-        int k2 = (potn - 16) / 2;
-        int k1 = (potn - 16) % 2;
-        wpi = nt * 4 + (i - nt)*2 + k1;
-        wpj = j * 4 + k2;
+        int k1 = (potn - 16) / 2;
+        int k2 = (potn - 16) % 2;
+        wpi = nt * 4 + (i - nt)*2 + k2;
+        wpj = j * 4 + k1;
     }
 }
 

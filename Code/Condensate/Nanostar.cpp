@@ -156,7 +156,11 @@ void Nanostar::create_nanostar() {
 }
 
 matrix<int> Nanostar::gets(matrix<int> &pairs, matrix<int> &specials, matrix<int> &not_specials){
-    //return pairs;
+    
+    save_sticky;
+
+
+    return pairs;
     // vector<mdpair> special_pairs;
     // vector<mdpair> not_special_pairs;
     // for(int i = 0 ; i < pairs.getNsafe() ; i++) {
