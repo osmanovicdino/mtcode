@@ -67,7 +67,7 @@ int iter = 0;
 for(int i = 0  ; i < 4 ; i++) {
     for(int j = 0  ; j < 4 ; j++) {
         params(iter,0) = 0.0;
-        params(iter,1) = 1.4;
+        params(iter,1) = 1.0;
         params(iter,2) =  0.927;
         iter++;
     }
@@ -89,19 +89,20 @@ for (int i = 0; i < 2; i++)
     {
         if (j == i)
         {
-            params(iter, 0) = 8.0;
-            params(iter, 1) = 1.4;
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1.0;
             params(iter, 2) = 0.927;
         }
         else
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4;
+            params(iter, 1) = 1.0;
             params(iter, 2) = 0.927;
         }
         iter++;
     }
 }
+
 
 int n = 500;
 int nt = 100;

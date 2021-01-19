@@ -338,9 +338,11 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
     {
             //un is r_i-r_j
+
         //dpos is the vector of differences of distance in each dimension
         if (rij > interaction_distance)
         {
+            //cout << "dis" << endl;
             fx = 0.0;
             fy = 0.0;
             fz = 0.0;
@@ -385,6 +387,7 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
 
             double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
             double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
+
 
             double f;
 
@@ -548,6 +551,7 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
             }
             else
             {
+                //cout << "ang" << endl;
                 f = 0.;
                 fx = 0.0;
                 fy = 0.0;
@@ -560,6 +564,10 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
                 tjz = 0.0;
             }
         }
+        // if(abs(fx)<1E-10) {
+        //     cout << "why zero" << endl;
+        //     pausel();
+        // }
     }
 
     void setparameters(const vector1<double> &param)

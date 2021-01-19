@@ -29,6 +29,12 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     {
         int p1 = pairs(i, 0);
         int p2 = pairs(i, 1);
+        if(p2 < p1) { //INDICES NEED TO BE SORTED FOR IT TO WORK
+            int tp1 = p1;
+            p1 = p2;
+            p2 = tp1;
+
+        }
         //int i1 = pairs(i,2);
         double dis;
         //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
@@ -147,7 +153,17 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp2)
                 {
                     //cout << argthetai <<  " " << argthetaj << endl;
-
+                    // cout << p1 << " " << p2 << endl;
+                    // cout << "params: " << endl;
+                    // cout << qtemp0 << " " << qtemp1 << " " << qtemp2 << " " << qtemp3 << " " << qtemp4 << " " << qtemp5 << " " << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
+                    // cout << gtemp0 << " " << gtemp1 << " " << gtemp2 << " " << gtemp3 << " " << gtemp4 << " " << gtemp5 << " " << gtemp6 << " " << gtemp7 << " " << gtemp8 << endl;
+                    // cout << un.gpcons(0) << " " << un.gpcons(1) << " " << un.gpcons(2) << endl;
+                    // cout << nxb1 << " " << nyb1 << " " << nzb1 << endl;
+                    // cout << nxb2 << " " << nyb2 << " " << nzb2 << endl;
+                    // cout << nx1 << " " << ny1 << " " << nz1 << endl;
+                    // cout << nx2 << " " << ny2 << " " << nz2 << endl;
+                    // cout << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
+                    // cout << endl;
                     // if((wp1 > 400 &&wp2 > 400)) {
                     //     cout << "\n\n\n";
                     //     cout << "possible patch" << endl;
@@ -773,7 +789,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             int wp1 = mypairs[i].a;
             int wp2 = mypairs[i].b;
             iny.which_particle(wp1,wp2,p1,p2);
-
+            
+            if (p2 < p1)
+            { //INDICES NEED TO BE SORTED FOR IT TO WORK
+                int tp1 = p1;
+                p1 = p2;
+                p2 = tp1;
+            }
             double dis;
             vector1<double> un(dimension);
             geo->distance_vector(*dat, p1, p2, un, dis);
@@ -783,6 +805,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             dis = sqrt(dis);
 
             un /= dis;
+
 
 
 
@@ -798,17 +821,74 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             double tjy;
             double tjz;
 
+           // cout << p1 << " " << p2 << endl;
             (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
+;
+            /* 
+            double dx = un.gpcons(0);
+            double dy = un.gpcons(1);
+            double dz = un.gpcons(2);
 
+            double qtemp0 = orient->gpcons(p1, 0);
+            double qtemp1 = orient->gpcons(p1, 1);
+            double qtemp2 = orient->gpcons(p1, 2);
+            double qtemp3 = orient->gpcons(p1, 3);
+            double qtemp4 = orient->gpcons(p1, 4);
+            double qtemp5 = orient->gpcons(p1, 5);
+            double qtemp6 = orient->gpcons(p1, 6);
+            double qtemp7 = orient->gpcons(p1, 7);
+            double qtemp8 = orient->gpcons(p1, 8);
 
-            // cout << p1 << " " << p2 << endl;
-            // cout << dis << endl;
-            // cout << potn << endl;
-            // cout << wp1 << " " << wp2 << endl;
-            // cout << fx << " " << fy << " " << fz << endl;
-            // cout << tix << " " << tiy << " " << tiz << endl;
-            // pausel();
+            double gtemp0 = orient->gpcons(p2, 0);
+            double gtemp1 = orient->gpcons(p2, 1);
+            double gtemp2 = orient->gpcons(p2, 2);
+            double gtemp3 = orient->gpcons(p2, 3);
+            double gtemp4 = orient->gpcons(p2, 4);
+            double gtemp5 = orient->gpcons(p2, 5);
+            double gtemp6 = orient->gpcons(p2, 6);
+            double gtemp7 = orient->gpcons(p2, 7);
+            double gtemp8 = orient->gpcons(p2, 8);
 
+           
+            double nxb1; // = params[0]; //iny[potn]->nxb1;
+            double nyb1; // = params[1]; //iny[potn]->nyb1;
+            double nzb1; // = params[2]; //iny[potn]->nzb1;
+
+            double nxb2; // = params[3]; //iny[potn]->nxb2;
+            double nyb2; // = params[4]; //iny[potn]->nyb2;
+            double nzb2; // = params[5]; //iny[potn]->nzb2;
+
+            double disp; // = params[6];
+
+            double thetam; // = params[8];
+
+            //                cout << p1 << " " << p2 << " " << potn << endl;
+            iny.get_params(p1, p2, potn, nxb1, nyb1, nzb1, nxb2, nyb2, nzb2, disp, thetam); //for this potential, get all the parameters
+
+            double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+            double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+            double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+            double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+            double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+            double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+            double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
+            double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
+            cout << (iny.potential_bundle)[potn]->getparameters() << endl;
+            cout << p1 << " " << p2 << endl;
+            cout << dis << endl;
+            cout << potn << endl;
+            cout << wp1 << " " << wp2 << endl;
+            cout << fx << " " << fy << " " << fz << endl;
+            cout << tix << " " << tiy << " " << tiz << endl;
+            cout << qtemp0 << " " << qtemp1 << " " << qtemp2 << " " << qtemp3 << " " << qtemp4 << " " << qtemp5 << " " << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
+            cout << gtemp0 << " " << gtemp1 << " " << gtemp2 << " " << gtemp3 << " " << gtemp4 << " " << gtemp5 << " " << gtemp6 << " " << gtemp7 << " " << gtemp8 << endl;
+            cout << dx << " " << dy << " " << dz << endl;
+            cout << nx1 << " " << ny1 << " " << nz1 << endl;
+            cout << nx2 << " " << ny2 << " " << nz2 << endl;
+            cout << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
+            pausel(); */
 
             forces(p1, 0) += fx;
             forces(p1, 1) += fy;
@@ -826,7 +906,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
             torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
         }
-        //pausel();
+        
        // cout << "forces" << endl;
         /* 
         #pragma omp parallel for
