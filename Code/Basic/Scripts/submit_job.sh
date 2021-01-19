@@ -30,7 +30,7 @@ module load gcc/4.9.3
 ##/usr/bin/time -v hostname
 mkdir ~/Chemistry/Results1
 cp ~/Chemistry/Code/main.cpp ~/Chemistry/Results1/
-g++ -fopenmp ~/Chemistry/Code/main.cpp -o ~/Chemistry/Results1/angron
+g++ -fopenmp -std=c++11 ~/Chemistry/Code/main.cpp -o ~/Chemistry/Results1/angron
 cd ~/Chemistry/Results1/
 ./angron
 # echo job info on joblog:
