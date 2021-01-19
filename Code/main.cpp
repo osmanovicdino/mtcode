@@ -95,7 +95,7 @@ for (int i = 0; i < 2; i++)
         }
         else
         {
-            params(iter, 0) = 8.0;
+            params(iter, 0) = 0.0;
             params(iter, 1) = 1.4;
             params(iter, 2) = 0.927;
         }
