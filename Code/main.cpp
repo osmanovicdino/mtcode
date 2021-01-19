@@ -112,7 +112,7 @@ TetrahedralWithSingle c2(10.0, 1.4, 0.927, 10., 1.4, 0.927, 10.0, 1.4, 0.927, nt
 
 TetrahedralPatch c3(10.0,1.4,0.927);
 
-double packing_fraction = 0.01;
+double packing_fraction = 0.02;
 
 double l = cbrt(pi * (double)n / (6. * packing_fraction));
 
