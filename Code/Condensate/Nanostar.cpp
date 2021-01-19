@@ -1,7 +1,7 @@
 #ifndef NANOSTAR_CPP
 #define NANOSTAR_CPP
 
-Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendpairs(vector<mdtriplet>()) {
+Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendpairs(vector<mdtriplet>()), stickerList(vector<int>()){
     obj = new LangevinNVT;
     dimension = 3;
     l = ll;
@@ -112,32 +112,37 @@ void Nanostar::Passa_set_nanostar(vector1<double> initCoord, double theta, doubl
 
     matrix<double> K (3,3); // rotating about z-axis
     K(0, 1) = -1;
-    K(1, 0) = 0;
+    K(1, 0) = 1;
 
     matrix <double> K2 = K*K;
 
     matrix<double> R = I + sin(incrementAngle)*K + (1 - cos(incrementAngle))*K2; // Rodrigues formula
 
     vector1 <double> currentMaxArmCoords(3);
-    currentMaxArmCoords[0] = maxCoord * sin(phi) * cos(theta);
-    currentMaxArmCoords[1] = maxCoord * sin(theta) * cos(theta); // verify later
-    currentMaxArmCoords[2] = maxCoord*cos(phi);
+    currentMaxArmCoords[0] = maxCoord * sin(theta) * cos(phi);
+    currentMaxArmCoords[1] = maxCoord * sin(theta) * sin(phi); // verify later
+    currentMaxArmCoords[2] = maxCoord*cos(theta);
 
     // init file i/o for csv file
 
     std::ofstream myFile(fileName);
     for (int i = 0; i < arms; i++)
     {
-      std::vector<double> x = linspace(initCoord[0], currentMaxArmCoords[0], armLength + 1);
-      std::vector<double> y = linspace(initCoord[1], currentMaxArmCoords[1], armLength + 1);
-      std::vector<double> z = linspace(initCoord[2], currentMaxArmCoords[2], armLength + 1);
-      for (int l = 0; l < armLength + 1; l++)
+      std::vector<double> xList = linspace(initCoord[0], currentMaxArmCoords[0] + initCoord[0], armLength + 1);
+      std::vector<double> yList = linspace(initCoord[1], currentMaxArmCoords[1] + initCoord[1], armLength + 1);
+      std::vector<double> zList = linspace(initCoord[2], currentMaxArmCoords[2] + initCoord[2], armLength + 1);
+      for (int h = 0; h < armLength + 1; h++)
       {
-        if (i != 0 && l == 0)
+        if (i != 0 && h == 0)
         {
-          l = 1;
+          h = 1;
         }
-        string coordinateToPrint = to_string(x[l]) + ',' + to_string(y[l]) + ',' + to_string(z[l]) + '\n';
+        // check if x, y, z coords are in bounds
+        // if not, apply periodic boundary condition
+        double x = applyPeriodicBC(xList[h], l);
+        double y = applyPeriodicBC(yList[h], l);
+        double z = applyPeriodicBC(zList[h], l);
+        string coordinateToPrint = to_string(x) + ',' + to_string(y) + ',' + to_string(z) + '\n';
         myFile << coordinateToPrint;
       }
 
@@ -177,19 +182,19 @@ void Nanostar::sortPairsTriplets(matrix<double> particles, int arms, int armLeng
         currentPair.firstParticle = prevParticle;
         currentPair.secondParticle = particles.getrowvector(currentParticleIndex);
         bindpairs.push_back(currentPair);
-
-        md currentTriplet; // different loop for out of bounds 
-        currentTriplet.leftParticle = prevParticle;
-        currentTriplet.centerParticle = particles.getrowvector(currentParticleIndex);
-        currentTriplet.rightParticle = particles.getrowvector(currentParticleIndex + 1);
-        bendpairs.push_back(currentTriplet);
-        prevParticle = particles.getrowvector(currentParticleIndex); // update the current iteration
-        currentParticleIndex++; //this is probably redundant
-        z++;
+        currentParticleIndex++; 
+    }
+    vector1 <double> prevParticle = nanostarCenter;
+    for (int z = 0; z < armLength - 2; z++){
+      md currentTriplet; // different loop for out of bounds
+      currentTriplet.leftParticle = prevParticle;
+      currentTriplet.centerParticle = particles.getrowvector(currentParticleIndex);
+      currentTriplet.rightParticle = particles.getrowvector(currentParticleIndex + 1);
+      bendpairs.push_back(currentTriplet);
+      prevParticle = particles.getrowvector(currentParticleIndex); // update the current iteration
+      currentParticleIndex++; //this is probably redundant
     }
   }
-
-
 }
 
 void Nanostar::set_initial_state(string s)

@@ -63,6 +63,12 @@ int main(int argc, char **argv)
     Nanostar A(2,11.0);
 
     vector1<double> start(3);
+    // vector1<double> initCoord, double theta, double phi, int arms,
+    // int armLength, double boxLength, string fileName
+    start[0] = 10;
+    start[1] = 9;
+    start[2] = 11;
+
 
     A.Passa_set_nanostar(start, 30, 20, 4, 3, 5, "test.csv");
 

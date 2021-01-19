@@ -31,3 +31,19 @@ std::vector<double> linspace(T start_in, T end_in, int num_in)
     double output = (angle / 360)*2*pi;
     return output;
   }
+
+  double applyPeriodicBC(double num, double length)
+  {
+    double bound = abs(length) / 2;
+    if (num < -1*bound)
+    {
+      double delta = abs(num + bound);
+      return bound - delta;
+    }
+    else if (num > bound) {
+      double delta = num - bound;
+      cout << -1*bound+delta << '\n';
+      return -1*bound + delta;
+    }
+    return num;
+  }
