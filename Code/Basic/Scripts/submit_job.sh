@@ -8,7 +8,7 @@
 #$ -l h_rt=1:00:00,h_data=1G
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 1
+#$ -pe shared 12
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -26,9 +26,13 @@ module load gcc/4.9.3
 
 ## substitute the command to run your code
 ## in the two lines below:
-echo '/usr/bin/time -v hostname'
-/usr/bin/time -v hostname
-
+##echo '/usr/bin/time -v hostname'
+##/usr/bin/time -v hostname
+mkdir ~/Chemistry/Results1
+cp ~/Chemistry/Code/main.cpp ~/Chemistry/Results1/
+g++ -fopenmp ~/Chemistry/Code/main.cpp -o ~/Chemistry/Results1/angron
+cd ~/Chemistry/Results1/
+./angron
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
