@@ -64,6 +64,8 @@ double int3 = atof(argv[4]);
 
 matrix<double> params(28,3);
 
+cout << packing_fraction << " " << int1 << " " << int2 << " " << int3 << endl;
+
 // for(int i = 0 ; i < 28 ; i++) {
 //     params(i, 0) =  10.0; //strength 
 //     params(i, 1) =  1.4; //distance
