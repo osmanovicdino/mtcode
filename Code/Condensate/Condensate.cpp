@@ -265,7 +265,6 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     matrix<int> *pairs = obj->calculatepairs(boxes, 3.5);
 
 
-
     WCAPotential wsa(1.0, 1.0, 0.0);
 
 
