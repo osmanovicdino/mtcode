@@ -43,7 +43,7 @@ else
    i3=0
    echo "did not read file correctly"
 fi
-dirwemake = "den=${den}_i1=${i1}_i2=${i2}_i3=${i3}"
+dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}"
 mkdir ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 cp ~/Chemistry/Code/main.cpp ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 g++ -fopenmp -std=c++11 ~/Chemistry/Code/main.cpp -o ~/Chemistry/PhaseDiagramBivalent/${dirwemake}/angron
