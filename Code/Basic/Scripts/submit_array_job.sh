@@ -32,15 +32,15 @@ module load gcc/4.9.3
 if [ -e  ~/Chemistry/Code/Basic/Scripts/params.dat ]; then
    # use the unix command sed -n ${line_number}p to read by line
    den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $1}'`
-   i1 =`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $2}'` 
-   i2 =`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $3}'` 
-   i3 =`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $4}'`
+   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $2}'` 
+   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $3}'` 
+   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $4}'`
    echo "read file correctly" 
 else
    den=0.01
-   i1 =0
-   i2 =0
-   i3 =0
+   i1=0
+   i2=0
+   i3=0
    echo "did not read file correctly"
 fi
 dirwemake = "den=${den}_i1=${i1}_i2=${i2}_i3=${i3}"
