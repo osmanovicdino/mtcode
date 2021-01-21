@@ -23,8 +23,10 @@ struct Nanostar {
 
     vector<mdpair> bindpairs;
 
-    vector<mdtriplet> bendpairs;
+    vector<mdtriplet> bendtriples;
     vector<int> stickerList;
+
+    matrix<int> particles;
 
     potential *faa;
     potential *hs;
@@ -34,10 +36,12 @@ struct Nanostar {
     Nanostar(int N, double ll);
 
     void create_nanostar();
+    vector1<double> initCoord;
 
-
-    void Passa_set_nanostar(vector1<double> initCoord, double theta, double phi, int arms, int armLength, double boxLength, string fileName);
-    void sortPairsTriplets(matrix<double> particles, int arms, int armLength);
+    void Passa_set_nanostar(vector1<double> start, double theta, double phi, int arms, int armLength, double spanLength, string fileName);
+    void sortPairsTriplets(int arms, int armLength);
+    void initStickerList(int arms, int armLength);
+    vector<mdpair> inStickerList(vector<mdpair> stickerPairs);
     matrix<double> create_initial_state();
     matrix<double> create_initial_state(string s);
 

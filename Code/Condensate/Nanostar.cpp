@@ -1,11 +1,10 @@
 #ifndef NANOSTAR_CPP
 #define NANOSTAR_CPP
 
-Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendpairs(vector<mdtriplet>()), stickerList(vector<int>()){
+Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendtriples(vector<mdtriplet>()), stickerList(vector<int>()){
     obj = new LangevinNVT;
     dimension = 3;
     l = ll;
-
     int num_nanostars = N;
     total_particles = 0;
 
@@ -32,9 +31,10 @@ Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendpairs(v
 
     BendingPotential nfr2(bending_strength,preferred_angle);
 
-    for(int i =  0 ; i < num_nanostars; i++) {
-        this->create_nanostar();
-    }
+
+    // for(int i =  0 ; i < num_nanostars; i++) {
+    //     this->Passa_set_nanostar(30, 20, 4, 3, 5, "test.csv");
+    // }
 
     potential *q1 = StickerPotential.clone();
     faa = q1;
@@ -93,11 +93,11 @@ matrix<double> Nanostar::create_initial_state(string s)
     return store;
 }
 
-void Nanostar::Passa_set_nanostar(vector1<double> initCoord, double theta, double phi, int arms, int armLength, double boxLength, string fileName) {
+void Nanostar::Passa_set_nanostar(vector1<double>start, double theta, double phi, int arms, int armLength, double spanLength, string fileName) {
     int totalParticles = arms * armLength;
     matrix<double> store(3,3);
     double pi = 2*acos(0.0);
-    double maxCoord = boxLength / 2; // center the box at (0, 0, 0)
+    double maxCoord = spanLength; // center the box at (0, 0, 0)
 
     theta = convertToRadians(theta);
     phi = convertToRadians(phi);
@@ -128,9 +128,9 @@ void Nanostar::Passa_set_nanostar(vector1<double> initCoord, double theta, doubl
     std::ofstream myFile(fileName);
     for (int i = 0; i < arms; i++)
     {
-      std::vector<double> xList = linspace(initCoord[0], currentMaxArmCoords[0] + initCoord[0], armLength + 1);
-      std::vector<double> yList = linspace(initCoord[1], currentMaxArmCoords[1] + initCoord[1], armLength + 1);
-      std::vector<double> zList = linspace(initCoord[2], currentMaxArmCoords[2] + initCoord[2], armLength + 1);
+      std::vector<double> xList = linspace(start[0], currentMaxArmCoords[0] + start[0], armLength + 1);
+      std::vector<double> yList = linspace(start[1], currentMaxArmCoords[1] + start[1], armLength + 1);
+      std::vector<double> zList = linspace(start[2], currentMaxArmCoords[2] + start[2], armLength + 1);
       for (int h = 0; h < armLength + 1; h++)
       {
         if (i != 0 && h == 0)
@@ -159,42 +159,75 @@ void Nanostar::Passa_set_nanostar(vector1<double> initCoord, double theta, doubl
     (*obj).setdat(store);
 }
 
-void Nanostar::sortPairsTriplets(matrix<double> particles, int arms, int armLength)
+void Nanostar::sortPairsTriplets(int arms, int armLength)
 {
   // sorting the pairs
-  vector1 <double> nanostarCenter (3);
-  // plug in values
-  for (int i = 0; i < 3; i++)
-  {
-    nanostarCenter(i) = particles(0, i);  //there might be a better way to do this
-                                          // but I would just like stuff to work
-  }
 
   // iterate through the pairs
 
+  float nanostarCenter = 0;
+  float currentParticleIndex = 1;
   for (int i = 0; i < arms; i++)
   {
-    int currentParticleIndex = i*armLength + 1;
-    vector1 <double> prevParticle = nanostarCenter;
-    for (int z = 0; z < armLength - 1; z++)
+    float prevParticle = nanostarCenter;
+    for (int z = 0; z < armLength; z++)
     {
-        md currentPair;
-        currentPair.firstParticle = prevParticle;
-        currentPair.secondParticle = particles.getrowvector(currentParticleIndex);
+        mdpair currentPair;
+        currentPair.a = prevParticle;
+        currentPair.b = currentParticleIndex;
         bindpairs.push_back(currentPair);
-        currentParticleIndex++; 
+        prevParticle = currentParticleIndex;
+        currentParticleIndex++;
     }
-    vector1 <double> prevParticle = nanostarCenter;
-    for (int z = 0; z < armLength - 2; z++){
-      md currentTriplet; // different loop for out of bounds
-      currentTriplet.leftParticle = prevParticle;
-      currentTriplet.centerParticle = particles.getrowvector(currentParticleIndex);
-      currentTriplet.rightParticle = particles.getrowvector(currentParticleIndex + 1);
-      bendpairs.push_back(currentTriplet);
-      prevParticle = particles.getrowvector(currentParticleIndex); // update the current iteration
-      currentParticleIndex++; //this is probably redundant
+
+
+  }
+
+  currentParticleIndex = 1;
+  for (int i = 0; i < arms; i++)
+  {
+    float prevParticle = nanostarCenter;
+
+    //this is probably redundant
+
+    for (int z = 0; z < armLength - 1; z++){
+      if (i > 0 && z == 0) {
+        currentParticleIndex++;
+      }
+      mdtriplet currentTriplet; // different loop for out of bounds
+      currentTriplet.a = prevParticle;
+      currentTriplet.b = currentParticleIndex;
+      currentTriplet.c = currentParticleIndex + 1;
+      bendtriples.push_back(currentTriplet);
+      prevParticle = currentParticleIndex;
+      currentParticleIndex++;
+
     }
   }
+}
+
+void Nanostar::initStickerList(int arms, int armLength)
+{
+  for (int i = 1; i < arms + 1; i++)
+  {
+    stickerList.push_back(armLength*i);
+  }
+}
+
+vector<mdpair> Nanostar::inStickerList(vector<mdpair> stickerPairs)
+{
+  int inputSize = stickerPairs.size();
+  vector<mdpair> outVector;
+  for (int i = 0; i < inputSize; i++)
+  {
+    int firstIndex = stickerPairs[i].a;
+    int secondIndex = stickerPairs[i].b;
+    if (count(stickerList.begin(), stickerList.end(), firstIndex) > 0 && count(stickerList.begin(), stickerList.end(), secondIndex))
+    {
+      outVector.push_back(stickerPairs[i]);
+    }
+  }
+  return outVector;
 }
 
 void Nanostar::set_initial_state(string s)
@@ -229,7 +262,7 @@ void Nanostar::create_nanostar() {
     for (int i = 0; i < num_branches; i++)
     {
         mdtriplet a(initial+0, initial+length_of_branch * i + 1, initial+length_of_branch*1+2);
-        bendpairs.push_back(a);
+        bendtriples.push_back(a);
     }
 
     for(int nb = 0 ; nb < num_branches ; nb++)
@@ -242,7 +275,7 @@ void Nanostar::create_nanostar() {
         for (int i = 1; i < length_of_branch - 1; i++)
         {
             mdtriplet a(initial + nb * length_of_branch + i, initial + nb * length_of_branch + i + 1, initial + nb * length_of_branch + i + 2);
-            bendpairs.push_back(a);
+            bendtriples.push_back(a);
         }
     total_particles +=num_branches*length_of_branch+1;
 
@@ -296,7 +329,7 @@ void Nanostar::create_nanostar() {
 //     matrix<int> bp2(bindpairs.size(),2);
 //
 //
-//     matrix<int> bep2(bendpairs.size(), 3);
+//     matrix<int> bep2(bendtriples.size(), 3);
 //
 //     //Collect all the interactions
 //
@@ -306,9 +339,9 @@ void Nanostar::create_nanostar() {
 //         bp2(i, 1) = temp.b;
 //     }
 //
-//     for (int i = 0; i < bendpairs.size(); i++)
+//     for (int i = 0; i < bendtriples.size(); i++)
 //     {
-//         mdtriplet temp = bendpairs[i];
+//         mdtriplet temp = bendtriples[i];
 //         bep2(i, 0) = temp.a;
 //         bep2(i, 1) = temp.b;
 //         bep2(i, 2) = temp.c;
