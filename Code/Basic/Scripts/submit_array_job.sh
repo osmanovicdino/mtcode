@@ -50,6 +50,7 @@ g++ -fopenmp -std=c++11 ~/Chemistry/Code/main.cpp -o ~/Chemistry/PhaseDiagramBiv
 cd ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 ./angron $den $i1 $i2 $i3 >log
 cp -r ~/Chemistry/PhaseDiagramBivalent/${dirwemake} /u/scratch/d/dinoo/ChemistryResults/
+cd ~
 rm -r ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
