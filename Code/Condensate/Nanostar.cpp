@@ -1,7 +1,7 @@
 #ifndef NANOSTAR_CPP
 #define NANOSTAR_CPP
 
-Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendtriples(vector<mdtriplet>()), stickerList(vector<int>()){
+Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendtriples(vector<mdtriplet>()), stickerList(vector<int>()), particles(matrix<double>()){
     obj = new LangevinNVT;
     dimension = 3;
     l = ll;
@@ -95,6 +95,8 @@ matrix<double> Nanostar::create_initial_state(string s)
 
 void Nanostar::Passa_set_nanostar(vector1<double>start, double theta, double phi, int arms, int armLength, double spanLength, string fileName) {
     int totalParticles = arms * armLength;
+    int totalRealParticles = totalParticles + 1; // add the nanostarCenter
+    matrix <double> temp(totalRealParticles, 3);
     matrix<double> store(3,3);
     double pi = 2*acos(0.0);
     double maxCoord = spanLength; // center the box at (0, 0, 0)
@@ -143,6 +145,7 @@ void Nanostar::Passa_set_nanostar(vector1<double>start, double theta, double phi
         double y = applyPeriodicBC(yList[h], l);
         double z = applyPeriodicBC(zList[h], l);
         string coordinateToPrint = to_string(x) + ',' + to_string(y) + ',' + to_string(z) + '\n';
+
         myFile << coordinateToPrint;
       }
 
@@ -157,6 +160,8 @@ void Nanostar::Passa_set_nanostar(vector1<double>start, double theta, double phi
     bool err;
     store = importcsv(fileName, T, err);
     (*obj).setdat(store);
+    temp = importcsv(fileName, T, err);
+    particles = temp;
 }
 
 void Nanostar::sortPairsTriplets(int arms, int armLength)

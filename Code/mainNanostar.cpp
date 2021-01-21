@@ -102,11 +102,6 @@ int main(int argc, char **argv)
     vector<mdpair> output = A.inStickerList(testSet);
     cout << output[0] << '\n';
 
-    cout << "runtime seems to work" << endl;
-
-    return 0;
-
-
     // A.run(10000,100);
 
     // string filename ="./";

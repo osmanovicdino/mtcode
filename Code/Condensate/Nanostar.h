@@ -24,9 +24,8 @@ struct Nanostar {
     vector<mdpair> bindpairs;
 
     vector<mdtriplet> bendtriples;
+    matrix<double> particles;
     vector<int> stickerList;
-
-    matrix<int> particles;
 
     potential *faa;
     potential *hs;
