@@ -5,10 +5,10 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=12:00:00,h_data=1G
+#$ -l h_rt=6:00:00,h_data=1G
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 12
+#$ -pe shared 36
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -49,6 +49,8 @@ cp ~/Chemistry/Code/main.cpp ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 g++ -fopenmp -std=c++11 ~/Chemistry/Code/main.cpp -o ~/Chemistry/PhaseDiagramBivalent/${dirwemake}/angron
 cd ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 ./angron $den $i1 $i2 $i3 >log
+cp -r ~/Chemistry/PhaseDiagramBivalent/${dirwemake} /u/scratch/d/dinoo/ChemistryResults/
+rm -r ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
