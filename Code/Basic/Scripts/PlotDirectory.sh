@@ -42,7 +42,13 @@ fi
 ##g++ -fopenmp -std=c++11 ~/Chemistry/Code/main.cpp -o ~/Chemistry/Results1/angron
 ##cd ~/Chemistry/Results1/
 ##./angron
-./Code/Plotting/PlotFrame.wls ${dir}/pos*.csv ${dir}/col.csv
+all_lines=`ls -d ${dir}/pos*.csv`
+for item in $all_lines; 
+do
+	echo "starting file";
+	echo "$item";
+	./Code/Plotting/PlotFrame.wls "$item" ${dir}/col.csv
+done
 
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
