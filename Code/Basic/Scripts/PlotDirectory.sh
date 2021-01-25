@@ -45,9 +45,11 @@ fi
 all_lines=`ls -d ${dir}/pos*.csv`
 for item in $all_lines; 
 do
-	echo "starting file";
+	echo "starting file\n";
 	echo "$item";
+   echo "\n";
 	./Code/Plotting/PlotFrame.wls "$item" ${dir}/col.csv
+   echo "\n"
 done
 
 # echo job info on joblog:
