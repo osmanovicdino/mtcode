@@ -37,3 +37,5 @@ str = FileBaseName[string];
 
 
 Export[dir<>str<>".jpg",img]
+
+Exit[]
