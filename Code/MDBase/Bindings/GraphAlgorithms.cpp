@@ -79,6 +79,23 @@ vector1<int> ConnectedComponents(matrix<int> &adj, vector1<int> &lens, vector1<i
     return nbins;
 }
 
+vector1<int> ConnectedComponentsParallel(matrix<int< &adj, vector1<int> &lens, vector1<int> indexes) {
+    vector1<int> f(indexes);
+    vector1<int> gf(indexes);
+
+    #pragma omp parallel for
+    for(int i = 0  ; i < adj.getNsafe() ; i++) {
+        int v1 =  adj(i,0);
+        int v2 =  adj(i,1);
+
+        if(gf[v1] > gf[v2]) {
+            f[f[v1]] = gf[v2];
+            f[v1] = gf[v2];
+        }
+
+    }
+}
+
 bool IndependentEdge(const vector<mdpair> &pairs, const vector1<bool> &bonds) {
     int bs = bonds.getsize();
     if(pairs.size() != bs) error("error in independent edge calculation");

@@ -155,12 +155,33 @@ void Nanostar::create_nanostar() {
 
 }
 
-matrix<int> Nanostar::gets(matrix<int> &pairs, matrix<int> &specials, matrix<int> &not_specials){
-    
-    save_sticky;
+vector<mdpair> -> matrix<int>
 
+void Nanostar::gets(matrix<int> &pairs, matrix<int> &specials, matrix<int> &not_specials, vector<int> stickers){
 
-    return pairs;
+    vector<mdpair> special_pairs;
+    vector<mdpair> not_special_pairs;
+
+    for(int i = 0  ; i < pairs.getNsafe() ; i++) {
+            int p1 = pairs(i,0);
+            int p2 = pairs(i,1);
+
+            mdpair temp(p1, p2);
+
+            if(which_nanostar != which_nanostar2  && endp1 && endp2) {
+                special_pairs.push_back(temp);
+            }
+            else{
+                not_special_pairs.push_back(temp);
+            }
+
+    }
+
+    specials = convert_vector_list(special_pairs);
+
+    specials = convert_vector_list(not_special_pairs);
+
+    //return pairs;
     // vector<mdpair> special_pairs;
     // vector<mdpair> not_special_pairs;
     // for(int i = 0 ; i < pairs.getNsafe() ; i++) {

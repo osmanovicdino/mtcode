@@ -279,94 +279,41 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     vector1<int> nbins = ConnectedComponents(boindices, tempbound, indexes);
 
     
-
-    // cout << "connectded components" << endl;
-    // #pragma omp parallel for
-    // for (int i = 0; i < nbins.getsize() - 1; i++)
-    // {
-
-    //     int size_of_cluster = nbins[i + 1] - nbins[i];
-
-    //     if (size_of_cluster > 2)
-    //     {
-
-    //         for (int j = nbins[i]; j < nbins[i + 1]; j++)
-    //         { //for all clusters
-    //             int ind = indexes[j];
-    //             if ((bo.isbound[ind]) == true)
-    //             {
-    //                 int bt = bo.boundto[ind];
-    //                 bool outside = true;
-    //                 for (int k = 0; k < tempbound[ind]; k++)
-    //                 {
-    //                     int pbt = boindices(ind, k);
-    //                     if (bt == pbt)
-    //                     {
-    //                         outside = false;
-    //                         break;
-    //                     }
-    //                 }
-    //                 if (outside)
-    //                 {
-
-    //                     // if(ind > 500) {
-
-    //                     //     cout << "unbinding due to move" << endl;
-    //                     //     cout << "size of cluster: " << size_of_cluster << endl;
-    //                     //     cout << ind << endl;
-    //                     //     cout << tempbound[ind] << endl;
-    //                     //     cout << "possible binders: ";
-    //                     //     for (int k = 0; k < tempbound[ind]; k++)
-    //                     //     {
-    //                     //         int pbt = boindices(ind, k);
-    //                     //         cout << pbt << " ";
-    //                     //     }
-    //                     //     cout << endl;
-    //                     //     cout <<"bound to: " << bt << endl;
-    //                     //     pausel();
-    //                     // }
-    //                     bo.isbound[ind] = false;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-//     cout << nbins.getsize() << endl;
-//     cout << total_number_of_patches << endl;
-//     pausel();
-//    cout << "got cc" << endl;
-   // if things are bound outside their clusters, unbind them:
-    // cout << nbins << endl;
-    /*
-    vector<int> v(nbins.getsize()-1);
-    for(int i = 0  ; i < nbins.getsize()-1 ;  i++) {
-        v[i] = nbins[i+1]-nbins[i];
+    // split into equally sized chunks
+    vector<int> singlets;
+    vector<int> s23lets;
+    vector<int> nlets;
+    singlets.reserve(nbins.getsize());
+    s23lets.reserve(nbins.getsize());
+    nlets.reserve(nbins.getsize());
+    for(int i = 0 ; i < nbins.getsize()-1 ; i++) {
+    int size = nbins[i+1] - nbins[i];
+    if(size == 1) {
+        singlets.push_back(i);
     }
-    std::sort(v.begin(),v.end());
-    for(int i = 0  ; i < v.size() ; i++)
-        cout << v[i] <<",";
-    cout << endl;
-    */
-
-//    cout << indexes << endl;
-//     cout << bo.isbound << endl;
-//     cout << endl;
-//   pausel();
-
-   // cout << "unbound" << endl;
-        //     cout << "cluster size distribution" << endl;
-        //    // cout << tempbound << endl;
-        //     for (int i = 0; i < nbins.getsize() - 1; i++)
-        //     {
-        //         cout << nbins[i + 1] - nbins[i] << " ";
-        //     }
-        //     pausel();
-        //Now we have the clusters. For each of these clusters, there is so some transition rate from one to another
-
-       // int tbt = 0;
+    else if(size == 2 || size ==3 ) {
+        s23lets.push_back(i);
+    }
+    else{
+        nlets.push_back(i);
+    }
+    }
 
 
 
+    #pragma omp parallel for schedule(static)
+    for(int i = 0 ; i < singlets.size() ; i++) {
+        
+            //do nothing
+            int j = singlets[i];
+            int i1 = indexes[nbins[j]];
+            //isbound[i1]=false;
+
+            bo.isbound[i1] = false;
+
+            //not bound to anything.
+        
+    }
 
         int number_to_reserve = MIN(2*((total_number_of_patches+1)- nbins.getsize()),total_number_of_patches/2 );
        // cout << number_to_reserve << endl;
@@ -387,23 +334,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             vector<mdpair> mypairs_private;
             mypairs_private.reserve(number_to_reserve);
 
-            #pragma omp for nowait schedule(static) 
-            for (int i = 0; i < nbins.getsize() - 1; i++)
+            #pragma omp for schedule(dynamic) 
+            for (int j = 0; j < s23lets.size() ; j++)
             {
-                
+                int i = s23lets[j];
                 int size_of_cluster = nbins[i + 1] - nbins[i];
                 //cout << "nbins: " << i << " " << size_of_cluster << endl;
-                if (size_of_cluster == 1)
-                {
-                    //do nothing
-                    int i1 = indexes[nbins[i]];
-                    //isbound[i1]=false;
-
-                    bo.isbound[i1] = false;
-
-                    //not bound to anything.
-                }
-                else if (size_of_cluster == 2)
+                if (size_of_cluster == 2)
                 {
                     //all fine, bindings
                     int ti1 = indexes[nbins[i]];
@@ -586,26 +523,17 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 }
                 else
                 {
-                    // cout << size_of_cluster << endl;
-                    // for(int j = 0 ; j < size_of_cluster ; j++) {
-                    //     for(int k = 0  ; k <tempbound[indexes[j]] ; k++ ) {
-                    //         vector1<double> un(dimension);
-                    //         double dis;
-                    //         int p1,p2;
-                    //         iny.which_particle(indexes[j], boindices(indexes[j],k), p1, p2);
-                    //         geo->distance_vector(*dat, p1,p2, un, dis);
+                        error("an error occured in the creation of 2/3 vector");
+                }
+            }
 
+            #pragma omp for nowait schedule(dynamic)
+            for (int j = 0; j < nlets.size(); j++) {
+                int i = s23lets[j];
+                int size_of_cluster = nbins[i + 1] - nbins[i];
 
-                    //         //un = i-j
-                    //         dis = sqrt(dis);
-                    //         cout << "{{" << indexes[j] << "\\" <<"[UndirectedEdge]" << boindices(indexes[j], k) <<"}," << dis << "},";
-                                             
-                    //     }
-                    // }
-                    // cout << endl;
-                    // //for large clusters, repeat the partitioning 
-                    // pausel();
-                    if(size_of_cluster < 10) {
+                if (size_of_cluster < 10)
+                {
                     //firstly, obtain the graph of edges;
                     vector<mdpair> matched;
                     matched.reserve(size_of_cluster*(size_of_cluster-1)/2);
@@ -630,16 +558,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         }
                     }
 
-                    
-
-                    //next, remove duplicate edges
 
                     sort(matched.begin(), matched.end());
                     matched.erase(unique(matched.begin(), matched.end()), matched.end());
 
-                    //cout << "removed duplicates" << endl;
 
-                    //get the initial state
                     vector1<bool> bounded(matched.size());
 
                     for(int j = 0 ; j < matched.size() ; j++) {
@@ -724,10 +647,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 // cout << afters << endl;
                 // pausel();
                // cout << "ncluster done" << endl;
-                }
+                
                 }
 
             }
+
             #pragma omp for schedule(static) ordered
             for (int i = 0; i < omp_get_num_threads(); i++)
             {

@@ -600,3 +600,364 @@ A.run_singlebond(10000000, 1000, base);
 
 
 </code></pre>
+
+Analysis of clusters
+
+<pre><code>
+
+        #pragma omp parallel 
+        {
+            vector<mdpair> mypairs_private;
+            mypairs_private.reserve(number_to_reserve);
+
+            #pragma omp for nowait schedule(dynamic) 
+            for (int i = 0; i < nbins.getsize() - 1; i++)
+            {
+                
+                int size_of_cluster = nbins[i + 1] - nbins[i];
+                //cout << "nbins: " << i << " " << size_of_cluster << endl;
+                if (size_of_cluster == 1)
+                {
+                    //do nothing
+                    int i1 = indexes[nbins[i]];
+                    //isbound[i1]=false;
+
+                    bo.isbound[i1] = false;
+
+                    //not bound to anything.
+                }
+                else if (size_of_cluster == 2)
+                {
+                    //all fine, bindings
+                    int ti1 = indexes[nbins[i]];
+                    int ti2 = indexes[nbins[i] + 1];
+
+                    int i1;
+                    int i2;
+                    sort_doublet(ti1, ti2, i1, i2);
+
+                    bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+
+                    bool aft;
+
+                    bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+
+                    if (aft)
+                    {
+                        bo.boundto[i1] = i2;
+                        bo.boundto[i2] = i1;
+                        bo.isbound[i1] = true;
+                        bo.isbound[i2] = true;
+                        //tbt++;
+                        mypairs_private.push_back(mdpair(i1,i2));
+                    }
+                    else
+                    {
+
+                        bo.isbound[i1] = false;
+                        bo.isbound[i2] = false;
+
+                    }
+                    //bool already_bound = prebound(i1,i2);
+                }
+                else if (size_of_cluster == 3)
+                {
+
+                    int ti1 = indexes[nbins[i]];
+                    int ti2 = indexes[nbins[i] + 1];
+                    int ti3 = indexes[nbins[i] + 2];
+
+                    //SORT THE INDICES (IMPORTANT)
+
+                    int i1;
+                    int i2;
+                    int i3;
+
+                    sort_triplet(ti1, ti2, ti3, i1, i2, i3);
+
+
+                    //DETERMINE WHETHER THEY ARE BOUND
+                    bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+                    bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
+                    bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
+
+                    //DETERMINE THE CONNECTIVENESS OF THE GRAPH
+                    //remember, that in order to count as a triplet
+                    bool c12 = false;
+                    bool c23 = false;
+                    bool c13 = false;
+
+                    int nb1 = tempbound[i1];
+
+                    int nb2 = tempbound[i2];
+                    int nb3 = tempbound[i3];
+
+                    // if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
+                        
+                    //     cout << i1 << " " << i2 << " " << i3 << endl;
+
+                    //     outfunc(tempbound, "t1");
+                    //     outfunc(boindices, "t2");
+
+                    //     pausel();
+                    //     error("something weird in code");
+                    // }
+
+                    if (nb1 == 1)
+                    {
+                        int tempi = boindices(i1, 0);
+                        if (tempi == i2)
+                        {
+                            c12 = true;
+                            c13 = false;
+                            c23 = true; //in order to be a triplet
+                        }
+                        else if (tempi == i3)
+                        {
+                            c13 = true;
+                            c12 = false;
+                            c23 = true;
+                        }
+                        else
+                            error("something weird");
+
+                        //check the other
+                    }
+                    else if (nb1 == 2)
+                    {
+                        c12 = true;
+                        c13 = true;
+
+                        int nb2 = tempbound[i2];
+                        if (nb1 == 1)
+                        {
+                            c23 = false;
+                        }
+                        else
+                        {
+                            c23 = true;
+                        }
+                    }
+                    else
+                    {
+                        cout << size_of_cluster << endl;
+                        cout << b12 <<  " " << b23 << " " << b13 << endl;
+                        cout << i1 << " " << i2 << " " << i3 << endl;
+                        cout << tempbound[i1] << " " << tempbound[i2] << " " << tempbound[i3] << endl;
+                        
+                        for(int k = 0 ; k < tempbound[i1] ; k++) {
+                            cout << boindices(i1,k) << " ";
+                        }
+                        cout << endl;
+
+                        for (int k = 0; k < tempbound[i2]; k++)
+                        {
+                            cout << boindices(i2, k) << " ";
+                        }
+                        cout << endl;
+
+                        for (int k = 0; k < tempbound[i3]; k++)
+                        {
+                            cout << boindices(i3, k) << " ";
+                        }
+                        cout << endl;
+
+                        error("error in clustering algorithm");
+                    }
+
+                    bool a12;
+                    bool a23;
+                    bool a13;
+                    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+
+                    if (a12)
+                    {
+                        bo.boundto[i1] = i2;
+                        bo.boundto[i2] = i1;
+                        bo.isbound[i1] = true;
+                        bo.isbound[i2] = true;
+                        bo.isbound[i3] = false;
+
+                        mypairs_private.push_back(mdpair(i2, i1));
+                    }
+                    else if (a23)
+                    {
+                        bo.boundto[i2] = i3;
+                        bo.boundto[i3] = i2;
+                        bo.isbound[i1] = false;
+                        bo.isbound[i2] = true;
+                        bo.isbound[i3] = true;
+
+                        mypairs_private.push_back(mdpair(i3, i2));
+                    }
+                    else if (a13)
+                    {
+                        bo.boundto[i1] = i3;
+                        bo.boundto[i3] = i1;
+                        bo.isbound[i1] = true;
+                        bo.isbound[i2] = false;
+                        bo.isbound[i3] = true;
+
+                        mypairs_private.push_back(mdpair(i3, i1));
+                    }
+                    else
+                    {
+                        bo.isbound[i1] = false;
+                        bo.isbound[i2] = false;
+                        bo.isbound[i3] = false;
+                    }
+                }
+                else
+                {
+                    // cout << size_of_cluster << endl;
+                    // for(int j = 0 ; j < size_of_cluster ; j++) {
+                    //     for(int k = 0  ; k <tempbound[indexes[j]] ; k++ ) {
+                    //         vector1<double> un(dimension);
+                    //         double dis;
+                    //         int p1,p2;
+                    //         iny.which_particle(indexes[j], boindices(indexes[j],k), p1, p2);
+                    //         geo->distance_vector(*dat, p1,p2, un, dis);
+
+
+                    //         //un = i-j
+                    //         dis = sqrt(dis);
+                    //         cout << "{{" << indexes[j] << "\\" <<"[UndirectedEdge]" << boindices(indexes[j], k) <<"}," << dis << "},";
+                                             
+                    //     }
+                    // }
+                    // cout << endl;
+                    // //for large clusters, repeat the partitioning 
+                    // pausel();
+                    if(size_of_cluster < 10) {
+                    //firstly, obtain the graph of edges;
+                    vector<mdpair> matched;
+                    matched.reserve(size_of_cluster*(size_of_cluster-1)/2);
+                    
+                    for (int j = nbins[i]; j < nbins[i + 1]; j++)
+                    {
+                        for (int k = 0; k < tempbound[indexes[j]]; k++)
+                        {
+                            mdpair m1;
+                            int f1 = indexes[j];
+                            int f2 = boindices(indexes[j], k);
+                            
+                            if(f1<f2) {
+                                m1.a = f1;
+                                m1.b = f2;
+                            }
+                            else{
+                                m1.a = f2;
+                                m1.b = f1;
+                            }
+                            matched.push_back(m1);
+                        }
+                    }
+
+                    
+
+                    //next, remove duplicate edges
+
+                    sort(matched.begin(), matched.end());
+                    matched.erase(unique(matched.begin(), matched.end()), matched.end());
+
+                    //cout << "removed duplicates" << endl;
+
+                    //get the initial state
+                    vector1<bool> bounded(matched.size());
+
+                    for(int j = 0 ; j < matched.size() ; j++) {
+                        int i1  = matched[j].a;
+                        int i2  = matched[j].b;
+                        bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+                        bounded[j] = b12;
+                    }
+
+                    //find all complimentary patterns
+
+                    //cout << bounded << endl;
+                    int m = 1 << matched.size();
+                   // cout << m << endl;
+
+                    if(abs(m)<1000) { //if the states are too big, don't do it
+
+                    //get the set of all possible bools to move to
+                    vector< vector1<bool> > possible_states;
+                    
+                    possible_states.reserve(m);
+
+                    //cout << pow(2,matched.size()) << endl;
+   
+
+                    for(int j = 0 ; j < m ; j++) {
+                        vector1<bool> binaryNum(matched.size());
+                        int n = j;
+                        int k = 0;
+                        while(n > 0) {
+                            binaryNum[k] = n % 2;
+                            n = n/2;
+                            k++;
+                        }
+
+                        if(IndependentEdge(matched,binaryNum)) {
+                           // cout << binaryNum << endl;
+                            possible_states.push_back(binaryNum);
+                        }
+                    }
+                    
+                    vector1<bool> afters(matched.size());
+                    
+                    bm.nlet(bounded, matched, possible_states, afters);
+
+
+                    for(int j =  0 ; j < afters.getsize() ; j++) {
+                        if(!afters[j]) {
+                            int i1 = matched[j].a;
+                            int i2 = matched[j].b;
+
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = false;
+                        }
+                    }
+                    // need to do it this way because of collisions
+
+                    for (int j = 0; j < afters.getsize(); j++)
+                    {
+                        if (afters[j])
+                        {
+                            int i1 = matched[j].a;
+                            int i2 = matched[j].b;
+
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = true;
+                            bo.boundto[i1] = i2;
+                            bo.boundto[i2] = i1;
+
+                            mypairs_private.push_back(mdpair(i1, i2));
+                        }
+                    }
+                }
+                    //cout << possible_states.capacity() << endl;
+                    //cout << i1 << " " << size_of_cluster << endl;
+
+                    //i1 is the number bound already
+                // cout << bounded << endl;
+                // for(int j  = 0  ; j < matched.size() ; j++) {
+                // cout << matched[j] << endl;
+                // }
+                // cout << afters << endl;
+                // pausel();
+               // cout << "ncluster done" << endl;
+                }
+                }
+
+            }
+
+            #pragma omp for schedule(static) ordered
+            for (int i = 0; i < omp_get_num_threads(); i++)
+            {
+            #pragma omp ordered
+                mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
+            }
+        }
+
+        </code></pre>
