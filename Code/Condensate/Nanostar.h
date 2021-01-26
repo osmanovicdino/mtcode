@@ -37,10 +37,11 @@ struct Nanostar {
     void create_nanostar();
     vector1<double> initCoord;
 
-    void Passa_set_nanostar(vector1<double> start, double theta, double phi, int arms, int armLength, double spanLength, string fileName);
+    void Passa_set_nanostar(vector1<double> start, double theta, double phi, int arms, int armLength, string fileName);
+    void setNanostar(vector1<double> start, int arms, int armLength, double theta, string fileName);
     void sortPairsTriplets(int arms, int armLength);
     void initStickerList(int arms, int armLength);
-    vector<mdpair> inStickerList(vector<mdpair> stickerPairs);
+    void inStickerList(matrix<int> &possiblePairs, matrix <int> &specials, matrix<int> &notSpecials);
     matrix<double> create_initial_state();
     matrix<double> create_initial_state(string s);
 

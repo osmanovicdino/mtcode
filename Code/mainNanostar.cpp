@@ -60,47 +60,47 @@ int main(int argc, char **argv)
     cout << endl;
     // srand(time(NULL));
 
-    vector1<double> start(3);
-    // vector1<double> initCoord, double theta, double phi, int arms,
-    // int armLength, double boxLength, string fileName
-    start[0] = 10;
-    start[1] = 9;
-    start[2] = 11;
 
     Nanostar A(1,11.0);
+    cout << "cons works" << '\n';
 
-    A.Passa_set_nanostar(start, 30, 20, 4, 3, 5, "test.csv");
+    cout << A.obj -> getdat() << endl;
 
 
-    A.sortPairsTriplets(4, 3);
-
-    for (int i = 0; i < A.bindpairs.size(); i++)
-    {
-      cout << A.bindpairs[i] << '\n';
-    }
-    for (int i = 0; i < A.bendtriples.size(); i++)
-    {
-      cout << A.bendtriples[i].a << A.bendtriples[i].b << A.bendtriples[i].c  << '\n';
-    }
-
-    A.initStickerList(4, 3);
-    for (int i = 0; i<A.stickerList.size();i++)
-    {
-      cout << A.stickerList[i] << '\n';
-    }
-
-    vector<mdpair> testSet;
-    mdpair test1;
-    test1.a = 3;
-    test1.b = 6;
-    mdpair test2;
-    test2.a = 1;
-    test2.b = 2;
-    testSet.push_back(test1);
-    testSet.push_back(test2);
-
-    vector<mdpair> output = A.inStickerList(testSet);
-    cout << output[0] << '\n';
+    // A.Passa_set_nanostar(start, 30, 20, 4, 3, 5, "test.csv");
+    //
+    //
+    // A.sortPairsTriplets(4, 3);
+    //
+    // for (int i = 0; i < A.bindpairs.size(); i++)
+    // {
+    //   cout << A.bindpairs[i] << '\n';
+    // }
+    // for (int i = 0; i < A.bendtriples.size(); i++)
+    // {
+    //   cout << A.bendtriples[i].a << A.bendtriples[i].b << A.bendtriples[i].c  << '\n';
+    // }
+    // # of timesteps,
+    A.run(10000, 100);
+    //
+    // A.initStickerList(4, 3);
+    // for (int i = 0; i<A.stickerList.size();i++)
+    // {
+    //   cout << A.stickerList[i] << '\n';
+    // }
+    //
+    // vector<mdpair> testSet;
+    // mdpair test1;
+    // test1.a = 3;
+    // test1.b = 6;
+    // mdpair test2;
+    // test2.a = 1;
+    // test2.b = 2;
+    // testSet.push_back(test1);
+    // testSet.push_back(test2);
+    //
+    // vector<mdpair> output = A.inStickerList(testSet);
+    // cout << output[0] << '\n';
 
     // A.run(10000,100);
 
