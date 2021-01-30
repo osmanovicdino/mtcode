@@ -26,6 +26,14 @@ vector1<T>::vector1(int n, T a) { //create a vector of n elements initialized to
 	for ( int i = 0 ; i < n ; i++ )
 		data[i] = a;
 }
+template <class T>
+vector1<T>::vector1(int n, string a)
+{ //create a vector of n elements initialized to a.
+    size = n;
+    data = new T[size];
+    for (int i = 0; i < n; i++)
+        data[i] = T(i);
+}
 
 template <class T>
 vector1<T>::vector1(const vector1<T> &v) { //copy constructor

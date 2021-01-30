@@ -57,6 +57,7 @@ public:
 	vector1(int,const T*); //create a vector of int elements, with element values in the pointer
 	vector1(int, T[]); //create vector with elements in array
 	vector1(int,T); //create a vector initialized to the value T
+        vector1(int,string);
 	vector1(const vector1&);
 	vector1(const vector1&,int); //vector1& with n extra elements
 	~vector1(); //destructor
@@ -256,6 +257,8 @@ public:
         friend mdpair get_two_values(const vector1<int>&,const int &i1,const int &i2);
 
         friend void iterator_update(vector1<int> &v, mdpair temp);
+        
+        friend void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes);
 };
 
 

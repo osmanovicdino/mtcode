@@ -286,8 +286,9 @@ void reset(T);
         friend matrix<Y> convertmatrix(matrix<Y>&a,int,int);
 
         template <class Y>
-        friend matrix<Y> poly_convertmatrix(matrix<Y>&a,int,int);        
+        friend matrix<Y> poly_convertmatrix(matrix<Y>&a,int,int);
 
+        friend void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes);
 };
 
 

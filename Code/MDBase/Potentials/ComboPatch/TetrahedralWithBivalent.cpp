@@ -219,7 +219,7 @@ int TetrahedralWithBivalent::which_potential(const int &i, const int &j, const i
     }
 }
 
-void TetrahedralWithBivalent::get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12)
+void TetrahedralWithBivalent::get_params(const int &i1, const int &j1, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12)
 {
     d12 = potential_bundle[potn]->interaction_distance;
     ang12 =params2(potn,2);

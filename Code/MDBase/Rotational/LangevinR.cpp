@@ -205,22 +205,29 @@ void LangevinNVTR::advancemom_halfstep(matrix<double> &F, matrix<double> &T)  {
 
     //where F is in LAB FRAME
     //and T is in BODY FRAME
-    #pragma omp parallel for
+    vector<double> temp1((*mom).getNsafe()*dimension);
+    vector<double> temp2((*mom).getNsafe()*dimension);    
+
+
+   
+    #pragma omp parallel for schedule(dynamic)
     for (int i = 0; i < (*mom).getNsafe(); i++)
     {
-        for (int i1 = 0; i1 < dimension; i1++)
-        {
-            (mom)->operator()(i, i1) = ((mom)->operator()(i, i1)) + (dt/2.) * F(i, i1) ;
-        }
+
+            // (mom)->operator()(i, i1) = ((mom)->operator()(i, i1)) + (dt/2.) * F(i, i1) ;
+            // (angmom)->operator()(i, i1) = (angmom)->operator()(i, i1) + (dt / 2.) * T(i, i1);
+        (*mom)(i, 0) += (dt / 2.) * F(i, 0);
+        (*angmom)(i, 0) += (dt / 2.) * T(i, 0);
+        (*mom)(i, 1) += (dt / 2.) * F(i, 1);
+        (*angmom)(i, 1) += (dt / 2.) * T(i, 1);
+        (*mom)(i, 2) += (dt / 2.) * F(i, 2);
+        (*angmom)(i, 2) += (dt / 2.) * T(i, 2);
     }
 
-    #pragma omp parallel for
-    for(int i = 0 ; i < (*angmom).getNsafe() ; i++) 
-    {
-        for(int i1 = 0 ; i1 < dimension ; i1++) {
-            (angmom)->operator()(i, i1) = (angmom)->operator()(i, i1) + (dt/2.)*T(i, i1);
-        }
-    }
+
+    
+
+    
 }
 
 void LangevinNVTR::advance_pos() {
@@ -232,6 +239,7 @@ void LangevinNVTR::advance_pos() {
             (dat)->operator()(i, i1) = ((dat)->operator()(i, i1)) + (dt / m) * mom->operator()(i, i1);
         }
     }
+
     (*this->geo).correct_position_and_momentum(*dat, *mom);
 }
 
@@ -316,7 +324,7 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
 
     int Ns = angmom->getNsafe();
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for (int i = 0; i < Ns; i++)
     {
         double qtemp0 = orient->operator()(i, 0);

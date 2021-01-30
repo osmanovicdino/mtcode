@@ -961,3 +961,240 @@ Analysis of clusters
         }
 
         </code></pre>
+
+
+        Old large cluster algorithm
+
+        <>pre<code>
+        {
+
+                    if(size_of_cluster < 10) {
+                    //firstly, obtain the graph of edges;
+                    vector<mdpair> matched;
+                    matched.reserve(size_of_cluster*(size_of_cluster-1)/2);
+                    
+                    for (int j = nbins[i]; j < nbins[i + 1]; j++)
+                    {
+                        //for (int k = 0; k < tempbound[indexes[j]]; k++)
+                        for (int k = 0; k < tempbound[jhg[j].b]; k++)
+                        {
+                            mdpair m1;
+                            //int f1 = indexes[j];
+                            //int f2 = boindices(indexes[j], k);
+
+                            int f1 = jhg[j].b;
+                            int f2 = boindices(jhg[j].b, k);
+
+                            if(f1<f2) {
+                                m1.a = f1;
+                                m1.b = f2;
+                            }
+                            else{
+                                m1.a = f2;
+                                m1.b = f1;
+                            }
+                            matched.push_back(m1);
+                        }
+                    }
+
+                    //push back all possible pairs
+
+                    
+
+                    //next, remove duplicate edges
+
+                    sort(matched.begin(), matched.end());
+                    matched.erase(unique(matched.begin(), matched.end()), matched.end());
+
+                    //cout << "removed duplicates" << endl;
+
+                    //get the initial state
+                    vector1<bool> bounded(matched.size());
+
+                    for(int j = 0 ; j < matched.size() ; j++) {
+                        int i1  = matched[j].a;
+                        int i2  = matched[j].b;
+                        bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+                        bounded[j] = b12;
+                    }
+
+                    //find all complimentary patterns
+
+                    //cout << bounded << endl;
+                    int m = 1 << matched.size();
+                   // cout << m << endl;
+
+                    if(abs(m)<1000) { //if the states are too big, don't do it
+
+                    //get the set of all possible bools to move to
+                    vector< vector1<bool> > possible_states;
+                    
+                    possible_states.reserve(m);
+
+                    //cout << pow(2,matched.size()) << endl;
+   
+
+                    for(int j = 0 ; j < m ; j++) {
+                        vector1<bool> binaryNum(matched.size());
+                        int n = j;
+                        int k = 0;
+                        while(n > 0) {
+                            binaryNum[k] = n % 2;
+                            n = n/2;
+                            k++;
+                        }
+
+                        if(IndependentEdge(matched,binaryNum)) {
+                           // cout << binaryNum << endl;
+                            possible_states.push_back(binaryNum);
+                        }
+                    }
+                    
+                    vector1<bool> afters(matched.size());
+                    
+                    bm.nlet(bounded, matched, possible_states, afters);
+
+
+                    for(int j =  0 ; j < afters.getsize() ; j++) {
+                        if(!afters[j]) {
+                            int i1 = matched[j].a;
+                            int i2 = matched[j].b;
+
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = false;
+                        }
+                    }
+                    // need to do it this way because of collisions
+
+                    for (int j = 0; j < afters.getsize(); j++)
+                    {
+                        if (afters[j])
+                        {
+                            int i1 = matched[j].a;
+                            int i2 = matched[j].b;
+
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = true;
+                            bo.boundto[i1] = i2;
+                            bo.boundto[i2] = i1;
+
+                            mypairs_private.push_back(mdpair(i1, i2));
+                        }
+                    }
+                }
+                    //cout << possible_states.capacity() << endl;
+                    //cout << i1 << " " << size_of_cluster << endl;
+
+                    //i1 is the number bound already
+                // cout << bounded << endl;
+                // for(int j  = 0  ; j < matched.size() ; j++) {
+                // cout << matched[j] << endl;
+                // }
+                // cout << afters << endl;
+                // pausel();
+               // cout << "ncluster done" << endl;
+                }
+                }
+                
+        </pre></code>
+
+Working parallel connected components
+
+        <pre><code>
+
+void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
+    vector1<int> f(indexes);
+    vector1<int> fnext(indexes);
+    //if(res.size() != indexes.size) error("error in capacity of save function");
+    vector1<int> ftemp(indexes.getsize());
+
+    // #pragma omp parallel for schedule(static)
+    // for(int i = 0  ; i < indexes.getNsafe() ; i++) {
+    //     f[i] =  indexes[i];
+    //     gf[i] = indexes[i];
+    // }
+ 
+
+    int nr = adj.nrows;
+
+    for(;;) {
+        bool equiv;
+
+        #pragma omp parallel for schedule(static)
+        for(int i= 0 ; i < f.size ; i++) {
+            ftemp.data[i] = f.data[i];
+        }
+        //#pragma omp parallel 
+        
+           // cout << omp_get_num_threads() << endl;
+        #pragma omp parallel for schedule(static)
+        for(int i = 0  ; i < nr ; i++) {
+            int u = adj.mat[i*2 + 0];
+            int v = adj.mat[i*2 + 1];
+            // int u,v;
+            // sort_doublet(u1,v1,u,v);
+            
+            int fu = f.data[u];
+            //cout << u << " " << v << " " << fu << " " << f.data[v] << endl;
+            if (fu == f.data[fu] && f.data[v] < fu)
+            {
+                fnext.data[fu] = f.data[v];
+            }
+            //pausel();
+        }
+
+        //cout << "loop done" << endl;
+
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < f.size; i++)
+            f.data[i] = fnext.data[i];         
+
+        #pragma omp parallel for schedule(static)
+        for(int i = 0 ; i < f.size ; i++) {
+            int u = i;
+            int fu = f.data[u];
+
+            if (fu != f.data[fu])
+            {
+                fnext.data[u] = f.data[fu];
+            }
+        }
+
+        equiv = true;
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < f.size; i++)
+        {
+            if (f.data[i] != fnext.data[i])
+            {
+                f.data[i] = fnext.data[i];
+            }
+            if(fnext.data[i] != ftemp.data[i]) {
+                equiv = false;
+            }
+        }
+        
+
+        //cout << "done 3" << endl;    
+        //bool equiv = true;
+       if(equiv) break;
+
+
+    }
+    
+    indexes = f;
+    // cout << f << endl;
+    // pausel();
+    // //f = gf;
+    // //res.resize(indexes.getsize());
+    // //vector<mdpair> res(indexes.getsize());
+    // #pragma omp parallel for
+    // for(int i = 0 ; i < f.getsize() ; i++) {
+    //     res[i].a = f.data[i];
+    //     res[i].b = indexes.data[i];
+    // }
+    // mdpairsort fg;
+    // std::sort(res.begin(),res.end(),fg);
+    //return res;
+
+}
+        </code></pre>

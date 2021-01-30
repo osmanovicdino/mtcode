@@ -143,14 +143,14 @@ void Condensate::run(int runtime, int every, string strbase = "")
 
     for (int i = 0; i < runtime; i++)
     {
-        //cout << i << endl;
-        // vector1<double> meas(6);
-        // obj->measured_temperature(meas);
-        // tottemp += meas;
-        // cout << tottemp/(double)(i+1) << endl;
-
-
         cout << i << endl;
+        vector1<double> meas(6);
+        obj->measured_temperature(meas);
+        tottemp += meas;
+        cout << tottemp/(double)(i+1) << endl;
+
+
+       // cout << i << endl;
         if (i > 0 && i % 20 == 0)
         {
             // cout << "pairs recalculated" << endl;
@@ -281,11 +281,17 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     obj->calculate_forces_and_torques3D_onlyone(*pairs, *pots, bbs , *bm, F, T);
 
     obj->create_forces_and_torques_sphere(F, T);
+    //vector1<double> tottemp(6);
 
     for (int i = 0; i < runtime; i++)
     {
+
         cout << i << endl;
-        if (i>0 && i % 20 == 0)
+        // vector1<double> meas(6);
+        // obj->measured_temperature(meas);
+        // tottemp += meas;
+        // cout << tottemp / (double)(i + 1) << endl;
+        if (i > 0 && i % 20 == 0)
         {
            // cout << "pairs recalculated" << endl;
             delete pairs;

@@ -79,21 +79,119 @@ vector1<int> ConnectedComponents(matrix<int> &adj, vector1<int> &lens, vector1<i
     return nbins;
 }
 
-vector1<int> ConnectedComponentsParallel(matrix<int< &adj, vector1<int> &lens, vector1<int> indexes) {
-    vector1<int> f(indexes);
-    vector1<int> gf(indexes);
+inline void UpdateMin(int &lhs, int &rhs) {
+    if(lhs < rhs)
+        lhs = rhs;
+}
 
-    #pragma omp parallel for
-    for(int i = 0  ; i < adj.getNsafe() ; i++) {
-        int v1 =  adj(i,0);
-        int v2 =  adj(i,1);
+/*GRAPHING ALGORITHM BASED ON THE SV ALGORITHM 
+Sources: https://www.sciencedirect.com/science/article/abs/pii/0196677482900086
+         https://arxiv.org/pdf/1910.05971.pdf
 
-        if(gf[v1] > gf[v2]) {
-            f[f[v1]] = gf[v2];
-            f[v1] = gf[v2];
+*/
+
+struct mdpairsort
+{
+    bool operator()(const mdpair &a1, const mdpair &a2) {
+        return a1.a < a2.a;
+    }
+};
+
+void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
+    //vector1<int> f(indexes);
+    vector1<int> fnext(indexes);
+    //if(res.size() != indexes.size) error("error in capacity of save function");
+    vector1<int> ftemp(indexes.getsize());
+
+    // #pragma omp parallel for schedule(static)
+    // for(int i = 0  ; i < indexes.getNsafe() ; i++) {
+    //     f[i] =  indexes[i];
+    //     gf[i] = indexes[i];
+    // }
+ 
+
+    int nr = adj.nrows;
+
+    for(;;) {
+        bool equiv;
+
+        #pragma omp parallel for schedule(static)
+        for(int i= 0 ; i < indexes.size ; i++) {
+            ftemp.data[i] = indexes.data[i];
+        }
+        //#pragma omp parallel 
+        
+           // cout << omp_get_num_threads() << endl;
+        #pragma omp parallel for schedule(static)
+        for(int i = 0  ; i < nr ; i++) {
+            int u = adj.mat[i*2 + 0];
+            int v = adj.mat[i*2 + 1];
+            // int u,v;
+            // sort_doublet(u1,v1,u,v);
+            
+            int fu = indexes.data[u];
+            //cout << u << " " << v << " " << fu << " " << f.data[v] << endl;
+            if (fu == indexes.data[fu] && indexes.data[v] < fu)
+            {
+                fnext.data[fu] = indexes.data[v];
+            }
+            //pausel();
         }
 
+        //cout << "loop done" << endl;
+
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < indexes.size; i++)
+            indexes.data[i] = fnext.data[i];         
+
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < indexes.size; i++)
+        {
+            int u = i;
+            int fu = indexes.data[u];
+
+            if (fu != indexes.data[fu])
+            {
+                fnext.data[u] = indexes.data[fu];
+            }
+        }
+
+        equiv = true;
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < indexes.size; i++)
+        {
+            if (indexes.data[i] != fnext.data[i])
+            {
+                indexes.data[i] = fnext.data[i];
+            }
+            if(fnext.data[i] != ftemp.data[i]) {
+                equiv = false;
+            }
+        }
+        
+
+        //cout << "done 3" << endl;    
+        //bool equiv = true;
+       if(equiv) break;
+
+
     }
+    
+  
+    // cout << f << endl;
+    // pausel();
+    // //f = gf;
+    // //res.resize(indexes.getsize());
+    // //vector<mdpair> res(indexes.getsize());
+    // #pragma omp parallel for
+    // for(int i = 0 ; i < f.getsize() ; i++) {
+    //     res[i].a = f.data[i];
+    //     res[i].b = indexes.data[i];
+    // }
+    // mdpairsort fg;
+    // std::sort(res.begin(),res.end(),fg);
+    //return res;
+
 }
 
 bool IndependentEdge(const vector<mdpair> &pairs, const vector1<bool> &bonds) {

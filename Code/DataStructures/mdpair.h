@@ -34,6 +34,10 @@ struct mdpair
     }
 };
 
+bool mdpairCompare(const mdpair &m1, const mdpair &m2) {
+    return m1.a < m2.a;
+}
+
 struct mdtriplet {
     int a;
     int b;

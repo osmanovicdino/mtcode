@@ -8,7 +8,6 @@
 #$ -l h_rt=12:00:00,h_data=1G
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 36
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -46,7 +45,7 @@ fi
 dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}"
 mkdir ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 cp ~/Chemistry/Code/main.cpp ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
-g++ -fopenmp -std=c++11 ~/Chemistry/Code/main.cpp -o ~/Chemistry/PhaseDiagramBivalent/${dirwemake}/angron
+g++ -std=c++11 ~/Chemistry/Code/main.cpp -o ~/Chemistry/PhaseDiagramBivalent/${dirwemake}/angron
 cd ~/Chemistry/PhaseDiagramBivalent/${dirwemake}
 ./angron $den $i1 $i2 $i3 >log
 cp -r ~/Chemistry/PhaseDiagramBivalent/${dirwemake} /u/scratch/d/dinoo/ChemistryResults/

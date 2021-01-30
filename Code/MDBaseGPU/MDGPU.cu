@@ -625,6 +625,8 @@ cudaFree(d_close2);
 }
 
 
+
+
 // __global__ void neighborlist(bool *list, int *p1, int *p2) {
 // 	//p1 and p2 are a list of indices of particles which are in the correct part
 // }
@@ -911,6 +913,7 @@ int *d_list1;
 int *d_list2;
 int *d_list3;
 int *d_list4;
+
 cudaMalloc((void**)&d_list1,th*sizeof(double));
 cudaMalloc((void**)&d_list2,th*sizeof(double));
 cudaMalloc((void**)&d_list3,th*sizeof(double));
@@ -934,7 +937,6 @@ thrust::device_ptr<int> t_list2(d_list2);
 thrust::device_ptr<int> t_list4(d_list4);
 
 thrust::sort_by_key(t_list1,t_list1+th,t_forces1x);
-
 
 thrust::sort_by_key(t_list2,t_list2+th,t_forces2x);
 

@@ -54,14 +54,22 @@ using namespace std;
 int main(int argc, char** argv) {
 
 srand (time(NULL));
-
-if(argc!=5) error("incorrect number of arguments passed to main file");
-
-double packing_fraction = atof(argv[1]);
-double int1 = atof(argv[2]);
-double int2 = atof(argv[3]);
-double int3 = atof(argv[4]);
-
+double packing_fraction;
+double int1;
+double int2;
+double int3;
+if(argc==5) {
+packing_fraction = atof(argv[1]);
+int1 = atof(argv[2]);
+int2 = atof(argv[3]);
+int3 = atof(argv[4]);
+}
+else {
+    packing_fraction = 0.01;
+    int1 =5.0;
+    int2 = 20.0;
+    int3 = 5.0;
+}
 matrix<double> params(28,3);
 
 cout << packing_fraction << " " << int1 << " " << int2 << " " << int3 << endl;
@@ -132,7 +140,7 @@ A.setpots(c);
 
 A.setviscosity(1.0);
 
-double beta = 1.0;
+double beta = 2.;
 
 A.obj->setkT(1. / beta);
 
@@ -142,7 +150,7 @@ ss << beta;
 string base = "_beta=";
 base += ss.str();
 
-A.run_singlebond(10000, 1000, base);
+A.run_singlebond(1500000, 1000, base);
 
 return 0;
 }

@@ -347,6 +347,7 @@ struct cube : geometry {
 
 	void correct_position_and_momentum(matrix<double> &r, matrix<double> &p) {
 		//for(int j = 0 ; j < r.getNsafe() ; j++) {
+			#pragma omp parallel for schedule(static)
 			for(int i = 0 ; i < dimension ; i++) {
 				if(pb[i]) {
 					for(int j = 0 ; j < r.getNsafe() ; j++) {

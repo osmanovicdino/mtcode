@@ -149,6 +149,7 @@ public:
 	void calculate_forces_and_torques3D(matrix<int> &pairs, ComboPatch &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
 
 	void calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, vector1<potentialtheta3D *> &, BinaryBindStore & , AbstractBindingModel&, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
+	matrix<int> CreateEdgeList(matrix<int> &adj, vector1<int> &lens);
 	void calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ComboPatch&, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
 
 	//matrix<double> calculateforcestheta_pos(matrix<int> &pairs, potentialtheta &);
