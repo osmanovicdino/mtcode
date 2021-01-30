@@ -5,10 +5,9 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=1:00:00,h_data=1G
+#$ -l h_rt=6:00:00,h_data=1G
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 12
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -30,9 +29,10 @@ module load gcc/4.9.3
 ##/usr/bin/time -v hostname
 mkdir ~/Chemistry/Results1
 cp ~/Chemistry/Code/main.cpp ~/Chemistry/Results1/
-g++ -fopenmp -std=c++11 ~/Chemistry/Code/main.cpp -o ~/Chemistry/Results1/angron
+g++ -std=c++11 -pg -no-pie ~/Chemistry/Code/main.cpp -o ~/Chemistry/Results1/angron
 cd ~/Chemistry/Results1/
 ./angron
+gprof angron gmon.out > analysis.txt
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
