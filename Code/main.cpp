@@ -92,10 +92,16 @@ for(int i = 0  ; i < 4 ; i++) {
 
 for(int i = 0  ; i < 4 ; i++) {
     for(int j = 0 ; j < 2 ; j++) {
+        if(j==1) {
             params(iter, 0) = int2;
-            params(iter, 1) = 1.4;
+            params(iter, 1) = 1.4*0.75;
+            params(iter, 2) = 1.1;
+        }
+        else{
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1.0 * 0.75;
             params(iter, 2) = 0.927;
-        
+        }
         iter++;
     }
 }
@@ -105,10 +111,16 @@ for (int i = 0; i < 2; i++)
     for (int j = 0; j < 2; j++)
     {
 
+        if(i==0 && j ==0) {
             params(iter, 0) = int3;
-            params(iter, 1) = 1.4;
+            params(iter, 1) = 1.4*0.5;
+            params(iter, 2) = 1.1;
+        }
+        else{
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1. * 0.5;
             params(iter, 2) = 0.927;
-        
+        }
 
         iter++;
     }
@@ -150,7 +162,7 @@ ss << beta;
 string base = "_beta=";
 base += ss.str();
 
-A.run_singlebond(15000000, 1000, base);
+A.run_singlebond_different_sizes(15000000, 1000, nt, base);
 
 return 0;
 }

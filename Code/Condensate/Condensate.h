@@ -26,7 +26,7 @@ void run(int,int, string strbase);
 
 void run_singlebond(int,int,string strbase);
 
-
+void run_singlebond_different_sizes(int runtime, int every, int div, string strbase);
 
 };
 
