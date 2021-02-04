@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=6:00:00,h_data=1G
+#$ -l h_rt=12:00:00,h_data=1G
 ## Modify the parallel environment
 ## and the number of cores as needed:
 # Email address to notify
@@ -27,12 +27,17 @@ module load gcc/4.9.3
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
+den=0.01
+i1=10.
+i2=10.
+i3=10.
 dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}"
 mkdir /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
-cp ~/Chemistry/Code/main.cpp ~/Chemistry/Results1/
-g++ -std=c++11 -pg -no-pie ~/Chemistry/Code/main.cpp -o ~/Chemistry/Results1/angron
-cd ~/Chemistry/Results1/
+cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
+g++ -std=c++11 -pg -no-pie ~/Chemistry/Code/main.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron
+cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 ./angron $den $i1 $i2 $i3 >log
+gprof angron gmon.out > analysis.txt
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
