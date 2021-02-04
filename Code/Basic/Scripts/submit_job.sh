@@ -38,7 +38,7 @@ cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake
 g++ -fopenmp -std=c++11 -pg -no-pie ~/Chemistry/Code/main.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 ./angron $den $i1 $i2 $i3 >log
-gprof angron gmon.out > analysis3.txt
+gprof angron gmon.out > analysis4.txt
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
