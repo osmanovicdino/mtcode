@@ -162,7 +162,7 @@ ss << beta;
 string base = "_beta=";
 base += ss.str();
 
-A.run_singlebond_different_sizes(15000000, 1000, nt, base);
+A.run_singlebond_different_sizes(10000, 1000, nt, base);
 
 return 0;
 }
