@@ -8,7 +8,7 @@
 #$ -l h_rt=01:00:00,h_data=1G
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 36
+#$ -pe shared 8
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -38,7 +38,7 @@ cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake
 g++ -fopenmp -std=c++11 -pg -no-pie ~/Chemistry/Code/main.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 ./angron $den $i1 $i2 $i3 >log
-gprof angron gmon.out > analysis2.txt
+gprof angron gmon.out > analysis3.txt
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
