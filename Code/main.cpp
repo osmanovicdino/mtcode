@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 #include <random>
 #include <mutex>
+#include <atomic>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -163,6 +164,54 @@ string base = "_beta=";
 base += ss.str();
 
 A.run_singlebond_different_sizes(10000, 1000, nt, base);
+
+/*
+int NN = 10000;
+matrix<double> F(NN, 3);
+matrix<double> T(NN, 3);
+
+for(int i  = 0 ; i < 10000 ; i++) {
+    F(i, 0) = (double)rand() / (double)(RAND_MAX);
+    F(i, 1) = (double)rand() / (double)(RAND_MAX);
+    F(i, 2) = (double)rand() / (double)(RAND_MAX);
+    T(i, 0) = (double)rand() / (double)(RAND_MAX);
+    T(i, 1) = (double)rand() / (double)(RAND_MAX);
+    T(i, 2) = (double)rand() / (double)(RAND_MAX);
+}
+
+//int NN = A.obj->getN();
+
+BinaryBindStore bbs;
+
+int nh = (*A.pots).get_total_patches(NN);
+
+vector1<bool> isbound(nh);
+
+vector1<int> boundto(nh);
+
+bbs.isbound = isbound;
+bbs.boundto = boundto;
+int ccc;
+int num = 20;
+matrix<int> boxes = A.obj->getgeo().generate_boxes_relationships(num, ccc);
+
+matrix<int> *pairs = A.obj->calculatepairs(boxes, 3.5);
+
+matrix<int> adj(28000,10);
+vector1<int> len(28000,2);
+
+for(int i = 0 ; i < 20000 ; i++) {
+    //A.obj->CreateEdgeList(adj,len);
+    //A.obj->advance_pos();
+    cout << i << endl;
+    A.obj->calculate_forces_and_torques3D_onlyone(*pairs, *(A.pots), bbs, *(A.bm), F, T);
+    // stringstream ss;
+    // ss<<i;
+    // string res = "output"+ss.str();
+    // outfunc(F,res);
+
+ }
+*/
 
 return 0;
 }

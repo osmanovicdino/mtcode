@@ -46,6 +46,16 @@ public:
 	void setdt(double);
 	void setgamma(double b)  {
 		gamma = b;
+		d = (gamma * dt / 2.);
+		q = (dt) / 2.;
+		r = sqrt(0.5 * kT * (gamma) * (m) * (dt));
+
+		c1 = (dt / m);
+		c2 = (1.0 / (1.0 + (d)));
+		c3 = (1.0 / (1.0 + (d))) * q;
+		c4 = (1.0 / (1.0 + (d))) * r;
+		c5 = (1 - (d));
+
 		Rt = sqrt(2 * gamma * kT / dt);
 	}
 	void setgammar(double b) 
@@ -142,8 +152,8 @@ public:
 
 
 	// void one_bond_per_patch_condition(matrix<int> &pairs, vector<potentialtheta3D*> &);
-
-	void create_forces_and_torques_sphere(matrix<double> &, matrix<double> &); //transform between body fixed frame and lab fixed frame
+	void create_random_forces(matrix<double>&, matrix<double>&);
+	void create_forces_and_torques_sphere(matrix<double> &, matrix<double> &, matrix<double> &, matrix<double> &); //transform between body fixed frame and lab fixed frame
 	void calculate_forces_and_torques3D(matrix<int> &pairs, potentialtheta3D &, matrix<double> &F, matrix<double> &T); //calculation of force for a single angle dependent theta
 	void calculate_forces_and_torques3D(matrix<int> &pairs, vector1<potentialtheta3D*> &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
 	void calculate_forces_and_torques3D(matrix<int> &pairs, ComboPatch &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
@@ -155,7 +165,7 @@ public:
 	//matrix<double> calculateforcestheta_pos(matrix<int> &pairs, potentialtheta &);
 	//matrix<double> calculateforces_ang(matrix<int> &pairs,potentialtheta&);
 	void advancemom_halfstep(matrix<double> &, matrix<double> &);
-	void advance_pos();
+	//void advance_pos();
 	// void advancemom_fullstep();
 	
 	virtual void adv(matrix<int>&);

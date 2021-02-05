@@ -145,6 +145,7 @@ vector1<double> LangevinNVT::avmom() {
 void LangevinNVT::advance_pos() { 
 	int ds = this->getdimension();
 	//int locald = this->getdimension();
+	#pragma omp parallel for schedule(dynamic)
 	for(int i = 0 ; i < (*dat).getNsafe() ;  i++ ) {
 	for(int i1 = 0 ; i1 < ds ; i1++ ) {
 	(*dat)(i,i1) = (*dat)(i,i1)+ c1*(*mom)(i,i1);

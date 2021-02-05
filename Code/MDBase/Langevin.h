@@ -25,7 +25,7 @@ public:
 	LangevinNVT(geometry &a); //define a Langevin system with a given geometry
 	virtual void setgamma(double); //set the damping factor
 	virtual void setdt(double); //set the timestep
-	void setkT(double); //set the temperature
+	virtual void setkT(double); //set the temperature
 	void setm(double); //set the mass of the particles
 	void setmom(matrix<double>&); //set the momentum of the particles
 
