@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=12:00:00,h_data=2G
+#$ -l h_rt=12:00:00,h_data=100M
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 36
@@ -37,7 +37,8 @@ mkdir /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 g++ -std=c++11 ~/Chemistry/Code/main.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
-./angron $den $i1 $i2 $i3 >log
+export OMP_NUM_THREADS=36
+./angron 10000000 $den $i1 $i2 $i3 >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
