@@ -327,7 +327,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     
     // //#pragma omp parallel for schedule(static)
-    for (i = 0; i < total_number_of_patches; ++i)
+    for (int i = 0; i < total_number_of_patches; ++i)
     {
         int wp1 = indexes2[i];
         //mtx.lock();

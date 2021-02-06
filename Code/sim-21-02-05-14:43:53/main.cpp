@@ -59,16 +59,13 @@ double packing_fraction;
 double int1;
 double int2;
 double int3;
-int runtime;
-if(argc==6) {
-runtime = atof(argv[1]);
-packing_fraction = atof(argv[2]);
-int1 = atof(argv[3]);
-int2 = atof(argv[4]);
-int3 = atof(argv[5]);
+if(argc==5) {
+packing_fraction = atof(argv[1]);
+int1 = atof(argv[2]);
+int2 = atof(argv[3]);
+int3 = atof(argv[4]);
 }
 else {
-    runtime = 10000;
     packing_fraction = 0.01;
     int1 =5.0;
     int2 = 20.0;
