@@ -70,9 +70,9 @@ int3 = atof(argv[5]);
 else {
     runtime = 10000;
     packing_fraction = 0.01;
-    int1 =5.0;
-    int2 = 20.0;
-    int3 = 5.0;
+    int1 =10.0;
+    int2 = 10.0;
+    int3 = 10.0;
 }
 matrix<double> params(28,3);
 
@@ -166,7 +166,7 @@ ss << beta;
 string base = "_beta=";
 base += ss.str();
 
-A.run_singlebond_different_sizes(10000, 1000, nt, base);
+A.run_singlebond_different_sizes(runtime, 1000, nt, base);
 
 /*
 int NN = 10000;
