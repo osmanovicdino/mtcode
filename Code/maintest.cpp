@@ -56,35 +56,8 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
-    matrix<double> *mom = new matrix<double>;
-    matrix<double> *angmom = new matrix<double>;
-
-    matrix<double> h(28000,3);
-
-    matrix<double> F(28000,3,1.);
-
-    matrix<double> T(28000,3,4.235457456746);
-
-    *mom = h;
-    *angmom = h;
-
-    double dt  = 0.005;
-
-    for(int j =0 ; j < 10000 ; j++) {
-        #pragma omp parallel for schedule(dynamic)
-        for (int i = 0; i < (*mom).getNsafe(); i++)
-        {
-            (*mom)(i, 0) += (dt / 2.) * F(i, 0);
-            (*angmom)(i, 0) += (dt / 2.) * T(i, 0);
-            (*mom)(i, 1) += (dt / 2.) * F(i, 1);
-            (*angmom)(i, 1) += (dt / 2.) * T(i, 1);
-            (*mom)(i, 2) += (dt / 2.) * F(i, 2);
-            (*angmom)(i, 2) += (dt / 2.) * T(i, 2);
-        }
-    }
-
-    done();
-
+    cout << omp_get_max_threads() << endl;
+    pausel();
 
     // for(int i = 0 ; i < 28000 ; i++) {
     //     asd[i] = rand() % 28000;
