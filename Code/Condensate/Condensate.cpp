@@ -472,6 +472,8 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
     {
 
         cout << i << endl;
+        //obj->measured_temperature();
+
         // vector1<double> meas(6);
         // obj->measured_temperature(meas);
         // tottemp += meas;
@@ -520,7 +522,10 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
 
         obj->advancemom_halfstep(F, T);
 
+
         obj->advance_pos();
+
+
 
         obj->rotate();
 
@@ -532,6 +537,7 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
 
         obj->calculate_forces_and_torques3D_onlyone(pairs, *pots, bbs, *bm, F, T);
         obj->create_random_forces(RT, RR);
+
         obj->create_forces_and_torques_sphere(F, T, RT, RR);
 
         obj->advancemom_halfstep(F, T);

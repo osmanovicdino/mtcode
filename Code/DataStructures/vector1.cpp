@@ -816,6 +816,14 @@ vector1<Y> smooth(const vector1<Y> &a, int s, bool open) {
     return temp;
 }
 
+int total_bool(const vector1<bool> &c1) {
+    int tot = 0;
+    for(int i = 0  ; i < c1.size ; i++) {
+        if(c1.data[i]) tot++;
+    }
+    return tot;
+}
+
 /*vector1<double> randomvec(int n, double r) { // random spherical vector in n dimensions with length r
 	MTRand sa;	
 	double theta,phi;

@@ -259,6 +259,8 @@ public:
         friend void iterator_update(vector1<int> &v, mdpair temp);
         
         friend void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes);
+
+        friend int total_bool(const vector1<bool>&);
 };
 
 

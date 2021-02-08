@@ -332,7 +332,7 @@ void LangevinNVTR::create_random_forces(matrix<double> &Rt, matrix<double> &Rr) 
     }
 }
 
-void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &Rt, matrix<double> &Rr )
+void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &RT, matrix<double> &RR )
 { //adds friction and noise
     //int timeseed = int(time(NULL));
     //NO TRANSLATIONAL/ROTATIONAL COUPLING
@@ -375,12 +375,12 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
         double tbrfy = (-gammar / im[4]) * lly;
         double tbrfz = (-gammar / im[8]) * llz;
 
-        double fbrrx = Rt(i,0);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double fbrry = Rt(i,1);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double fbrrz = Rt(i,2);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrrx = Rr(i,0);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrry = Rr(i,1);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrrz = Rr(i,2);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrrx = Rt * RT(i, 0);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrry = Rt * RT(i, 1);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrrz = Rt * RT(i, 2);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrrx = Rr * RR(i, 0);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrry = Rr * RR(i, 1); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrrz = Rr * RR(i, 2); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
 
         double fx = forcel(i, 0) + (fbrfx + fbrrx) * qtemp0 + (fbrfy + fbrry) * qtemp3 + (fbrfz + fbrrz) * qtemp6;
         double fy = forcel(i, 1) + (fbrfx + fbrrx) * qtemp1 + (fbrfy + fbrry) * qtemp4 + (fbrfz + fbrrz) * qtemp7;

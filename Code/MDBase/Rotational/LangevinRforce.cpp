@@ -336,107 +336,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         int iterator1 = ccs[wp1];
         if(iterator1 < 10) {
             
-            
-            ccs[wp1]++;
             boindices2(wp1, iterator1) = i;
-           // mtx.unlock();
+            ccs[wp1]++;
+            // mtx.unlock();
         }
         //mtx.unlock();
     }
     
     
-
-    // matrix<int> boindices2(total_number_of_patches,depth_of_matrix);
-    // //vector1<std::atomic<int> > ccs2(total_number_of_patches, {0});
-    // // std::atomic<int> * ccs2 = new std::atomic<int>[ total_number_of_patches ];
-    
-    // std::vector<std::atomic<int>> ccs(total_number_of_patches);
-    // // Initialize.
-    // for (auto &e : ccs)
-    //     e.store(0, std::memory_order_relaxed);
-
-    // // vector1<int> ccs2(total_number_of_patches);
-
-    // #pragma omp parallel for schedule(static)
-    // for (i = 0; i < total_number_of_patches; ++i)
-    // {
-    //     int wp1 = indexes2[i];
-    //     //mtx.lock();
-    //     //const std::lock_guard<std::mutex> lock(mtx);
-
-    //     int iterator1;// = ccs[wp1];
-    //     iterator1 = (ccs[wp1]).load(std::memory_order_relaxed);
-    //     if (iterator1 < 10)
-    //     {
-
-            
-    //         boindices2(wp1, iterator1) = i;
-
-    //         ccs[wp1]++;
-    //         // mtx.unlock();
-    //     }
-    //     //mtx.unlock();
-    // }
-
-    // outfunc(boindices2, "old");
-    // outfunc(boindices2, "new");
-
-    // ofstream myfilex;
-    // myfilex.open("ccs.csv");
-    // myfilex <<= ccs;
-    // myfilex.close();
-
-    // ofstream myfiley;
-    // myfiley.open("ccs2.csv");
-    // for(int i = 0 ; i < total_number_of_patches-1 ; i++) {
-    //     myfiley << ccs2[i] << ",";
-    // }
-    // myfiley << ccs2[total_number_of_patches-1];
-    // myfiley.close();
-    // pausel();
-    // int nc1 = nbins.getsize();
-    // int nc2 = 0;
-    // for(int i = 0 ; i<total_number_of_patches ; i++) {
-    //     if(ccs[i]>0) nc2++;
-    // }
-
-    // if(nc1-1 != nc2) {
-    //     cout << nc1-1 << endl;
-    //     cout << nc2 << endl;
-    //     cout << edgelist.getNsafe() << endl;
-    //     int edgeCount= 0;
-    //     for(int j = 0 ;  j < tempbound.getsize() ; j++) {
-    //         edgeCount += tempbound[j];
-    //     }
-    //     cout << edgeCount << endl;
-
-    //     int unique = 0;
-    //     for(int i = 0  ; i < total_number_of_patches ; i++) {
-    //         int j;
-    //         for (j = 0; j < i; j++)
-    //             if (indexes2[i] == indexes2[j])
-    //                 break;
-    //         if (i == j)
-    //             unique++;
-    //     }
-
-    //     cout << unique << endl;
-    //     // pausel();
-
-
-    //     outfunc(edgelist,"edge");
-
-    //     outfunc(boindices,"boindices");
-    //     outfunc(tempbound, "tempbound");
-    //     pausel();
-    // }
-
-    // outfunc(nbins,"nbins");
-    // outfunc(indexes,"indexes");
-    // outfunc(boindices2,"boindeces2");
-    // outfunc(ccs,"ccs");
-    // pausel();
- 
 
         int number_to_reserve = MIN(2*((total_number_of_patches+1)- total_number_of_patches),total_number_of_patches/2 );
 //        // cout << number_to_reserve << endl;
@@ -959,19 +866,19 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
             double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
             cout << (iny.potential_bundle)[potn]->getparameters() << endl;
-            cout << p1 << " " << p2 << endl;
-            cout << dis << endl;
-            cout << potn << endl;
-            cout << wp1 << " " << wp2 << endl;
-            cout << fx << " " << fy << " " << fz << endl;
-            cout << tix << " " << tiy << " " << tiz << endl;
-            cout << qtemp0 << " " << qtemp1 << " " << qtemp2 << " " << qtemp3 << " " << qtemp4 << " " << qtemp5 << " " << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
-            cout << gtemp0 << " " << gtemp1 << " " << gtemp2 << " " << gtemp3 << " " << gtemp4 << " " << gtemp5 << " " << gtemp6 << " " << gtemp7 << " " << gtemp8 << endl;
-            cout << dx << " " << dy << " " << dz << endl;
-            cout << nx1 << " " << ny1 << " " << nz1 << endl;
-            cout << nx2 << " " << ny2 << " " << nz2 << endl;
-            cout << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
-            pausel(); */
+            cout << "particles:  " <<p1 << " " << p2 << endl;
+            cout << "distance: " << dis << endl;
+            cout << "potential number: " << potn << endl;
+            cout << "which patch: " << wp1 << " " << wp2 << endl;
+            cout << "force: " << fx << " " << fy << " " << fz << endl;
+            cout << "torques: " << tix << " " << tiy << " " << tiz << endl;
+            cout << "orientation1: " << qtemp0 << " " << qtemp1 << " " << qtemp2 << " " << qtemp3 << " " << qtemp4 << " " << qtemp5 << " " << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
+            cout << "orientation2: " << gtemp0 << " " << gtemp1 << " " << gtemp2 << " " << gtemp3 << " " << gtemp4 << " " << gtemp5 << " " << gtemp6 << " " << gtemp7 << " " << gtemp8 << endl;
+            cout << "dx: " << dx << " " << dy << " " << dz << endl;
+            cout << "n: " << nx1 << " " << ny1 << " " << nz1 << endl;
+            cout << "n2: " << nx2 << " " << ny2 << " " << nz2 << endl;
+            cout << "arguments: " << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
+            pausel();  */
 
             forces(p1, 0) += fx;
             forces(p1, 1) += fy;

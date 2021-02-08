@@ -144,6 +144,7 @@ public:
 		return newv;
 	}
 	void measured_temperature();
+	
 	void measured_temperature(ofstream&);
 	void measured_temperature(vector1<double>&);
 
