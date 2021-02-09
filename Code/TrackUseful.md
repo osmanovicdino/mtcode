@@ -965,7 +965,7 @@ Analysis of clusters
 
         Old large cluster algorithm
 
-        <>pre<code>
+        <pre><code>
         {
 
                     if(size_of_cluster < 10) {
@@ -1096,11 +1096,11 @@ Analysis of clusters
                 }
                 }
                 
-        </pre></code>
+        </code></pre>
 
 Working parallel connected components
 
-        <pre><code>
+<pre><code>
 
 void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
     vector1<int> f(indexes);
@@ -1197,4 +1197,122 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
     //return res;
 
 }
-        </code></pre>
+</code></pre>
+
+Bivalent run
+
+<pre><code>
+srand (time(NULL));
+double packing_fraction;
+double int1;
+double int2;
+double int3;
+int runtime;
+if(argc==6) {
+runtime = atof(argv[1]);
+packing_fraction = atof(argv[2]);
+int1 = atof(argv[3]);
+int2 = atof(argv[4]);
+int3 = atof(argv[5]);
+}
+else {
+    runtime = 10000;
+    packing_fraction = 0.01;
+    int1 =10.0;
+    int2 = 10.0;
+    int3 = 10.0;
+}
+matrix<double> params(28,3);
+
+cout << packing_fraction << " " << int1 << " " << int2 << " " << int3 << endl;
+
+// for(int i = 0 ; i < 28 ; i++) {
+//     params(i, 0) =  10.0; //strength 
+//     params(i, 1) =  1.4; //distance
+//     params(i, 2) = 0.927;
+// }
+
+int iter = 0;
+for(int i = 0  ; i < 4 ; i++) {
+    for(int j = 0  ; j < 4 ; j++) {
+        params(iter,0) = int1;
+        params(iter,1) = 1.4;
+        params(iter,2) =  0.927;
+        iter++;
+    }
+}
+
+for(int i = 0  ; i < 4 ; i++) {
+    for(int j = 0 ; j < 2 ; j++) {
+        if(j==1) {
+            params(iter, 0) = int2;
+            params(iter, 1) = 1.4*0.75;
+            params(iter, 2) = 1.1;
+        }
+        else{
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1.0 * 0.75;
+            params(iter, 2) = 0.927;
+        }
+        iter++;
+    }
+}
+
+for (int i = 0; i < 2; i++)
+{
+    for (int j = 0; j < 2; j++)
+    {
+
+        if(i==0 && j ==0) {
+            params(iter, 0) = int3;
+            params(iter, 1) = 1.4*0.5;
+            params(iter, 2) = 1.1;
+        }
+        else{
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1. * 0.5;
+            params(iter, 2) = 0.927;
+        }
+
+        iter++;
+    }
+}
+
+
+int n = 10000;
+int nt = 2000;
+TetrahedralWithBivalent c(params,nt,n);
+
+TetrahedralWithSingle c2(10.0, 1.4, 0.927, 10., 1.4, 0.927, 10.0, 1.4, 0.927, nt, n);
+
+
+TetrahedralPatch c3(10.0,1.4,0.927);
+
+//double packing_fraction = 0.02;
+
+double l = cbrt(pi * (double)n / (6. * packing_fraction));
+
+BindingModelBinary b(nt*4);
+
+b.setup_equilibrium();
+
+Condensate A(l, n);
+
+A.setBindingModel(b);
+
+A.setpots(c);
+
+A.setviscosity(0.1);
+
+double beta = 1.;
+
+A.obj->setkT(1. / beta);
+
+stringstream ss;
+ss << beta;
+
+string base = "_beta=";
+base += ss.str();
+
+A.run_singlebond_different_sizes(runtime, 1000, nt, base);
+</code></pre>

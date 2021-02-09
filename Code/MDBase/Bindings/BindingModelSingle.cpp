@@ -63,7 +63,6 @@ void BindingModelSingle::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
         r4 = off_rate;
     }
 
-
     // double r1 = c12 * triprates(ing, i1 * 4 + 0); //goes to bind 12
     // double r2 = c23 * triprates(ing, i1 * 4 + 1); //goes to bind 23
     // double r3 = c13 * triprates(ing, i1 * 4 + 2); //goes to bind 13

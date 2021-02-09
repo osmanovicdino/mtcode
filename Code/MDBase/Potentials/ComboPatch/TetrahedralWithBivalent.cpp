@@ -138,7 +138,7 @@ void TetrahedralWithBivalent::UpdateIteratorSafe(const int &i, const int &j, int
     }
 }
 
-int TetrahedralWithBivalent::get_total_patches(const int &N) { return 4 * nt + 2*nb; }
+int TetrahedralWithBivalent::get_total_patches(const int &N) { return 4 * nt + 2*(nb-nt); }
 
 void TetrahedralWithBivalent::which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
 {

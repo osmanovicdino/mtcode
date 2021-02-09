@@ -17,7 +17,6 @@ void BindingModelBinary::setup_equilibrium() {
     r11[3] = 1.0;
 
     vector1<double> r12(r11);
-
     vector1<double> r22(r11);
     // r22[0] = 1.0;
     // r22[1] = 0.0;
@@ -218,6 +217,8 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
         double r3 = c13 * tripr111[i1 * 4 + 2];  //goes to bind 13
         double r4 = tripr111[i1 * 4 + 3];        //goes to none-bound
 
+
+
         double totalr = r1 + r2 + r3 + r4;
 
         double rr = totalr * ((double)rand() / (double)(RAND_MAX));
@@ -345,6 +346,7 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
         double r3 = c13 * tripr122[i1 * 4 + 2]; //goes to bind 13
         double r4 = tripr111[i1 * 4 + 3];       //goes to none-bound
 
+
         double totalr = r1 + r2 + r3 + r4;
 
         double rr = totalr * ((double)rand() / (double)(RAND_MAX));
@@ -433,41 +435,101 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
 
 void BindingModelBinary::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters)
 {
-   /*  int bb = 0;
+    int bb = 0;
+    int nb = befores.getsize();
 
-    for (int i = 0; i < befores.getsize(); i++)
+    for (int i = 0; i < nb; i++)
     {
         bb += (int)befores.gpcons(i);
     }
 
-    vector1<double> possible_rates(possibles.size());
+    int nst = possibles.size(); //number of states to
 
-    for (int i = 0; i < possibles.size(); i++)
-    {
+    vector1<double> possible_rates(nst);
 
-        int ab = 0;
-        for (int j = 0; j < befores.getsize(); j++)
+    for (int i = 0; i < nst; i++)
+    { //for all the number of possible states
+
+        for (int j = 0; j < nb; j++)
         {
-            ab += (int)possibles[i].gpcons(j);
-        }
+            vector1<double> rtemp;
+            int index1 = indices[j].a;
+            int index2 = indices[j].b;
 
+            int ind1, ind2;
 
-        if (ab > bb)
-            possible_rates[i] = (ab - bb) * on_rate; //transition to more boundedness
-        else if (bb < ab)
-            possible_rates[i] = (bb - ab) * off_rate; //less boundedness
-        else
-        {
-            if (befores == possibles[i])
+            if (index1 < div)
+                ind1 = 1;
+            else
+                ind1 = 2;
+
+            if (index2 < div)
+                ind2 = 1;
+            else
+                ind2 = 2;
+            
+            int indt1, indt2;
+            sort_doublet(ind1, ind2, indt1, indt2);
+
+            //rtemp = get_drate(indt1, indt2);
+
+            int i1;
+            if (befores.gpcons(j) == false)
             {
-                possible_rates[i] = on_rate; //if the same state
+                i1 = 0;
             }
             else
             {
-                possible_rates[i] = off_rate; //if different state
+                i1 = 1;
+            }
+
+            int i2 = (int)possibles[i].gpcons(j);
+            if(indt1 == 1 && indt2 == 1) {
+                possible_rates[i] += doubr11[i1 * 2 + i2];
+            }
+            else if (indt1 == 1 && indt2 == 2) {
+                possible_rates[i] += doubr12[i1 * 2 + i2];
+            }
+            else {
+                possible_rates[i] += doubr22[i1 * 2 + i2];
+            }
+            //possible_rates[j] += rtemp();
+        }
+    }
+
+    double totalrate = 0.0;
+    vector1<double> well_defined_rates(nst);
+    for (int i = 0; i < nst; i++)
+    {
+        totalrate += possible_rates[i];
+        double vertexrate = 0.0;
+        for (int k = 0; k < i + 1; k++)
+        {
+            vertexrate += possible_rates[k];
+        }
+        well_defined_rates[i] = vertexrate;
+    }
+
+    double rr = totalrate * (double)rand() / (double)(RAND_MAX);
+
+    int whichto;
+    if (rr < well_defined_rates[0])
+    {
+        whichto = 0;
+    }
+    else
+    {
+        for (int i = 1; i < nst; i++)
+        {
+            if (rr > well_defined_rates[i - 1] && rr < well_defined_rates[i])
+            {
+                whichto = i;
+                break;
             }
         }
-    } */
+    }
+
+    afters = possibles[whichto];
 }
 
 #endif /* BINARYMODELBINARY_CPP */

@@ -68,7 +68,7 @@ int2 = atof(argv[4]);
 int3 = atof(argv[5]);
 }
 else {
-    runtime = 10000;
+    runtime = 1000000;
     packing_fraction = 0.01;
     int1 =10.0;
     int2 = 10.0;
@@ -138,7 +138,7 @@ TetrahedralWithBivalent c(params,nt,n);
 TetrahedralWithSingle c2(10.0, 1.4, 0.927, 10., 1.4, 0.927, 10.0, 1.4, 0.927, nt, n);
 
 
-TetrahedralPatch c3(10.0,1.4,0.927);
+TetrahedralPatch c3(20.0,1.4,0.927);
 
 //double packing_fraction = 0.02;
 
@@ -146,7 +146,12 @@ double l = cbrt(pi * (double)n / (6. * packing_fraction));
 
 BindingModelBinary b(nt*4);
 
+BindingModelSingle b2(0.998,0.002);
+
 b.setup_equilibrium();
+
+
+
 
 Condensate A(l, n);
 
@@ -154,9 +159,9 @@ A.setBindingModel(b);
 
 A.setpots(c);
 
-A.setviscosity(1.0);
+A.setviscosity(0.1);
 
-double beta = 2.;
+double beta = 1.;
 
 A.obj->setkT(1. / beta);
 
@@ -165,6 +170,9 @@ ss << beta;
 
 string base = "_beta=";
 base += ss.str();
+
+
+//A.run_singlebond(runtime, 1000, base);
 
 A.run_singlebond_different_sizes(runtime, 1000, nt, base);
 
