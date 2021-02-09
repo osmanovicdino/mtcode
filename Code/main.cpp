@@ -146,8 +146,6 @@ double l = cbrt(pi * (double)n / (6. * packing_fraction));
 
 BindingModelBinary b(nt*4);
 
-BindingModelSingle b2(0.998,0.002);
-
 b.setup_equilibrium();
 
 
