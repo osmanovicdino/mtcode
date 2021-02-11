@@ -29,12 +29,12 @@ module load gcc/7.5.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-if [ -e  ~/Chemistry/Code/Basic/Scripts/params.dat ]; then
+if [ -e  ~/Chemistry/Code/Basic/Scripts/params2.dat ]; then
    # use the unix command sed -n ${line_number}p to read by line
-   den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $1}'`
-   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $2}'` 
-   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $3}'` 
-   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params.dat | awk '{print $4}'`
+   den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params2.dat | awk '{print $1}'`
+   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params2.dat | awk '{print $2}'` 
+   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params2.dat | awk '{print $3}'` 
+   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params2.dat | awk '{print $4}'`
    echo "read file correctly" 
 else
    den=0.01

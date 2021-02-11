@@ -70,7 +70,7 @@ int3 = atof(argv[5]);
 else {
     runtime = 1000000;
     packing_fraction = 0.01;
-    int1 =10.0;
+    int1 =15.0;
     int2 = 10.0;
     int3 = 10.0;
 }
@@ -99,7 +99,7 @@ for(int i = 0  ; i < 4 ; i++) {
         if(j==1) {
             params(iter, 0) = int2;
             params(iter, 1) = 1.4*0.75;
-            params(iter, 2) = 1.1;
+            params(iter, 2) = 0.927;
         }
         else{
             params(iter, 0) = 0.0;
@@ -118,7 +118,7 @@ for (int i = 0; i < 2; i++)
         if(i==0 && j ==0) {
             params(iter, 0) = int3;
             params(iter, 1) = 1.4*0.5;
-            params(iter, 2) = 1.1;
+            params(iter, 2) = 0.927;
         }
         else{
             params(iter, 0) = 0.0;
@@ -146,6 +146,8 @@ double l = cbrt(pi * (double)n / (6. * packing_fraction));
 
 BindingModelBinary b(nt*4);
 
+BindingModelSingle b2(0.998,0.002);
+
 b.setup_equilibrium();
 
 
@@ -153,7 +155,7 @@ b.setup_equilibrium();
 
 Condensate A(l, n);
 
-A.setBindingModel(b);
+A.setBindingModel(b2);
 
 A.setpots(c);
 
