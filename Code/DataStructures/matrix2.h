@@ -289,6 +289,8 @@ void reset(T);
         friend matrix<Y> poly_convertmatrix(matrix<Y>&a,int,int);
 
         friend void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes);
+
+        friend void generate_uniform_random_matrix(matrix<double> &ra);
 };
 
 

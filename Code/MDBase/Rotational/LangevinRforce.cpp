@@ -42,6 +42,44 @@ matrix<int> LangevinNVTR::CreateEdgeList(matrix<int> &adj, vector1<int> &len) {
     return a;
 }
 
+void SingleHistogram(vector1<int> &indexes2, matrix<int> &boindices2, vector1<int> &ccs) {
+    if ((indexes2.getsize() != boindices2.getnrows()) || ((indexes2.getsize() != ccs.getsize())))
+        error("initial arrays must be same size in Single Histogram");
+
+    int sl = boindices2.getncols();
+    for (int i = 0; i < indexes2.getsize(); ++i)
+    {
+        int wp1 = indexes2[i];
+        //mtx.lock();
+        //const std::lock_guard<std::mutex> lock(mtx);
+
+        int iterator1 = ccs[wp1];
+        if (iterator1 < sl)
+        {
+
+            boindices2(wp1, iterator1) = i;
+            ccs[wp1]++;
+            // mtx.unlock();
+        }
+        //mtx.unlock();
+    }
+}
+
+void PairHistogram(vector<mdpair> &edgelist, matrix<int> &boindices, vector1<int> &tempbound) {
+    
+    //Boindices must be wide enough to store the histogram, this is the responsibility of the programmer.
+    for (int i = 0; i < edgelist.size(); i++)
+    {
+        int wp1 = edgelist[i].a;
+        int wp2 = edgelist[i].b;
+
+        boindices(wp1, tempbound[wp1]) = wp2;
+        boindices(wp2, tempbound[wp2]) = wp1;
+        tempbound[wp1]++;
+        tempbound[wp2]++;
+    }
+}
+
 void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
 {
 
@@ -59,13 +97,19 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     matrix<int> boindices(total_number_of_patches, depth_of_matrix);
 
+    vector<mdpair> edgelist;
+    edgelist.reserve(total_number_of_patches);
 
-
-    std::mutex mtx;
+    //std::mutex mtx;
 
     unsigned int i;
 
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel
+    {
+    vector<mdpair> edgelist_private;
+    edgelist_private.reserve(total_number_of_patches);
+
+    #pragma omp for nowait schedule(dynamic)
     for (i = 0; i < pairs.getNsafe(); ++i)
     {
         int p1 = pairs(i, 0);
@@ -224,21 +268,22 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     //#pragma omp atomic read
                     //mtx.lock();
 
-                    const std::lock_guard<std::mutex> lock(mtx);
-                    
-                    int iterator1 = tempbound[wp1];
-                    //#pragma omp atomic read
-                    int iterator2 = tempbound[wp2];
+                    //const std::lock_guard<std::mutex> lock(mtx);
+                    mdpair test(wp1,wp2);
+                    edgelist_private.push_back(test);
+                    // int iterator1 = tempbound[wp1];
+                    // //#pragma omp atomic read
+                    // int iterator2 = tempbound[wp2];
 
 
-                    tempbound[wp1]++;
-                    tempbound[wp2]++;
+                    // tempbound[wp1]++;
+                    // tempbound[wp2]++;
 
-                    //mtx.unlock();
+                    // //mtx.unlock();
                    
-                    boindices(wp1, iterator1) = wp2;
+                    // boindices(wp1, iterator1) = wp2;
                     
-                    boindices(wp2, iterator2) = wp1;
+                    // boindices(wp2, iterator2) = wp1;
 
 
                 }
@@ -249,6 +294,12 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //     }
         // }
         }
+        #pragma omp for schedule(static) ordered
+        for(int i = 0 ; i < omp_get_num_threads(); i++) {
+            #pragma omp ordered
+            edgelist.insert(edgelist.end(),edgelist_private.begin(),edgelist_private.end());
+        }        
+    }
 
         // cout << "which patch" << endl;
         //pausel();
@@ -313,8 +364,18 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         }
     }
 
+    //save connectivity
+    // for(int i = 0  ; i < edgelist.size() ; i++) {
+    //     int wp1 = edgelist[i].a;
+    //     int wp2 = edgelist[i].b;
 
-    matrix<int> edgelist = this->CreateEdgeList(boindices, tempbound);
+    //     boindices(wp1, tempbound[wp1]) = wp2;
+    //     boindices(wp2, tempbound[wp2]) = wp1;
+    //     tempbound[wp1]++;
+    //     tempbound[wp2]++;
+    // }
+    PairHistogram(edgelist,boindices,tempbound);
+    //matrix<int> edgelist = this->CreateEdgeList(boindices, tempbound);
 
     string sg = "a";
     vector1<int> indexes2(total_number_of_patches,sg);
@@ -325,23 +386,24 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
     vector1<int> ccs(total_number_of_patches);
 
-    
-    // //#pragma omp parallel for schedule(static)
-    for (int i = 0; i < total_number_of_patches; ++i)
-    {
-        int wp1 = indexes2[i];
-        //mtx.lock();
-        //const std::lock_guard<std::mutex> lock(mtx);
 
-        int iterator1 = ccs[wp1];
-        if(iterator1 < 10) {
+    SingleHistogram(indexes2,boindices2,ccs);    
+    // //#pragma omp parallel for schedule(static)
+    // for (int i = 0; i < total_number_of_patches; ++i)
+    // {
+    //     int wp1 = indexes2[i];
+    //     //mtx.lock();
+    //     //const std::lock_guard<std::mutex> lock(mtx);
+
+    //     int iterator1 = ccs[wp1];
+    //     if(iterator1 < 10) {
             
-            boindices2(wp1, iterator1) = i;
-            ccs[wp1]++;
-            // mtx.unlock();
-        }
-        //mtx.unlock();
-    }
+    //         boindices2(wp1, iterator1) = i;
+    //         ccs[wp1]++;
+    //         // mtx.unlock();
+    //     }
+    //     //mtx.unlock();
+    // }
     
     
 

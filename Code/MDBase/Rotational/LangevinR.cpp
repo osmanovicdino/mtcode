@@ -216,7 +216,7 @@ void LangevinNVTR::advancemom_halfstep(matrix<double> &F, matrix<double> &T)  {
     //where F is in LAB FRAME
     //and T is in BODY FRAME
     int np = (*mom).getNsafe();
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < np; i++)
     {
 
@@ -320,19 +320,21 @@ vector1<double> LangevinNVTR::genfullmat(int i) {
 
     return up;
 }
-void LangevinNVTR::create_random_forces(matrix<double> &Rt, matrix<double> &Rr) {
-    int Ns = Rt.getNsafe();
-    for(int i = 0 ; i < Ns ; i++) {
-        Rt(i, 0) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        Rt(i, 1) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        Rt(i, 2) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        Rr(i, 0) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        Rr(i, 1) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        Rr(i, 2) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-    }
-}
+// void LangevinNVTR::create_random_forces(matrix<double> &Rt, matrix<double> &Rr) {
+//     int Ns = Rt.getNsafe();
+//     for(int i = 0 ; i < Ns ; i++) {
+//         Rt(i, 0) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+//         Rt(i, 1) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+//         Rt(i, 2) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+//         Rr(i, 0) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+//         Rr(i, 1) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+//         Rr(i, 2) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+//     }
+// }
 
-void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &RT, matrix<double> &RR )
+
+
+void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &Randoms )
 { //adds friction and noise
     //int timeseed = int(time(NULL));
     //NO TRANSLATIONAL/ROTATIONAL COUPLING
@@ -375,12 +377,12 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
         double tbrfy = (-gammar / im[4]) * lly;
         double tbrfz = (-gammar / im[8]) * llz;
 
-        double fbrrx = Rt * RT(i, 0);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double fbrry = Rt * RT(i, 1);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double fbrrz = Rt * RT(i, 2);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrrx = Rr * RR(i, 0);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrry = Rr * RR(i, 1); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrrz = Rr * RR(i, 2); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrrx = Rt * Randoms(i, 0);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrry = Rt * Randoms(i, 1);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrrz = Rt * Randoms(i, 2);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrrx = Rr * Randoms(i, 3);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrry = Rr * Randoms(i, 4); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrrz = Rr * Randoms(i, 5); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
 
         double fx = forcel(i, 0) + (fbrfx + fbrrx) * qtemp0 + (fbrfy + fbrry) * qtemp3 + (fbrfz + fbrrz) * qtemp6;
         double fy = forcel(i, 1) + (fbrfx + fbrrx) * qtemp1 + (fbrfy + fbrry) * qtemp4 + (fbrfz + fbrrz) * qtemp7;
@@ -425,7 +427,7 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
 
 void LangevinNVTR::rotate() {
     // updates the matrices q and qt;
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for(int i = 0  ; i < (angmom)->getNsafe() ; i++) {
         vector1<double> rr = genfullmat(i);
 

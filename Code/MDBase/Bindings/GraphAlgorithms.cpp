@@ -177,20 +177,90 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
 
     }
     
-  
-    // cout << f << endl;
-    // pausel();
-    // //f = gf;
-    // //res.resize(indexes.getsize());
-    // //vector<mdpair> res(indexes.getsize());
-    // #pragma omp parallel for
-    // for(int i = 0 ; i < f.getsize() ; i++) {
-    //     res[i].a = f.data[i];
-    //     res[i].b = indexes.data[i];
+
+}
+
+
+void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes) {
+    //vector1<int> f(indexes);
+    vector1<int> fnext(indexes);
+    //if(res.size() != indexes.size) error("error in capacity of save function");
+    vector1<int> ftemp(indexes.getsize());
+
+    // #pragma omp parallel for schedule(static)
+    // for(int i = 0  ; i < indexes.getNsafe() ; i++) {
+    //     f[i] =  indexes[i];
+    //     gf[i] = indexes[i];
     // }
-    // mdpairsort fg;
-    // std::sort(res.begin(),res.end(),fg);
-    //return res;
+ 
+
+    int nr = adj.size();
+
+    for(;;) {
+        bool equiv;
+
+        #pragma omp parallel for schedule(static)
+        for(int i= 0 ; i < indexes.size ; i++) {
+            ftemp.data[i] = indexes.data[i];
+        }
+        //#pragma omp parallel 
+        
+           // cout << omp_get_num_threads() << endl;
+        #pragma omp parallel for schedule(static)
+        for(int i = 0  ; i < nr ; i++) {
+            int u = adj[i].a;
+            int v = adj[i].b;
+            // int u,v;
+            // sort_doublet(u1,v1,u,v);
+            
+            int fu = indexes.data[u];
+            //cout << u << " " << v << " " << fu << " " << f.data[v] << endl;
+            if (fu == indexes.data[fu] && indexes.data[v] < fu)
+            {
+                fnext.data[fu] = indexes.data[v];
+            }
+            //pausel();
+        }
+
+        //cout << "loop done" << endl;
+
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < indexes.size; i++)
+            indexes.data[i] = fnext.data[i];         
+
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < indexes.size; i++)
+        {
+            int u = i;
+            int fu = indexes.data[u];
+
+            if (fu != indexes.data[fu])
+            {
+                fnext.data[u] = indexes.data[fu];
+            }
+        }
+
+        equiv = true;
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < indexes.size; i++)
+        {
+            if (indexes.data[i] != fnext.data[i])
+            {
+                indexes.data[i] = fnext.data[i];
+            }
+            if(fnext.data[i] != ftemp.data[i]) {
+                equiv = false;
+            }
+        }
+        
+
+        //cout << "done 3" << endl;    
+        //bool equiv = true;
+       if(equiv) break;
+
+
+    }
+    
 
 }
 

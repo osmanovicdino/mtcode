@@ -122,8 +122,7 @@ void Condensate::run(int runtime, int every, string strbase = "")
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
-    matrix<double> RT(NN, 3);
-    matrix<double> RR(NN, 3);
+    matrix<double> RT(NN, 6);
     matrix<double> zeromatrix(NN,3);
 
     F = obj->calculateforces(*pairs, wsa);
@@ -137,8 +136,9 @@ void Condensate::run(int runtime, int every, string strbase = "")
     // KernFrenkelOnePatch2 testpot(nxtemp, nytemp, -nztemp, nxtemp, nytemp, nztemp, 100., 2., pi / 3., 0.75);
     // obj->calculate_forces_and_torques3D(*pairs, testpot, F, T);
 
-    obj->create_random_forces(RT, RR);
-    obj->create_forces_and_torques_sphere(F, T, RT, RR);
+    //obj->create_random_forces(RT, RR);
+    generate_uniform_random_matrix(RT);
+    obj->create_forces_and_torques_sphere(F, T, RT);
 
     vector1<double> tottemp(6);
 
@@ -177,8 +177,9 @@ void Condensate::run(int runtime, int every, string strbase = "")
         // outfunc(F, "Fl_i=" + aa.str());
         // obj->calculate_forces_and_torques3D(*pairs, *pots->potential_bundle[0], F, T);
 
-        obj->create_random_forces(RT, RR);
-        obj->create_forces_and_torques_sphere(F, T, RT, RR);
+        // obj->create_random_forces(RT, RR);
+        generate_uniform_random_matrix(RT);
+        obj->create_forces_and_torques_sphere(F, T, RT);
 
         // outfunc(T, "Tb_i=" + aa.str());
         // outfunc(F, "Fb_i=" + aa.str());
@@ -273,8 +274,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
-    matrix<double> RT(NN, 3);
-    matrix<double> RR(NN, 3);
+    matrix<double> RT(NN, 6);
     matrix<double> zeromatrix(NN, 3);
 
 
@@ -283,8 +283,8 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
 
     obj->calculate_forces_and_torques3D_onlyone(*pairs, *pots, bbs , *bm, F, T);
-    obj->create_random_forces(RT, RR);
-    obj->create_forces_and_torques_sphere(F, T, RT, RR);
+    generate_uniform_random_matrix(RT);
+    obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
 
     for (int i = 0; i < runtime; i++)
@@ -318,8 +318,8 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
         obj->calculate_forces_and_torques3D_onlyone(*pairs, *pots, bbs, *bm, F, T);
 
-        obj->create_random_forces(RT, RR);
-        obj->create_forces_and_torques_sphere(F, T, RT, RR);
+        generate_uniform_random_matrix(RT);
+        obj->create_forces_and_torques_sphere(F, T, RT);
 
         obj->advancemom_halfstep(F, T);
 
@@ -430,8 +430,7 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
-    matrix<double> RT(NN, 3);
-    matrix<double> RR(NN, 3);
+    matrix<double> RT(NN, 6);
     matrix<double> zeromatrix(NN, 3);
 
     F = obj->calculateforces(*pairsp1, wsa1);
@@ -464,8 +463,8 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
     pairs = pairstemp;
 
     obj->calculate_forces_and_torques3D_onlyone(pairs, *pots, bbs, *bm, F, T);
-    obj->create_random_forces(RT,RR);
-    obj->create_forces_and_torques_sphere(F, T, RT, RR);
+    generate_uniform_random_matrix(RT);
+    obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
 
     for (int i = 0; i < runtime; i++)
@@ -536,9 +535,8 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
         T.reset(0.0);
 
         obj->calculate_forces_and_torques3D_onlyone(pairs, *pots, bbs, *bm, F, T);
-        obj->create_random_forces(RT, RR);
-
-        obj->create_forces_and_torques_sphere(F, T, RT, RR);
+        generate_uniform_random_matrix(RT);
+        obj->create_forces_and_torques_sphere(F, T, RT);
 
         obj->advancemom_halfstep(F, T);
 

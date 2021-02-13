@@ -68,7 +68,7 @@ int2 = atof(argv[4]);
 int3 = atof(argv[5]);
 }
 else {
-    runtime = 1000000;
+    runtime = 10000;
     packing_fraction = 0.01;
     int1 =15.0;
     int2 = 10.0;
@@ -96,16 +96,16 @@ for(int i = 0  ; i < 4 ; i++) {
 
 for(int i = 0  ; i < 4 ; i++) {
     for(int j = 0 ; j < 2 ; j++) {
-        //if(j==1) {
+        if(j==1) {
             params(iter, 0) = int2;
             params(iter, 1) = 1.4*0.75;
             params(iter, 2) = 0.927;
-        //}
-        // else{
-        //     params(iter, 0) = 0.0;
-        //     params(iter, 1) = 1.0 * 0.75;
-        //     params(iter, 2) = 0.927;
-        // }
+        }
+        else{
+            params(iter, 0) = int3;
+            params(iter, 1) = 1.4 * 0.75;
+            params(iter, 2) = 0.927;
+        }
         iter++;
     }
 }

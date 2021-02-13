@@ -435,101 +435,101 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
 
 void BindingModelBinary::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters)
 {
-    int bb = 0;
-    int nb = befores.getsize();
+    // int bb = 0;
+    // int nb = befores.getsize();
 
-    for (int i = 0; i < nb; i++)
-    {
-        bb += (int)befores.gpcons(i);
-    }
+    // for (int i = 0; i < nb; i++)
+    // {
+    //     bb += (int)befores.gpcons(i);
+    // }
 
-    int nst = possibles.size(); //number of states to
+    // int nst = possibles.size(); //number of states to
 
-    vector1<double> possible_rates(nst);
+    // vector1<double> possible_rates(nst);
 
-    for (int i = 0; i < nst; i++)
-    { //for all the number of possible states
+    // for (int i = 0; i < nst; i++)
+    // { //for all the number of possible states
 
-        for (int j = 0; j < nb; j++)
-        {
-            vector1<double> rtemp;
-            int index1 = indices[j].a;
-            int index2 = indices[j].b;
+    //     for (int j = 0; j < nb; j++)
+    //     {
+    //         vector1<double> rtemp;
+    //         int index1 = indices[j].a;
+    //         int index2 = indices[j].b;
 
-            int ind1, ind2;
+    //         int ind1, ind2;
 
-            if (index1 < div)
-                ind1 = 1;
-            else
-                ind1 = 2;
+    //         if (index1 < div)
+    //             ind1 = 1;
+    //         else
+    //             ind1 = 2;
 
-            if (index2 < div)
-                ind2 = 1;
-            else
-                ind2 = 2;
+    //         if (index2 < div)
+    //             ind2 = 1;
+    //         else
+    //             ind2 = 2;
             
-            int indt1, indt2;
-            sort_doublet(ind1, ind2, indt1, indt2);
+    //         int indt1, indt2;
+    //         sort_doublet(ind1, ind2, indt1, indt2);
 
-            //rtemp = get_drate(indt1, indt2);
+    //         //rtemp = get_drate(indt1, indt2);
 
-            int i1;
-            if (befores.gpcons(j) == false)
-            {
-                i1 = 0;
-            }
-            else
-            {
-                i1 = 1;
-            }
+    //         int i1;
+    //         if (befores.gpcons(j) == false)
+    //         {
+    //             i1 = 0;
+    //         }
+    //         else
+    //         {
+    //             i1 = 1;
+    //         }
 
-            int i2 = (int)possibles[i].gpcons(j);
-            if(indt1 == 1 && indt2 == 1) {
-                possible_rates[i] += doubr11[i1 * 2 + i2];
-            }
-            else if (indt1 == 1 && indt2 == 2) {
-                possible_rates[i] += doubr12[i1 * 2 + i2];
-            }
-            else {
-                possible_rates[i] += doubr22[i1 * 2 + i2];
-            }
-            //possible_rates[j] += rtemp();
-        }
-    }
+    //         int i2 = (int)possibles[i].gpcons(j);
+    //         if(indt1 == 1 && indt2 == 1) {
+    //             possible_rates[i] += doubr11[i1 * 2 + i2];
+    //         }
+    //         else if (indt1 == 1 && indt2 == 2) {
+    //             possible_rates[i] += doubr12[i1 * 2 + i2];
+    //         }
+    //         else {
+    //             possible_rates[i] += doubr22[i1 * 2 + i2];
+    //         }
+    //         //possible_rates[j] += rtemp();
+    //     }
+    // }
 
-    double totalrate = 0.0;
-    vector1<double> well_defined_rates(nst);
-    for (int i = 0; i < nst; i++)
-    {
-        totalrate += possible_rates[i];
-        double vertexrate = 0.0;
-        for (int k = 0; k < i + 1; k++)
-        {
-            vertexrate += possible_rates[k];
-        }
-        well_defined_rates[i] = vertexrate;
-    }
+    // double totalrate = 0.0;
+    // vector1<double> well_defined_rates(nst);
+    // for (int i = 0; i < nst; i++)
+    // {
+    //     totalrate += possible_rates[i];
+    //     double vertexrate = 0.0;
+    //     for (int k = 0; k < i + 1; k++)
+    //     {
+    //         vertexrate += possible_rates[k];
+    //     }
+    //     well_defined_rates[i] = vertexrate;
+    // }
 
-    double rr = totalrate * (double)rand() / (double)(RAND_MAX);
+    // double rr = totalrate * (double)rand() / (double)(RAND_MAX);
 
-    int whichto;
-    if (rr < well_defined_rates[0])
-    {
-        whichto = 0;
-    }
-    else
-    {
-        for (int i = 1; i < nst; i++)
-        {
-            if (rr > well_defined_rates[i - 1] && rr < well_defined_rates[i])
-            {
-                whichto = i;
-                break;
-            }
-        }
-    }
+    // int whichto;
+    // if (rr < well_defined_rates[0])
+    // {
+    //     whichto = 0;
+    // }
+    // else
+    // {
+    //     for (int i = 1; i < nst; i++)
+    //     {
+    //         if (rr > well_defined_rates[i - 1] && rr < well_defined_rates[i])
+    //         {
+    //             whichto = i;
+    //             break;
+    //         }
+    //     }
+    // }
 
-    afters = possibles[whichto];
+    // afters = possibles[whichto];
 }
 
 #endif /* BINARYMODELBINARY_CPP */
