@@ -98,6 +98,8 @@ struct mdpairsort
 };
 
 void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
+
+    //Adj is the edgelist of 2 the number of edges, each edge has to be doubly connected
     //vector1<int> f(indexes);
     vector1<int> fnext(indexes);
     //if(res.size() != indexes.size) error("error in capacity of save function");
@@ -182,6 +184,9 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
 
 
 void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes) {
+    
+    //WE duplicate the connectivity naturally here
+
     //vector1<int> f(indexes);
     vector1<int> fnext(indexes);
     //if(res.size() != indexes.size) error("error in capacity of save function");
@@ -196,7 +201,9 @@ void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes) {
 
     int nr = adj.size();
 
+
     for(;;) {
+        //cout << "iterate" << endl;
         bool equiv;
 
         #pragma omp parallel for schedule(static)
@@ -207,9 +214,16 @@ void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes) {
         
            // cout << omp_get_num_threads() << endl;
         #pragma omp parallel for schedule(static)
-        for(int i = 0  ; i < nr ; i++) {
-            int u = adj[i].a;
-            int v = adj[i].b;
+        for(int i = 0  ; i < 2*nr ; i++) {
+            int u,v;
+            if(i%2==0) {
+            u = adj[i/2].a;
+            v = adj[i/2].b;
+            }
+            else{
+            u = adj[i/2].b;
+            v = adj[i/2].a;
+            }
             // int u,v;
             // sort_doublet(u1,v1,u,v);
             
@@ -219,6 +233,18 @@ void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes) {
             {
                 fnext.data[fu] = indexes.data[v];
             }
+
+            // int u1 = v;
+            // int v1 = u;
+            // // int u,v;
+            // // sort_doublet(u1,v1,u,v);
+
+            // int fu1 = indexes.data[u1];
+            // //cout << u << " " << v << " " << fu << " " << f.data[v] << endl;
+            // if (fu1 == indexes.data[fu1] && indexes.data[v1] < fu1)
+            // {
+            //     fnext.data[fu1] = indexes.data[v1];
+            // }
             //pausel();
         }
 
@@ -260,6 +286,8 @@ void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes) {
 
 
     }
+
+   // pausel();
     
 
 }

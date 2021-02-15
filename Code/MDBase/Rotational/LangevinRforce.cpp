@@ -47,6 +47,7 @@ void SingleHistogram(vector1<int> &indexes2, matrix<int> &boindices2, vector1<in
         error("initial arrays must be same size in Single Histogram");
 
     int sl = boindices2.getncols();
+
     for (int i = 0; i < indexes2.getsize(); ++i)
     {
         int wp1 = indexes2[i];
@@ -82,7 +83,7 @@ void PairHistogram(vector<mdpair> &edgelist, matrix<int> &boindices, vector1<int
 
 void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
 {
-
+    
     //for all the pairs, for all bindings
 
     //for a given sphere geometry
@@ -339,6 +340,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     // }
 
 // //   
+    PairHistogram(edgelist,boindices,tempbound);
 
     #pragma omp parallel for schedule(static)
     for(int i = 0  ; i <total_number_of_patches ; i++) { //check bindings, if distance metric is wrong, break bindings
@@ -374,20 +376,30 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     //     tempbound[wp1]++;
     //     tempbound[wp2]++;
     // }
-    PairHistogram(edgelist,boindices,tempbound);
+
+
+
+    
     //matrix<int> edgelist = this->CreateEdgeList(boindices, tempbound);
 
     string sg = "a";
     vector1<int> indexes2(total_number_of_patches,sg);
     //std::vector<mdpair> jhg(total_number_of_patches);
     
+
+
     ConnectedComponentsParallel(edgelist, indexes2);
+
+
+
     
     matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
     vector1<int> ccs(total_number_of_patches);
 
 
     SingleHistogram(indexes2,boindices2,ccs);    
+
+
     // //#pragma omp parallel for schedule(static)
     // for (int i = 0; i < total_number_of_patches; ++i)
     // {
@@ -786,50 +798,50 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
         }
 
-        
+   
 
-//     //    cout << "calc patches" << endl;
+        //     //    cout << "calc patches" << endl;
 
-//         //Having gone through all the patches to determine the bindings, we can now calculate the forces
+        //         //Having gone through all the patches to determine the bindings, we can now calculate the forces
 
-// /*         vector1<bool> visited(total_number_of_patches); //keep track of patches that we already calculated
-//         vector1<int> par1(tbt);
-//         vector1<int> par2(tbt);
-//         int tb = 0;
-//         int tb2 = 0;
-//         int iter3 = 0;
-//         for (int i = 0; i < total_number_of_patches; i++)
-//         {
-//             tb2 += bo.isbound[i];
-//             if (bo.isbound[i] == true &&  visited[i] == false)
-//             {
-//                 visited[i] = true;
-//                 visited[bo.boundto[i]] = true;
-//                 //tb += bo.isbound[i];
-//                 par1[iter3] = i;
-//                 par2[iter3] = bo.boundto[i];
-//                 iter3++;
-//             }
-//         }
+        // /*         vector1<bool> visited(total_number_of_patches); //keep track of patches that we already calculated
+        //         vector1<int> par1(tbt);
+        //         vector1<int> par2(tbt);
+        //         int tb = 0;
+        //         int tb2 = 0;
+        //         int iter3 = 0;
+        //         for (int i = 0; i < total_number_of_patches; i++)
+        //         {
+        //             tb2 += bo.isbound[i];
+        //             if (bo.isbound[i] == true &&  visited[i] == false)
+        //             {
+        //                 visited[i] = true;
+        //                 visited[bo.boundto[i]] = true;
+        //                 //tb += bo.isbound[i];
+        //                 par1[iter3] = i;
+        //                 par2[iter3] = bo.boundto[i];
+        //                 iter3++;
+        //             }
+        //         }
 
-//         cout << par1 << endl;
-//         cout << par2 << endl;
-//         for(int j  = 0  ; j < mypairs.size() ; j++) {
-//             cout << mypairs[j].a << ", ";
-//         }
-//         cout << endl;
-//         for (int j = 0; j < mypairs.size(); j++)
-//         {
-//             cout << mypairs[j].b << ", ";
-//         }
-//         cout << endl;
+        //         cout << par1 << endl;
+        //         cout << par2 << endl;
+        //         for(int j  = 0  ; j < mypairs.size() ; j++) {
+        //             cout << mypairs[j].a << ", ";
+        //         }
+        //         cout << endl;
+        //         for (int j = 0; j < mypairs.size(); j++)
+        //         {
+        //             cout << mypairs[j].b << ", ";
+        //         }
+        //         cout << endl;
 
-//         cout << mypairs.size() << endl;
+        //         cout << mypairs.size() << endl;
 
-//         cout << tbt << endl;
-//         cout << tb2 << endl;
-//         cout << tb << endl;
-//         pausel(); */
+        //         cout << tbt << endl;
+        //         cout << tb2 << endl;
+        //         cout << tb << endl;
+        //         pausel(); */
 
 
 
@@ -875,7 +887,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
            // cout << p1 << " " << p2 << endl;
             (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
-;
+
             /* 
             double dx = un.gpcons(0);
             double dy = un.gpcons(1);
@@ -940,7 +952,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             cout << "n: " << nx1 << " " << ny1 << " " << nz1 << endl;
             cout << "n2: " << nx2 << " " << ny2 << " " << nz2 << endl;
             cout << "arguments: " << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
-            pausel();  */
+            pausel();   */
 
             forces(p1, 0) += fx;
             forces(p1, 1) += fy;
