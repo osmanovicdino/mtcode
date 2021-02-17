@@ -102,7 +102,7 @@ for(int i = 0  ; i < 4 ; i++) {
             params(iter, 2) = 0.927;
         }
         else{
-            params(iter, 0) = int1;
+            params(iter, 0) = int3;
             params(iter, 1) = 1.4 * 0.75;
             params(iter, 2) = 0.927;
         }
@@ -131,8 +131,8 @@ for (int i = 0; i < 2; i++)
 }
 
 
-int n = 9000;
-int nt = 1000;
+int n = 10000;
+int nt = 2000;
 TetrahedralWithBivalent c(params,nt,n);
 
 TetrahedralWithSingle c2(10.0, 1.4, 0.927, 10., 1.4, 0.927, 10.0, 1.4, 0.927, nt, n);
