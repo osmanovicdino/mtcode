@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-30:1
+#$ -t 1-50:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -29,12 +29,12 @@ module load gcc/7.5.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-if [ -e  ~/Chemistry/Code/Basic/Scripts/params4.dat ]; then
+if [ -e  ~/Chemistry/Code/Basic/Scripts/params5.dat ]; then
    # use the unix command sed -n ${line_number}p to read by line
-   den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params4.dat | awk '{print $1}'`
-   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params4.dat | awk '{print $2}'` 
-   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params4.dat | awk '{print $3}'` 
-   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params4.dat | awk '{print $4}'`
+   den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params5.dat | awk '{print $1}'`
+   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params5.dat | awk '{print $2}'` 
+   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params5.dat | awk '{print $3}'` 
+   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params5.dat | awk '{print $4}'`
    echo "read file correctly" 
 else
    den=0.01
