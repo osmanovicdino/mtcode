@@ -39,7 +39,7 @@ dir = DirectoryName[string];
 
 str = FileBaseName[string];
 
-
+Print["export directory: "<>dir<>str<>".jpg"]
 
 Export[dir<>str<>".jpg",img]
 Print["exported successfully"];
