@@ -22,13 +22,13 @@ dm,
 2,
 Graphics[Map[Disk[#,0.5]&,pos],PlotRange->{{0,sm},{0,sm}}],
 3,
-Graphics3D[Transpose[{col,Map[Sphere[#,0.5]&,pos]}],PlotRange->{{0,sm},{0,sm},{0,sm}},ImageSize->1000],
+Graphics3D[Transpose[{col,MapIndexed[Sphere[#1, If[First[#2] < 1000, 0.5, 0.25]] &, pos]}],PlotRange->{{0,sm},{0,sm},{0,sm}},ImageSize->1000],
 _,
 Graphics[Disk[]]
 ]]
 ]
 
-img = PlotFrame[x,s,d];
+img = PlotFrame[x,77.8181,d];
 
 dir = DirectoryName[string];
 

@@ -319,8 +319,18 @@ T Power(T a, int b) { //number to an integer power
 }
 
 
-	
-
+bool list_all_files(string name) {
+len = strlen(name);
+dirp = opendir(".");
+while ((dp = readdir(dirp)) != NULL)
+    if (dp->d_namlen == len && !strcmp(dp->d_name, name))
+    {
+        (void)closedir(dirp);
+        return FOUND;
+    }
+(void)closedir(dirp);
+return NOT_FOUND;
+}
 
 
 

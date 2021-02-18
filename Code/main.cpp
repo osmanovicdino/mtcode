@@ -3,6 +3,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdarg.h>
+#include <dirent.h>
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
@@ -162,6 +163,9 @@ A.setpots(c);
 A.setviscosity(0.1);
 
 double beta = 1.;
+
+
+
 
 A.obj->setkT(1. / beta);
 

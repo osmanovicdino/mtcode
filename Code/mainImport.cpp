@@ -131,8 +131,8 @@ for (int i = 0; i < 2; i++)
 }
 
 
-int n = 10000;
-int nt = 2000;
+int n = 9000;
+int nt = 1000;
 TetrahedralWithBivalent c(params,nt,n);
 
 TetrahedralWithSingle c2(10.0, 1.4, 0.927, 10., 1.4, 0.927, 10.0, 1.4, 0.927, nt, n);
