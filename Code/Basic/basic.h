@@ -318,21 +318,59 @@ T Power(T a, int b) { //number to an integer power
     return 0;
 }
 
+int return_csv_in_current_dir(string match, vector<string> &files) {
+DIR *dir;
+struct dirent *diread;
+//vector<string> files;
 
-bool list_all_files(string name) {
-len = strlen(name);
-dirp = opendir(".");
-while ((dp = readdir(dirp)) != NULL)
-    if (dp->d_namlen == len && !strcmp(dp->d_name, name))
+if ((dir = opendir("./")) != nullptr)
+{
+    while ((diread = readdir(dir)) != nullptr)
     {
-        (void)closedir(dirp);
-        return FOUND;
+        std::string fname = diread->d_name;
+        if (fname.find(match) != std::string::npos && fname.find(".csv") != std::string::npos)
+            files.push_back(fname);
+
+        //files.push_back(diread->d_name);
     }
-(void)closedir(dirp);
-return NOT_FOUND;
+    closedir(dir);
+}
+else
+{
+    perror("opendir");
+    return EXIT_FAILURE;
 }
 
+return 0;
 
+}
+
+int return_csv_in_dir(string directory, string match, vector<string> &files)
+{
+    DIR *dir;
+    struct dirent *diread;
+    //vector<string> files;
+
+    if ((dir = opendir(directory.c_str())) != nullptr)
+    {
+        while ((diread = readdir(dir)) != nullptr)
+        {
+            std::string fname = diread->d_name;
+            if (fname.find(match) != std::string::npos && fname.find(".csv") != std::string::npos)
+                files.push_back(fname);
+
+            //files.push_back(diread->d_name);
+        }
+        closedir(dir);
+    }
+    else
+    {
+        perror("opendir");
+        return EXIT_FAILURE;
+    }
+
+    return 0;
+}
 
 #endif	/* BASIC_H */
 

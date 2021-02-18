@@ -20,6 +20,7 @@
 #include <random>
 #include <mutex>
 #include <atomic>
+#include <dirent.h>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -50,8 +51,6 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 
 using namespace std;
 
-
-
 int main(int argc, char** argv) {
 
 srand (time(NULL));
@@ -59,6 +58,20 @@ double packing_fraction;
 double int1;
 double int2;
 double int3;
+
+
+// vector<string> files;
+
+// string directory = "/home/dino/External/PhaseDiagramBivalent/den=0.01_i1=15._i2=50.0_i3=7.";
+// return_csv_in_dir(directory, "pos", files);
+
+// for (auto file : files)
+//     cout << file << "| ";
+// cout << endl;
+
+// pausel();
+
+
 int runtime;
 if(argc==6) {
 runtime = atof(argv[1]);
@@ -173,8 +186,48 @@ base += ss.str();
 
 
 //A.run_singlebond(runtime, 1000, base);
+vector<string> orientfiles;
+vector<string> posfiles;
+vector<string> bindfiles;
 
-A.run_singlebond_different_sizes(runtime, 1000, nt, base);
+return_csv_in_current_dir("orient", orientfiles);
+return_csv_in_current_dir("pos", posfiles);
+return_csv_in_current_dir("bind", bindfiles);
+
+int s1 = orientfiles.size();
+int s2 = posfiles.size();
+int s3 = bindfiles.size();
+
+    if ((s1 == 0) || (s2 == 0) || (s3 == 0)) {
+        error("no files found to import");
+    }
+
+    if( (s1 != s2 ) || (s2 != s3 ) || (s1 != s3 ) ) {
+        error("different sizes of import");
+    }
+
+    double T;
+    int TT;
+    bool vv1,vv2,vv3;
+    matrix<double> postemp = importcsv(posfiles[posfiles.size() - 1], T, vv1);
+    matrix<double> orienttemp = importcsv(orientfiles[orientfiles.size() - 1], T, vv2);
+    matrix<int> bindtemp = importcsv(bindfiles[bindfiles.size() - 1], TT, vv3);
+
+
+    A.obj->setdat(postemp);
+    A.obj->setorientation(orienttemp);
+    BinaryBindStore bbs2;
+    vector1<bool> iss(bindtemp.getncols());
+    vector1<int> ist(bindtemp.getncols());
+    for(int i  = 0 ; i < bindtemp.getncols() ; i++ ) {
+        iss[i] = (bool)bindtemp(0,i);
+        ist[i] =  bindtemp(1,i);
+    }
+    bbs2.isbound =  iss;
+    bbs2.boundto = ist;
+    //Do processing to make sure everything is fine here
+
+    A.run_singlebond_different_sizes_continue(runtime, 1000, nt, posfiles.size(), bbs2, base);
 
 /*
 int NN = 10000;

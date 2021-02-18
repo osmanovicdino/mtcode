@@ -3,7 +3,6 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdarg.h>
-#include <dirent.h>
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
