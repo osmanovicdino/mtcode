@@ -6,6 +6,7 @@ colstring=If[Length[$ScriptCommandLine]>2,$ScriptCommandLine[[3]],"void"];
 (* PeriodicAddVector[x_, y_, ll_] := Module[{dx, dx2},dx = x + y;dx2 = Map[If[# > ll, # - ll, If[# < 0, # + ll, #]] &, dx];dx2]
 rho0=5;
 n=1000; *)
+Print[$ScriptCommandLine];
 
 x = Import[string];
 d = Length[x[[1]]];
@@ -26,9 +27,13 @@ Graphics3D[Transpose[{col,MapIndexed[Sphere[#1, If[First[#2] < 1000, 0.5, 0.25]]
 _,
 Graphics[Disk[]]
 ]]
-]
+];
+
+Print["defined everything"];
 
 img = PlotFrame[x,77.8181,d];
+
+Print["Plotted Image"];
 
 dir = DirectoryName[string];
 
@@ -37,5 +42,7 @@ str = FileBaseName[string];
 
 
 Export[dir<>str<>".jpg",img]
+Print["exported successfully"];
+
 
 Exit[]
