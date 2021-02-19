@@ -23,7 +23,6 @@ echo " "
 . /u/local/Modules/default/init/modules.sh
 ## Edit the line below as needed:
 module load gcc/7.5.0
-module load mathematica/12.1
 module load ffmpeg
 
 if [ -e  ~/Chemistry/Code/Basic/Scripts/directories.txt ]; then
@@ -50,7 +49,9 @@ do
    echo "starting file\n";
    echo "$item";
    echo "\n";
+   module load mathematica/12.1;
         wolframscript -file /u/home/d/dinoo/Chemistry/Code/Plotting/PlotFrame2.wl "$item";
+   module unload mathematica/12.1;
    echo "\n";
 done
 
