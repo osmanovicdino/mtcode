@@ -1,0 +1,1 @@
+Export[FileBaseName[$ScriptCommandLine[[2]]]<>".jpg",Graphics3D[Transpose[{Map[RGBColor,Import["col.csv"]],MapIndexed[Sphere[#1, If[First[#2] < 1000, 0.5, 0.25]] &, Import[$ScriptCommandLine[[2]]]]}], ImageSize -> 1000]]

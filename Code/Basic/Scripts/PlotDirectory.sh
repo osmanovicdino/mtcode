@@ -5,10 +5,9 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=12:00:00,h_data=2G
+#$ -l h_rt=12:00:00,h_data=16G
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 8
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -51,7 +50,7 @@ do
    echo "starting file\n";
    echo "$item";
    echo "\n";
-        /u/home/d/dinoo/Chemistry/Code/Plotting/PlotFrame.wls "$item" col.csv;
+        wolframscript -file /u/home/d/dinoo/Chemistry/Code/Plotting/PlotFrame2.wl "$item";
    echo "\n";
 done
 

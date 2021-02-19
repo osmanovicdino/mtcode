@@ -30,7 +30,7 @@ else:
 
 print(data[0])
 
-graph(filename,data)
+graph(filename,data,1000)
 
 # outputfilename = os.path.splitext(filename)[0]+'.jpg'
 
