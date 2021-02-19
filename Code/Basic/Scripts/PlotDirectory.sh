@@ -23,6 +23,7 @@ echo " "
 . /u/local/Modules/default/init/modules.sh
 ## Edit the line below as needed:
 module load gcc/7.5.0
+module load mathematica/12.1
 module load ffmpeg
 
 if [ -e  ~/Chemistry/Code/Basic/Scripts/directories.txt ]; then
@@ -43,17 +44,7 @@ fi
 ##cd ~/Chemistry/Results1/
 ##./angron
 cd $dir
-all_lines=`ls -d ./pos*.csv`
-for item in $all_lines; 
-do
-   echo "starting file\n";
-   echo "$item";
-   echo "\n";
-   module load mathematica/12.1;
-        wolframscript -file /u/home/d/dinoo/Chemistry/Code/Plotting/PlotFrame2.wl "$item";
-   module unload mathematica/12.1;
-   echo "\n";
-done
+wolframscript -file /u/home/d/dinoo/Chemistry/Code/Plotting/PlotFrame2.wl
 
 ffmpeg -i pos_beta\=1_i\=%05d.jpg -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p test.mp4
 
