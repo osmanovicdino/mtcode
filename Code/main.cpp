@@ -20,6 +20,7 @@
 #include <random>
 #include <mutex>
 #include <atomic>
+#include <dirent.h>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
