@@ -44,7 +44,7 @@ fi
 ##cd ~/Chemistry/Results1/
 ##./angron
 cd $dir
-ffmpeg -i pos_beta\=1_i\=%05d.jpg -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p test.mp4
+ffmpeg -pattern_type glob -i '*.jpg' -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p test.mp4
 
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
