@@ -35,7 +35,8 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 //#include "intmatrix.h"
 #include "MDBase/MD.h"
 #include "MDBase/Langevin.h"
-
+#include "DataStructures/importbmp.h"
+#include "DataStructures/interpolation.h"
 
 // #include "BrownianGel.cpp"
 // #include "BrownianGel2.cpp"
@@ -226,6 +227,16 @@ struct spatial_viscosity {
 spatial_viscosity q;
 
 
+//BITMAP IMPORT SCHEME
+
+Bilinear3 mybmp(simulation_box_length,simulation_box_length,"./Basic/InitialConditions/TestImage.bmp"); //import bitmap
+
+mybmp.gamma_white = 1.0; //SET THE GAMMA FOR WHITE REGIONS OF THE BITMAP
+mybmp.gamma_black = 10.0; //SET THE GAMMA FOR BLACK REGIONS OF THE BITMAP
+
+// mybmp.head
+
+
 
 
 cout << "start" << endl;
@@ -245,7 +256,9 @@ p1[1] = 2; p2[1] = 3;
 p1[2] = 4; p2[2] = 5;
 
 
-a.runMTONLY_initialstate(10000,1000,q,distance_to_create_bonds_up_to,p1,p2);
+//change q to whichever you prefer, either a user defined function or the BITMAP function
+
+a.runMTONLY_initialstate(10000,1000,mybmp,distance_to_create_bonds_up_to,p1,p2);
 
 
 return 0;

@@ -32,6 +32,12 @@ class s_matrix;
 template <class T>
 class d_matrix;
 
+template <class T>
+struct Bilinear2;
+
+
+struct Bilinear3;
+
 typedef double (*enfunc)(double);
 typedef double (*func)(double, double);
 typedef double (*func2)(double,double,double);
@@ -46,6 +52,9 @@ class vector1 {
 friend class s_matrix<T>;
 friend class d_matrix<T>;
 friend class matrix<T>;
+friend struct Bilinear2<T>;
+friend struct Bilinear3;
+
 private:
 	int size; //size of the vector
 	T * data; //pointer to data members

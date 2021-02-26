@@ -23,6 +23,8 @@ template <class T>
 class matrix  {
 friend struct cube;
 friend class MD;
+friend struct Bilinear2<T>;
+friend struct Bilinear3;
 
 private:
 	int ncols; // no. of cols
