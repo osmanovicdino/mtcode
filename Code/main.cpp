@@ -182,7 +182,7 @@ base += ss.str();
 double T;
 int TT;
 bool vv1, vv2, vv3;
-matrix<double> postemp = importcsv("~/Chemistry/Code/InitialConditions/evappos.csv", T, vv1);
+matrix<double> postemp = importcsv("~/Chemistry/Code/Basic/InitialConditions/evappos.csv", T, vv1);
 matrix<double> orienttemp = importcsv("~/Chemistry/Code/Basic/InitialConditions/evapori.csv", T, vv2);
 matrix<int> bindtemp = importcsv("~/Chemistry/Code/Basic/InitialConditions/evapbin.csv", TT, vv3);
 
