@@ -132,7 +132,7 @@ for (int i = 0; i < 2; i++)
 }
 
 
-int n = 3000;
+int n = 9000;
 int nt = 1000;
 TetrahedralWithBivalent c(params,nt,n);
 
@@ -151,14 +151,14 @@ BindingModelSingle b2(0.998,0.002);
 
 b.setup_equilibrium();
 
-vector1<bool> pb(3, false);
-cube geo(l, pb, 3);
 
 
 
 Condensate A(l, n);
 
-A.obj->setgeometry(geo);
+// vector1<bool> pb(3, false);
+// cube geo(l, pb, 3);
+//A.obj->setgeometry(geo);
 
 A.setBindingModel(b2);
 
@@ -179,10 +179,33 @@ ss << beta;
 string base = "_beta=";
 base += ss.str();
 
+double T;
+int TT;
+bool vv1, vv2, vv3;
+matrix<double> postemp = importcsv("~/Chemistry/Code/InitialConditions/evappos.csv", T, vv1);
+matrix<double> orienttemp = importcsv("~/Chemistry/Code/Basic/InitialConditions/evapori.csv", T, vv2);
+matrix<int> bindtemp = importcsv("~/Chemistry/Code/Basic/InitialConditions/evapbin.csv", TT, vv3);
 
+A.obj->setdat(postemp);
+A.obj->setorientation(orienttemp);
+BinaryBindStore bbs2;
+vector1<bool> iss(bindtemp.getncols());
+vector1<int> ist(bindtemp.getncols());
+for (int i = 0; i < bindtemp.getncols(); i++)
+{
+    iss[i] = (bool)bindtemp(0, i);
+    ist[i] = bindtemp(1, i);
+}
+bbs2.isbound = iss;
+bbs2.boundto = ist;
+//Do processing to make sure everything is fine here
+
+
+
+A.run_singlebond_different_sizes_continue(runtime, 1000, nt, 0, bbs2, base);
 //A.run_singlebond(runtime, 1000, base);
 
-A.run_singlebond_different_sizes(runtime, 1000, nt, base);
+//A.run_singlebond_different_sizes(runtime, 1000, nt, base);
 
 /*
 int NN = 10000;
