@@ -103,7 +103,7 @@ for(int i = 0  ; i < 4 ; i++) {
             params(iter, 2) = 0.927;
         }
         else{
-            params(iter, 0) = int1;
+            params(iter, 0) = int3;
             params(iter, 1) = 1.4 * 0.75;
             params(iter, 2) = 0.927;
         }
@@ -132,7 +132,7 @@ for (int i = 0; i < 2; i++)
 }
 
 
-int n = 9000;
+int n = 3000;
 int nt = 1000;
 TetrahedralWithBivalent c(params,nt,n);
 
@@ -151,10 +151,14 @@ BindingModelSingle b2(0.998,0.002);
 
 b.setup_equilibrium();
 
+vector1<bool> pb(3, false);
+cube geo(l, pb, 3);
 
 
 
 Condensate A(l, n);
+
+A.obj->setgeometry(geo);
 
 A.setBindingModel(b2);
 
