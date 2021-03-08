@@ -12,7 +12,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-50:1
+#$ -t 1-40:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -24,7 +24,6 @@ echo " "
 ## Edit the line below as needed:
 module load gcc/7.5.0
 module load mathematica/12.1
-module load ffmpeg
 
 if [ -e  ~/Chemistry/Code/Basic/Scripts/directories.txt ]; then
    # use the unix command sed -n ${line_number}p to read by line
@@ -46,7 +45,7 @@ fi
 cd $dir
 wolframscript -file /u/home/d/dinoo/Chemistry/Code/Plotting/PlotFrame2.wl
 
-ffmpeg -i pos_beta\=1_i\=%05d.jpg -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p test.mp4
+## ffmpeg -i pos_beta\=1_i\=%05d.jpg -vcodec libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p test.mp4
 
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
