@@ -12,7 +12,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-50:1
+#$ -t 1-40:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
