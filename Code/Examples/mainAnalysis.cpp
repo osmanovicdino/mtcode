@@ -1,3 +1,6 @@
+/*Test case for analyzing a directory and producing the pair correlation function*/
+
+
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>

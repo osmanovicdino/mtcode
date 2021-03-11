@@ -57,22 +57,124 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
+
+    vector1<int> vec1(4);
+    vec1[0]=4;
+    vec1[1]=3;
+    vec1[2]=2;
+    vec1[3]=1;
+
+    vector1<int> numb(4);
+
+    numb[0] = 2000;
+    numb[1] = 3000;
+    numb[2] =  3500;
+    numb[3] =  7500;
+
+    int tot = 0;
+    for(int i = 0 ; i < 4 ; i++) {
+        for(int j = i ; j < 4 ; j++) {
+            tot += vec1[i]*vec1[j];
+        }
+    }
+    matrix<double> params(tot,3);
+
+    for(int i = 0  ; i < tot ; i++) {
+        params(i,0) = 10.0;
+        params(i,1) = 1.4;
+        params(i,2) = 0.927;
+    }
+
+    matrix<double> orient(10,3);
+
+    double nx1 = sqrt(8. / 9.);
+    double ny1 = 0.;
+    double nz1 = -1. / 3.;
+
+    double nx2 = -sqrt(2. / 9.);
+    double ny2 = sqrt(2. / 3.);
+    double nz2 = -1. / 3.;
+
+    double nx3 = -sqrt(2. / 9.);
+    double ny3 = -sqrt(2. / 3.);
+    double nz3 = -1. / 3.;
+
+    double nx4 = 0;
+    double ny4 = 0;
+    double nz4 = 1.;
+
+    matrix<double> asd(4,3);
+
+    asd(0,0) = nx1;
+    asd(0,1) = ny1;
+    asd(0,2) = nz1;
+
+    asd(1, 0) = nx2;
+    asd(1, 1) = ny2;
+    asd(1, 2) = nz2;
+
+    asd(2, 0) = nx3;
+    asd(2, 1) = ny3;
+    asd(2, 2) = nz3;
+
+    asd(3, 0) = nx4;
+    asd(3, 1) = ny4;
+    asd(3, 2) = nz4;
+
+    int iter = 0;
+    for(int i = 0  ; i < 4 ; i++) {
+        for(int j = 0  ; j < vec1[i] ; j++) {
+        orient(iter, 0) = asd(j, 0);
+        orient(iter, 1) = asd(j, 1);
+        orient(iter, 2) = asd(j, 2);
+        iter++;
+        }
+    }
+
+    GeneralPatch a(vec1,numb, params,orient);
+
+
+
+    cout << a.no_patches_per_type << endl;
+    cout << a.total_patches_per_type << endl;    
+    cout << a.num_per_type << endl;
+
+    int i,j;
+    a.which_particle(11500,15786,i,j);
+    cout << i << " " << j << endl;
+
+    cout << a.return_type(i) << " " << a.return_type(j) << endl;
+
+    int wpi,wpj;
+    int potn = a.pot_starters(2,3);
+    cout << potn << endl;
+    a.which_patch(i,j,potn,wpi,wpj);
+
+    cout << wpi << " " << wpj << endl;
+    
+    cout << a.which_potential(1000,3100,wpi,wpj) << endl;
+
+    
+    pausel();
+    
+
+
     // BMP a("./Basic/InitialConditions/TestImage.bmp");
 
-    Bilinear3 a(20., 20., "./Basic/InitialConditions/TestImage.bmp");
+    // Bilinear3 a(20., 20., "./Basic/InitialConditions/TestImage.bmp");
 
 
-    a.gamma_white = 2.;
-    a.gamma_black = 1.;
+    // a.gamma_white = 2.;
+    // a.gamma_black = 1.;
 
-    cout << a.data << endl;
+    // cout << a.data << endl;
 
-    for(int i = 0 ; i < 20 ; i++) {
-        for(int j = 0 ; j < 20 ; j++) {
-            cout << a(double(i),double(j)) << ", ";
-        }
-        cout << endl;
-    }
+    // for(int i = 0 ; i < 20 ; i++) {
+    //     for(int j = 0 ; j < 20 ; j++) {
+    //         cout << a(double(i),double(j)) << ", ";
+    //     }
+    //     cout << endl;
+    // }
 
    // a(10,10);
 

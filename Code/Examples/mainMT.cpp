@@ -1,3 +1,5 @@
+/*Do a simulation of microtubules */
+
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>

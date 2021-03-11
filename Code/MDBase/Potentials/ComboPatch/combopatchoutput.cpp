@@ -264,4 +264,34 @@ void TetrahedralWithBivalent::CreateFiles()
     outfunc(col, "col");
 }
 
+void GeneralPatch::CreateFiles() {
+    outfunc(orient,"ori");
+
+    matrix<double> vv(no_types,3);
+
+    for(int i = 0 ; i < no_types ; i++) {
+        vv(i, 0) = (double)rand() / (double)RAND_MAX;
+        vv(i, 1) = (double)rand() / (double)RAND_MAX;
+        vv(i, 2) = (double)rand() / (double)RAND_MAX;
+    }
+
+    vector1<int> start_and_to(no_types+1);
+
+    for(int i = 1 ; i < no_types ; i++) {
+        start_and_to[i] = num_per_type[i-1];
+    }
+
+    matrix<double> col(num_per_type[no_types-1],3);
+
+    for(int i = 0 ; i < no_types ; i++) {
+        for(int j = start_and_to[i] ; j < start_and_to[j+1] ; j++) {
+            col(j, 0) = vv(i, 0);
+            col(j, 1) = vv(i, 1);
+            col(j, 2) = vv(i, 2);
+        }
+    }
+
+    outfunc(col, "col");
+}
+
 #endif /* COMBOPATCHOUTPUT_CPP */

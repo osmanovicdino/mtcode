@@ -1,3 +1,5 @@
+/*Microtubule simulation on the GPU*/
+
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>

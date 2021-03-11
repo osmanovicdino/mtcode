@@ -223,11 +223,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 }
                 else if (b1  && b2 && !cond1) //both bound and not to each other
                 {
-                    disp2 = 0.8*disp; //if both bound, make the conditions more onerous
+                    disp2 = 0.5*disp; //if both bound, make the conditions more onerous
                 }
                 else if (!b1 != !b2) //only one bound
                 {
-                    disp2 = 0.8*disp; //more onerous
+                    disp2 = 0.7*disp; //more onerous
                 }
                 else{
                     //neither bound
@@ -416,8 +416,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     //     }
     //     //mtx.unlock();
     // }
-    
-    
+
+
 
         int number_to_reserve = MIN(2*((total_number_of_patches+1)- total_number_of_patches),total_number_of_patches/2 );
 //        // cout << number_to_reserve << endl;
@@ -688,6 +688,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                                 matched.push_back(m1);
                             }
                     }
+
+
 
                     //push back all possible pairs
 

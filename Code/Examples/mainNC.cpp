@@ -1,3 +1,6 @@
+/*simulate a non-conservative system*/
+
+
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>

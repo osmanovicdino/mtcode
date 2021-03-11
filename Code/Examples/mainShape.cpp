@@ -1,3 +1,5 @@
+/*Do a refraction simulation*/
+
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>

@@ -24,8 +24,6 @@ virtual ComboPatch *clone() const = 0;
 
 virtual void CreateFiles();
 //~ComboPatch() {delete p;}
-
-
 };
 
 
@@ -35,6 +33,7 @@ virtual void CreateFiles();
 #include "TetrahedralWithBivalent.h"
 #include "TwoTetrahedral.h"
 #include "TwoTetrahedralAndSingle.h"
+#include "GeneralPatch.h"
 #include "combopatch.cpp"
 #include "combopatchoutput.cpp"
 

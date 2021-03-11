@@ -1,3 +1,6 @@
+/*simple test case constructing a pair list using the GPU */
+
+
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
