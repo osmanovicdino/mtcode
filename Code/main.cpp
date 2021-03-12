@@ -210,8 +210,8 @@ int main(int argc, char **argv)
     A.obj->setdat(newpostemp);
     A.obj->setorientation(neworienttemp);
     BinaryBindStore bbs2;
-    vector1<bool> iss(n);
-    vector1<int> ist(n);
+    vector1<bool> iss(1000 * 4 + 2000 * 2);
+    vector1<int> ist(1000 * 4 + 2000 * 2);
     for (int i = 0; i < 1000*4+2000*2; i++)
     {
         iss[i] = (bool)bindtemp(0, i);
