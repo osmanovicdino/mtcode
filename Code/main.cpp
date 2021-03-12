@@ -12,7 +12,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
-#include <sys/ioctl.h> 
+#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <time.h>
 #include <sys/time.h>
@@ -27,8 +27,8 @@
 #include <omp.h>
 #else
 typedef int omp_int_t;
-inline omp_int_t omp_get_thread_num() { return 0;}
-inline omp_int_t omp_get_max_threads() { return 1;}
+inline omp_int_t omp_get_thread_num() { return 0; }
+inline omp_int_t omp_get_max_threads() { return 1; }
 inline omp_int_t omp_get_num_threads() { return 1; }
 #endif
 
@@ -45,169 +45,182 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 // #include "NCGasR.h"
 // #include "Microtubule.h"
 
-
-
 //#include "MDGPU.cu"
 
 using namespace std;
 
-
-
-int main(int argc, char** argv) {
-
-srand (time(NULL));
-double packing_fraction;
-double int1;
-double int2;
-double int3;
-double beta;
-int runtime;
-if(argc==4) {
-runtime = atof(argv[1]);
-packing_fraction = atof(argv[2]);
-beta = atof(argv[3]);
-}
-else {
-    runtime = 10000;
-    packing_fraction = 0.01;
-    beta = 1.0;
-}
-
-cout << packing_fraction << " " << beta <<  endl;
-
-// for(int i = 0 ; i < 28 ; i++) {
-//     params(i, 0) =  10.0; //strength 
-//     params(i, 1) =  1.4; //distance
-//     params(i, 2) = 0.927;
-// }
-
-
-
-int n = 9000;
-int nt = 1000;
-
-
-vector1<int> vec1(1);
-vec1[0] = 3;
-
-vector1<int> numb(1);
-
-numb[0] = nt;
-
-int tot = 0;
-for (int i = 0; i < 1; i++)
+int main(int argc, char **argv)
 {
-    for (int j = i; j < 1; j++)
+
+    srand(time(NULL));
+    double packing_fraction;
+    double int1;
+    double int2;
+    double int3;
+    int runtime;
+    if (argc == 6)
     {
-        tot += vec1[i] * vec1[j];
+        runtime = atof(argv[1]);
+        packing_fraction = atof(argv[2]);
+        int1 = atof(argv[3]);
+        int2 = atof(argv[4]);
+        int3 = atof(argv[5]);
     }
-}
-
-
-cout << tot << endl;
-
-
-matrix<double> params2(tot, 3);
-
-for (int i = 0; i < tot; i++)
-{
-    params2(i, 0) = 10.0;
-    params2(i, 1) = 1.4;
-    params2(i, 2) = 0.927;
-}
-
-matrix<double> orient(3, 3);
-
-double nx1 = 0.0;
-double ny1 = 1.;
-double nz1 = 0.0;
-
-double nx2 = -sqrt(12. / 16.);
-double ny2 = -1./2.;
-double nz2 = 0.0;
-
-double nx3 = sqrt(12. / 16.);
-double ny3 = -1./2.;
-double nz3 = 0;
-
-
-matrix<double> asd(3, 3);
-
-asd(0, 0) = nx1;
-asd(0, 1) = ny1;
-asd(0, 2) = nz1;
-
-asd(1, 0) = nx2;
-asd(1, 1) = ny2;
-asd(1, 2) = nz2;
-
-asd(2, 0) = nx3;
-asd(2, 1) = ny3;
-asd(2, 2) = nz3;
-
-
-int iter2 = 0;
-for (int i = 0; i < 1; i++)
-{
-    for (int j = 0; j < vec1[i]; j++)
+    else
     {
-        orient(iter2, 0) = asd(j, 0);
-        orient(iter2, 1) = asd(j, 1);
-        orient(iter2, 2) = asd(j, 2);
-        iter2++;
+        runtime = 10000;
+        packing_fraction = 0.01;
+        int1 = 15.0;
+        int2 = 10.0;
+        int3 = 10.0;
     }
-}
+    matrix<double> params(28, 3);
 
+    cout << packing_fraction << " " << int1 << " " << int2 << " " << int3 << endl;
 
+    // for(int i = 0 ; i < 28 ; i++) {
+    //     params(i, 0) =  10.0; //strength
+    //     params(i, 1) =  1.4; //distance
+    //     params(i, 2) = 0.927;
+    // }
 
-GeneralPatch c4(vec1, numb, params2, orient);
+    int iter = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            params(iter, 0) = int1;
+            params(iter, 1) = 1.4;
+            params(iter, 2) = 0.927;
+            iter++;
+        }
+    }
 
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            if (j == 1)
+            {
+                params(iter, 0) = int2;
+                params(iter, 1) = 1.4 * 0.75;
+                params(iter, 2) = 0.927;
+            }
+            else
+            {
+                params(iter, 0) = int3;
+                params(iter, 1) = 1.4 * 0.75;
+                params(iter, 2) = 0.927;
+            }
+            iter++;
+        }
+    }
 
-//double packing_fraction = 0.02;
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
 
-double l = cbrt(pi * (double)nt / (6. * packing_fraction));
+            if (i == 0 && j == 0)
+            {
+                params(iter, 0) = int3;
+                params(iter, 1) = 1.4 * 0.5;
+                params(iter, 2) = 0.927;
+            }
+            else
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = 1. * 0.5;
+                params(iter, 2) = 0.927;
+            }
 
-BindingModelBinary b(nt*4);
+            iter++;
+        }
+    }
 
-BindingModelSingle b2(0.998,0.002);
+    int n = 3000;
+    int nt = 1000;
+    TetrahedralWithBivalent c(params, nt, n);
 
-b.setup_equilibrium();
+    TetrahedralWithSingle c2(10.0, 1.4, 0.927, 10., 1.4, 0.927, 10.0, 1.4, 0.927, nt, n);
 
+    TetrahedralPatch c3(20.0, 1.4, 0.927);
 
-Condensate A(l, nt);
+    //double packing_fraction = 0.02;
 
-// vector1<bool> pb(3, false);
-// cube geo(l, pb, 3);
-//A.obj->setgeometry(geo);
+    double l = cbrt(pi * (double)n / (6. * packing_fraction));
 
-A.setBindingModel(b2);
+    BindingModelBinary b(nt * 4);
 
-A.setpots(c4);
+    BindingModelSingle b2(0.998, 0.002);
 
+    b.setup_equilibrium();
 
+    Condensate A(l, n);
 
-A.setviscosity(0.1);
+    // vector1<bool> pb(3, false);
+    // cube geo(l, pb, 3);
+    //A.obj->setgeometry(geo);
 
-//double beta = 1.;
+    A.setBindingModel(b2);
 
+    A.setpots(c);
 
+    A.setviscosity(0.1);
 
+    double beta = 1.;
 
-A.obj->setkT(1. / beta);
+    A.obj->setkT(1. / beta);
 
-stringstream ss;
-ss << beta;
+    stringstream ss;
+    ss << beta;
 
-string base = "_beta=";
-base += ss.str();
+    string base = "_beta=";
+    base += ss.str();
 
+    double T;
+    int TT;
+    bool vv1, vv2, vv3;
+    matrix<double> postemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/evappos.csv", T, vv1);
+    matrix<double> orienttemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/evapori.csv", T, vv2);
+    matrix<int> bindtemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/evapbin.csv", TT, vv3);
 
+    // matrix<double> postemp = importcsv("./Basic/InitialConditions/evappos.csv", T, vv1);
+    // matrix<double> orienttemp = importcsv("./Basic/InitialConditions/evapori.csv", T, vv2);
+    // matrix<int> bindtemp = importcsv("./Basic/InitialConditions/evapbin.csv", TT, vv3);
 
-A.run_singlebond(runtime, 1000, base);
+    matrix<double> newpostemp(n, 3);
+    matrix<double> neworienttemp(n, 3);
 
-//A.run_singlebond_different_sizes(runtime, 1000, nt, base);
+    for(int i = 0  ; i < n ; i++) {
+        newpostemp(i, 0) = postemp(i, 0);
+        newpostemp(i, 1) = postemp(i, 1);
+        newpostemp(i, 2) = postemp(i, 2);
+        neworienttemp(i, 0) = orienttemp(i, 0);
+        neworienttemp(i, 1) = orienttemp(i, 1);
+        neworienttemp(i, 2) = orienttemp(i, 2);
+    }
 
-/*
+    A.obj->setdat(newpostemp);
+    A.obj->setorientation(neworienttemp);
+    BinaryBindStore bbs2;
+    vector1<bool> iss(n);
+    vector1<int> ist(n);
+    for (int i = 0; i < n; i++)
+    {
+        iss[i] = (bool)bindtemp(0, i);
+        ist[i] = bindtemp(1, i);
+    }
+    bbs2.isbound = iss;
+    bbs2.boundto = ist;
+    //Do processing to make sure everything is fine here
+
+    A.run_singlebond_different_sizes_continue(runtime, 1000, nt, 0, bbs2, base);
+    //A.run_singlebond(runtime, 1000, base);
+
+    //A.run_singlebond_different_sizes(runtime, 1000, nt, base);
+
+    /*
 int NN = 10000;
 matrix<double> F(NN, 3);
 matrix<double> T(NN, 3);
@@ -255,5 +268,5 @@ for(int i = 0 ; i < 20000 ; i++) {
  }
 */
 
-return 0;
+    return 0;
 }
