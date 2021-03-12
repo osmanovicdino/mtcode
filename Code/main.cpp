@@ -212,7 +212,7 @@ int main(int argc, char **argv)
     BinaryBindStore bbs2;
     vector1<bool> iss(n);
     vector1<int> ist(n);
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < 1000*4+2000*2; i++)
     {
         iss[i] = (bool)bindtemp(0, i);
         ist[i] = bindtemp(1, i);
