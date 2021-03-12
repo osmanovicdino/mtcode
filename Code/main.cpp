@@ -190,7 +190,7 @@ int main(int argc, char **argv)
     // matrix<int> bindtemp = importcsv("./Basic/InitialConditions/evapbin.csv", TT, vv3);
 
     matrix<double> newpostemp(n, 3);
-    matrix<double> neworienttemp(n, 3);
+    matrix<double> neworienttemp(n, 9);
 
     for(int i = 0  ; i < n ; i++) {
         newpostemp(i, 0) = postemp(i, 0);
@@ -199,6 +199,12 @@ int main(int argc, char **argv)
         neworienttemp(i, 0) = orienttemp(i, 0);
         neworienttemp(i, 1) = orienttemp(i, 1);
         neworienttemp(i, 2) = orienttemp(i, 2);
+        neworienttemp(i, 3) = orienttemp(i, 3);
+        neworienttemp(i, 4) = orienttemp(i, 4);
+        neworienttemp(i, 5) = orienttemp(i, 5);
+        neworienttemp(i, 6) = orienttemp(i, 6);
+        neworienttemp(i, 7) = orienttemp(i, 7);
+        neworienttemp(i, 8) = orienttemp(i, 8);
     }
 
     A.obj->setdat(newpostemp);
