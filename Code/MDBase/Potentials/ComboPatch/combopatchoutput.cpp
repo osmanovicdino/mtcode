@@ -17,6 +17,31 @@ void ComboPatch::CreateFiles() {
     outfunc(col, "col");
 }
 
+void BivalentPatch::CreateFiles()
+{
+    matrix<double> v(2, 3);
+    v(0, 0) = nx1;
+    v(0, 1) = ny1;
+    v(0, 2) = nz1;
+
+    //vector1<double> v2(3);
+
+    v(1, 0) = nx2;
+    v(1, 1) = ny2;
+    v(1, 2) = nz2;
+
+    //vector1<double> v3(3);
+
+    outfunc(v, "ori");
+
+    matrix<double> col(1, 3);
+    col(0, 0) = 0.;
+    col(0, 1) = 0.5;
+    col(0, 2) = 0.5;
+
+    outfunc(col, "col");
+}
+
 void TetrahedralPatch::CreateFiles() {
     matrix<double> v(4, 3);
     v(0, 0) = nx1;

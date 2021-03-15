@@ -39,6 +39,7 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 #include "MDBase/Langevin.h"
 //#include "MDBase/LangevinR.h"
 #include "Condensate/Condensate.h"
+#include "Nanotube/Nanotube.h"
 #include "DataStructures/importbmp.h"
 #include "DataStructures/interpolation.h"
 // #include "NCGasR.h"
@@ -57,6 +58,14 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
+    NanotubeAssembly A(30.,1000);
+
+    // BivalentPatch p2(100.0,1.3,pi/3.);
+    // A.setpots(p2);
+
+
+    A.run(100000,100);
+/* 
 
     vector1<int> vec1(4);
     vec1[0]=4;
@@ -156,7 +165,7 @@ int main(int argc, char **argv)
 
     
     pausel();
-    
+     */
 
 
     // BMP a("./Basic/InitialConditions/TestImage.bmp");

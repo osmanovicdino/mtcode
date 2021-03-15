@@ -522,7 +522,7 @@ void LangevinNVTR::rotate() {
 void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialtheta3D &iny, matrix<double> &forces, matrix<double> &torques)
 {
 
-#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < pairs.getNsafe(); ++i)
     {
         int p1 = pairs(i, 0);
@@ -624,6 +624,8 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
 
     void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, ComboPatch &iny, matrix<double> &forces, matrix<double> &torques)
     {
+
+
         #pragma omp parallel for
         for (int i = 0; i < pairs.getNsafe(); ++i)
         {
@@ -639,12 +641,23 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
             dis = sqrt(dis);
 
             un /= dis;
-
-            iny.UpdateIterator(p1,p2); // this points the patch pointer to the correct particles
-
-            for (int tp = 1; tp < (*(iny.p))[0]+1; tp++)
+            int **q = new int *;
+            
+            if (iny.safe)
             {
-                int potn =  (*(iny.p))[tp];
+                iny.UpdateIterator(p1, p2);
+                *q = *iny.p;
+            }
+            else
+            {
+                iny.UpdateIteratorSafe(p1, p2, q);
+            }
+            //iny.UpdateIterator(p1,p2); // this points the patch pointer to the correct particles
+
+            for (int tp = 1; tp < (*q)[0] + 1; tp++)
+            {
+                
+                int potn = (*q)[tp];
                 double fx;
                 double fy;
                 double fz;
@@ -656,7 +669,7 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
                 double tjx;
                 double tjy;
                 double tjz;
-
+                //cout << p1 << " " << p2 << " " << tp  << " " << potn << endl;
                 (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
 
 
@@ -681,6 +694,7 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
                 torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
                 torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
             }
+            delete q;
         }
     }
 

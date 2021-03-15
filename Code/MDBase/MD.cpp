@@ -1387,7 +1387,103 @@ matrix<double> MD::calculateforces_truncated(matrix<int> &pairs, double above) {
 }
 
 
+class spherical_confinement_3D {
+	private:
+	double rmax;
+
+	double v;
+
+	double shft;
 
 
+	public:
+	spherical_confinement_3D() : rmax(10.0), v(1.0), shft(5.)
+	{
+	}
+
+	spherical_confinement_3D(double rmaxx, double vv, double shftt) : rmax(rmaxx), v(vv), shft(shftt)
+	{
+
+	}
+	spherical_confinement_3D& operator=(const spherical_confinement_3D &old) {
+		rmax = old.rmax;
+		v = old.v;
+		shft = old.shft;
+		return *this ;
+	}
+
+	vector1<double> operator()(const vector1<double> &x) const {
+		
+		//for(int j = 0  ; j < 3 ; )
+		// double r = sqrt(SQR(x.gpcons(0)) + SQR(x.gpcons(1)) + SQR(x.gpcons(2)));
+		double r = sqrt(SQR(x.gpcons(0)-shft) + SQR(x.gpcons(1)-shft) + SQR(x.gpcons(2)-shft));
+
+
+
+		vector1<double> force(3);
+
+		if(abs(r-rmax) > 2.) return force;
+		else {
+
+		double r2 = SQR(r-rmax);
+
+		double r6 = CUB(r2);
+
+		double r12 = SQR(r6);
+
+		force[0] = 12 * v * (x.gpcons(0)-shft) / (r * (r - rmax) * r12);
+		force[1] = 12 * v * (x.gpcons(1)-shft) / (r * (r - rmax) * r12);
+		force[2] = 12 * v * (x.gpcons(2)-shft) / (r * (r - rmax) * r12);
+
+		return force;
+		}
+	}
+
+};
+
+template <class Q>
+matrix<double> MD::calculateforces_external(Q &func)
+{
+
+	matrix<double> forces((*dat).getNsafe(), dimension);
+	//vec_vec<double> outputs(pairs.getn());
+	// ofstream myfile;
+	// myfile.open("forces.csv", ios::out | ios::app);
+	//cout << pairs.getNsafe() << endl;
+	//potential * pot = ints(0,1,0).clone();
+
+	#pragma omp parallel for
+	for (int i = 0; i < (*dat).getNsafe(); i++)
+	{
+
+		double dis;
+		//vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+		vector1<double> un = (*dat).getrowvector(i);
+		//int p1 = pairs.mat[i*2+0];
+		//int p2 = pairs.mat[i*2+1];
+		//geo->distance_vector(*dat,p1,p2,un,dis);
+
+		// int p1 = pairs.mat[i * 2 + 0] * dimension;
+		// int p2 = pairs.mat[i * 2 + 1] * dimension;
+
+
+		vector1<double> f =  func(un);
+		// cout << f << endl;
+		// pausel();
+		// geo->distance3v((*dat).mat[p1 + 0], (*dat).mat[p2 + 0], (*dat).mat[p1 + 1], (*dat).mat[p2 + 1], (*dat).mat[p1 + 2], (*dat).mat[p2 + 2], un, dis);
+
+		//double f1 = (*ints).force2mdx(dis);
+
+		for (int j = 0; j < dimension; j++)
+		{
+			//double fac = f1 * un[j];
+			//if(f[j]>0) { cout << f[j] << endl; pausel(); }
+			(forces).mat[i* dimension + j] += f[j];
+			//(forces).mat[pairs.mat[i * 2 + 1] * dimension + j] += -fac;
+		}
+	}
+
+	return forces;
+}
 
 //void MD::adv(matrix<int> &pairs) { error("adv function not overriden matrix");}

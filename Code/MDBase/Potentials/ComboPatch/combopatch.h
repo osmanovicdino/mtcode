@@ -28,6 +28,7 @@ virtual void CreateFiles();
 
 
 #include "SingPatch.h"
+#include "BivalentPatch.h"
 #include "TetrahedralPatch.h"
 #include "TetrahedralWithSingle.h"
 #include "TetrahedralWithBivalent.h"

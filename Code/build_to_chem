@@ -2,4 +2,4 @@
 var=$1
 mkdir -p /home/dino/Desktop/Chemistry/SimulationResults/$var/
 cp main.cpp /home/dino/Desktop/Chemistry/SimulationResults/$var/
-g++ -fopenmp main.cpp -o /home/dino/Desktop/Chemistry/SimulationResults/$var/angron
+g++ -fopenmp maintest.cpp -o /home/dino/Desktop/Chemistry/SimulationResults/$var/angron

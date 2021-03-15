@@ -94,6 +94,9 @@ matrix<double> calculateforces_threebody(matrix<int>&,potential3&);
 matrix<double> calculatestress(matrix<int>&); //calculate the stress;
 matrix<double> calculateforces_truncated(matrix<int>&, double); //calculate the forces using the pairs as an input
 matrix<double> calculateforces_fast3D(matrix<int>&);
+
+template <class Q>
+matrix<double> calculateforces_external(Q&);
 //s_matrix<double> calculateforces(matrix<int>&,vector1<int>&,vector1<bool>&,intmatrix&); //calculate the forces using the pairs as an input
 
 //virtual double calculate_energy(vec_vec<int>&);

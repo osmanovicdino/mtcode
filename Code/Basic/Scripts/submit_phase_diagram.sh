@@ -45,7 +45,7 @@ cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramTrivalent/${dirwemak
 g++ -std=c++11 -fopenmp ~/Chemistry/Code/main.cpp -o /u/scratch/d/dinoo/PhaseDiagramTrivalent/${dirwemake}/angron
 cd /u/scratch/d/dinoo/PhaseDiagramTrivalent/${dirwemake}
 export OMP_NUM_THREADS=8
-./angron 1000000 $den $beta >log
+./angron 1000000 0.05 $beta >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
