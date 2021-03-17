@@ -281,8 +281,12 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
     obj->calculateforces(*pairs, wsa);
 
-
+    //cout << "fi" << endl;
+    //cout << "fi" << endl;
     obj->calculate_forces_and_torques3D_onlyone(*pairs, *pots, bbs , *bm, F, T);
+    //cout << "fi2" << endl;
+
+
     generate_uniform_random_matrix(RT);
     obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
@@ -317,6 +321,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
         T.reset(0.0);
 
         obj->calculate_forces_and_torques3D_onlyone(*pairs, *pots, bbs, *bm, F, T);
+
 
         generate_uniform_random_matrix(RT);
         obj->create_forces_and_torques_sphere(F, T, RT);

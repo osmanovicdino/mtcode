@@ -379,14 +379,20 @@ void BindingModelTernary::triplet(bool b12, bool b23, bool b13, bool c12, bool c
     int indt1,indt2,indt3;
     sort_triplet(ind1,ind2,ind3,indt1,indt2,indt3);
 
-    rtemp = get_trate(indt1,indt2,indt3);
 
     
+    rtemp = get_trate(indt1,indt2,indt3);
 
     double r1 = c12 * rtemp[i1 * 4 + 0]; //goes to bind 12
     double r2 = c23 * rtemp(i1 * 4 + 1); //goes to bind 23
     double r3 = c13 * rtemp[i1 * 4 + 2]; //goes to bind 13
     double r4 = rtemp[i1 * 4 + 3];       //goes to none-bound
+
+    // cout << i1 << endl;
+    // cout << rtemp << endl;
+    // cout << indt1 << " " << indt2 << " " << indt3 << endl;
+    // cout << r1 << " " << r2 << " " << r3 << " " << r4 << endl;
+    // pausel();
 
     double totalr = r1 + r2 + r3 + r4;
 
@@ -398,13 +404,13 @@ void BindingModelTernary::triplet(bool b12, bool b23, bool b13, bool c12, bool c
         a23 = false;
         a13 = false;
     }
-    else if (rr >= r1 && rr < r2)
+    else if (rr >= r1 && rr < r1+r2)
     {
         a12 = false;
         a23 = true;
         a13 = false;
     }
-    else if (rr >= r2 && rr < r3)
+    else if (rr >= r1+r2 && rr < r1+r2+r3)
     {
         a12 = false;
         a23 = false;

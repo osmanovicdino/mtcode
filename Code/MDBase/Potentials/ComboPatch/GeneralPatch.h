@@ -15,10 +15,10 @@ struct GeneralPatch : ComboPatch {
     int **i1; //as it is of indeterminate length we have to have a double pointer.
 
     GeneralPatch(vector1<int>no_patches_per_typee, vector1<int> num_per_typee, matrix<double>&, matrix<double>& );
-
+    GeneralPatch(const GeneralPatch&);
 
     ~GeneralPatch() {
-        for(int i = 0; i < no_types*(no_types-1)/2 ; i++) {
+        for(int i = 0; i < no_types*(no_types+1)/2 ; i++) {
             delete i1[i];
         }
         delete [] i1;

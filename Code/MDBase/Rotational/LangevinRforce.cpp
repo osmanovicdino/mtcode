@@ -92,6 +92,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     int total_number_of_patches = bo.boundto.getsize();//iny.get_total_patches(this->getN());
 
 
+
     vector1<int> tempbound(total_number_of_patches,0); //no binding to begin wtih
 
     int depth_of_matrix = 10; //Choose this value to be deep enough such that all values can be stored
@@ -173,6 +174,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
 
 
+
+
             //int **q = iny.p;
 
             for (int tp = 1; tp < (*q)[0] + 1; tp++)
@@ -215,6 +218,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double disp2;
                 bool cond1 =  bo.boundto[wp1] == wp2;
                 bool b1,b2;
+                
                 b1 = bo.isbound[wp1];
                 b2 = bo.isbound[wp2];
 

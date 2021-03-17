@@ -309,7 +309,7 @@ void GeneralPatch::CreateFiles() {
     matrix<double> col(num_per_type[no_types-1],3);
 
     for(int i = 0 ; i < no_types ; i++) {
-        for(int j = start_and_to[i] ; j < start_and_to[j+1] ; j++) {
+        for(int j = start_and_to[i] ; j < start_and_to[i+1] ; j++) {
             col(j, 0) = vv(i, 0);
             col(j, 1) = vv(i, 1);
             col(j, 2) = vv(i, 2);

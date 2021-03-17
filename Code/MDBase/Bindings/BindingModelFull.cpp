@@ -117,12 +117,12 @@ void BindingModelFull::triplet(bool b12, bool b23, bool b13, bool c12, bool c23,
         a23 = false;
         a13 = false;
     }
-    else if(rr>=r1 && rr <r2) {
+    else if(rr>=r1 && rr <r1+r2) {
         a12 = false;
         a23 = true;
         a13 = false;
     }
-    else if(rr>=r2 && rr < r3 ) {
+    else if(rr>=r1+r2 && rr < r1+r2+r3 ) {
         a12 = false;
         a23 = false;
         a13 = true;

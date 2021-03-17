@@ -28,27 +28,33 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
     if(orient.getnrows() != total_no_of_orients) error("incorrect no. of orientations");
 
 
-    int ht =  no_types*(no_types-1)/2;
+    int ht =  no_types*(no_types+1)/2;
     i1 = new int *[ht]; // allocate an array of 10 int pointers — these are our rows
 
     
     int hj = 0;
+    int nn = 0;
     for(int i = 0 ; i < no_types ; i++ ) {
         for(int j = i ; j< no_types; j++) {
             pot_starters(i,j) = hj;
-            i1[i*no_types+j] = new int [1+no_patches_per_type[i]*no_patches_per_type[j]];
+            i1[nn] = new int [1+no_patches_per_type[i]*no_patches_per_type[j]];
 
 
-            i1[i*no_types+j][0] = no_patches_per_type[i]*no_patches_per_type[j];
+            i1[nn][0] = no_patches_per_type[i]*no_patches_per_type[j];
+           
+            
 
             for (int k = 0; k < no_patches_per_type[i] * no_patches_per_type[j] ; k++) {
-                i1[i * no_types + j][k+1] =  hj;
+                i1[nn][k+1] =  hj;
                 hj++;
             }
+            nn++;
         }
     }
 
     p = &i1[0];
+
+
 
     safe = false;
 
@@ -85,6 +91,82 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
 
 }
 
+GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnrows()), params(a.params), orient(a.orient), no_patches_per_type(a.no_patches_per_type), num_per_type(a.num_per_type), total_patches_per_type(a.total_patches_per_type), pot_starters(a.pot_starters)
+{
+    
+    no_types = no_patches_per_type.getsize();
+    
+    int total_no_of_orients = 0;
+    vector1<int> start_and_end_points(no_types + 1);
+    start_and_end_points[0] = 0;
+
+    for (int i = 0; i < no_patches_per_type.getsize(); i++)
+    {
+        total_no_of_orients += no_patches_per_type[i];
+        start_and_end_points[i + 1] = total_no_of_orients;
+    }
+
+
+
+    int ht = no_types * (no_types+1) / 2;
+    i1 = new int *[ht]; // allocate an array of 10 int pointers — these are our rows
+
+    int hj = 0;
+    int nn = 0;
+    for (int i = 0; i < no_types; i++)
+    {
+        for (int j = i; j < no_types; j++)
+        {
+
+
+            pot_starters(i, j) = hj;
+
+            i1[nn] = new int[1 + no_patches_per_type[i] * no_patches_per_type[j]];
+
+            i1[nn][0] = no_patches_per_type[i] * no_patches_per_type[j];
+
+            for (int k = 0; k < no_patches_per_type[i] * no_patches_per_type[j]; k++)
+            {
+                i1[nn][k + 1] = hj;
+                hj++;
+            }
+            nn++;
+        }
+    }
+
+    p = &i1[0];
+
+    safe = false;
+
+    int iter = 0;
+
+    for (int i = 0; i < no_types; i++)
+    {
+        for (int j = i; j < no_types; j++)
+        {
+            // for(int i1  = 0 ; i1 < no_patches_per_type[i] ; i1++ ) {
+            //     for(int j1 = 0 ; j1 < no_pathes_per_type[j] ; j1++) {
+
+            int starti = start_and_end_points[i];
+            int endi = start_and_end_points[i + 1];
+            int startj = start_and_end_points[j];
+            int endj = start_and_end_points[j + 1];
+
+            for (int i2 = starti; i2 < endi; i2++)
+            {
+                for (int j1 = startj; j1 < endj; j1++)
+                {
+                    mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
+
+                    potential_bundle[iter] = pot1->clone();
+                    delete pot1;
+                    iter++;
+                }
+            }
+        }
+    }
+
+}
 
 inline int GeneralPatch::return_type(int i) {
 
@@ -122,9 +204,9 @@ void GeneralPatch::UpdateIterator(const int &i, const int &j) {
 int k1 = return_type(i);
 int k2 = return_type(j);
 
-p=&(i1[k1*no_types+k2]);
+// no_types*k1 - (k1*(1 + k1))/2. + k2
 
-
+p = &(i1[ no_types*k1 - (k1*(1 + k1))/2 + k2 ]);
 }
 
 
@@ -132,7 +214,7 @@ void GeneralPatch::UpdateIteratorSafe(const int &i, const int &j, int **q) {
     int k1 = return_type(i);
     int k2 = return_type(j);
 
-    *q = (i1[k1 * no_types + k2]);
+    *q = (i1[no_types * k1 - (k1 * (1 + k1)) / 2 + k2]);
 }
 
 int GeneralPatch::get_total_patches(const int &N) {
@@ -154,7 +236,7 @@ int GeneralPatch::get_total_patches(const int &N) {
 
     int potstart = potn - pot_starters(k1,k2);
 
-    int ori = no_patches_per_type[k1];
+    int ori = no_patches_per_type[k2];
 
     int k3 = potstart / ori;
     int k4 = potstart % ori;
@@ -164,6 +246,8 @@ int GeneralPatch::get_total_patches(const int &N) {
 
     int startpi = k1 == 0 ? 0 : num_per_type[k1 - 1];
     int startpj = k2 == 0 ? 0 : num_per_type[k2 - 1];
+
+
 
     wpi = starti + (i-startpi) * no_patches_per_type[k1] + k3;
     wpj = startj + (j-startpj) * no_patches_per_type[k2] + k4;
@@ -216,7 +300,9 @@ int GeneralPatch::get_total_patches(const int &N) {
 
      int potstart = potn - pot_starters(k1, k2);
 
-     int ori = no_patches_per_type[k1];
+     int ori = no_patches_per_type[k2];
+
+
 
      int k3 = potstart / ori;
      int k4 = potstart % ori;
@@ -230,14 +316,14 @@ int GeneralPatch::get_total_patches(const int &N) {
     for (int j1 = 0; j1 < k2; j1++)
          startj += no_patches_per_type[j1];
 
-     nxb1 = orient(starti + k3, 0);
-     nyb1 = orient(starti + k3, 1);
-     nzb1 = orient(starti + k3, 2);
 
-     nxb2 = orient(startj + k4, 0);
-     nyb2 = orient(startj + k4, 1);
-     nzb2 = orient(startj + k4, 2);
+    nxb1 = orient(starti + k3, 0);
+    nyb1 = orient(starti + k3, 1);
+    nzb1 = orient(starti + k3, 2);
+
+    nxb2 = orient(startj + k4, 0);
+    nyb2 = orient(startj + k4, 1);
+    nzb2 = orient(startj + k4, 2);
  }
 
- 
 #endif /* GENERALPATCH_CPP */
