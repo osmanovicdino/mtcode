@@ -288,7 +288,7 @@ int GeneralPatch::get_total_patches(const int &N) {
      int patchi = (wpi - starti) % no_patches_per_type[k1];
      int patchj = (wpj - startj) % no_patches_per_type[k2];
 
-     return potstart + patchi*no_patches_per_type[k1]+patchj;
+     return potstart + patchi*no_patches_per_type[k2]+patchj;
  }
 
  void GeneralPatch::get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12) {

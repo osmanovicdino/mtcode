@@ -370,6 +370,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         }
     }
 
+
     //save connectivity
     // for(int i = 0  ; i < edgelist.size() ; i++) {
     //     int wp1 = edgelist[i].a;
@@ -804,7 +805,6 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
         }
 
-   
 
         //     //    cout << "calc patches" << endl;
 
@@ -891,9 +891,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             double tjy;
             double tjz;
 
-           // cout << p1 << " " << p2 << endl;
             (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
-
             /* 
             double dx = un.gpcons(0);
             double dy = un.gpcons(1);
@@ -978,9 +976,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         }
 //UP TO HERE
 
-        //check std atomic
-        
-       // cout << "forces" << endl;
+
         /* 
         #pragma omp parallel for
         for (int i = 0; i < total_number_of_patches; ++i)

@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
-    //signal(SIGSEGV, handler);
+    signal(SIGSEGV, handler);
 
     double packing_fraction;
     double int1;
