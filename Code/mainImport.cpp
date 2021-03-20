@@ -21,6 +21,9 @@
 #include <mutex>
 #include <atomic>
 #include <dirent.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <unistd.h>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -54,86 +57,126 @@ using namespace std;
 int main(int argc, char** argv) {
 
 srand (time(NULL));
+
 double packing_fraction;
 double int1;
 double int2;
 double int3;
-
-
-// vector<string> files;
-
-// string directory = "/home/dino/External/PhaseDiagramBivalent/den=0.01_i1=15._i2=50.0_i3=7.";
-// return_csv_in_dir(directory, "pos", files);
-
-// for (auto file : files)
-//     cout << file << "| ";
-// cout << endl;
-
-// pausel();
-
-
 int runtime;
-if(argc==6) {
-runtime = atof(argv[1]);
-packing_fraction = atof(argv[2]);
-int1 = atof(argv[3]);
-int2 = atof(argv[4]);
-int3 = atof(argv[5]);
+if (argc == 6)
+{
+    runtime = atof(argv[1]);
+    packing_fraction = atof(argv[2]);
+    int1 = atof(argv[3]);
+    int2 = atof(argv[4]);
+    int3 = atof(argv[5]);
 }
-else {
+else
+{
     runtime = 10000;
     packing_fraction = 0.01;
-    int1 =15.0;
+    int1 = 15.0;
     int2 = 10.0;
     int3 = 10.0;
 }
-matrix<double> params(28,3);
 
-cout << packing_fraction << " " << int1 << " " << int2 << " " << int3 << endl;
+cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
 
 // for(int i = 0 ; i < 28 ; i++) {
-//     params(i, 0) =  10.0; //strength 
+//     params(i, 0) =  10.0; //strength
 //     params(i, 1) =  1.4; //distance
 //     params(i, 2) = 0.927;
 // }
+int m1 = 2000;
+int m2 = 6000;
+int n = 10000;
+BindingModelTernary b(m1 * 4, m1 * 4 + 4 * (m2 - m1));
+
+// b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
+// 0.,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0,
+// 0.0);
+
+b.setup(0.99, 0.01, 0.99, 0.2, 0.99, 0.2,
+        0.,
+        0.,
+        0.,
+        0.0,
+        -2.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0);
+
+// vector1<int> cc(4);
+
+// for(int k = 0; k < 100000 ; k++) {
+// bool after1, after2,after3;
+// b.triplet(false,false,true,true,true,true, 6000,20000,28000,after1,after2,after3);
+
+// if(after1) {
+//     cc[0]++;
+// }
+// else if(after2) {
+//     cc[1]++;
+// }
+// else if(after3) {
+//     cc[2]++;
+// }
+// else {
+//     cc[3]++;
+// }
+// }
+// cout << cc << endl;
+// pausel();
+
+// pausel();
+
+vector1<int> vec1(3);
+vec1[0] = 4;
+vec1[1] = 4;
+vec1[2] = 2;
+
+vector1<int> numb(3);
+
+numb[0] = m1;
+numb[1] = m2;
+numb[2] = n;
+
+int tot = 4 * 4 + 4 * 2 + 4 * 4 + 3 * 2 + 4 * 2 + 4 * 4;
+matrix<double> params(tot, 3);
 
 int iter = 0;
-for(int i = 0  ; i < 4 ; i++) {
-    for(int j = 0  ; j < 4 ; j++) {
-        params(iter,0) = int1;
-        params(iter,1) = 1.4;
-        params(iter,2) =  0.927;
-        iter++;
-    }
-}
-
-for(int i = 0  ; i < 4 ; i++) {
-    for(int j = 0 ; j < 2 ; j++) {
-        if(j==1) {
-            params(iter, 0) = int2;
-            params(iter, 1) = 1.4*0.75;
-            params(iter, 2) = 0.927;
-        }
-        else{
-            params(iter, 0) = int3;
-            params(iter, 1) = 1.4 * 0.75;
-            params(iter, 2) = 0.927;
-        }
-        iter++;
-    }
-}
-
-for (int i = 0; i < 2; i++)
+for (int i = 0; i < 4; i++)
 {
-    for (int j = 0; j < 2; j++)
+    for (int j = 0; j < 4; j++)
+    {
+        params(iter, 0) = int1;
+        params(iter, 1) = 1.4;
+        params(iter, 2) = 0.927;
+        iter++;
+    }
+}
+
+for (int i = 0; i < 4; i++)
+{
+    for (int j = 0; j < 4; j++)
     {
 
-        if(i==0 && j ==0) {
-            params(iter, 0) = int3;
-            params(iter, 1) = 1.4*0.5;
+        if (i == 0 && j == 0)
+        {
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1 * 0.5;
             params(iter, 2) = 0.927;
         }
-        else{
+        else
+        {
             params(iter, 0) = 0.0;
             params(iter, 1) = 1. * 0.5;
             params(iter, 2) = 0.927;
@@ -143,38 +186,207 @@ for (int i = 0; i < 2; i++)
     }
 }
 
+for (int i = 0; i < 4; i++)
+{
+    for (int j = 0; j < 2; j++)
+    {
+        if (j == 1)
+        {
+            params(iter, 0) = int2;
+            params(iter, 1) = 1.4 * 0.75;
+            params(iter, 2) = 0.927;
+        }
+        else
+        {
+            params(iter, 0) = int3;
+            params(iter, 1) = 1.4 * 0.75;
+            params(iter, 2) = 0.927;
+        }
+        iter++;
+    }
+}
+for (int i = 0; i < 4; i++)
+{
+    for (int j = 0; j < 4; j++)
+    {
 
-int n = 9000;
-int nt = 1000;
-TetrahedralWithBivalent c(params,nt,n);
+        if (i == 0 && j == 0)
+        {
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1 * 0.5;
+            params(iter, 2) = 0.927;
+        }
+        else
+        {
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1. * 0.5;
+            params(iter, 2) = 0.927;
+        }
 
-TetrahedralWithSingle c2(10.0, 1.4, 0.927, 10., 1.4, 0.927, 10.0, 1.4, 0.927, nt, n);
+        iter++;
+    }
+}
 
+for (int i = 0; i < 4; i++)
+{
+    for (int j = 0; j < 2; j++)
+    {
 
-TetrahedralPatch c3(20.0,1.4,0.927);
+        if (i == 0 && j == 0)
+        {
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1 * 0.5;
+            params(iter, 2) = 0.927;
+        }
+        else
+        {
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1. * 0.5;
+            params(iter, 2) = 0.927;
+        }
 
-//double packing_fraction = 0.02;
+        iter++;
+    }
+}
 
-double l = cbrt(pi * (double)n / (6. * packing_fraction));
+for (int i = 0; i < 2; i++)
+{
+    for (int j = 0; j < 2; j++)
+    {
+        if (j == 1)
+        {
+            params(iter, 0) = int3;
+            params(iter, 1) = 1.4 * 0.5;
+            params(iter, 2) = 0.927;
+        }
+        else
+        {
+            params(iter, 0) = 0.0;
+            params(iter, 1) = 1.4 * 0.5;
+            params(iter, 2) = 0.927;
+        }
+        iter++;
+    }
+}
 
-BindingModelBinary b(nt*4);
+matrix<double> orient(10, 3);
 
-BindingModelSingle b2(0.998,0.002);
+double nx1 = sqrt(8. / 9.);
+double ny1 = 0.;
+double nz1 = -1. / 3.;
 
-b.setup_equilibrium();
+double nx2 = -sqrt(2. / 9.);
+double ny2 = sqrt(2. / 3.);
+double nz2 = -1. / 3.;
 
+double nx3 = -sqrt(2. / 9.);
+double ny3 = -sqrt(2. / 3.);
+double nz3 = -1. / 3.;
 
+double nx4 = 0;
+double ny4 = 0;
+double nz4 = 1.;
 
+orient(0, 0) = nx1;
+orient(0, 1) = ny1;
+orient(0, 2) = nz1;
+
+orient(1, 0) = nx2;
+orient(1, 1) = ny2;
+orient(1, 2) = nz2;
+
+orient(2, 0) = nx3;
+orient(2, 1) = ny3;
+orient(2, 2) = nz3;
+
+orient(3, 0) = nx4;
+orient(3, 1) = ny4;
+orient(3, 2) = nz4;
+
+orient(4, 0) = nx1;
+orient(4, 1) = ny1;
+orient(4, 2) = nz1;
+
+orient(5, 0) = nx2;
+orient(5, 1) = ny2;
+orient(5, 2) = nz2;
+
+orient(6, 0) = nx3;
+orient(6, 1) = ny3;
+orient(6, 2) = nz3;
+
+orient(7, 0) = nx4;
+orient(7, 1) = ny4;
+orient(7, 2) = nz4;
+
+orient(8, 0) = nx4;
+orient(8, 1) = ny4;
+orient(8, 2) = nz4;
+
+orient(9, 0) = nx4;
+orient(9, 1) = ny4;
+orient(9, 2) = -nz4;
+
+GeneralPatch c(vec1, numb, params, orient);
+
+//int n2 = 100;
+//double packing_fraction = 0.01;
+
+double l = cbrt(pi * (double)m2 / (6. * packing_fraction));
 
 Condensate A(l, n);
 
-A.setBindingModel(b2);
+//TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
 
+// string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
+// string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
+
+// string filp = "/home/dino/Documents/Condensate/TernaryFluid2/pos_beta=1_i=02097.csv";
+// string filo = "/home/dino/Documents/Condensate/TernaryFluid2/orientation_beta=1_i=02097.csv";
+
+// double T;
+// bool err1;
+// bool err2;
+// matrix<double> temppos = importcsv(filp, T, err1);
+// matrix<double> tempori = importcsv(filo, T, err1);
+
+// matrix<double> newpos(2000,3);
+// matrix<double> newori(2000,3);
+
+// A.obj->setdat(temppos);
+// A.obj->setorientation(tempori);
+
+// cout << b.tripr111 << endl;
+// cout << b.doubr11 << endl;
+// cout << b.doubr22 << endl;
+// cout << b2.on_rate << endl;
+// cout << b2.off_rate << endl;
+// pausel();
+
+//TetrahedralPatch c2(10.0,1.4,0.927);
+
+A.setBindingModel(b);
+
+//cout << "set up 1" << endl;
 A.setpots(c);
+
+//int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+
+//int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+
+//A.run_singlebond(10000, 1000);
+// for(int i = 0 ; i < 6 ; i++) {
+
+// for(int j = 0 ; j < (c.i1)[i][0] ; j++ ) {
+// cout << (c.i1)[i][j+1] <<" ";
+
+// }
+// cout << endl;
+// }
 
 A.setviscosity(0.1);
 
-double beta = 1.;
+double beta = 1.0;
 
 A.obj->setkT(1. / beta);
 
@@ -183,7 +395,6 @@ ss << beta;
 
 string base = "_beta=";
 base += ss.str();
-
 
 //A.run_singlebond(runtime, 1000, base);
 vector<string> orientfiles;
@@ -227,7 +438,7 @@ int s3 = bindfiles.size();
     bbs2.boundto = ist;
     //Do processing to make sure everything is fine here
 
-    A.run_singlebond_different_sizes_continue(runtime, 1000, nt, posfiles.size(), bbs2, base);
+    A.run_singlebond_different_sizes_continue(runtime, 1000, m2, posfiles.size(), bbs2, base);
 
 /*
 int NN = 10000;

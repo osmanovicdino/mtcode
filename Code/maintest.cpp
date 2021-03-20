@@ -19,6 +19,9 @@
 #include <sys/stat.h>
 #include <random>
 #include <mutex>
+#include <execinfo.h>
+#include <signal.h>
+#include <unistd.h>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -58,13 +61,18 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
-    NanotubeAssembly A(30.,1000);
+    int N = 1000;
+    double pd = 0.01;
+    double d = cbrt(N/pd);
+
+    NanotubeAssembly A(d,N);
 
     // BivalentPatch p2(100.0,1.3,pi/3.);
     // A.setpots(p2);
+    //A.setkT(0.1);
 
 
-    A.run(100000,100);
+    A.run(1000000,1000);
 /* 
 
     vector1<int> vec1(4);

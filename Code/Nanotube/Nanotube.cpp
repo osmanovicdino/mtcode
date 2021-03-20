@@ -13,8 +13,68 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     BivalentPatch temp_patch(100., 1.3, pi / 4.); //initialize abstract base class to be a one patch system
 
     //pots = new ComboPatch;
+    vector1<int> vec1(1);
+    vec1[0] = 4;
 
-    this->setpots(temp_patch);
+    vector1<int> numb(1);
+
+    numb[0] = N;
+
+    int tot = 4 * 4;
+    matrix<double> params(tot, 3);
+
+    int iter = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            bool cond1 = i == 0 || i == 3;
+            bool cond2 = (i == 1 && j == 2)||(j==1&&i==2);
+
+            if( cond1 && !cond2 ) {
+                params(iter, 0) = 00.0;
+                params(iter, 1) = 1.4;
+                params(iter, 2) = 0.6;
+                iter++;
+            }
+            else if(cond2 && !cond1 ) {
+                params(iter, 0) = 100.0;
+                params(iter, 1) = 1.4;
+                params(iter, 2) = 0.8;
+                iter++;
+            }
+            else{
+                params(iter, 0) = 00.0;
+                params(iter, 1) = 1.0;
+                params(iter, 2) = 0.8;
+                iter++;
+            }
+        }
+    }
+
+
+
+    matrix<double> orient(4, 3);
+
+    orient(0, 0) = 0.;
+    orient(0, 1) = 0.;
+    orient(0, 2) = 1.;
+
+    orient(1, 0) = 1;
+    orient(1, 1) = 0.;
+    orient(1, 2) = 0.;
+
+    orient(2, 0) = -0.5;
+    orient(2, 1) = sqrt(3)/2;
+    orient(2, 2) = 0.;
+
+    orient(3, 0) = 0.;
+    orient(3, 1) = 0.;
+    orient(3, 2) = -1.;
+
+    GeneralPatch c(vec1, numb, params, orient);
+
+    this->setpots(c);
 
 
 
@@ -80,7 +140,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     double dt = 0.005;
     b.setdt(dt);
 
-    double viscosity = 1.0;
+    double viscosity = 0.1;
     double hdradius = 0.5;
 
     b.setgamma(6. * pi * viscosity * hdradius);
