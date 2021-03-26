@@ -4,10 +4,10 @@
 // we define here a general patch model such that we may quickly be able to create new simulations of whichever
 // geometry we are interested in
 
-GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_per_typee, matrix<double> &paramss, matrix<double> &orientt) : ComboPatch(paramss.getnrows()), params(paramss), orient(orientt), no_patches_per_type(no_patches_per_typee), num_per_type(num_per_typee), total_patches_per_type(vector1<int>(no_patches_per_typee.getsize())), pot_starters(matrix<int>(num_per_typee.getsize(), num_per_typee.getsize()))
+GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_per_typee, matrix<double> &paramss, matrix<double> &orientt, bool flatt  = false) : ComboPatch(paramss.getnrows()), params(paramss), orient(orientt), no_patches_per_type(no_patches_per_typee), num_per_type(num_per_typee), total_patches_per_type(vector1<int>(no_patches_per_typee.getsize())), pot_starters(matrix<int>(num_per_typee.getsize(), num_per_typee.getsize()))
 {
     no_types = no_patches_per_type.getsize();
-
+    flat = flatt;
 
 
     //if(params.getnrows() != no_types*(no_types)/2 ) error("param matrix not of the correct size");
@@ -75,7 +75,12 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
 
                     for(int i2 =  starti ; i2 < endi ; i2++) {
                         for(int j1 = startj  ; j1 < endj ; j1++) {
-                            mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
+                            potentialtheta3D *pot1;
+                            if(flat)
+                                pot1 = new KernFrenkelOnePatchFlatBottom(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.5);
+                            else 
+                                pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
+
 
                             potential_bundle[iter] = pot1->clone();
                             delete pot1;
@@ -93,7 +98,7 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
 
 GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnrows()), params(a.params), orient(a.orient), no_patches_per_type(a.no_patches_per_type), num_per_type(a.num_per_type), total_patches_per_type(a.total_patches_per_type), pot_starters(a.pot_starters)
 {
-    
+    flat = a.flat;
     no_types = no_patches_per_type.getsize();
     
     int total_no_of_orients = 0;
@@ -156,7 +161,12 @@ GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnro
             {
                 for (int j1 = startj; j1 < endj; j1++)
                 {
-                    mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
+                    //mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
+                    potentialtheta3D *pot1;
+                    if (flat)
+                        pot1 = new KernFrenkelOnePatchFlatBottom(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.5);
+                    else
+                        pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
 
                     potential_bundle[iter] = pot1->clone();
                     delete pot1;

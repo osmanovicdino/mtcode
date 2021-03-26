@@ -75,9 +75,9 @@ int main(int argc, char **argv)
     {
         runtime = 10000;
         packing_fraction = 0.01;
-        int1 = 15.0;
-        int2 = 10.0;
-        int3 = 10.0;
+        int1 = 12.0;
+        int2 = 42.0;
+        int3 = 12.0;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -90,6 +90,11 @@ int main(int argc, char **argv)
     int m1 = 2000;
     int m2 = 6000;
     int n = 10000;
+
+    // int m1  = 2;
+    // int m2 = 6;
+    // int n = 10;
+
     BindingModelTernary b(m1 * 4, m1*4 + 4 * (m2-m1));
 
     // b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
@@ -174,13 +179,13 @@ int main(int argc, char **argv)
             if (i == 0 && j == 0)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1 * 0.5;
+                params(iter, 1) = 1.4;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1. * 0.5;
+                params(iter, 1) = 1.4;
                 params(iter, 2) = 0.927;
             }
 
@@ -237,13 +242,13 @@ int main(int argc, char **argv)
             if (i == 0 && j == 0)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1 * 0.5;
+                params(iter, 1) = 1.4 * 0.75;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1. * 0.5;
+                params(iter, 1) = 1.4 * 0.75;
                 params(iter, 2) = 0.927;
             }
 
@@ -335,13 +340,19 @@ int main(int argc, char **argv)
 
     GeneralPatch c(vec1, numb, params, orient);
 
+    cout << "created patch" << endl;
+
     //int n2 = 100;
     //double packing_fraction = 0.01;
 
     double l = cbrt(pi * (double)m2 / (6. * packing_fraction));
 
+
+    cout << l << endl;
+
     Condensate A(l, n);
 
+    cout << "created condensate" << endl;
     //TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
 
     // string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
@@ -404,7 +415,32 @@ int main(int argc, char **argv)
     string base = "_beta=";
     base += ss.str();
 
-    A.run_singlebond_different_sizes(10000000, 1000,6000, base);
+    double T;
+    int TT;
+    bool vv1, vv2, vv3;
+
+    matrix<double> postemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
+    matrix<double> orienttemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
+    matrix<int> bindtemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
+
+
+    A.obj->setdat(postemp);
+    A.obj->setorientation(orienttemp);
+    BinaryBindStore bbs2;
+    vector1<bool> iss(bindtemp.getncols());
+    vector1<int> ist(bindtemp.getncols());
+    for (int i = 0; i < bindtemp.getncols(); i++)
+    {
+        iss[i] = (bool)bindtemp(0, i);
+        ist[i] = bindtemp(1, i);
+    }
+    bbs2.isbound = iss;
+    bbs2.boundto = ist;
+    //Do processing to make sure everything is fine here
+
+    A.run_singlebond_different_sizes_continue(runtime, 1000, m2, 0, bbs2, base);
+
+    //A.run_singlebond_different_sizes(100000, 10,m2, base);
 
     // A.run_singlebond_different_sizes(10000000, 1000, 6000, base);
 

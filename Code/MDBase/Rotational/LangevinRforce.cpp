@@ -231,7 +231,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 }
                 else if (!b1 != !b2) //only one bound
                 {
-                    disp2 = 0.7*disp; //more onerous
+                    disp2 = 0.8*disp; //more onerous
                 }
                 else{
                     //neither bound
@@ -622,6 +622,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     bool a12;
                     bool a23;
                     bool a13;
+                    //cout << "triplet called: " << i1 << " " << i2 << " " << i3 << endl;
+                    //pausel();
+
                     bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
 
                     if (a12)
@@ -631,17 +634,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i1] = true;
                         bo.isbound[i2] = true;
                         bo.isbound[i3] = false;
-
                         mypairs_private.push_back(mdpair(i2, i1));
                     }
                     else if (a23)
                     {
+
                         bo.boundto[i2] = i3;
                         bo.boundto[i3] = i2;
                         bo.isbound[i1] = false;
                         bo.isbound[i2] = true;
                         bo.isbound[i3] = true;
-
                         mypairs_private.push_back(mdpair(i3, i2));
                     }
                     else if (a13)
@@ -651,7 +653,6 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i1] = true;
                         bo.isbound[i2] = false;
                         bo.isbound[i3] = true;
-
                         mypairs_private.push_back(mdpair(i3, i1));
                     }
                     else

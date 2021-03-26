@@ -1,6 +1,200 @@
 #ifndef NANOTUBE_CPP
 #define NANOTUBE_CPP
 
+
+struct mypoin {
+
+vector1<double> operator()(double r, double theta, double phi) {
+    //{r Cos[\[Phi]] Sin[\[Theta]], r Sin[\[Theta]] Sin[\[Phi]], r Cos[\[Theta]]}
+    vector1<double> a(3);
+    a[0] = r*cos(phi)*sin(theta);
+    a[1] = r*sin(phi)*sin(theta);
+    a[2] = r*cos(theta);
+    return a;
+
+
+}
+
+};
+
+GeneralPatch CreateHexatic(int N, double str1, double rang1, double ang1,
+                                double str2, double rang2, double ang2,
+                                double dphi, double dtheta,
+                                double baseangle
+                                )
+{
+
+    int nop = 12;
+    //pots = new ComboPatch;
+    vector1<int> vec1(1);
+    vec1[0] = nop;
+
+    vector1<int> numb(1);
+
+    numb[0] = N;
+
+    int tot = nop * nop;
+    matrix<double> params(tot, 3);
+
+    int iter = 0;
+    for (int i = 0; i < nop; i++)
+    {
+        for (int j = 0; j < nop; j++)
+        {
+            bool cond1 = i < 6 && j < 6;
+            bool cond2 = i >= 6 && j >= 6 && i < 12 && j < 12;
+            bool cond3 = i >= 12 && j >= 12;
+
+            if (cond1 || cond2)
+            {
+                params(iter, 0) = str1;
+                params(iter, 1) = rang1;
+                params(iter, 2) = ang1;
+                iter++;
+            }
+            else if (cond3)
+            {
+                params(iter, 0) = 30.0;
+                params(iter, 1) = 1.2;
+                params(iter, 2) = 0.4;
+                iter++;
+            }
+            else
+            {
+                params(iter, 0) = str2;
+                params(iter, 1) = rang2;
+                params(iter, 2) = ang2;
+                iter++;
+            }
+        }
+    }
+
+    outfunc(params, "lig");
+
+    matrix<double> orient(nop, 3);
+
+    mypoin B;
+    // orient(0, 0) = 0.;
+    // orient(0, 1) = 0.;
+    // orient(0, 2) = 1.;
+
+    // orient(1, 0) = 1;
+    // orient(1, 1) = 0.;
+    // orient(1, 2) = 0.;
+
+    // orient(2, 0) = -0.5;
+    // orient(2, 1) = sqrt(3)/2;
+    // orient(2, 2) = 0.;
+
+    // orient(3, 0) = 0.;
+    // orient(3, 1) = 0.;
+    // orient(3, 2) = -1.;
+
+    // double dphi = 0.2;
+    // double dtheta = 0.1;
+    vector1<double> p1 = B(1, dtheta + pid / 2., -dphi);
+    vector1<double> p2 = B(1, pid / 2., -dphi);
+    vector1<double> p3 = B(1, -dtheta + pid / 2., -dphi);
+
+    vector1<double> p4 = B(1, dtheta + pid / 2., baseangle + dphi);
+    vector1<double> p5 = B(1, pid / 2., baseangle + dphi);
+    vector1<double> p6 = B(1, -dtheta + pid / 2., baseangle + dphi);
+
+    vector1<double> p7 = B(1, dtheta + pid / 2., dphi);
+    vector1<double> p8 = B(1, pid / 2., dphi);
+    vector1<double> p9 = B(1, -dtheta + pid / 2., dphi);
+
+    vector1<double> p10 = B(1, dtheta + pid / 2., baseangle - dphi);
+    vector1<double> p11 = B(1, pid / 2., baseangle - dphi);
+    vector1<double> p12 = B(1, -dtheta + pid / 2., baseangle - dphi);
+
+    // vector1<double> p13(3);
+    // vector1<double> p14(3);
+
+    // double p1[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p2[3] = {cos(pid / 18.), -sin(pid / 18.), 0};
+
+    // double p3[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p4[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p5[3] = {-sin((2 * pid) / 9.), cos((2 * pid) / 9.), 0};
+
+    // double p6[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p7[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p8[3] = {cos(pid / 18.), sin(pid / 18.), 0};
+
+    // double p9[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p10[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p11[3] = {-sin(pid / 9.), cos(pid / 9.), 0};
+
+    // double p12[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    orient(0, 0) = p1[0];
+    orient(0, 1) = p1[1];
+    orient(0, 2) = p1[2];
+
+    orient(1, 0) = p2[0];
+    orient(1, 1) = p2[1];
+    orient(1, 2) = p2[2];
+
+    orient(2, 0) = p3[0];
+    orient(2, 1) = p3[1];
+    orient(2, 2) = p3[2];
+
+    orient(3, 0) = p4[0];
+    orient(3, 1) = p4[1];
+    orient(3, 2) = p4[2];
+
+    orient(4, 0) = p5[0];
+    orient(4, 1) = p5[1];
+    orient(4, 2) = p5[2];
+
+    orient(5, 0) = p6[0];
+    orient(5, 1) = p6[1];
+    orient(5, 2) = p6[2];
+
+    orient(6, 0) = p7[0];
+    orient(6, 1) = p7[1];
+    orient(6, 2) = p7[2];
+
+    orient(7, 0) = p8[0];
+    orient(7, 1) = p8[1];
+    orient(7, 2) = p8[2];
+
+    orient(8, 0) = p9[0];
+    orient(8, 1) = p9[1];
+    orient(8, 2) = p9[2];
+
+    orient(9, 0) = p10[0];
+    orient(9, 1) = p10[1];
+    orient(9, 2) = p10[2];
+
+    orient(10, 0) = p11[0];
+    orient(10, 1) = p11[1];
+    orient(10, 2) = p11[2];
+
+    orient(11, 0) = p12[0];
+    orient(11, 1) = p12[1];
+    orient(11, 2) = p12[2];
+
+    // orient(12,0) = 0.;
+    // orient(12,1) = 0.;
+    // orient(12,2) = 1.0;
+
+    // orient(13, 0) = 0.;
+    // orient(13, 1) = 0.;
+    // orient(13, 2) = -1.0;
+
+    GeneralPatch c(vec1, numb, params, orient, true);
+    return c;
+}
+
 NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
 
 
@@ -12,67 +206,176 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
 
     BivalentPatch temp_patch(100., 1.3, pi / 4.); //initialize abstract base class to be a one patch system
 
+    int nop = 12;
     //pots = new ComboPatch;
     vector1<int> vec1(1);
-    vec1[0] = 4;
+    vec1[0] = nop;
 
     vector1<int> numb(1);
 
     numb[0] = N;
 
-    int tot = 4 * 4;
+    int tot = nop * nop;
     matrix<double> params(tot, 3);
 
     int iter = 0;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < nop; i++)
     {
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < nop; j++)
         {
-            bool cond1 = i == 0 || i == 3;
-            bool cond2 = (i == 1 && j == 2)||(j==1&&i==2);
+            bool cond1 = i < 6 && j < 6;
+            bool cond2 = i >= 6 && j >= 6 && i < 12 && j < 12;
+            bool cond3 = i >=12 && j >= 12;
 
-            if( cond1 && !cond2 ) {
-                params(iter, 0) = 00.0;
+
+
+            if( cond1  || cond2 ) {
+                params(iter, 0) = 10.0;
                 params(iter, 1) = 1.4;
-                params(iter, 2) = 0.6;
+                params(iter, 2) = 0.4;
                 iter++;
             }
-            else if(cond2 && !cond1 ) {
-                params(iter, 0) = 100.0;
-                params(iter, 1) = 1.4;
-                params(iter, 2) = 0.8;
+            else if(cond3) {
+                params(iter, 0) = 30.0;
+                params(iter, 1) = 1.2;
+                params(iter, 2) = 0.4;
                 iter++;
             }
             else{
-                params(iter, 0) = 00.0;
-                params(iter, 1) = 1.0;
-                params(iter, 2) = 0.8;
+                params(iter, 0) = 0.0;
+                params(iter, 1) = 1.4;
+                params(iter, 2) = 0.3;
                 iter++;
             }
         }
     }
 
+    outfunc(params,"lig");
+
+    matrix<double> orient(nop, 3);
+
+    mypoin B;
+    // orient(0, 0) = 0.;
+    // orient(0, 1) = 0.;
+    // orient(0, 2) = 1.;
+
+    // orient(1, 0) = 1;
+    // orient(1, 1) = 0.;
+    // orient(1, 2) = 0.;
+
+    // orient(2, 0) = -0.5;
+    // orient(2, 1) = sqrt(3)/2;
+    // orient(2, 2) = 0.;
+
+    // orient(3, 0) = 0.;
+    // orient(3, 1) = 0.;
+    // orient(3, 2) = -1.;
+
+    double dphi = 0.2;
+    double dtheta =0.1;
+    vector1<double> p1 = B(1, dtheta + pid / 2., -dphi);
+    vector1<double> p2 = B(1, pid / 2., -dphi);
+    vector1<double> p3 = B(1, -dtheta + pid / 2., -dphi);
+
+    vector1<double> p4 = B(1, dtheta + pid / 2.,(2.*pid/3.)  + dphi);
+    vector1<double> p5 = B(1, pid / 2., (2. * pid / 3.) + dphi );
+    vector1<double> p6 = B(1, -dtheta + pid / 2., (2. * pid / 3.) + dphi );
+
+    vector1<double> p7 = B(1, dtheta + pid / 2., dphi);
+    vector1<double> p8 = B(1, pid / 2., dphi);
+    vector1<double> p9 = B(1, -dtheta + pid / 2., dphi);
+
+    vector1<double> p10 = B(1, dtheta + pid / 2., (2. * pid / 3.) - dphi);
+    vector1<double> p11 = B(1, pid / 2., (2. * pid / 3.) - dphi);
+    vector1<double> p12 = B(1, -dtheta + pid / 2., (2. * pid / 3.) - dphi);
+
+    // vector1<double> p13(3);
+    // vector1<double> p14(3);
+
+    // double p1[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p2[3] = {cos(pid / 18.), -sin(pid / 18.), 0};
+
+    // double p3[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p4[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p5[3] = {-sin((2 * pid) / 9.), cos((2 * pid) / 9.), 0};
+
+    // double p6[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p7[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p8[3] = {cos(pid / 18.), sin(pid / 18.), 0};
+
+    // double p9[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p10[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    // double p11[3] = {-sin(pid / 9.), cos(pid / 9.), 0};
+
+    // double p12[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+
+    orient(0,0) = p1[0];
+    orient(0,1) = p1[1];
+    orient(0,2) = p1[2];
+
+    orient(1,0) = p2[0];
+    orient(1,1) = p2[1];
+    orient(1,2) = p2[2];
+
+    orient(2,0) = p3[0];
+    orient(2,1) = p3[1];
+    orient(2,2) = p3[2];
+
+    orient(3,0) = p4[0];
+    orient(3,1) = p4[1];
+    orient(3,2) = p4[2];
+
+    orient(4,0) = p5[0];
+    orient(4,1) = p5[1];
+    orient(4,2) = p5[2];
+
+    orient(5,0) = p6[0];
+    orient(5,1) = p6[1];
+    orient(5,2) = p6[2];
+
+    orient(6,0) = p7[0];
+    orient(6,1) = p7[1];
+    orient(6,2) = p7[2];
+
+    orient(7,0) = p8[0];
+    orient(7,1) = p8[1];
+    orient(7,2) = p8[2];
+
+    orient(8,0) = p9[0];
+    orient(8,1) = p9[1];
+    orient(8,2) = p9[2];
+
+    orient(9,0) = p10[0];
+    orient(9,1) = p10[1];
+    orient(9,2) = p10[2];
+
+    orient(10,0) = p11[0];
+    orient(10,1) = p11[1];
+    orient(10,2) = p11[2];
+
+    orient(11,0) = p12[0];
+    orient(11,1) = p12[1];
+    orient(11,2) = p12[2];
+
+    // orient(12,0) = 0.;
+    // orient(12,1) = 0.;
+    // orient(12,2) = 1.0;
+
+    // orient(13, 0) = 0.;
+    // orient(13, 1) = 0.;
+    // orient(13, 2) = -1.0;
+
+    GeneralPatch c(vec1, numb, params, orient, true);
 
 
-    matrix<double> orient(4, 3);
-
-    orient(0, 0) = 0.;
-    orient(0, 1) = 0.;
-    orient(0, 2) = 1.;
-
-    orient(1, 0) = 1;
-    orient(1, 1) = 0.;
-    orient(1, 2) = 0.;
-
-    orient(2, 0) = -0.5;
-    orient(2, 1) = sqrt(3)/2;
-    orient(2, 2) = 0.;
-
-    orient(3, 0) = 0.;
-    orient(3, 1) = 0.;
-    orient(3, 2) = -1.;
-
-    GeneralPatch c(vec1, numb, params, orient);
+    BivalentPatch c2(10.0, 1.4,0.5);
 
     this->setpots(c);
 
@@ -140,7 +443,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     double dt = 0.005;
     b.setdt(dt);
 
-    double viscosity = 0.1;
+    double viscosity = 1.;
     double hdradius = 0.5;
 
     b.setgamma(6. * pi * viscosity * hdradius);
@@ -231,7 +534,7 @@ void NanotubeAssembly::run(int runtime, int every, string strbase = "")
 
     for (int i = 0; i < runtime; i++)
     {
-        cout << i << endl;
+        //cout << i << endl;
         vector1<double> meas(6);
         // obj->measured_temperature(meas);
         // tottemp += meas;
@@ -276,7 +579,7 @@ void NanotubeAssembly::run(int runtime, int every, string strbase = "")
         if (i % every == 0)
         {
 
-            //cout << i << endl;
+            cout << i << endl;
 
             stringstream ss;
 
@@ -312,6 +615,8 @@ void NanotubeAssembly::run(int runtime, int every, string strbase = "")
 
             myfile.close();
             myfile2.close();
+
+            //pausel();
         }
     }
 }

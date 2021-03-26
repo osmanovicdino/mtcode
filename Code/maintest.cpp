@@ -61,18 +61,122 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
-    int N = 1000;
+    int N = 6;
     double pd = 0.01;
     double d = cbrt(N/pd);
 
     NanotubeAssembly A(d,N);
+
+    
+    // matrix<double> vf(2,3);
+    // vf(0, 0) = d / 2.;
+    // vf(0, 1) = d / 2.;
+    // vf(0, 2) = d / 2.;
+
+    // vf(1, 0) = d / 2. + 1.4;
+    // vf(1, 1) = d / 2.;
+    // vf(1, 2) = d / 2.;
+
+    // matrix<double> ori2(2,9);
+
+
+    // double theta =  0.0;
+    // ori2(0, 0) = cos(theta);
+    // ori2(0, 1) = 0.0;
+    // ori2(0, 2) = sin(theta);
+    // ori2(0, 3) = 0.0;
+    // ori2(0, 4) = 1.0;
+    // ori2(0, 5) = 0.0;
+    // ori2(0, 6) = -sin(theta);
+    // ori2(0, 7) = 0.0;
+    // ori2(0, 8) = cos(theta);
+
+
+    // double theta2 = 0.0;
+    // ori2(1, 0) = -cos(theta2);
+    // ori2(1, 1) = 0.0;
+    // ori2(1, 2) = -sin(theta2);
+    // ori2(1, 3) = 0.0;
+    // ori2(1, 4) = 1.0;
+    // ori2(1, 5) = 0.0;
+    // ori2(1, 6) = sin(theta2);
+    // ori2(1, 7) = 0.0;
+    // ori2(1, 8) = -cos(theta2);
+
+    // A.obj->setdat(vf);
+    // A.obj->setorientation(ori2);
+    // A.setkT(1.0);
+
+    // A.run(1000,1);
+    
+
 
     // BivalentPatch p2(100.0,1.3,pi/3.);
     // A.setpots(p2);
     //A.setkT(0.1);
 
 
-    A.run(1000000,1000);
+    double beta = 1.;
+    //for(double beta = 0.2 ; beta < 1.01 ; beta += 0.1) {
+    double strp1[3] = {10.,20.,30.};
+    double srang1[3] = {1.2, 1.3 , 1.4};
+    double sang1[4] = {0.3,0.4,0.5,0.6};
+    double sang2[4] = {0.1,0.2,0.3,0.4};
+
+    double sdphi[4] = {0.1,0.2,0.3,0.4};
+    double sdtheta[2] = {0.1,0.2};
+    double sbaseangle[2] = {2 *pid / 2.5 , 2 *pid / 3.};
+    
+
+
+
+
+    for ( int i1 = 0 ; i1 < 3 ; i1++ )
+    for ( int i2 = 0 ; i2 < 3;  i2++ )
+    for (int i3 = 0 ; i3 < 4 ; i3++ )
+    for (int i4 = 0 ; i4 < 3 ; i4++ )
+    for (int i5 = 0 ; i5 < 3 ; i5++ )
+    for (int i6 = 0 ; i6 < 4 ; i6++ )
+    for (int i7 = 0  ; i7 < 4 ; i7++ )
+    for (int i8 = 0  ; i8 < 2 ; i8++ )
+    for (int i9 = 0  ; i9 < 2 ; i9++ ) {
+
+    double str1 = strp1[i1];
+    double rang1 = srang1[i2];
+    double ang1 =  sang1[i3];
+
+    double str2 = -strp1[i4];
+    double rang2 = srang1[i5];
+    double ang2 = sang2[i6];
+
+    double dphi = sdphi[i7];
+    double dtheta = sdtheta[i8];
+
+    double baseangle = sbaseangle[i9];
+
+
+    GeneralPatch c(CreateHexatic(N, str1, rang1, ang1, str2, rang2, ang2, dphi, dtheta, baseangle));
+    stringstream ss;
+    ss << i1;
+    ss << i2;
+    ss << i3;
+    ss << i4;
+    ss << i5;
+    ss << i6;
+    ss << i7;
+    ss << i8;
+    ss << i9;
+
+    string base = "_identitystring=";
+    base += ss.str();
+
+    A.setkT(1. / beta);
+    A.setpots(c);
+
+    A.run(100000, 1000, base);
+    }
+
+    //}
 /* 
 
     vector1<int> vec1(4);

@@ -5,6 +5,7 @@
 struct GeneralPatch : ComboPatch {
 
     int no_types;
+    bool flat;
     vector1<int> no_patches_per_type;
     vector1<int> num_per_type;
     vector1<int> total_patches_per_type;
@@ -14,7 +15,7 @@ struct GeneralPatch : ComboPatch {
 
     int **i1; //as it is of indeterminate length we have to have a double pointer.
 
-    GeneralPatch(vector1<int>no_patches_per_typee, vector1<int> num_per_typee, matrix<double>&, matrix<double>& );
+    GeneralPatch(vector1<int>no_patches_per_typee, vector1<int> num_per_typee, matrix<double>&, matrix<double>& ,bool);
     GeneralPatch(const GeneralPatch&);
 
     ~GeneralPatch() {

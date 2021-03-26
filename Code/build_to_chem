@@ -1,5 +1,5 @@
 #!/bin/bash
 var=$1
 mkdir -p /home/dino/Desktop/Chemistry/SimulationResults/$var/
-cp main.cpp /home/dino/Desktop/Chemistry/SimulationResults/$var/
-g++ -fopenmp maintest.cpp -o /home/dino/Desktop/Chemistry/SimulationResults/$var/angron
+cp maintest.cpp /home/dino/Desktop/Chemistry/SimulationResults/$var/
+g++ main.cpp -o /home/dino/Desktop/Chemistry/SimulationResults/$var/angron

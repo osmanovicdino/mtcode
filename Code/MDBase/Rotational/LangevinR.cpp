@@ -654,6 +654,7 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
             }
             //iny.UpdateIterator(p1,p2); // this points the patch pointer to the correct particles
 
+            //cout << (*q)[0] << endl;
             for (int tp = 1; tp < (*q)[0] + 1; tp++)
             {
                 
@@ -677,7 +678,11 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
                 // cout << dis << endl;
                 // cout << un << endl;
                 // cout << iny.potential_bundle[potn]->getparameters() << endl;
-                
+                // if(abs(fx)>1E-10 || abs(fy)>1E-10|| abs(fz)> 1E-10) {
+                //     int wp1,wp2;
+                //     iny.which_patch(p1,p2,potn,wp1,wp2);
+                //     cout << p1 <<" " << p2 << " " <<potn << " " << wp1 << " " << wp2 << endl;
+                // }
                 forces(p1, 0) += fx;
                 forces(p1, 1) += fy;
                 forces(p1, 2) += fz;
@@ -694,6 +699,8 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
                 torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
                 torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
             }
+
+
             delete q;
         }
     }
