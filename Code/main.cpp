@@ -108,12 +108,14 @@ int main(int argc, char **argv)
     // 0.0,
     // 0.0);
 
+    double unbinding_rebar =  -2.0;
+
     b.setup(0.99, 0.01, 0.99, 0.2, 0.99, 0.2,
             0.,
             0.,
             0.,
             0.0,
-            -2.0,
+            unbinding_rebar,
             0.0,
             0.0,
             0.0,
