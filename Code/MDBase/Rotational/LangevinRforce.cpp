@@ -231,7 +231,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 }
                 else if (!b1 != !b2) //only one bound
                 {
-                    disp2 = 0.8*disp; //more onerous
+                    disp2 = 0.7*disp; //more onerous
                 }
                 else{
                     //neither bound

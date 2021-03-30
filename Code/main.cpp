@@ -73,11 +73,11 @@ int main(int argc, char **argv)
     }
     else
     {
-        runtime = 10000;
-        packing_fraction = 0.01;
+        runtime = 100000;
+        packing_fraction = 0.05;
         int1 = 12.0;
-        int2 = 42.0;
-        int3 = 12.0;
+        int2 = 22.0;
+        int3 = 7.0;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -412,9 +412,9 @@ int main(int argc, char **argv)
     A.obj->setkT(1. / beta);
 
     stringstream ss;
-    ss << beta;
+    ss << unbinding_rebar;
 
-    string base = "_beta=";
+    string base = "_rebar=";
     base += ss.str();
 
     double T;
@@ -425,6 +425,9 @@ int main(int argc, char **argv)
     matrix<double> orienttemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
     matrix<int> bindtemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
 
+    // matrix<double> postemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
+    // matrix<double> orienttemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
+    // matrix<int> bindtemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
 
     A.obj->setdat(postemp);
     A.obj->setorientation(orienttemp);

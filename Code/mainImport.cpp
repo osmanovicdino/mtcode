@@ -148,7 +148,6 @@ vector1<int> numb(3);
 numb[0] = m1;
 numb[1] = m2;
 numb[2] = n;
-
 int tot = 4 * 4 + 4 * 2 + 4 * 4 + 3 * 2 + 4 * 2 + 4 * 4;
 matrix<double> params(tot, 3);
 
@@ -172,13 +171,13 @@ for (int i = 0; i < 4; i++)
         if (i == 0 && j == 0)
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1 * 0.5;
+            params(iter, 1) = 1.4;
             params(iter, 2) = 0.927;
         }
         else
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1. * 0.5;
+            params(iter, 1) = 1.4;
             params(iter, 2) = 0.927;
         }
 
@@ -235,13 +234,13 @@ for (int i = 0; i < 4; i++)
         if (i == 0 && j == 0)
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1 * 0.5;
+            params(iter, 1) = 1.4 * 0.75;
             params(iter, 2) = 0.927;
         }
         else
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1. * 0.5;
+            params(iter, 1) = 1.4 * 0.75;
             params(iter, 2) = 0.927;
         }
 
