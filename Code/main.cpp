@@ -62,14 +62,16 @@ int main(int argc, char **argv)
     double int1;
     double int2;
     double int3;
+    int m5;
     int runtime;
-    if (argc == 6)
+    if (argc == 7)
     {
         runtime = atof(argv[1]);
         packing_fraction = atof(argv[2]);
         int1 = atof(argv[3]);
         int2 = atof(argv[4]);
         int3 = atof(argv[5]);
+        m5 = atof(argv[6]);
     }
     else
     {
@@ -78,6 +80,7 @@ int main(int argc, char **argv)
         int1 = 12.0;
         int2 = 22.0;
         int3 = 7.0;
+        m5 = 4000;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -88,8 +91,10 @@ int main(int argc, char **argv)
     //     params(i, 2) = 0.927;
     // }
     int m1 = 2000;
-    int m2 = 6000;
-    int n = 10000;
+    int m2 = m1+m5;
+    int n = m2 + 4000;
+
+
 
     // int m1  = 2;
     // int m2 = 6;
@@ -347,7 +352,7 @@ int main(int argc, char **argv)
     //int n2 = 100;
     //double packing_fraction = 0.01;
 
-    double l = cbrt(pi * (double)m2 / (6. * packing_fraction));
+    double l = cbrt(pi * (double)6000 / (6. * packing_fraction));
 
 
     cout << l << endl;
@@ -421,27 +426,65 @@ int main(int argc, char **argv)
     int TT;
     bool vv1, vv2, vv3;
 
-    matrix<double> postemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
-    matrix<double> orienttemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
-    matrix<int> bindtemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
+    // matrix<double> postemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
+    // matrix<double> orienttemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
+    // matrix<int> bindtemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
 
-    // matrix<double> postemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
-    // matrix<double> orienttemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
-    // matrix<int> bindtemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
+    matrix<double> postemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
+    matrix<double> orienttemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
+    matrix<int> bindtemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
 
-    A.obj->setdat(postemp);
-    A.obj->setorientation(orienttemp);
+    // pausel();
+
+    cout << bindtemp.getncols() << endl;
+
+    matrix<double> postemp2(n,3);
+    matrix<double> orienttemp2(n,9);
+    matrix<int> bindtemp2(2,m2*4+4000*2);
+
+    cout << bindtemp2.getncols() << endl;
+
+    for(int i = 0  ; i < m2 ; i++) {
+        for(int j = 0 ; j < 3 ; j++) {
+            postemp2(i,j) =  postemp(i,j);
+        }
+        for (int j = 0; j < 9; j++)
+        {
+            orienttemp2(i, j) = orienttemp(i, j);
+        }
+    }
+    for(int i = m2 ; i < n ; i++) {
+        for (int j = 0; j < 3; j++)
+        {
+            postemp2(i, j) = postemp(i-m2+6000, j);
+        }
+        for (int j = 0; j < 9; j++)
+        {
+            orienttemp2(i, j) = orienttemp(i - m2 + 6000, j);
+        }
+    }
+
+
+
+    A.obj->setdat(postemp2);
+    A.obj->setorientation(orienttemp2);
     BinaryBindStore bbs2;
-    vector1<bool> iss(bindtemp.getncols());
-    vector1<int> ist(bindtemp.getncols());
-    for (int i = 0; i < bindtemp.getncols(); i++)
+    vector1<bool> iss(bindtemp2.getncols());
+    vector1<int> ist(bindtemp2.getncols());
+    for (int i = 0; i < bindtemp2.getncols(); i++)
     {
-        iss[i] = (bool)bindtemp(0, i);
-        ist[i] = bindtemp(1, i);
+        iss[i] = (bool)bindtemp2(0, i);
+        ist[i] = bindtemp2(1, i);
     }
     bbs2.isbound = iss;
     bbs2.boundto = ist;
+
+   // cout << "done" << endl;
     //Do processing to make sure everything is fine here
+
+    //pausel();
+    //cout << m2 << endl;
+
 
     A.run_singlebond_different_sizes_continue(runtime, 1000, m2, 0, bbs2, base);
 

@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-32:1
+#$ -t 1-40:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -29,27 +29,29 @@ module load gcc/7.5.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-if [ -e  ~/Chemistry/Code/Basic/Scripts/params11.dat ]; then
+if [ -e  ~/Chemistry/Code/Basic/Scripts/params12.dat ]; then
    # use the unix command sed -n ${line_number}p to read by line
-   den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params11.dat | awk '{print $1}'`
-   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params11.dat | awk '{print $2}'` 
-   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params11.dat | awk '{print $3}'` 
-   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params11.dat | awk '{print $4}'`
+   den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $1}'`
+   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $2}'` 
+   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $3}'` 
+   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $4}'`
+   m2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $5}'`
    echo "read file correctly" 
 else
    den=0.01
    i1=0
    i2=0
    i3=0
+   m2=1000
    echo "did not read file correctly"
 fi
-dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}"
+dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}_m2=${m2}"
 mkdir /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 g++ -std=c++11 -fopenmp ~/Chemistry/Code/main.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 export OMP_NUM_THREADS=8
-./angron 10000000 $den $i1 $i2 $i3 >log
+./angron 10000000 $den $i1 $i2 $i3 $m2 >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `

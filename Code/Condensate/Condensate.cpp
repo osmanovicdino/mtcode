@@ -615,6 +615,7 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
 
     int NN = obj->getN();
 
+   
     vector1<int> p1(div);
     vector1<int> p2(NN - div);
     for (int i = 0; i < div; i++)

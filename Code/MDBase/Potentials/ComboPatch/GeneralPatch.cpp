@@ -77,11 +77,11 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
                         for(int j1 = startj  ; j1 < endj ; j1++) {
                             potentialtheta3D *pot1;
                             if(flat) {
-                                cout << "create flat bottom" << endl;
+                                //cout << "create flat bottom" << endl;
                                 pot1 = new KernFrenkelOnePatchFlatBottom(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.5);
                             }
                             else {
-                                cout << "create normal" << endl;
+                                //cout << "create normal" << endl;
                                 pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
                             }
 
@@ -167,11 +167,11 @@ GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnro
                     //mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
                     potentialtheta3D *pot1;
                     if (flat) {
-                        cout << "create flat bottom" << endl;
+                        //cout << "create flat bottom" << endl;
                         pot1 = new KernFrenkelOnePatchFlatBottom(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.5);
                         }
                     else {
-                        cout << "create normal" << endl;
+                        //cout << "create normal" << endl;
                         pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
                     }
                     potential_bundle[iter] = pot1->clone();
