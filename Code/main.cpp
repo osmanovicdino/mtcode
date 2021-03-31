@@ -426,17 +426,17 @@ int main(int argc, char **argv)
     int TT;
     bool vv1, vv2, vv3;
 
-    // matrix<double> postemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
-    // matrix<double> orienttemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
-    // matrix<int> bindtemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
+    matrix<double> postemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
+    matrix<double> orienttemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
+    matrix<int> bindtemp = importcsv("/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
 
-    matrix<double> postemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
-    matrix<double> orienttemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
-    matrix<int> bindtemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
+    // matrix<double> postemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartp.csv", T, vv1);
+    // matrix<double> orienttemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstarto.csv", T, vv2);
+    // matrix<int> bindtemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/bigstartb.csv", TT, vv3);
 
     // pausel();
 
-    cout << bindtemp.getncols() << endl;
+    // cout << bindtemp.getncols() << endl;
 
     matrix<double> postemp2(n,3);
     matrix<double> orienttemp2(n,9);
