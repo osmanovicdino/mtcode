@@ -430,8 +430,8 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
     matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5);
 
     WCAPotential wsa1(1.0, 1.0, 0.0);
-    WCAPotential wsa2(1.0, 0.75, 0.0);
-    WCAPotential wsa3(1.0, 0.5, 0.0);
+    WCAPotential wsa2(1.0, 0.625, 0.0);
+    WCAPotential wsa3(1.0, 0.25, 0.0);
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);

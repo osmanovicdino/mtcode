@@ -67,7 +67,7 @@ void BindingModelTernary::setup(double st11, double st22, double st33, double st
     doubr23[2] = 1.0-(double)st23;
     doubr23[3] = (double)st23;
 
-    double baserates = 0.1;
+    
 
     //if st11 is 1, it means it binds strongly, if it is zero it means it unbinds strongly
     //we can represent this assymetry with 1-2*st11, so that  the rate of going strongly to unbound states matches the doublet
@@ -106,9 +106,10 @@ void BindingModelTernary::setup(double st11, double st22, double st33, double st
     // double assym_23_33;
 
     //only keep allowed transitions
-
+    double baserates = 0.1;
     double baserates2 = 1.0;
     double baserates3 = 0.001;
+
     //base rates will be related to the double rates
 
     double pos_11 = log((1. - st11) / st11);
@@ -118,16 +119,36 @@ void BindingModelTernary::setup(double st11, double st22, double st33, double st
     double pos_23 = log((1. - st23) / st23);
     double pos_33 = log((1. - st33) / st33);
 
-    set_stable_triple(tripr111, baserates3, baserates3, baserates2, baserates3, baserates2, baserates2, 0.0, 0.0, pos_11, 0.0, pos_11, pos_11);
-    set_stable_triple(tripr112, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_11_12 , assym_11_12 ,pos_11, 0.0 /*assym_12_12*/  , pos_12, pos_12);
-    set_stable_triple(tripr113, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_11_13, assym_11_13, pos_11, 0.0 /*assym_13_13*/, pos_13, pos_13);
-    set_stable_triple(tripr122, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_12_22 , 0.0 /*assym_12_12*/ , pos_12, -assym_12_22  , pos_22,pos_12);
-    set_stable_triple(tripr123, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_12_23  , assym_12_13  , pos_12, assym_23_13  , pos_23, pos_13);
-    set_stable_triple(tripr133, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_13_33  , 0.0 /*assym_13_13*/  , pos_13, -assym_13_33  , pos_33, pos_13);
-    set_stable_triple(tripr222, baserates, baserates, baserates2, baserates, baserates2, baserates2, 0.0, 0.0, pos_22, 0.0, pos_22, pos_22);
-    set_stable_triple(tripr223, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_22_23  , assym_22_23  , pos_22, 0.0 /*assym_23_23*/  , pos_23, pos_23);
-    set_stable_triple(tripr233, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_23_33  , 0.0 /*assym_23_23*/ , pos_23, -assym_23_33  , pos_23, pos_23);
-    set_stable_triple(tripr333, baserates, baserates, baserates2, baserates, baserates2, baserates2, 0.0, 0.0, pos_33, 0.0, pos_33, pos_33);
+    
+
+    // set_stable_triple(tripr111, baserates3, baserates3, baserates2, baserates3, baserates2, baserates2, 0.0, 0.0, pos_11, 0.0, pos_11, pos_11);
+    // set_stable_triple(tripr112, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_11_12 , assym_11_12 ,pos_11, 0.0 /*assym_12_12*/  , pos_12, pos_12);
+    // set_stable_triple(tripr113, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_11_13, assym_11_13, pos_11, 0.0 /*assym_13_13*/, pos_13, pos_13);
+    // set_stable_triple(tripr122, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_12_22 , 0.0 /*assym_12_12*/ , pos_12, -assym_12_22  , pos_22,pos_12);
+    // set_stable_triple(tripr123, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_12_23  , assym_12_13  , pos_12, assym_23_13  , pos_23, pos_13);
+    // set_stable_triple(tripr133, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_13_33  , 0.0 /*assym_13_13*/  , pos_13, -assym_13_33  , pos_33, pos_13);
+    // set_stable_triple(tripr222, baserates, baserates, baserates2, baserates, baserates2, baserates2, 0.0, 0.0, pos_22, 0.0, pos_22, pos_22);
+    // set_stable_triple(tripr223, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_22_23  , assym_22_23  , pos_22, 0.0 /*assym_23_23*/  , pos_23, pos_23);
+    // set_stable_triple(tripr233, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_23_33  , 0.0 /*assym_23_23*/ , pos_23, -assym_23_33  , pos_23, pos_23);
+    // set_stable_triple(tripr333, baserates, baserates, baserates2, baserates, baserates2, baserates2, 0.0, 0.0, pos_33, 0.0, pos_33, pos_33);
+
+    double base_sub_11 = baserates * st11;
+    double base_sub_12 = baserates * st12;
+    double base_sub_13 = baserates * st13;
+    double base_sub_22 = baserates * st22;
+    double base_sub_23 = baserates * st23;
+    double base_sub_33 = baserates * st33;
+
+    set_stable_triple(tripr111, base_sub_11, base_sub_11, baserates2, base_sub_11, baserates2, baserates2, 0.0, 0.0, pos_11, 0.0, pos_11, pos_11);
+    set_stable_triple(tripr112, base_sub_12, base_sub_12, baserates2, base_sub_12, baserates2, baserates2, assym_11_12, assym_11_12, pos_11, 0.0 /*assym_12_12*/, pos_12, pos_12);
+    set_stable_triple(tripr113, base_sub_13, base_sub_13, baserates2, base_sub_13, baserates2, baserates2, assym_11_13, assym_11_13, pos_11, 0.0 /*assym_13_13*/, pos_13, pos_13);
+    set_stable_triple(tripr122, base_sub_22, base_sub_12, baserates2, base_sub_12, baserates2, baserates2, assym_12_22, 0.0 /*assym_12_12*/, pos_12, -assym_12_22, pos_22, pos_12);
+    set_stable_triple(tripr123, base_sub_23, base_sub_13, baserates2, base_sub_13, baserates2, baserates2, assym_12_23, assym_12_13, pos_12, assym_23_13, pos_23, pos_13);
+    set_stable_triple(tripr133, base_sub_33, base_sub_13, baserates2, base_sub_13, baserates2, baserates2, assym_13_33, 0.0 /*assym_13_13*/, pos_13, -assym_13_33, pos_33, pos_13);
+    set_stable_triple(tripr222, base_sub_22, base_sub_22, baserates2, base_sub_22, baserates2, baserates2, 0.0, 0.0, pos_22, 0.0, pos_22, pos_22);
+    set_stable_triple(tripr223, base_sub_23, base_sub_23, baserates2, base_sub_23, baserates2, baserates2, assym_22_23, assym_22_23, pos_22, 0.0 /*assym_23_23*/, pos_23, pos_23);
+    set_stable_triple(tripr233, base_sub_33, base_sub_23, baserates2, base_sub_23, baserates2, baserates2, assym_23_33, 0.0 /*assym_23_23*/, pos_23, -assym_23_33, pos_23, pos_23);
+    set_stable_triple(tripr333, base_sub_33, base_sub_33, baserates2, base_sub_33, baserates2, baserates2, 0.0, 0.0, pos_33, 0.0, pos_33, pos_33);
 
     /*
 
@@ -388,11 +409,8 @@ void BindingModelTernary::triplet(bool b12, bool b23, bool b13, bool c12, bool c
     double r3 = c13 * rtemp[i1 * 4 + 2]; //goes to bind 13
     double r4 = rtemp[i1 * 4 + 3];       //goes to none-bound
 
-    // cout << i1 << endl;
-    // cout << rtemp << endl;
-    // cout << indt1 << " " << indt2 << " " << indt3 << endl;
-    // cout << r1 << " " << r2 << " " << r3 << " " << r4 << endl;
-    // pausel();
+
+
 
     double totalr = r1 + r2 + r3 + r4;
 
@@ -422,6 +440,36 @@ void BindingModelTernary::triplet(bool b12, bool b23, bool b13, bool c12, bool c
         a23 = false;
         a13 = false;
     }
+    // if (indt1 != indt2 && indt2 != indt3 && indt1 != indt3 && i1 != 3)
+    // {
+    //     cout << i1 << endl;
+    //     cout << rtemp << endl;
+    //     cout << rr << endl;
+    //     cout << indt1 << " " << indt2 << " " << indt3 << endl;
+    //     cout << r1 << " " << r2 << " " << r3 << " " << r4 << endl;
+
+    //     int i2;
+    //     if (a12)
+    //     { //INDEX 1 and INDEX2 bound
+    //         i2 = 0;
+    //     }
+    //     else if (a23)
+    //     { //INDEX 2 and INDEX 3 bound
+    //         i2 = 1;
+    //     }
+    //     else if (a13)
+    //     { //INDEX 1 and INDEX 3 bound
+    //         i2 = 2;
+    //     }
+    //     else
+    //     { //NO BINDINGS
+    //         i2 = 3;
+    //     }
+
+    //     if(i1 != i2) { cout << "changed" << endl; cout << i1 << " " << i2 << endl; pausel(); }
+    //     else { cout << "unchanged" << endl; }
+
+    // }
 }
 
 void BindingModelTernary::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters) {

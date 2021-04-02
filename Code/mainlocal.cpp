@@ -62,25 +62,32 @@ int main(int argc, char **argv)
     double int1;
     double int2;
     double int3;
+    double int4;
     int m5;
+    int m6;
     int runtime;
-    if (argc == 7)
+    if (argc == 9)
     {
         runtime = atof(argv[1]);
         packing_fraction = atof(argv[2]);
         int1 = atof(argv[3]);
         int2 = atof(argv[4]);
         int3 = atof(argv[5]);
-        m5 = atof(argv[6]);
+        int4 = atof(argv[6]);
+        m5 = atof(argv[7]);
+        m6 = atof(argv[8]);
     }
     else
     {
+        error("incorrect arg number");
         runtime = 100000;
         packing_fraction = 0.05;
         int1 = 12.0;
         int2 = 22.0;
         int3 = 7.0;
-        m5 = 4000;
+        int4 = 5.0;
+        m5 = 500;
+        m6 = 500;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -91,8 +98,8 @@ int main(int argc, char **argv)
     //     params(i, 2) = 0.927;
     // }
     int m1 = 500;
-    int m2 = m1+m5;
-    int n = m2 + 1000;
+    int m2 = m1 + m5;
+    int n = m2 + m6;
 
 
 
@@ -115,13 +122,13 @@ int main(int argc, char **argv)
 
     double unbinding_rebar =  -2.0;
 
-    b.setup(0.99, 0.01, 0.99, 0.2, 0.99, 0.2,
-            0.,
-            0.,
-            0.,
+    b.setup(0.99, 0.01, 0.99, 0.01, 0.99, 0.99,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
             0.0,
             unbinding_rebar,
-            0.0,
             0.0,
             0.0,
             0.0);
@@ -246,20 +253,11 @@ int main(int argc, char **argv)
         for (int j = 0; j < 2; j++)
         {
 
-            if (i == 0 && j == 0)
-            {
-                params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4 * 0.625;
-                params(iter, 2) = 0.927;
-            }
-            else
-            {
-                params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4 * 0.625;
-                params(iter, 2) = 0.927;
-            }
 
-            iter++;
+                params(iter, 0) = int4;
+                params(iter, 1) = 1.4 * 0.625;
+                params(iter, 2) = 0.927;
+                iter++;
         }
     }
 
@@ -352,7 +350,7 @@ int main(int argc, char **argv)
     //int n2 = 100;
     //double packing_fraction = 0.01;
 
-    double l = cbrt(pi * (double)m2 / (6. * packing_fraction));
+    double l = cbrt(pi * (double)m1 / (6. * packing_fraction));
 
 
     cout << l << endl;
