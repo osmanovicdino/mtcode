@@ -202,7 +202,7 @@ int main(int argc, char **argv)
             else
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4;
+                params(iter, 1) = 1.4*size1;
                 params(iter, 2) = 0.927;
             }
 
