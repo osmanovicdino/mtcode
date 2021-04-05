@@ -79,15 +79,15 @@ int main(int argc, char **argv)
     }
     else
     {
-        error("incorrect arg number");
-        runtime = 100000;
+        //error("incorrect arg number");
+        runtime = 1000;
         packing_fraction = 0.05;
         int1 = 12.0;
         int2 = 22.0;
         int3 = 7.0;
         int4 = 5.0;
-        m5 = 500;
-        m6 = 500;
+        m5 = 1000;
+        m6 = 1000;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -122,7 +122,7 @@ int main(int argc, char **argv)
 
     double unbinding_rebar =  -2.0;
 
-    b.setup(0.99, 0.01, 0.99, 0.01, 0.99, 0.99,
+    b.setup(0.99999, 0.00001, 0.99999, 0.00001, 0.99999, 0.99999,
             0.0,
             0.0,
             0.0,
@@ -155,7 +155,10 @@ int main(int argc, char **argv)
     // cout << cc << endl;
     // pausel();
 
-    
+    double size1 = 4.0;
+    double size2 = 1.0;
+
+    double sizemix = (size1+size2)/2.;
     // pausel();
 
     vector1<int> vec1(3);
@@ -178,7 +181,7 @@ int main(int argc, char **argv)
         for (int j = 0; j < 4; j++)
         {
             params(iter, 0) = int1;
-            params(iter, 1) = 1.4;
+            params(iter, 1) = 1.4*size1;
             params(iter, 2) = 0.927;
             iter++;
         }
@@ -193,7 +196,7 @@ int main(int argc, char **argv)
             if (i == 0 && j == 0)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4;
+                params(iter, 1) = 1.4*size1;
                 params(iter, 2) = 0.927;
             }
             else
@@ -214,13 +217,13 @@ int main(int argc, char **argv)
             if (j == 1)
             {
                 params(iter, 0) = int2;
-                params(iter, 1) = 1.4 * 0.625;
+                params(iter, 1) = 1.4 * sizemix;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = int3;
-                params(iter, 1) = 1.4 * 0.625;
+                params(iter, 1) = 1.4 * sizemix;
                 params(iter, 2) = 0.927;
             }
             iter++;
@@ -234,13 +237,13 @@ int main(int argc, char **argv)
             if (i == 0 && j == 0)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1 * 0.25;
+                params(iter, 1) = 1 * size1;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1. * 0.25;
+                params(iter, 1) = 1. * size1;
                 params(iter, 2) = 0.927;
             }
 
@@ -255,7 +258,7 @@ int main(int argc, char **argv)
 
 
                 params(iter, 0) = int4;
-                params(iter, 1) = 1.4 * 0.625;
+                params(iter, 1) = 1.4 * sizemix;
                 params(iter, 2) = 0.927;
                 iter++;
         }
@@ -270,13 +273,13 @@ int main(int argc, char **argv)
             if (j == 1)
             {
                 params(iter, 0) = int3;
-                params(iter, 1) = 1.4 * 0.25;
+                params(iter, 1) = 1.4 * size2;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4 * 0.25;
+                params(iter, 1) = 1.4 * size2;
                 params(iter, 2) = 0.927;
             }
             iter++;
@@ -350,7 +353,7 @@ int main(int argc, char **argv)
     //int n2 = 100;
     //double packing_fraction = 0.01;
 
-    double l = cbrt(pi * (double)m1 / (6. * packing_fraction));
+    double l = cbrt(pi * CUB(4.0) * (double)m1 / (6. * packing_fraction));
 
 
     cout << l << endl;
@@ -427,8 +430,7 @@ int main(int argc, char **argv)
     //pausel();
     //cout << m2 << endl;
 
-
-    A.run_singlebond_different_sizes(runtime, 1000, m2, base);
+    A.run_singlebond_different_sizes(runtime, 1000, m2, size1, size2, base);
 
     //A.run_singlebond_different_sizes(100000, 10,m2, base);
 

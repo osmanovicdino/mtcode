@@ -3,7 +3,7 @@
 
 
 struct GeneralPatch : ComboPatch {
-
+    
     int no_types;
     bool flat;
     vector1<int> no_patches_per_type;

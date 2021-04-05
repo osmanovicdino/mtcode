@@ -2,6 +2,7 @@
 
 Condensate::Condensate(double ll, int N)  {
     num = floor(ll/4.);
+    ls = ll;
 
     obj = new LangevinNVTR;
 
@@ -18,7 +19,12 @@ Condensate::Condensate(double ll, int N)  {
 
     matrix<double> dat(N,3);
 
-    int pp = floor(ll-1.);
+
+    int pp =  ceil(cbrt((double)N)) +1;
+    double binsize = (ll)/(double)pp;
+
+
+
 
     vector<double> possible_pos_x;
     vector<double> possible_pos_y;
@@ -27,16 +33,16 @@ Condensate::Condensate(double ll, int N)  {
     for(int i = 0 ; i < pp ; i++) {
         for(int j = 0  ; j < pp ; j++) {
             for(int k = 0 ; k < pp ; k++) {
-                double x = 0.5 + i;
-                double y = 0.5 + j;
-                double z = 0.5 + k;
+                double x = 0.5*binsize + i*binsize;
+                double y = 0.5*binsize + j*binsize;
+                double z = 0.5*binsize + k*binsize;
                 possible_pos_x.push_back(x);
                 possible_pos_y.push_back(y);
                 possible_pos_z.push_back(z);
-
             }
         }
     }
+
 
 
    
@@ -386,7 +392,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     }
 }
 
-void Condensate::run_singlebond_different_sizes(int runtime, int every, int div, string strbase = "")
+void Condensate::run_singlebond_different_sizes(int runtime, int every, int div, double size1, double size2, string strbase = "")
 {
 
     int ccc;
@@ -421,17 +427,20 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
     bbs.isbound = isbound;
     bbs.boundto = boundto;
 
+    
+    num = floor(ls / (4.*size1) );
+
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
-    matrix<int> *pairsp1 = obj->calculatepairs(boxes, p1, 3.5);
+    matrix<int> *pairsp1 = obj->calculatepairs(boxes, p1, 3.5*size1);
 
-    matrix<int> *pairsp2 = obj->calculatepairs(boxes, p2, 3.5);
+    matrix<int> *pairsp2 = obj->calculatepairs(boxes, p2, 3.5*size2);
 
-    matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5);
+    matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5*(size1+size2)/2.);
 
-    WCAPotential wsa1(1.0, 1.0, 0.0);
-    WCAPotential wsa2(1.0, 0.625, 0.0);
-    WCAPotential wsa3(1.0, 0.25, 0.0);
+    WCAPotential wsa1(3.0, size1, 0.0);
+    WCAPotential wsa2(3.0, (size1+size2)/2., 0.0);
+    WCAPotential wsa3(3.0, size2, 0.0);
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
@@ -489,12 +498,11 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
             delete pairsp2;
             delete pairsp1p2;
 
-            
-            pairsp1 = obj->calculatepairs(boxes, p1, 3.5);
+            pairsp1 = obj->calculatepairs(boxes, p1, 3.5 * size1);
 
-            pairsp2 = obj->calculatepairs(boxes, p2, 3.5);
+            pairsp2 = obj->calculatepairs(boxes, p2, 3.5 * size2);
 
-            pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5);
+            pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5 * (size1 + size2) / 2.);
 
             npp = (pairsp1->getNsafe()) + (pairsp2->getNsafe()) + (pairsp1p2->getNsafe());
             
@@ -600,7 +608,7 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
     }
 }
 
-void Condensate::run_singlebond_different_sizes_continue(int runtime, int every, int div, int starval, BinaryBindStore &bbs2, string strbase = "")
+void Condensate::run_singlebond_different_sizes_continue(int runtime, int every, int div, double size1, double size2, int starval, BinaryBindStore &bbs2, string strbase = "")
 {
 
     int ccc;
@@ -639,17 +647,19 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
     // bbs.isbound = isbound;
     // bbs.boundto = boundto;
 
+    num = floor(ls / (4. * size1));
+
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
-    matrix<int> *pairsp1 = obj->calculatepairs(boxes, p1, 3.5);
+    matrix<int> *pairsp1 = obj->calculatepairs(boxes, p1, 3.5 * size1);
 
-    matrix<int> *pairsp2 = obj->calculatepairs(boxes, p2, 3.5);
+    matrix<int> *pairsp2 = obj->calculatepairs(boxes, p2, 3.5 * size2);
 
-    matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5);
+    matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5 * (size1 + size2) / 2.);
 
-    WCAPotential wsa1(1.0, 1.0, 0.0);
-    WCAPotential wsa2(1.0, 0.625, 0.0);
-    WCAPotential wsa3(1.0, 0.25, 0.0);
+    WCAPotential wsa1(3.0, size1, 0.0);
+    WCAPotential wsa2(3.0, (size1+size2)/2., 0.0);
+    WCAPotential wsa3(3.0, size2, 0.0);
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
@@ -708,11 +718,11 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
             delete pairsp2;
             delete pairsp1p2;
 
-            pairsp1 = obj->calculatepairs(boxes, p1, 3.5);
+            pairsp1 = obj->calculatepairs(boxes, p1, 3.5 * size1);
 
-            pairsp2 = obj->calculatepairs(boxes, p2, 3.5);
+            pairsp2 = obj->calculatepairs(boxes, p2, 3.5 * size2);
 
-            pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5);
+            pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5 * (size1 + size2) / 2.);
 
             npp = (pairsp1->getNsafe()) + (pairsp2->getNsafe()) + (pairsp1p2->getNsafe());
 

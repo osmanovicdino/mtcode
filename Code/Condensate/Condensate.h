@@ -6,6 +6,7 @@
 struct Condensate {
 
 int num;
+double ls;
 
 LangevinNVTR *obj;
 
@@ -26,9 +27,9 @@ void run(int,int, string strbase);
 
 void run_singlebond(int,int,string strbase);
 
-void run_singlebond_different_sizes(int runtime, int every, int div, string strbase);
+void run_singlebond_different_sizes(int runtime, int every, int div, double size1, double size2, string strbase);
 
-void run_singlebond_different_sizes_continue(int runtime, int every, int div, int startval, BinaryBindStore &bbs2, string strbase);
+void run_singlebond_different_sizes_continue(int runtime, int every, int div, double size1, double size2, int startval, BinaryBindStore &bbs2, string strbase);
 };
 
 #include "Condensate.cpp"

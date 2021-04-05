@@ -38,6 +38,7 @@ struct Bilinear2;
 
 struct Bilinear3;
 
+
 typedef double (*enfunc)(double);
 typedef double (*func)(double, double);
 typedef double (*func2)(double,double,double);
