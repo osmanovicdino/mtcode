@@ -60,7 +60,8 @@ TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt
         for (int j = 0; j < 4; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -71,7 +72,8 @@ TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt
         for (int j = 0; j < 2; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v2(j, 0), v2(j, 1), v2(j, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -82,7 +84,8 @@ TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt
         for (int j = 0; j < 2; j++)
         {
             mypot *pot1 = new mypot(v2(i, 0), v2(i, 1), v2(i, 2), v2(j, 0), v2(j, 1), v2(j, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;

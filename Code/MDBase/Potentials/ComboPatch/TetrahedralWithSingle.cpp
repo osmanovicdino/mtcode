@@ -62,7 +62,8 @@ TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, doubl
         for (int j = 0; j < 4; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strtt, distt, angtt, 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -73,7 +74,8 @@ TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, doubl
         for (int j = 0; j < 1; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strts, dists, angts, 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -84,7 +86,8 @@ TetrahedralWithSingle::TetrahedralWithSingle(double strrtt, double disstt, doubl
         for (int j = 0; j < 1; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), strss, disss, angss, 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;

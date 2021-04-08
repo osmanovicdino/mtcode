@@ -9,7 +9,8 @@ SingPatch::SingPatch(double strr, double disss, double angg) : ComboPatch(1), an
     p = &i1;
 
     mypot *pot1 = new mypot(nx, ny, nz, nx, ny, nz, str, dis, ang, 0.75);
-
+    if (pot1->interaction_distance > max_check)
+        max_check = pot1->interaction_distance;
     potential_bundle[0] = pot1->clone();
 
     delete pot1;

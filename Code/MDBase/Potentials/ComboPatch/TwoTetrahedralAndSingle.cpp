@@ -87,7 +87,8 @@ TwoTetrahedralAndSingle::TwoTetrahedralAndSingle(matrix<double> &paramss, int nt
         for (int j = 0; j < 4; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(0, 0), params(0, 1), params(0, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -98,7 +99,8 @@ TwoTetrahedralAndSingle::TwoTetrahedralAndSingle(matrix<double> &paramss, int nt
         for (int j = 0; j < 4; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(1, 0), params(1, 1), params(1, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -109,7 +111,8 @@ TwoTetrahedralAndSingle::TwoTetrahedralAndSingle(matrix<double> &paramss, int nt
         for (int j = 0; j < 1; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(2, 0), params(2, 1), params(2, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -120,7 +123,8 @@ TwoTetrahedralAndSingle::TwoTetrahedralAndSingle(matrix<double> &paramss, int nt
         for (int j = 0; j < 4; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(3, 0), params(3, 1), params(3, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -131,7 +135,8 @@ TwoTetrahedralAndSingle::TwoTetrahedralAndSingle(matrix<double> &paramss, int nt
         for (int j = 0; j < 1; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(4, 0), params(4, 1), params(4, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;
@@ -142,7 +147,8 @@ TwoTetrahedralAndSingle::TwoTetrahedralAndSingle(matrix<double> &paramss, int nt
         for (int j = 0; j < 1; j++)
         {
             mypot *pot1 = new mypot(v(i, 0), v(i, 1), v(i, 2), v(j, 0), v(j, 1), v(j, 2), params(5, 0), params(5, 1), params(5, 2), 0.75);
-
+            if (pot1->interaction_distance > max_check)
+                max_check = pot1->interaction_distance;
             potential_bundle[iter] = pot1->clone();
             delete pot1;
             iter++;

@@ -129,7 +129,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         geo->distance_vector(*dat, p1, p2, un, dis);
 
         //un = i-j
+        
+        
         dis = sqrt(dis);
+
+        if(dis < iny.max_check) {
 
         un /= dis;
         double dx = un.gpcons(0);
@@ -183,20 +187,40 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 int potn = (*q)[tp];
                 // vector1<double> params = (iny.potential_bundle)[potn]->getparameters();
                 //cout << potn << endl;
-                double nxb1;// = params[0]; //iny[potn]->nxb1;
-                double nyb1;// = params[1]; //iny[potn]->nyb1;
-                double nzb1;// = params[2]; //iny[potn]->nzb1;
+//                 double nxb1;// = params[0]; //iny[potn]->nxb1;
+//                 double nyb1;// = params[1]; //iny[potn]->nyb1;
+//                 double nzb1;// = params[2]; //iny[potn]->nzb1;
 
-                double nxb2;// = params[3]; //iny[potn]->nxb2;
-                double nyb2;// = params[4]; //iny[potn]->nyb2;
-                double nzb2;// = params[5]; //iny[potn]->nzb2;
+//                 double nxb2;// = params[3]; //iny[potn]->nxb2;
+//                 double nyb2;// = params[4]; //iny[potn]->nyb2;
+//                 double nzb2;// = params[5]; //iny[potn]->nzb2;
 
-                double disp;// = params[6];
+//                 double disp;// = params[6];
 
-                double thetam;// = params[8];
+//                 double thetam;// = params[8];
 
-//                cout << p1 << " " << p2 << " " << potn << endl;
-                iny.get_params(p1,p2,potn,nxb1,nyb1,nzb1,nxb2,nyb2,nzb2,disp,thetam); //for this potential, get all the parameters
+// //                cout << p1 << " " << p2 << " " << potn << endl;
+//                 iny.get_params(p1,p2,potn,nxb1,nyb1,nzb1,nxb2,nyb2,nzb2,disp,thetam); //for this potential, get all the parameters
+
+                double nxb1 = iny.potential_bundle[potn]->nxb1;
+                double nxb2 = iny.potential_bundle[potn]->nxb2;
+                double nyb1 = iny.potential_bundle[potn]->nyb1;
+                double nyb2 = iny.potential_bundle[potn]->nyb2;
+                double nzb1 = iny.potential_bundle[potn]->nzb1;
+                double nzb2 = iny.potential_bundle[potn]->nzb2;
+                double disp = iny.potential_bundle[potn]->interaction_distance;
+                double thetam = iny.potential_bundle[potn]->thetam;
+
+                // cout << nxb1 << endl;
+                // cout << nxb2 << endl;
+                // cout << nyb1 << endl;
+                // cout << nyb2 << endl;
+                // cout << nzb1 << endl;
+                // cout << nzb2 << endl;
+                // cout << disp << endl;
+                // cout << thetam << endl;
+
+                // pausel();
 
                 double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
                 double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
@@ -295,6 +319,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
             //pausel();
             delete q;
+            }
             
         //     }
         // }
@@ -303,7 +328,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         for(int i = 0 ; i < omp_get_num_threads(); i++) {
             #pragma omp ordered
             edgelist.insert(edgelist.end(),edgelist_private.begin(),edgelist_private.end());
-        }        
+        }
+        
+              
     }
 
         // cout << "which patch" << endl;

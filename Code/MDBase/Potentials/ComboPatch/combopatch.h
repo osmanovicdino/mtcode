@@ -8,9 +8,10 @@ typedef KernFrenkelOnePatch2 mypot;
 struct ComboPatch {
 int **p; //pointer to array where potentials are
 bool safe; // is this combo patch parallel safe?
-vector1<potentialtheta3D*> potential_bundle; //list of potentials
+vector1<mypot*> potential_bundle; //list of potentials
+double max_check;
 
-ComboPatch(int n) : potential_bundle(vector1<potentialtheta3D*>(n)), safe(true) { p = new int*;}
+ComboPatch(int n) : potential_bundle(vector1<mypot*>(n)), safe(true) { p = new int*; max_check = 1.0; }
 
 virtual int num_patches(const int&) = 0; //return the number of patches on particle int
 virtual void UpdateIterator(const int&, const int&) = 0; //reassign the pointer to point to something else

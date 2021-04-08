@@ -429,6 +429,7 @@ int main(int argc, char **argv)
 
     //pausel();
     //cout << m2 << endl;
+    A.obj->setdt(0.005);
 
     A.run_singlebond_different_sizes(runtime, 1000, m2, size1, size2, base);
 
