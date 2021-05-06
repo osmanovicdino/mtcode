@@ -32,18 +32,19 @@ struct Nanostar {
     potential *bindp;
     potential3 *bendp;
 
-    Nanostar(int N, double ll);
+    Nanostar(matrix<double> startPositions, int N, double ll);
 
     void create_nanostar();
     vector1<double> initCoord;
 
     void Passa_set_nanostar(vector1<double> start, double theta, double phi, int arms, int armLength, string fileName);
-    void setNanostar(vector1<double> start, int arms, int armLength, double theta, string fileName);
-    void sortPairsTriplets(int arms, int armLength);
-    void initStickerList(int arms, int armLength);
+    void setNanostar(int arms, int armLength, double theta, string fileName);
+    void sortPairsTriplets(int centerIdx, int arms, int armLength);
+    void initStickerList(int centerIdx, int arms, int armLength);
     void inStickerList(matrix<int> &possiblePairs, matrix <int> &specials, matrix<int> &notSpecials);
     matrix<double> create_initial_state();
     matrix<double> create_initial_state(string s);
+    matrix<double> placement;
 
     void set_initial_state(string s);
 

@@ -34,16 +34,15 @@ std::vector<double> linspace(T start_in, T end_in, int num_in)
 
   double applyPeriodicBC(double num, double length)
   {
-    double bound = abs(length) / 2;
-    if (num < -1*bound)
+    double bound = length;
+    if (num < 0)
     {
-      double delta = abs(num + bound);
-      return bound - delta;
+      return num + bound;
     }
     else if (num > bound) {
-      double delta = num - bound;
-      cout << -1*bound+delta << '\n';
-      return -1*bound + delta;
+      return num - bound;
+    } else {
+      return num;
     }
-    return num;
+
   }

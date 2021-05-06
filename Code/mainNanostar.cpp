@@ -57,14 +57,40 @@ int main(int argc, char **argv)
 
     matrix<double> K2 = K*K;
 
-    cout << endl;
+    // cout << endl;
     // srand(time(NULL));
 
+    matrix<double> initCenters(2, 3);
+    initCenters(0, 0) = 2;
+    initCenters(0, 1) = 2;
+    initCenters(0, 2) = 2;
+    initCenters(1, 0) = 7.2;
+    initCenters(1, 1) = 2;
+    initCenters(1, 2) = 2;
 
-    Nanostar A(1,11.0);
-    cout << "cons works" << '\n';
 
-    cout << A.obj -> getdat() << endl;
+    Nanostar A(initCenters, 2,11.0);
+    // double T;
+    // bool err;
+    // matrix <double> temp = importcsv("C:/cygwin64/home/passa/mtcode/Code/out_folder/cond4/pos_i=000.csv", T, err);
+    // for(int i = 0 ; i < temp.getnrows() ;i++) {
+    //     for(int j = i+1 ; j < temp.getnrows() ; j++)
+    // {
+    // double distance = A.obj->getgeo().distance(temp,i,j); 
+    // if (distance < 1) {
+    //     cout << i << ' ' << j << ' ' << distance << endl; 
+    // }
+    // // cout << A.obj->getgeo().distance(temp,i,j) << endl;
+    // }
+    // }
+    // pausel(); 
+    //cout << "changes work" << '\n';
+    // for (int l = 0; l < A.stickerList.size(); l++){
+    //     cout << A.stickerList[l] << endl;
+    // }
+
+
+    // cout << A.obj -> getdat() << endl;
 
 
     // A.Passa_set_nanostar(start, 30, 20, 4, 3, 5, "test.csv");
@@ -80,8 +106,10 @@ int main(int argc, char **argv)
     // {
     //   cout << A.bendtriples[i].a << A.bendtriples[i].b << A.bendtriples[i].c  << '\n';
     // }
-    // # of timesteps,
-    A.run(10000, 100);
+    // # of timesteps, files 
+    // change this to a million time steps 
+    // make the box smaller 
+    A.run(1000000, 10000);
     //
     // A.initStickerList(4, 3);
     // for (int i = 0; i<A.stickerList.size();i++)

@@ -1,13 +1,13 @@
 #ifndef NANOSTAR_CPP
 #define NANOSTAR_CPP
 
-Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendtriples(vector<mdtriplet>()), stickerList(vector<int>()), particles(matrix<double>()){
+Nanostar::Nanostar(matrix<double> startPositions, int N, double ll) :  placement(startPositions), bindpairs(vector<mdpair>()), bendtriples(vector<mdtriplet>()), stickerList(vector<int>()), particles(matrix<double>()){
     obj = new LangevinNVT;
     dimension = 3;
     l = ll;
-    int num_nanostars = N;
+    num_nanostars = N;
     total_particles = 0;
-
+    // matrix<double> placement = startPositions;
     num_branches = 4;
 
     length_of_branch = 10;
@@ -17,7 +17,10 @@ Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendtriples
 
     double sigma = 1.0;
 
-    double att_epp = 3.0;
+    double att_epp = 300.0; // mocified this 
+
+    // change this line below
+    // increase by a factor of 10
 
     WCAPotential StickerPotential(10.0,sigma,att_epp);
 
@@ -27,10 +30,9 @@ Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendtriples
 
     double preferred_angle = 0.0;
 
-    double bending_strength = 10.0;
+    double bending_strength = 15.0;
 
     BendingPotential nfr2(bending_strength,preferred_angle);
-
 
     // for(int i =  0 ; i < num_nanostars; i++) {
     //     this->Passa_set_nanostar(30, 20, 4, 3, 5, "test.csv");
@@ -38,16 +40,18 @@ Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendtriples
 
     // }
 
-
-    vector1<double> start(3);
-
-    start[0] = 5;
-    start[1] = 5;
-    start[2] = 5;
-    setNanostar(start, 4, 3, 120, "test.csv");
+    int armCount = 4;
+    int armLength = 3;
+    setNanostar(armCount, armLength, 120, "test.csv");
+    // cout << "past setnanostar" << '\n';
     // Passa_set_nanostar(start, 30, 20, 4, 3, "test.csv");
-    sortPairsTriplets(4, 3);
-    initStickerList(4, 3);
+    for (int p = 0; p < num_nanostars; p++){
+      int centerIdx = p*(armLength*armCount + 1);
+      sortPairsTriplets(centerIdx, armCount, armLength);
+      initStickerList(centerIdx, armCount, armLength);
+    }
+
+    // cout << "past sorting" <<"\n";
     potential *q1 = StickerPotential.clone();
     faa = q1;
     potential *q2 = nrr.clone();
@@ -59,9 +63,8 @@ Nanostar::Nanostar(int N, double ll) :  bindpairs(vector<mdpair>()), bendtriples
 
 
     // matrix<double> store = create_initial_state();
-
     LangevinNVT b(bc);
-
+    // cout << "after langevinnvt" <<"\n";
     double kT = 1.0;
     double dt = 0.005;
     double eta = 50.;
@@ -106,56 +109,83 @@ matrix<double> Nanostar::create_initial_state(string s)
     return store;
 }
 
-void Nanostar::setNanostar(vector1<double> start, int arms, int armLength, double theta, string fileName){
-  int totalRealParticles = arms*armLength + 1;
-  matrix <double> temp(totalRealParticles, 3);
+void Nanostar::setNanostar(int arms, int armLength, double theta, string fileName){
+  int totalRealParticles = num_nanostars*(arms*armLength + 1);
+  matrix<double> storeParticles(totalRealParticles, 3);
+  int iter = 0;
   double pi = 2*acos(0.0);
   double incrementAngle = 2*pi / (arms - 1);
   theta = convertToRadians(theta);
-  std::ofstream myFile(fileName);
-  for (int i = 0; i < arms - 1; i++) {
-    double phi = incrementAngle*i;
-    double xEnd = armLength * sin(theta)*cos(phi);
-    double yEnd = armLength * sin(theta)*sin(phi);
-    double zEnd = armLength * cos(theta);
-    vector<double> xList = linspace(start[0], xEnd + start[0], armLength + 1);
-    vector<double> yList = linspace(start[1], yEnd + start[1], armLength + 1);
-    vector<double> zList = linspace(start[2], zEnd + start[2], armLength + 1);
-    for (int h = 0; h < armLength + 1; h++)
-    {
-      if (i != 0 && h == 0)
-      {
-        h = 1;
-      }
-      // check if x, y, z coords are in bounds
-      // if not, apply periodic boundary condition
-      double x = applyPeriodicBC(xList[h], l);
-      double y = applyPeriodicBC(yList[h], l);
-      double z = applyPeriodicBC(zList[h], l);
-      string coordinateToPrint = to_string(x) + ',' + to_string(y) + ',' + to_string(z) + '\n';
+  // std::ofstream myFile(fileName);
+  // cout << placement << "\n";
+  pausel();
+  for (int j = 0; j < num_nanostars; j++){
+    vector1<double> start = placement.getrowvector(j);
 
-      myFile << coordinateToPrint;
-    }
+    //string centerCoordinate = to_string(start[0]) + ',' + to_string(start[1]) + ',' + to_string(start[2]);
+    // cout << "placing center" << endl;
+    storeParticles(iter,0) = start[0];
+    storeParticles(iter,1) = start[1];
+    storeParticles(iter,2) = start[2];
+    iter++;
+
+  //  myFile << centerCoordinate;
+    for (int i = 0; i < arms - 1; i++) {
+      double phi = incrementAngle*i;
+      double xEnd = armLength * sin(theta)*cos(phi);
+      double yEnd = armLength * sin(theta)*sin(phi);
+      double zEnd = armLength * cos(theta);
+      vector<double> xList = linspace(start[0], xEnd + start[0], armLength + 1);
+      vector<double> yList = linspace(start[1], yEnd + start[1], armLength + 1);
+      vector<double> zList = linspace(start[2], zEnd + start[2], armLength + 1);
+
+      // placing center point
+      for (int h = 1; h < armLength + 1; h++)
+      {
+
+        double x = applyPeriodicBC(xList[h], l);
+        double y = applyPeriodicBC(yList[h], l);
+        double z = applyPeriodicBC(zList[h], l);
+      //  string coordinateToPrint = to_string(x) + ',' + to_string(y) + ',' + to_string(z) + '\n';
+
+        //myFile << coordinateToPrint;
+        // cout << j << " " << i << " " << h << endl;
+        storeParticles(iter,0) = x;
+        storeParticles(iter,1) = y;
+        storeParticles(iter,2) = z;
+
+        iter++;
+        // check if x, y, z coords are in bounds
+        // if not, apply periodic boundary condition
+
+      }
+        }
+      // the last arm that comes straight up
+      vector<double> zListLastArm = linspace(start[2], start[2] + armLength, armLength + 1);
+      for (int d = 1; d < armLength + 1; d++)
+      {
+        double x = applyPeriodicBC(start[0], l);
+        double y = applyPeriodicBC(start[1], l);
+        double z = applyPeriodicBC(zListLastArm[d], l);
+        // string coordinateToPrint = to_string(x) + ',' + to_string(y) + ',' + to_string(z) +'\n';
+        // myFile << coordinateToPrint;
+        cout << j << " " << 3 << " " << d << endl;
+        storeParticles(iter,0) = x;
+        storeParticles(iter,1) = y;
+        storeParticles(iter,2) = z;
+        iter++;
+      }
+
   }
-  // the last arm that comes straight up
-  vector<double> zListLastArm = linspace(start[2], start[2] + armLength, armLength + 1);
-  for (int d = 1; d < armLength + 1; d++)
-  {
-    double x = applyPeriodicBC(start[0], l);
-    double y = applyPeriodicBC(start[1], l);
-    double z = applyPeriodicBC(zListLastArm[d], l);
-    string coordinateToPrint = to_string(x) + ',' + to_string(y) + ',' + to_string(z) +'\n';
-    myFile << coordinateToPrint;
-  }
+  pausel();
+
 
   // storing csv output to file
-  myFile.close();
-  double T;
-  bool err;
+
   // store = importcsv(fileName, T, err);
   // (*obj).setdat(store);
-  temp = importcsv(fileName, T, err);
-  particles = temp;
+  // write to particles with storeParticles Matrix 
+  particles = storeParticles;
 }
 
 void Nanostar::Passa_set_nanostar(vector1<double>start, double theta, double phi, int arms, int armLength, string fileName) {
@@ -229,14 +259,14 @@ void Nanostar::Passa_set_nanostar(vector1<double>start, double theta, double phi
     particles = temp;
 }
 
-void Nanostar::sortPairsTriplets(int arms, int armLength)
+void Nanostar::sortPairsTriplets(int centerIdx, int arms, int armLength)
 {
   // sorting the pairs
 
   // iterate through the pairs
 
-  float nanostarCenter = 0;
-  float currentParticleIndex = 1;
+  float nanostarCenter = centerIdx;
+  float currentParticleIndex = centerIdx + 1;
   for (int i = 0; i < arms; i++)
   {
     float prevParticle = nanostarCenter;
@@ -253,7 +283,7 @@ void Nanostar::sortPairsTriplets(int arms, int armLength)
 
   }
 
-  currentParticleIndex = 1;
+  currentParticleIndex = centerIdx + 1;
   for (int i = 0; i < arms; i++)
   {
     float prevParticle = nanostarCenter;
@@ -276,11 +306,11 @@ void Nanostar::sortPairsTriplets(int arms, int armLength)
   }
 }
 
-void Nanostar::initStickerList(int arms, int armLength)
+void Nanostar::initStickerList(int centerIdx, int arms, int armLength)
 {
   for (int i = 1; i < arms + 1; i++)
   {
-    stickerList.push_back(armLength*i);
+    stickerList.push_back(centerIdx + armLength*i);
   }
 }
 
