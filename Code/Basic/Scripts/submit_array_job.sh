@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=6:00:00,h_data=128M
+#$ -l h_rt=12:00:00,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 8
@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-96:1
+#$ -t 1-128:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -29,15 +29,15 @@ module load gcc/7.5.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-if [ -e  ~/Chemistry/Code/Basic/Scripts/params12.dat ]; then
+if [ -e  ~/Chemistry/Code/Basic/Scripts/params13.dat ]; then
    # use the unix command sed -n ${line_number}p to read by line
-   den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $1}'`
-   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $2}'` 
-   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $3}'` 
-   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $4}'`
-   i4=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $5}'`
-   m1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $6}'`
-   m2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params12.dat | awk '{print $7}'`
+   den=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params13.dat | awk '{print $1}'`
+   i1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params13.dat | awk '{print $2}'` 
+   i2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params13.dat | awk '{print $3}'` 
+   i3=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params13.dat | awk '{print $4}'`
+   i4=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params13.dat | awk '{print $5}'`
+   m1=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params13.dat | awk '{print $6}'`
+   m2=`sed -n ${SGE_TASK_ID}p ~/Chemistry/Code/Basic/Scripts/params13.dat | awk '{print $7}'`
    echo "read file correctly" 
 else
    den=0.01
