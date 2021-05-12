@@ -12,6 +12,8 @@ struct GeneralPatch : ComboPatch {
     matrix<double> params;
     matrix<double> orient;
     matrix<int> pot_starters;
+    matrix<mdpair> *whpa;
+    int Nt;
 
     int **i1; //as it is of indeterminate length we have to have a double pointer.
 
@@ -34,6 +36,8 @@ struct GeneralPatch : ComboPatch {
     void UpdateIteratorSafe(const int &i, const int &j, int **q);
     int get_total_patches(const int &N);
     void which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj);
+    void pre_which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj);
+    matrix<mdpair> preallocate_which_patch();
     void which_particle(const int &wpi, const int &wpj, int &i, int &j);
     int which_potential(const int &i, const int &j, const int &wpi, const int &wpj);
 

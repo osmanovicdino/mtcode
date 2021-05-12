@@ -185,6 +185,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             for (int tp = 1; tp < (*q)[0] + 1; tp++)
             {
                 int potn = (*q)[tp];
+
+                mypot *temppot = iny.potential_bundle[potn];
                 // vector1<double> params = (iny.potential_bundle)[potn]->getparameters();
                 //cout << potn << endl;
 //                 double nxb1;// = params[0]; //iny[potn]->nxb1;
@@ -202,14 +204,33 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 // //                cout << p1 << " " << p2 << " " << potn << endl;
 //                 iny.get_params(p1,p2,potn,nxb1,nyb1,nzb1,nxb2,nyb2,nzb2,disp,thetam); //for this potential, get all the parameters
 
-                double nxb1 = iny.potential_bundle[potn]->nxb1;
-                double nxb2 = iny.potential_bundle[potn]->nxb2;
-                double nyb1 = iny.potential_bundle[potn]->nyb1;
-                double nyb2 = iny.potential_bundle[potn]->nyb2;
-                double nzb1 = iny.potential_bundle[potn]->nzb1;
-                double nzb2 = iny.potential_bundle[potn]->nzb2;
-                double disp = iny.potential_bundle[potn]->interaction_distance;
-                double thetam = iny.potential_bundle[potn]->thetam;
+                // double nxb1 = iny.potential_bundle[potn]->nxb1;
+                // double nxb2 = iny.potential_bundle[potn]->nxb2;
+                // double nyb1 = iny.potential_bundle[potn]->nyb1;
+                // double nyb2 = iny.potential_bundle[potn]->nyb2;
+                // double nzb1 = iny.potential_bundle[potn]->nzb1;
+                // double nzb2 = iny.potential_bundle[potn]->nzb2;
+                // double disp = iny.potential_bundle[potn]->interaction_distance;
+                // double thetam = iny.potential_bundle[potn]->thetam;
+
+                double nxb1 = temppot->nxb1;
+                double nxb2 = temppot->nxb2;
+                double nyb1 = temppot->nyb1;
+                double nyb2 = temppot->nyb2;
+                double nzb1 = temppot->nzb1;
+                double nzb2 = temppot->nzb2;
+                double disp = temppot->interaction_distance;
+                double thetam = temppot->thetam;
+
+                // cout << nxb1 << " " << nxb1_1 << endl;
+                // cout << nxb2 << " " << nxb2_1 << endl;
+                // cout << nyb1 << " " << nyb1_1 << endl;
+                // cout << nyb2 << " " << nyb2_1 << endl;
+                // cout << nzb1 << " " << nzb1_1 << endl;
+                // cout << nzb2 << " " << nzb2_1 << endl;
+                // cout << disp << " " << disp_1 << endl;
+                // cout << thetam << " " << thetam_1 << endl;
+                // pausel();
 
                 // cout << nxb1 << endl;
                 // cout << nxb2 << endl;

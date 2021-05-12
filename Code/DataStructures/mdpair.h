@@ -6,11 +6,19 @@ struct mdpair
     int a;
     int b;
     mdpair() : a(0), b(0) {}
+    mdpair(const int i) : a(i), b(i) {}
     mdpair(const int &aa, const int &bb) : a(aa), b(bb) {}
     bool operator<(mdpair const &rhs) const
     {
         return a < rhs.a || (a == rhs.a && b < rhs.b);
     }
+
+    mdpair& operator=(const mdpair &rhs) {
+        a=rhs.a;
+        b=rhs.b;
+        return *this;
+    }
+    
     bool operator==(const mdpair &rhs) const
     {
         if (a == rhs.a && b == rhs.b)

@@ -82,7 +82,7 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
                             // }
                            // else {
                                 //cout << "create normal" << endl;
-                                mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
+                            mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
                             //}
 
                             potential_bundle[iter] = pot1->clone();
@@ -93,9 +93,11 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
         }
     }
 
-    
 
+    Nt = num_per_type[num_per_type.getsize() - 1];
+    //*whpa = preallocate_which_patch();
 
+    //whpa = new matrix<mdpair>(preallocate_which_patch());
 
 }
 
@@ -103,7 +105,8 @@ GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnro
 {
     flat = a.flat;
     no_types = no_patches_per_type.getsize();
-    
+    Nt = a.Nt;
+
     int total_no_of_orients = 0;
     vector1<int> start_and_end_points(no_types + 1);
     start_and_end_points[0] = 0;
@@ -184,6 +187,7 @@ GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnro
         }
     }
 
+    //whpa = new matrix<mdpair>(*(a.whpa));
 }
 
 inline int GeneralPatch::return_type(int i) {
@@ -248,7 +252,7 @@ int GeneralPatch::get_total_patches(const int &N) {
  }
 
  void GeneralPatch::which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
- {
+ { // what this function does is take 
      int k1 = return_type(i);
      int k2 = return_type(j);
 
@@ -273,6 +277,115 @@ int GeneralPatch::get_total_patches(const int &N) {
     //  wpi = i;
     //  wpj = j;
  }
+
+ void GeneralPatch::pre_which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
+ { // what this function does is take
+     int k1 = return_type(i);
+     int k2 = return_type(j);
+
+     int potstart = potn - pot_starters(k1, k2);
+
+     int ori = no_patches_per_type[k2];
+
+     int k3 = potstart / ori;
+     int k4 = potstart % ori;
+
+     int starti = k1 == 0 ? 0 : total_patches_per_type[k1 - 1];
+     int startj = k2 == 0 ? 0 : total_patches_per_type[k2 - 1];
+
+     int startpi = k1 == 0 ? 0 : num_per_type[k1 - 1];
+     int startpj = k2 == 0 ? 0 : num_per_type[k2 - 1];
+
+     wpi = starti + (i - startpi) * no_patches_per_type[k1] + k3;
+     wpj = startj + (j - startpj) * no_patches_per_type[k2] + k4;
+
+     //  wpi = i;
+     //  wpj = j;
+ }
+
+ matrix<mdpair> GeneralPatch::preallocate_which_patch() {
+    //  Nt = num_per_type[num_per_type.getsize()-1];
+
+     int max_depth = i1[0][0];
+
+     for (int j = 1; j < no_types * (no_types + 1) / 2 ; j++) {
+         int temp = i1[j][0];
+         if(temp>max_depth) max_depth=temp;
+     }
+
+     matrix<mdpair> temp_mat(SQR(Nt),max_depth+2);
+
+     
+     for(int i =0 ; i < Nt ; i++) {
+         for(int j = 0 ; j < Nt ; j++){
+             int k1 = return_type(i);
+             int k2 = return_type(j);
+             int potstart=pot_starters(k1, k2);
+
+
+             int **q = new int*;
+             this->UpdateIteratorSafe(i,j,q);
+
+             int np = (*q)[0];
+
+            //  cout << k1 << " " << k2 << endl;
+            //  for (int k = 0; k < np; k++)
+            //      cout << (*q)[k + 1] << " ";
+            //  cout << endl;
+
+             (temp_mat)(i * Nt + j, 0) = mdpair(np,0);
+             (temp_mat)(i * Nt + j, 1) = mdpair(potstart,0);
+             for(int k = 0 ; k < np ; k++) {
+                int wp1,wp2;
+                 this->pre_which_patch(i, j, (*q)[k + 1],wp1,wp2);
+                //  if(wp1<0||wp2<0) {
+                //      for(int k =0 ; k < np ; k++)
+                //         cout << (*q)[k + 1] << " ";
+                //      cout << endl;
+                //      cout << i << " " << j << endl;
+                //      cout << k1 << " " << k2 << endl; 
+                //      cout << k << endl;
+                //      cout << np << endl;
+                //      cout << (*q)[k+1] << endl;
+                //      cout << wp1 << " " << wp2 << endl;
+                //      pausel();
+                //      }
+                 mdpair asd(wp1,wp2);
+
+                 (temp_mat)(i * Nt + j, k + 2) = asd;
+                     
+             }
+             delete q;
+         }
+     }
+   
+    return temp_mat;
+
+    // cout << whpa->getnrows() << endl;
+
+ }
+
+//  void GeneralPatch::which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj) {
+//     //cout << "whi" << endl;
+//     //  cout << i << " " << j << endl;
+//     //cout << potn << endl;
+
+//     //cout << whpa->getnrows() << endl;
+
+//      int po = whpa->operator()(i*Nt+j,1).a;
+//     //  cout << po << endl;
+     
+//     //  cout << i << " " << j << " " << po << " " << potn << endl;
+//     //  cout << Nt << endl;
+//     //  cout << i * Nt + j << endl;
+//      mdpair temp = whpa->operator()(i *Nt + j, potn - po+2);
+     
+//     //  cout << temp << endl;
+//     //  cout << endl;
+//      wpi = temp.a;
+//      wpj = temp.b;
+//     //  cout << "patches: " << wpi << " " << wpj << endl;
+//  }
 
  void GeneralPatch::which_particle(const int &wpi, const int &wpj, int &i, int &j)
  {
