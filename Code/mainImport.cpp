@@ -453,6 +453,10 @@ int s3 = bindfiles.size();
     bbs2.isbound =  iss;
     bbs2.boundto = ist;
     //Do processing to make sure everything is fine here
+    cout << A.obj->getN() << endl;
+    cout << posfiles.size() << endl;
+    cout << bbs2.boundto.getsize() << endl;
+    
 
     A.run_singlebond_different_sizes_continue(runtime, 1000, m2, size1, size2, posfiles.size(), bbs2, base);
 

@@ -52,11 +52,11 @@ fi
 dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_m1=${m1}_m2=${m2}"
 mkdir /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
-g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainImport.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron
+g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainImport.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron2
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 export OMP_NUM_THREADS=8
-./angron 10000000 $den $i1 $i2 $i3 >log
-./angron 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 >log
+./angron2 10000000 $den $i1 $i2 $i3 >log
+./angron2 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
