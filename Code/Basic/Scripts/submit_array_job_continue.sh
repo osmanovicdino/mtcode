@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=12:00:00,h_data=512M
+#$ -l h_rt=6:00:00,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 8
@@ -56,6 +56,7 @@ g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainImport.cpp -o /u/scratch/d/dinoo/Ph
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 export OMP_NUM_THREADS=8
 ./angron 10000000 $den $i1 $i2 $i3 >log
+./angron 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
