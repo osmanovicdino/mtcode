@@ -6,13 +6,13 @@ struct GeneralPatch : ComboPatch {
     
     int no_types;
     bool flat;
-    vector1<int> no_patches_per_type;
-    vector1<int> num_per_type;
-    vector1<int> total_patches_per_type;
+    int* no_patches_per_type;
+    int* num_per_type;
+    int* total_patches_per_type;
     matrix<double> params;
     matrix<double> orient;
     matrix<int> pot_starters;
-    matrix<mdpair> *whpa;
+    //matrix<mdpair> *whpa;
     int Nt;
 
     int **i1; //as it is of indeterminate length we have to have a double pointer.

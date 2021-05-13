@@ -62,22 +62,32 @@ double packing_fraction;
 double int1;
 double int2;
 double int3;
+double int4;
+int m5;
+int m6;
 int runtime;
-if (argc == 6)
+if (argc == 9)
 {
     runtime = atof(argv[1]);
     packing_fraction = atof(argv[2]);
     int1 = atof(argv[3]);
     int2 = atof(argv[4]);
     int3 = atof(argv[5]);
+    int4 = atof(argv[6]);
+    m5 = atof(argv[7]);
+    m6 = atof(argv[8]);
 }
 else
 {
-    runtime = 10000;
-    packing_fraction = 0.01;
-    int1 = 15.0;
-    int2 = 10.0;
-    int3 = 10.0;
+    //error("incorrect arg number");
+    runtime = 1001;
+    packing_fraction = 0.05;
+    int1 = 12.0;
+    int2 = 22.0;
+    int3 = 7.0;
+    int4 = 5.0;
+    m5 = 1000;
+    m6 = 1000;
 }
 
 cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -86,10 +96,15 @@ cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
 //     params(i, 0) =  10.0; //strength
 //     params(i, 1) =  1.4; //distance
 //     params(i, 2) = 0.927;
-// }
-int m1 = 2000;
-int m2 = 6000;
-int n = 10000;
+// }   int m1 = 500;
+int m1 = 500;
+int m2 = m1 + m5;
+int n = m2 + m6;
+
+// int m1  = 2;
+// int m2 = 6;
+// int n = 10;
+
 BindingModelTernary b(m1 * 4, m1 * 4 + 4 * (m2 - m1));
 
 // b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
@@ -103,13 +118,15 @@ BindingModelTernary b(m1 * 4, m1 * 4 + 4 * (m2 - m1));
 // 0.0,
 // 0.0);
 
-b.setup(0.99, 0.01, 0.99, 0.2, 0.99, 0.2,
-        0.,
-        0.,
-        0.,
+double unbinding_rebar = -2.0;
+
+b.setup(0.99999, 0.00001, 0.99999, 0.00001, 0.99999, 0.99999,
         0.0,
-        -2.0,
         0.0,
+        0.0,
+        0.0,
+        0.0,
+        unbinding_rebar,
         0.0,
         0.0,
         0.0);
@@ -136,6 +153,10 @@ b.setup(0.99, 0.01, 0.99, 0.2, 0.99, 0.2,
 // cout << cc << endl;
 // pausel();
 
+double size1 = 4.0;
+double size2 = 1.0;
+
+double sizemix = (size1 + size2) / 2.;
 // pausel();
 
 vector1<int> vec1(3);
@@ -148,6 +169,7 @@ vector1<int> numb(3);
 numb[0] = m1;
 numb[1] = m2;
 numb[2] = n;
+
 int tot = 4 * 4 + 4 * 2 + 4 * 4 + 3 * 2 + 4 * 2 + 4 * 4;
 matrix<double> params(tot, 3);
 
@@ -157,7 +179,7 @@ for (int i = 0; i < 4; i++)
     for (int j = 0; j < 4; j++)
     {
         params(iter, 0) = int1;
-        params(iter, 1) = 1.4;
+        params(iter, 1) = 1.4 * size1;
         params(iter, 2) = 0.927;
         iter++;
     }
@@ -171,13 +193,13 @@ for (int i = 0; i < 4; i++)
         if (i == 0 && j == 0)
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4;
+            params(iter, 1) = 1.4 * size1;
             params(iter, 2) = 0.927;
         }
         else
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4;
+            params(iter, 1) = 1.4 * size1;
             params(iter, 2) = 0.927;
         }
 
@@ -192,13 +214,13 @@ for (int i = 0; i < 4; i++)
         if (j == 1)
         {
             params(iter, 0) = int2;
-            params(iter, 1) = 1.4 * 0.75;
+            params(iter, 1) = 1.4 * sizemix;
             params(iter, 2) = 0.927;
         }
         else
         {
             params(iter, 0) = int3;
-            params(iter, 1) = 1.4 * 0.75;
+            params(iter, 1) = 1.4 * sizemix;
             params(iter, 2) = 0.927;
         }
         iter++;
@@ -212,13 +234,13 @@ for (int i = 0; i < 4; i++)
         if (i == 0 && j == 0)
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1 * 0.5;
+            params(iter, 1) = 1 * size1;
             params(iter, 2) = 0.927;
         }
         else
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1. * 0.5;
+            params(iter, 1) = 1. * size1;
             params(iter, 2) = 0.927;
         }
 
@@ -231,19 +253,9 @@ for (int i = 0; i < 4; i++)
     for (int j = 0; j < 2; j++)
     {
 
-        if (i == 0 && j == 0)
-        {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4 * 0.75;
-            params(iter, 2) = 0.927;
-        }
-        else
-        {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4 * 0.75;
-            params(iter, 2) = 0.927;
-        }
-
+        params(iter, 0) = int4;
+        params(iter, 1) = 1.4 * sizemix;
+        params(iter, 2) = 0.927;
         iter++;
     }
 }
@@ -255,13 +267,13 @@ for (int i = 0; i < 2; i++)
         if (j == 1)
         {
             params(iter, 0) = int3;
-            params(iter, 1) = 1.4 * 0.5;
+            params(iter, 1) = 1.4 * size2;
             params(iter, 2) = 0.927;
         }
         else
         {
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4 * 0.5;
+            params(iter, 1) = 1.4 * size2;
             params(iter, 2) = 0.927;
         }
         iter++;
@@ -335,7 +347,7 @@ GeneralPatch c(vec1, numb, params, orient);
 //int n2 = 100;
 //double packing_fraction = 0.01;
 
-double l = cbrt(pi * (double)m2 / (6. * packing_fraction));
+double l = cbrt(pi * CUB(4.0) * (double)m1 / (6. * packing_fraction));
 
 Condensate A(l, n);
 
@@ -399,6 +411,7 @@ ss << beta;
 string base = "_beta=";
 base += ss.str();
 
+A.obj->setdt(0.005);
 //A.run_singlebond(runtime, 1000, base);
 vector<string> orientfiles;
 vector<string> posfiles;
@@ -441,7 +454,7 @@ int s3 = bindfiles.size();
     bbs2.boundto = ist;
     //Do processing to make sure everything is fine here
 
-    A.run_singlebond_different_sizes_continue(runtime, 1000, m2, posfiles.size(), bbs2, base);
+    A.run_singlebond_different_sizes_continue(runtime, 1000, m2, size1, size2, posfiles.size(), bbs2, base);
 
 /*
 int NN = 10000;

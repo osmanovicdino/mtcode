@@ -4,11 +4,20 @@
 // we define here a general patch model such that we may quickly be able to create new simulations of whichever
 // geometry we are interested in
 
-GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_per_typee, matrix<double> &paramss, matrix<double> &orientt, bool flatt  = false) : ComboPatch(paramss.getnrows()), params(paramss), orient(orientt), no_patches_per_type(no_patches_per_typee), num_per_type(num_per_typee), total_patches_per_type(vector1<int>(no_patches_per_typee.getsize())), pot_starters(matrix<int>(num_per_typee.getsize(), num_per_typee.getsize()))
+GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_per_typee, matrix<double> &paramss, matrix<double> &orientt, bool flatt = false) : ComboPatch(paramss.getnrows()), params(paramss), orient(orientt), /*no_patches_per_type(no_patches_per_typee), num_per_type(num_per_typee), total_patches_per_type(vector1<int>(no_patches_per_typee.getsize())),*/ pot_starters(matrix<int>(num_per_typee.getsize(), num_per_typee.getsize()))
 {
-    no_types = no_patches_per_type.getsize();
+    no_types = no_patches_per_typee.getsize();
     flat = flatt;
 
+    num_per_type = new int [no_types];
+    for(int i = 0 ; i < no_types ;i++)
+        num_per_type[i]=num_per_typee[i];
+
+    no_patches_per_type = new int[no_types];
+    for (int i = 0; i < no_types; i++)
+        no_patches_per_type[i] = no_patches_per_typee[i];
+
+    total_patches_per_type = new int[no_types];
 
     //if(params.getnrows() != no_types*(no_types)/2 ) error("param matrix not of the correct size");
     total_patches_per_type[0] = num_per_type[0]*no_patches_per_type[0];
@@ -19,7 +28,7 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
     int total_no_of_orients =  0;
     vector1<int> start_and_end_points(no_types+1);
     start_and_end_points[0] = 0;
-    for(int i = 0  ; i < no_patches_per_type.getsize() ; i++) {
+    for(int i = 0  ; i < no_types ; i++) {
         total_no_of_orients += no_patches_per_type[i];
         start_and_end_points[i+1] =  total_no_of_orients;
     }
@@ -94,24 +103,35 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
     }
 
 
-    Nt = num_per_type[num_per_type.getsize() - 1];
+    Nt = num_per_type[no_types - 1];
     //*whpa = preallocate_which_patch();
 
     //whpa = new matrix<mdpair>(preallocate_which_patch());
 
 }
 
-GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnrows()), params(a.params), orient(a.orient), no_patches_per_type(a.no_patches_per_type), num_per_type(a.num_per_type), total_patches_per_type(a.total_patches_per_type), pot_starters(a.pot_starters)
+GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnrows()), params(a.params), orient(a.orient), /*no_patches_per_type(a.no_patches_per_type), num_per_type(a.num_per_type), total_patches_per_type(a.total_patches_per_type),*/ pot_starters(a.pot_starters)
 {
     flat = a.flat;
-    no_types = no_patches_per_type.getsize();
+    no_types = a.no_types;//no_patches_per_type.getsize();
     Nt = a.Nt;
+    num_per_type = new int[no_types];
+    for (int i = 0; i < no_types; i++)
+        num_per_type[i] = a.num_per_type[i];
+
+    no_patches_per_type = new int[no_types];
+    for (int i = 0; i < no_types; i++)
+        no_patches_per_type[i] = a.no_patches_per_type[i];
+
+    total_patches_per_type = new int[no_types];
+    for (int i = 0; i < no_types; i++)
+        total_patches_per_type[i] = a.total_patches_per_type[i];
 
     int total_no_of_orients = 0;
     vector1<int> start_and_end_points(no_types + 1);
     start_and_end_points[0] = 0;
 
-    for (int i = 0; i < no_patches_per_type.getsize(); i++)
+    for (int i = 0; i < no_types; i++)
     {
         total_no_of_orients += no_patches_per_type[i];
         start_and_end_points[i + 1] = total_no_of_orients;

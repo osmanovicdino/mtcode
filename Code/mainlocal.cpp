@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     else
     {
         //error("incorrect arg number");
-        runtime = 1000;
+        runtime = 1001;
         packing_fraction = 0.05;
         int1 = 12.0;
         int2 = 22.0;
