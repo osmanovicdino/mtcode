@@ -55,7 +55,6 @@ cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake
 g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainImport.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron2
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 export OMP_NUM_THREADS=8
-./angron2 10000000 $den $i1 $i2 $i3 >log
 ./angron2 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
