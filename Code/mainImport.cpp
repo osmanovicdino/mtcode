@@ -406,9 +406,9 @@ double beta = 1.0;
 A.obj->setkT(1. / beta);
 
 stringstream ss;
-ss << beta;
+ss << unbinding_rebar;
 
-string base = "_beta=";
+string base = "_rebar=";
 base += ss.str();
 
 A.obj->setdt(0.005);
@@ -455,7 +455,10 @@ int s3 = bindfiles.size();
     //Do processing to make sure everything is fine here
     cout << A.obj->getN() << endl;
     cout << posfiles.size() << endl;
+    cout << posfiles[posfiles.size()-1] << endl;
+    
     cout << bbs2.boundto.getsize() << endl;
+    pausel();
     
 
     A.run_singlebond_different_sizes_continue(runtime, 1000, m2, size1, size2, posfiles.size(), bbs2, base);

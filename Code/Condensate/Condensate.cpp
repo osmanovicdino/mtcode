@@ -779,6 +779,12 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
 
             ss << setw(number_of_digits) << setfill('0') << starval + (i / every);
 
+            cout << "outputting file" << endl;
+            cout << ss.str() << endl;
+
+            pausel();
+
+
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();
 
