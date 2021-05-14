@@ -54,7 +54,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    
+
     srand(time(NULL));
     //signal(SIGSEGV, handler);
 
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     //     params(i, 1) =  1.4; //distance
     //     params(i, 2) = 0.927;
     // }
-    int m1 = 2000;
+    int m1 = 500;
     int m2 = m1 + m5;
     int n = m2 + m6;
 
@@ -120,9 +120,9 @@ int main(int argc, char **argv)
     // 0.0,
     // 0.0);
 
-    double unbinding_rebar =  0.0;
+    double unbinding_rebar =  -2.0;
 
-    b.setup(0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
+    b.setup(0.99999, 0.00001, 0.99999, 0.00001, 0.99999, 0.99999,
             0.0,
             0.0,
             0.0,
@@ -155,7 +155,7 @@ int main(int argc, char **argv)
     // cout << cc << endl;
     // pausel();
 
-    double size1 = 2.0;
+    double size1 = 4.0;
     double size2 = 1.0;
 
     double sizemix = (size1+size2)/2.;
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            if (j == 0)
+            if (j == 1)
             {
                 params(iter, 0) = int2;
                 params(iter, 1) = 1.4 * sizemix;
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i==1 && j == 1)
+            if (j == 1)
             {
                 params(iter, 0) = int3;
                 params(iter, 1) = 1.4 * size2;
@@ -355,7 +355,7 @@ int main(int argc, char **argv)
     //int n2 = 100;
     //double packing_fraction = 0.01;
 
-    double l = cbrt(pi * CUB(size1) * (double)m1 / (6. * packing_fraction));
+    double l = cbrt(pi * CUB(4.0) * (double)m1 / (6. * packing_fraction));
 
 
     cout << l << endl;

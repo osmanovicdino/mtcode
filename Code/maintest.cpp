@@ -50,6 +50,8 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 
 //#include "MDGPU.cu"
 
+#include "fftw3.h"
+
 using namespace std;
 
 void done() {
@@ -61,12 +63,37 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
+    int n0 = 512;
+    int n1 = 512;
+
+    // fftw_complex *in;
+    // fftw_complex *out;
+
+    int N1 = 512;
+    int N2 = 512;
+
+    double *an_array;
+    an_array = (double *)fftw_malloc(N1*N2* sizeof(double));
+
+    double *out;
+    out = (double*)fftw_malloc(N1*N2*sizeof(double));
+    // in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
+    // out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
+
+    fftw_plan p;
+    p = fftw_plan_r2r_2d(N1, N2, an_array, out,1);
+    // p = fftw_plan_dft_1d(N,in,out,FFTW_FORWARD,FFTW_ESTIMATE);
+
+    FFTW_REDFT00
+
+
+    /*
     int N = 6;
     double pd = 0.01;
     double d = cbrt(N/pd);
 
     NanotubeAssembly A(d,N);
-
+    */
     
     // matrix<double> vf(2,3);
     // vf(0, 0) = d / 2.;
@@ -115,7 +142,7 @@ int main(int argc, char **argv)
     // A.setpots(p2);
     //A.setkT(0.1);
 
-
+    /*
     double beta = 1.;
     //for(double beta = 0.2 ; beta < 1.01 ; beta += 0.1) {
     double strp1[3] = {10.,20.,30.};
@@ -175,6 +202,7 @@ int main(int argc, char **argv)
 
     A.run(100000, 1000, base);
     }
+    */
 
     //}
 /* 
