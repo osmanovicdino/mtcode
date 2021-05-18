@@ -377,7 +377,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
 
     BivalentPatch c2(10.0, 1.4,0.5);
 
-    this->setpots(c);
+    this->setpots(c2);
 
 
 

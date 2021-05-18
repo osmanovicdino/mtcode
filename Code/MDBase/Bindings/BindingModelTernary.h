@@ -5,6 +5,38 @@
 #include "../../Basic/basic.h"
 
 
+struct SortingFunctionUniform {
+int div1;
+int div2;
+
+int operator()(const int &index1) {
+    if (index1 < div1)
+        return 1;
+    else if (index1 < div2)
+        return 2;
+    else
+        return 3;
+}
+
+
+};
+
+struct SortingFunctionNonUniform {
+    int div1;
+    int div2;
+    int operator()(const int &index1) {
+        if (index1 < div1)
+            return 1;
+        else if (index1 < div2)
+            return 2;
+        else
+            if((index1-div1-div2)%3 == 2) return 3;
+            else return 1;
+    }
+};
+
+
+template <typename Q> //Modified to include the fact that we shall be able to bin into types a,b,c according to an arbitrary rule passed by template
 struct BindingModelTernary : AbstractBindingModel
 {
     vector1<double> doubr11;
@@ -25,12 +57,21 @@ struct BindingModelTernary : AbstractBindingModel
     vector1<double> tripr233;
     vector1<double> tripr333;
 
-    int div1;
-    int div2;
+    // int div1;
+    // int div2;
 
-    BindingModelTernary(int, int);
+    Q func; /* this is the function that takes the input argument and outputs what chemical species it is
+    we do not do thiss with runtime polymorphism as this function will need to be called so many times
+    as to make the difference between the two non-negligible 
+
+    The only feature this function needs is operator()(int) that returns another int 1 2 or 3
+    */
+
+    BindingModelTernary(Q&);
 
     void setup(double st11, double st22, double st33, double st12, double st13, double st23, double, double, double, double, double, double, double, double, double);
+
+    void setup_energy_barrier(double st11, double st22, double st33, double st12, double st13, double st23, double, double, double, double, double, double, double, double, double, double, double, double, double, double, double);
 
     inline vector1<double> get_drate(int, int);
     inline vector1<double> get_trate(int,int,int);

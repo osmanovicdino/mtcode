@@ -63,9 +63,6 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
-    int n0 = 512;
-    int n1 = 512;
-
     // fftw_complex *in;
     // fftw_complex *out;
 
@@ -79,12 +76,32 @@ int main(int argc, char **argv)
     out = (double*)fftw_malloc(N1*N2*sizeof(double));
     // in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
     // out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * N);
-
+    
+    for(int i = 0 ; i < N1 ; i++) {
+        for(int j = 0 ; j < N2 ; j++) {
+            an_array[i*N1+j]=1.;
+        }
+    }
+    
     fftw_plan p;
-    p = fftw_plan_r2r_2d(N1, N2, an_array, out,1);
+    
+    p = fftw_plan_r2r_2d(N1, N2, an_array, out, FFTW_REDFT10, FFTW_REDFT10, 1);
+
+    fftw_execute(p);
+    cout << an_array[0] << endl;
+    cout << out[0]/(2*512) << endl;
+    
+
+    fftw_plan p2;
+    p2 = fftw_plan_r2r_2d(N1, N2, out, an_array, FFTW_REDFT01, FFTW_REDFT01, 1);
+
+    fftw_execute(p2);
+
+    cout << an_array[0] << endl;
+    cout << an_array[1] << endl;
+    cout << out[0] / SQR(2 * 512) << endl;
     // p = fftw_plan_dft_1d(N,in,out,FFTW_FORWARD,FFTW_ESTIMATE);
 
-    FFTW_REDFT00
 
 
     /*

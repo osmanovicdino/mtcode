@@ -86,8 +86,8 @@ int main(int argc, char **argv)
         int2 = 22.0;
         int3 = 7.0;
         int4 = 5.0;
-        m5 = 1000;
-        m6 = 1000;
+        m5 = 0;
+        m6 = 2000;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     //     params(i, 1) =  1.4; //distance
     //     params(i, 2) = 0.927;
     // }
-    int m1 = 1000;
+    int m1 = 2000;
     int m2 = m1 + m5;
     int n = m2 + m6;
 
@@ -107,14 +107,12 @@ int main(int argc, char **argv)
     // int m2 = 6;
     // int n = 10;
 
-    //SortingFunctionUniform my_sorter;
-    
-    SortingFunctionNonUniform my_sorter;
+    SortingFunctionUniform my_sorter;
     my_sorter.div1 = (m1 * 4);
     my_sorter.div2 = (m1 * 4 + 4 * (m2 - m1));
     //BindingModelTernary b(m1 * 4, m1*4 + 4 * (m2-m1));
 
-    BindingModelTernary<SortingFunctionNonUniform> b(my_sorter);
+    BindingModelTernary<SortingFunctionUniform> b(my_sorter);
     //BindingModelTernary b(my_sorter);
 
     // b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
@@ -128,20 +126,18 @@ int main(int argc, char **argv)
     // 0.0,
     // 0.0);
 
-    double unbinding_rebar =  -20.0;
-    double unbinding_rebar2 = 2.0;
+    double unbinding_rebar =  0.0;
 
-    b.setup_energy_barrier(0.99999, 0.99999, 0.99999, 0.99999, 0.01, 0.99999,
-                   0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
-                   0.0,
-                   unbinding_rebar2,
-                   0.0,
-                   0.0,
-                   0.0,
-                   unbinding_rebar,
-                   0.0,
-                   0.0,
-                   0.0);
+    b.setup(0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            unbinding_rebar,
+            0.0,
+            0.0,
+            0.0);
 
     // vector1<int> cc(4);
 
@@ -174,7 +170,7 @@ int main(int argc, char **argv)
     vector1<int> vec1(3);
     vec1[0] = 4;
     vec1[1] = 4;
-    vec1[2] = 3;
+    vec1[2] = 2;
 
     vector1<int> numb(3);
 
@@ -182,7 +178,7 @@ int main(int argc, char **argv)
     numb[1] = m2;
     numb[2] = n;
 
-    int tot = 4*4+4*4+4*3+4*4+4*3+3*3;
+    int tot = 4*4+4*2+4*4+3*2+4*2+4*4;
     matrix<double> params(tot, 3);
 
     int iter = 0;
@@ -222,7 +218,7 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < 4; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 2; j++)
         {
             if (j == 0)
             {
@@ -230,14 +226,9 @@ int main(int argc, char **argv)
                 params(iter, 1) = 1.4 * sizemix;
                 params(iter, 2) = 0.927;
             }
-            else if (j==1)
+            else
             {
                 params(iter, 0) = int3;
-                params(iter, 1) = 1.4 * sizemix;
-                params(iter, 2) = 0.927;
-            }
-            else {
-                params(iter, 0) = int4;
                 params(iter, 1) = 1.4 * sizemix;
                 params(iter, 2) = 0.927;
             }
@@ -268,11 +259,11 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < 4; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 2; j++)
         {
 
 
-                params(iter, 0) = 0.0;
+                params(iter, 0) = int4;
                 params(iter, 1) = 1.4 * sizemix;
                 params(iter, 2) = 0.927;
                 iter++;
@@ -281,9 +272,9 @@ int main(int argc, char **argv)
 
 
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 2; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 2; j++)
         {
             if (i==1 && j == 1)
             {
@@ -301,7 +292,7 @@ int main(int argc, char **argv)
         }
     }
 
-    matrix<double> orient(11,3);
+    matrix<double> orient(10,3);
 
     double nx1 = sqrt(8. / 9.);
     double ny1 = 0.;
@@ -361,10 +352,6 @@ int main(int argc, char **argv)
     orient(9, 1) = ny4;
     orient(9, 2) = -nz4;
 
-    orient(10, 0) = nx4;
-    orient(10, 1) = nz4;
-    orient(10, 2) = ny4;
-
     GeneralPatch c(vec1, numb, params, orient);
 
     cout << "created patch" << endl;
@@ -413,6 +400,14 @@ int main(int argc, char **argv)
 
     A.setBindingModel(b);
 
+    bool c2;
+
+    int part1 = 1000;
+    int part2 = 10000;
+    A.bm->doublet(0,part1,part2,c2);
+
+    cout << my_sorter(part1) << " " << my_sorter(part2) << endl;
+    pausel();
 
     //cout << "set up 1" << endl;
     A.setpots(c);
