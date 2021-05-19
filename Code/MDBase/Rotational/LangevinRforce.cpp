@@ -683,6 +683,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i2] = true;
                         bo.isbound[i3] = false;
                         mypairs_private.push_back(mdpair(i2, i1));
+
+                        // if(a12 != b12)
+                        // {
+                        //     cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                        // }
                     }
                     else if (a23)
                     {
@@ -693,6 +698,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i2] = true;
                         bo.isbound[i3] = true;
                         mypairs_private.push_back(mdpair(i3, i2));
+                        // if (a23 != b23)
+                        // {
+                        //     //cout << "change" << endl;
+                        //     cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                        // }
                     }
                     else if (a13)
                     {
@@ -702,6 +712,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i2] = false;
                         bo.isbound[i3] = true;
                         mypairs_private.push_back(mdpair(i3, i1));
+                        // if (a13 != b13)
+                        // {
+                        //     cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                        // }
                     }
                     else
                     {

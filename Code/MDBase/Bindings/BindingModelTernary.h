@@ -29,9 +29,11 @@ struct SortingFunctionNonUniform {
             return 1;
         else if (index1 < div2)
             return 2;
-        else
-            if((index1-div1-div2)%3 == 2) return 3;
+        else {
+           // cout << index1-div2 << endl;
+            if((index1-div2)%3 == 2) return 3;
             else return 1;
+        }
     }
 };
 

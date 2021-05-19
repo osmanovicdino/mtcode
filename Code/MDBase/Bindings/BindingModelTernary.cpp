@@ -490,6 +490,8 @@ void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &
         int ind1 = func(index1);
         int ind2 = func(index2);
 
+        // cout << ind1 << " " << ind2 << endl;
+
     
         
 /*         if (index1 < div1)

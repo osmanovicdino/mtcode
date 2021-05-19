@@ -56,374 +56,402 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-srand (time(NULL));
+    srand(time(NULL));
+    //signal(SIGSEGV, handler);
 
-double packing_fraction;
-double int1;
-double int2;
-double int3;
-double int4;
-int m5;
-int m6;
-int runtime;
-if (argc == 9)
-{
-    runtime = atof(argv[1]);
-    packing_fraction = atof(argv[2]);
-    int1 = atof(argv[3]);
-    int2 = atof(argv[4]);
-    int3 = atof(argv[5]);
-    int4 = atof(argv[6]);
-    m5 = atof(argv[7]);
-    m6 = atof(argv[8]);
-}
-else
-{
-    //error("incorrect arg number");
-    runtime = 1001;
-    packing_fraction = 0.05;
-    int1 = 12.0;
-    int2 = 22.0;
-    int3 = 7.0;
-    int4 = 5.0;
-    m5 = 1000;
-    m6 = 1000;
-}
-
-cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
-
-// for(int i = 0 ; i < 28 ; i++) {
-//     params(i, 0) =  10.0; //strength
-//     params(i, 1) =  1.4; //distance
-//     params(i, 2) = 0.927;
-// }   int m1 = 500;
-int m1 = 500;
-int m2 = m1 + m5;
-int n = m2 + m6;
-
-// int m1  = 2;
-// int m2 = 6;
-// int n = 10;
-
-BindingModelTernary b(m1 * 4, m1 * 4 + 4 * (m2 - m1));
-
-// b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
-// 0.,
-// 0.0,
-// 0.0,
-// 0.0,
-// 0.0,
-// 0.0,
-// 0.0,
-// 0.0,
-// 0.0);
-
-double unbinding_rebar = -2.0;
-
-b.setup(0.99999, 0.00001, 0.99999, 0.00001, 0.99999, 0.99999,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        unbinding_rebar,
-        0.0,
-        0.0,
-        0.0);
-
-// vector1<int> cc(4);
-
-// for(int k = 0; k < 100000 ; k++) {
-// bool after1, after2,after3;
-// b.triplet(false,false,true,true,true,true, 6000,20000,28000,after1,after2,after3);
-
-// if(after1) {
-//     cc[0]++;
-// }
-// else if(after2) {
-//     cc[1]++;
-// }
-// else if(after3) {
-//     cc[2]++;
-// }
-// else {
-//     cc[3]++;
-// }
-// }
-// cout << cc << endl;
-// pausel();
-
-double size1 = 4.0;
-double size2 = 1.0;
-
-double sizemix = (size1 + size2) / 2.;
-// pausel();
-
-vector1<int> vec1(3);
-vec1[0] = 4;
-vec1[1] = 4;
-vec1[2] = 2;
-
-vector1<int> numb(3);
-
-numb[0] = m1;
-numb[1] = m2;
-numb[2] = n;
-
-int tot = 4 * 4 + 4 * 2 + 4 * 4 + 3 * 2 + 4 * 2 + 4 * 4;
-matrix<double> params(tot, 3);
-
-int iter = 0;
-for (int i = 0; i < 4; i++)
-{
-    for (int j = 0; j < 4; j++)
+    double packing_fraction;
+    double int1;
+    double int2;
+    double int3;
+    double int4;
+    int m5;
+    int m6;
+    int runtime;
+    if (argc == 9)
     {
-        params(iter, 0) = int1;
-        params(iter, 1) = 1.4 * size1;
-        params(iter, 2) = 0.927;
-        iter++;
+        runtime = atof(argv[1]);
+        packing_fraction = atof(argv[2]);
+        int1 = atof(argv[3]);
+        int2 = atof(argv[4]);
+        int3 = atof(argv[5]);
+        int4 = atof(argv[6]);
+        m5 = atof(argv[7]);
+        m6 = atof(argv[8]);
     }
-}
-
-for (int i = 0; i < 4; i++)
-{
-    for (int j = 0; j < 4; j++)
+    else
     {
+        //error("incorrect arg number");
+        runtime = 100001;
+        packing_fraction = 0.02;
+        int1 = 10.0;
+        int2 = 10.0;
+        int3 = 10.0;
+        int4 = 50.0;
+        m5 = 1000;
+        m6 = 1000;
+    }
 
-        if (i == 0 && j == 0)
+    cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
+
+    // for(int i = 0 ; i < 28 ; i++) {
+    //     params(i, 0) =  10.0; //strength
+    //     params(i, 1) =  1.4; //distance
+    //     params(i, 2) = 0.927;
+    // }
+    int m1 = 1000;
+    int m2 = m1 + m5;
+    int n = m2 + m6;
+
+    // int m1  = 2;
+    // int m2 = 6;
+    // int n = 10;
+
+    //SortingFunctionUniform my_sorter;
+
+    SortingFunctionNonUniform my_sorter;
+    my_sorter.div1 = (m1 * 4);
+    my_sorter.div2 = (m1 * 4 + 4 * (m2 - m1));
+    //BindingModelTernary b(m1 * 4, m1*4 + 4 * (m2-m1));
+
+    BindingModelTernary<SortingFunctionNonUniform> b(my_sorter);
+    //BindingModelTernary b(my_sorter);
+
+    // b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
+    // 0.,
+    // 0.0,
+    // 0.0,
+    // 0.0,
+    // 0.0,
+    // 0.0,
+    // 0.0,
+    // 0.0,
+    // 0.0);
+
+    double unbinding_rebar = -20.0;
+    double unbinding_rebar2 = 2.0;
+
+    b.setup_energy_barrier(0.99999, 0.99999, 0.99999, 0.99999, 0.01, 0.99999,
+                           0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
+                           0.0,
+                           unbinding_rebar2,
+                           0.0,
+                           0.0,
+                           0.0,
+                           unbinding_rebar,
+                           0.0,
+                           0.0,
+                           0.0);
+
+    // vector1<int> cc(4);
+
+    // for(int k = 0; k < 100000 ; k++) {
+    // bool after1, after2,after3;
+    // b.triplet(false,false,true,true,true,true, 6000,20000,28000,after1,after2,after3);
+
+    // if(after1) {
+    //     cc[0]++;
+    // }
+    // else if(after2) {
+    //     cc[1]++;
+    // }
+    // else if(after3) {
+    //     cc[2]++;
+    // }
+    // else {
+    //     cc[3]++;
+    // }
+    // }
+    // cout << cc << endl;
+    // pausel();
+
+    double size1 = 2.0;
+    double size2 = 1.0;
+
+    double sizemix = (size1 + size2) / 2.;
+    // pausel();
+
+    vector1<int> vec1(3);
+    vec1[0] = 4;
+    vec1[1] = 4;
+    vec1[2] = 3;
+
+    vector1<int> numb(3);
+
+    numb[0] = m1;
+    numb[1] = m2;
+    numb[2] = n;
+
+    int tot = 4 * 4 + 4 * 4 + 4 * 3 + 4 * 4 + 4 * 3 + 3 * 3;
+    matrix<double> params(tot, 3);
+
+    int iter = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
         {
-            params(iter, 0) = 0.0;
+            params(iter, 0) = int1;
             params(iter, 1) = 1.4 * size1;
             params(iter, 2) = 0.927;
+            iter++;
         }
-        else
-        {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4 * size1;
-            params(iter, 2) = 0.927;
-        }
-
-        iter++;
     }
-}
 
-for (int i = 0; i < 4; i++)
-{
-    for (int j = 0; j < 2; j++)
+    for (int i = 0; i < 4; i++)
     {
-        if (j == 1)
+        for (int j = 0; j < 4; j++)
         {
-            params(iter, 0) = int2;
+
+            if (i == 0 && j == 0)
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = 1.4 * size1;
+                params(iter, 2) = 0.927;
+            }
+            else
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = 1.4 * size1;
+                params(iter, 2) = 0.927;
+            }
+
+            iter++;
+        }
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            if (j == 0)
+            {
+                params(iter, 0) = int2;
+                params(iter, 1) = 1.4 * sizemix;
+                params(iter, 2) = 0.927;
+            }
+            else if (j == 1)
+            {
+                params(iter, 0) = int3;
+                params(iter, 1) = 1.4 * sizemix;
+                params(iter, 2) = 0.927;
+            }
+            else
+            {
+                params(iter, 0) = int4;
+                params(iter, 1) = 1.4 * sizemix;
+                params(iter, 2) = 0.927;
+            }
+            iter++;
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+
+            if (i == 0 && j == 0)
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = 1 * size1;
+                params(iter, 2) = 0.927;
+            }
+            else
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = 1. * size1;
+                params(iter, 2) = 0.927;
+            }
+
+            iter++;
+        }
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+
+            params(iter, 0) = 0.0;
             params(iter, 1) = 1.4 * sizemix;
             params(iter, 2) = 0.927;
+            iter++;
         }
-        else
-        {
-            params(iter, 0) = int3;
-            params(iter, 1) = 1.4 * sizemix;
-            params(iter, 2) = 0.927;
-        }
-        iter++;
     }
-}
-for (int i = 0; i < 4; i++)
-{
-    for (int j = 0; j < 4; j++)
+
+    for (int i = 0; i < 3; i++)
     {
-
-        if (i == 0 && j == 0)
+        for (int j = 0; j < 3; j++)
         {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = 1 * size1;
-            params(iter, 2) = 0.927;
+            if (i == 1 && j == 1)
+            {
+                params(iter, 0) = int3;
+                params(iter, 1) = 1.4 * size2;
+                params(iter, 2) = 0.927;
+            }
+            else
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = 1.4 * size2;
+                params(iter, 2) = 0.927;
+            }
+            iter++;
         }
-        else
-        {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = 1. * size1;
-            params(iter, 2) = 0.927;
-        }
-
-        iter++;
     }
-}
 
-for (int i = 0; i < 4; i++)
-{
-    for (int j = 0; j < 2; j++)
-    {
+    matrix<double> orient(11, 3);
 
-        params(iter, 0) = int4;
-        params(iter, 1) = 1.4 * sizemix;
-        params(iter, 2) = 0.927;
-        iter++;
-    }
-}
+    double nx1 = sqrt(8. / 9.);
+    double ny1 = 0.;
+    double nz1 = -1. / 3.;
 
-for (int i = 0; i < 2; i++)
-{
-    for (int j = 0; j < 2; j++)
-    {
-        if (j == 1)
-        {
-            params(iter, 0) = int3;
-            params(iter, 1) = 1.4 * size2;
-            params(iter, 2) = 0.927;
-        }
-        else
-        {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4 * size2;
-            params(iter, 2) = 0.927;
-        }
-        iter++;
-    }
-}
+    double nx2 = -sqrt(2. / 9.);
+    double ny2 = sqrt(2. / 3.);
+    double nz2 = -1. / 3.;
 
-matrix<double> orient(10, 3);
+    double nx3 = -sqrt(2. / 9.);
+    double ny3 = -sqrt(2. / 3.);
+    double nz3 = -1. / 3.;
 
-double nx1 = sqrt(8. / 9.);
-double ny1 = 0.;
-double nz1 = -1. / 3.;
+    double nx4 = 0;
+    double ny4 = 0;
+    double nz4 = 1.;
 
-double nx2 = -sqrt(2. / 9.);
-double ny2 = sqrt(2. / 3.);
-double nz2 = -1. / 3.;
+    orient(0, 0) = nx1;
+    orient(0, 1) = ny1;
+    orient(0, 2) = nz1;
 
-double nx3 = -sqrt(2. / 9.);
-double ny3 = -sqrt(2. / 3.);
-double nz3 = -1. / 3.;
+    orient(1, 0) = nx2;
+    orient(1, 1) = ny2;
+    orient(1, 2) = nz2;
 
-double nx4 = 0;
-double ny4 = 0;
-double nz4 = 1.;
+    orient(2, 0) = nx3;
+    orient(2, 1) = ny3;
+    orient(2, 2) = nz3;
 
-orient(0, 0) = nx1;
-orient(0, 1) = ny1;
-orient(0, 2) = nz1;
+    orient(3, 0) = nx4;
+    orient(3, 1) = ny4;
+    orient(3, 2) = nz4;
 
-orient(1, 0) = nx2;
-orient(1, 1) = ny2;
-orient(1, 2) = nz2;
+    orient(4, 0) = nx1;
+    orient(4, 1) = ny1;
+    orient(4, 2) = nz1;
 
-orient(2, 0) = nx3;
-orient(2, 1) = ny3;
-orient(2, 2) = nz3;
+    orient(5, 0) = nx2;
+    orient(5, 1) = ny2;
+    orient(5, 2) = nz2;
 
-orient(3, 0) = nx4;
-orient(3, 1) = ny4;
-orient(3, 2) = nz4;
+    orient(6, 0) = nx3;
+    orient(6, 1) = ny3;
+    orient(6, 2) = nz3;
 
-orient(4, 0) = nx1;
-orient(4, 1) = ny1;
-orient(4, 2) = nz1;
+    orient(7, 0) = nx4;
+    orient(7, 1) = ny4;
+    orient(7, 2) = nz4;
 
-orient(5, 0) = nx2;
-orient(5, 1) = ny2;
-orient(5, 2) = nz2;
+    orient(8, 0) = nx4;
+    orient(8, 1) = ny4;
+    orient(8, 2) = nz4;
 
-orient(6, 0) = nx3;
-orient(6, 1) = ny3;
-orient(6, 2) = nz3;
+    orient(9, 0) = nx4;
+    orient(9, 1) = ny4;
+    orient(9, 2) = -nz4;
 
-orient(7, 0) = nx4;
-orient(7, 1) = ny4;
-orient(7, 2) = nz4;
+    orient(10, 0) = nx4;
+    orient(10, 1) = nz4;
+    orient(10, 2) = ny4;
 
-orient(8, 0) = nx4;
-orient(8, 1) = ny4;
-orient(8, 2) = nz4;
+    GeneralPatch c(vec1, numb, params, orient);
 
-orient(9, 0) = nx4;
-orient(9, 1) = ny4;
-orient(9, 2) = -nz4;
+    cout << "created patch" << endl;
 
-GeneralPatch c(vec1, numb, params, orient);
+    //int n2 = 100;
+    //double packing_fraction = 0.01;
 
+    double l = cbrt(pi * CUB(size1) * (double)m1 / (6. * packing_fraction));
 
+    cout << l << endl;
 
+    Condensate A(l, n);
 
+    cout << "created condensate" << endl;
+    //TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
 
-//int n2 = 100;
-//double packing_fraction = 0.01;
+    // string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
+    // string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
 
-double l = cbrt(pi * CUB(4.0) * (double)m1 / (6. * packing_fraction));
+    // string filp = "/home/dino/Documents/Condensate/TernaryFluid2/pos_beta=1_i=02097.csv";
+    // string filo = "/home/dino/Documents/Condensate/TernaryFluid2/orientation_beta=1_i=02097.csv";
 
-Condensate A(l, n);
+    // double T;
+    // bool err1;
+    // bool err2;
+    // matrix<double> temppos = importcsv(filp, T, err1);
+    // matrix<double> tempori = importcsv(filo, T, err1);
 
-//TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
+    // matrix<double> newpos(2000,3);
+    // matrix<double> newori(2000,3);
 
-// string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
-// string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
+    // A.obj->setdat(temppos);
+    // A.obj->setorientation(tempori);
 
-// string filp = "/home/dino/Documents/Condensate/TernaryFluid2/pos_beta=1_i=02097.csv";
-// string filo = "/home/dino/Documents/Condensate/TernaryFluid2/orientation_beta=1_i=02097.csv";
+    // cout << b.tripr111 << endl;
+    // cout << b.doubr11 << endl;
+    // cout << b.doubr22 << endl;
+    // cout << b2.on_rate << endl;
+    // cout << b2.off_rate << endl;
+    // pausel();
 
-// double T;
-// bool err1;
-// bool err2;
-// matrix<double> temppos = importcsv(filp, T, err1);
-// matrix<double> tempori = importcsv(filo, T, err1);
+    //TetrahedralPatch c2(10.0,1.4,0.927);
 
-// matrix<double> newpos(2000,3);
-// matrix<double> newori(2000,3);
+    A.setBindingModel(b);
 
-// A.obj->setdat(temppos);
-// A.obj->setorientation(tempori);
+    //cout << "set up 1" << endl;
+    A.setpots(c);
 
-// cout << b.tripr111 << endl;
-// cout << b.doubr11 << endl;
-// cout << b.doubr22 << endl;
-// cout << b2.on_rate << endl;
-// cout << b2.off_rate << endl;
-// pausel();
+    //int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
-//TetrahedralPatch c2(10.0,1.4,0.927);
+    //int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
-A.setBindingModel(b);
+    //A.run_singlebond(10000, 1000);
+    // for(int i = 0 ; i < 6 ; i++) {
 
-//cout << "set up 1" << endl;
-A.setpots(c);
+    // for(int j = 0 ; j < (c.i1)[i][0] ; j++ ) {
+    // cout << (c.i1)[i][j+1] <<" ";
 
-//int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+    // }
+    // cout << endl;
+    // }
 
-//int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
+    A.setviscosity(0.1);
 
-//A.run_singlebond(10000, 1000);
-// for(int i = 0 ; i < 6 ; i++) {
+    double beta = 1.0;
 
-// for(int j = 0 ; j < (c.i1)[i][0] ; j++ ) {
-// cout << (c.i1)[i][j+1] <<" ";
+    A.obj->setkT(1. / beta);
 
-// }
-// cout << endl;
-// }
+    stringstream ss;
+    ss << unbinding_rebar;
 
-A.setviscosity(0.1);
+    string base = "_rebar=";
+    base += ss.str();
 
-double beta = 1.0;
+    // cout << "done" << endl;
+    //Do processing to make sure everything is fine here
 
-A.obj->setkT(1. / beta);
+    //pausel();
+    //cout << m2 << endl;
+    A.obj->setdt(0.005);
 
-stringstream ss;
-ss << unbinding_rebar;
+    //A.run_singlebond(runtime, 1000, base);
+    vector<string> orientfiles;
+    vector<string> posfiles;
+    vector<string> bindfiles;
 
-string base = "_rebar=";
-base += ss.str();
+    return_csv_in_current_dir("orient", orientfiles);
+    return_csv_in_current_dir("pos", posfiles);
+    return_csv_in_current_dir("bind", bindfiles);
 
-A.obj->setdt(0.005);
-//A.run_singlebond(runtime, 1000, base);
-vector<string> orientfiles;
-vector<string> posfiles;
-vector<string> bindfiles;
-
-return_csv_in_current_dir("orient", orientfiles);
-return_csv_in_current_dir("pos", posfiles);
-return_csv_in_current_dir("bind", bindfiles);
-
-int s1 = orientfiles.size();
-int s2 = posfiles.size();
-int s3 = bindfiles.size();
+    int s1 = orientfiles.size();
+    int s2 = posfiles.size();
+    int s3 = bindfiles.size();
 
     if ((s1 == 0) || (s2 == 0) || (s3 == 0)) {
         error("no files found to import");

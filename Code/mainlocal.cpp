@@ -80,12 +80,12 @@ int main(int argc, char **argv)
     else
     {
         //error("incorrect arg number");
-        runtime = 1001;
-        packing_fraction = 0.05;
-        int1 = 12.0;
-        int2 = 22.0;
-        int3 = 7.0;
-        int4 = 5.0;
+        runtime = 100001;
+        packing_fraction = 0.02;
+        int1 = 10.0;
+        int2 = 10.0;
+        int3 = 10.0;
+        int4 = 50.0;
         m5 = 1000;
         m6 = 1000;
     }
@@ -128,6 +128,7 @@ int main(int argc, char **argv)
     // 0.0,
     // 0.0);
 
+
     double unbinding_rebar =  -20.0;
     double unbinding_rebar2 = 2.0;
 
@@ -142,6 +143,9 @@ int main(int argc, char **argv)
                    0.0,
                    0.0,
                    0.0);
+
+    bool c1;
+
 
     // vector1<int> cc(4);
 
