@@ -494,7 +494,7 @@ void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &
 
     
         
-/*         if (index1 < div1)
+        /*if (index1 < div1)
             ind1 = 1;
         else if (index1 < div2)
             ind1 = 2;
