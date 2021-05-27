@@ -470,28 +470,28 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     //     //mtx.unlock();
     // }
 
-    cout << "possibles:" << endl;
-    for(int i = 0  ; i < total_number_of_patches ; i++) {
-        bool print = false;
-        if(ccs[i]>1) {
+    // cout << "possibles:" << endl;
+    // for(int i = 0  ; i < total_number_of_patches ; i++) {
+    //     bool print = false;
+    //     if(ccs[i]>1) {
            
-            for(int j = 0  ; j < ccs[i] ; j++) {
-                // cout << boindices2(i,j) << ",";
-                if(boindices2(i,j) >= 80) {
-                    if((boindices2(i,j)-80)%3==2)
-                    print = true;
-                }
+    //         for(int j = 0  ; j < ccs[i] ; j++) {
+    //             // cout << boindices2(i,j) << ",";
+    //             if(boindices2(i,j) >= 80) {
+    //                 if((boindices2(i,j)-80)%3==2)
+    //                 print = true;
+    //             }
                 
-            }
-            if(print) {
-                for (int j = 0; j < ccs[i]; j++)
-                {
-                    cout << boindices2(i,j) << ",";
-                }
-            }
-        }
-        if(ccs[i]>1 && print) cout << endl;
-    }
+    //         }
+    //         if(print) {
+    //             for (int j = 0; j < ccs[i]; j++)
+    //             {
+    //                 cout << boindices2(i,j) << ",";
+    //             }
+    //         }
+    //     }
+    //     if(ccs[i]>1 && print) cout << endl;
+    // }
 
     
 
@@ -894,18 +894,20 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         }
 
 
-        cout << "end bound:" << endl;
-        for(int i = 0  ; i < mypairs.size() ; i++) {
+        // cout << "end bound:" << endl;
+        // for(int i = 0  ; i < mypairs.size() ; i++) {
 
-            bool print = false;
+        //     bool print = false;
 
-            if( (mypairs[i].a-80 )%3 ==2 || (mypairs[i].b-80 )%3 ==2  ) {
-                print=true;
-            }
+        //     if( (mypairs[i].a-80 )%3 ==2 || (mypairs[i].b-80 )%3 ==2  ) {
+        //         print=true;
+        //     }
             
-            if(print)
-            cout << mypairs[i].a << " " << mypairs[i].b << endl;
-        }
+        //     if(print)
+        //     cout << mypairs[i].a << " " << mypairs[i].b << endl;
+        // }
+
+
         //pausel();
 
 
