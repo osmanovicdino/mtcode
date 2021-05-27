@@ -57,9 +57,20 @@ int main(int argc, char **argv)
     
     srand(time(NULL));
     //signal(SIGSEGV, handler);
-    NanotubeAssembly A(10.,20);
+    double radius = 40.;
+    double monomers = 1000;
+
+    //monomers/(4/3piradius3)
 
 
+    NanotubeAssembly A(radius,monomers);
+
+
+    double deltaG = 20.0;
+    double angle = 0.6;
+    BivalentPatch c2(deltaG, 1.4, angle);
+
+    A.setpots(c2);
 
     A.run(1000000,1000);
 

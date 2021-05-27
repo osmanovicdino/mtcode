@@ -86,8 +86,8 @@ int main(int argc, char **argv)
         int2 = 10.0;
         int3 = 10.0;
         int4 = 50.0;
-        m5 = 1000;
-        m6 = 1000;
+        m5 = 10;
+        m6 = 10;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
     double unbinding_rebar =  -20.0;
     double unbinding_rebar2 = 2.0;
 
-    b.setup_energy_barrier(0.99999, 0.99999, 0.99999, 0.99999, 0.01, 0.99999,
+    b.setup_energy_barrier(0.99999, 0.99999, 0.99999, 0.99999, 0.0001, 0.99999,
                    0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
                    0.0,
                    unbinding_rebar2,

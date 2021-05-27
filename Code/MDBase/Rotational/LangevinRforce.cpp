@@ -470,6 +470,31 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     //     //mtx.unlock();
     // }
 
+    cout << "possibles:" << endl;
+    for(int i = 0  ; i < total_number_of_patches ; i++) {
+        bool print = false;
+        if(ccs[i]>1) {
+           
+            for(int j = 0  ; j < ccs[i] ; j++) {
+                // cout << boindices2(i,j) << ",";
+                if(boindices2(i,j) >= 80) {
+                    if((boindices2(i,j)-80)%3==2)
+                    print = true;
+                }
+                
+            }
+            if(print) {
+                for (int j = 0; j < ccs[i]; j++)
+                {
+                    cout << boindices2(i,j) << ",";
+                }
+            }
+        }
+        if(ccs[i]>1 && print) cout << endl;
+    }
+
+    
+
 
 
         int number_to_reserve = MIN(2*((total_number_of_patches+1)- total_number_of_patches),total_number_of_patches/2 );
@@ -869,6 +894,21 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         }
 
 
+        cout << "end bound:" << endl;
+        for(int i = 0  ; i < mypairs.size() ; i++) {
+
+            bool print = false;
+
+            if( (mypairs[i].a-80 )%3 ==2 || (mypairs[i].b-80 )%3 ==2  ) {
+                print=true;
+            }
+            
+            if(print)
+            cout << mypairs[i].a << " " << mypairs[i].b << endl;
+        }
+        //pausel();
+
+
         //     //    cout << "calc patches" << endl;
 
         //         //Having gone through all the patches to determine the bindings, we can now calculate the forces
@@ -935,6 +975,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
             int potn = iny.which_potential(p1, p2, wp1, wp2);
 
+
+
+
             dis = sqrt(dis);
 
             un /= dis;
@@ -955,6 +998,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             double tjz;
 
             (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
+
+
             /* 
             double dx = un.gpcons(0);
             double dy = un.gpcons(1);

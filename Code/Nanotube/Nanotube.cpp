@@ -69,7 +69,7 @@ GeneralPatch CreateHexatic(int N, double str1, double rang1, double ang1,
         }
     }
 
-    outfunc(params, "lig");
+    outfunc(params, "myparameters");
 
     matrix<double> orient(nop, 3);
 

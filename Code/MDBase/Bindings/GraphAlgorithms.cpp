@@ -99,6 +99,8 @@ struct mdpairsort
 
 void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
 
+    //this creates a list where each index gives the component
+
     //Adj is the edgelist of 2 the number of edges, each edge has to be doubly connected
     //vector1<int> f(indexes);
     vector1<int> fnext(indexes);
