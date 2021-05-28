@@ -66,7 +66,8 @@ int main(int argc, char **argv)
     int m5;
     int m6;
     int runtime;
-    if (argc == 9)
+    double energy_barrier;
+    if (argc == 10)
     {
         runtime = atof(argv[1]);
         packing_fraction = atof(argv[2]);
@@ -76,18 +77,20 @@ int main(int argc, char **argv)
         int4 = atof(argv[6]);
         m5 = atof(argv[7]);
         m6 = atof(argv[8]);
+        energy_barrier = atof(argv[9]);
     }
     else
     {
         //error("incorrect arg number");
-        runtime = 101;
+        runtime = 1000001;
         packing_fraction = 0.02;
         int1 = 10.0;
         int2 = 10.0;
         int3 = 10.0;
         int4 = 50.0;
-        m5 = 10;
-        m6 = 10;
+        m5 = 1000;
+        m6 = 1000;
+        energy_barrier = 0.01;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -132,7 +135,9 @@ int main(int argc, char **argv)
     double unbinding_rebar =  -20.0;
     double unbinding_rebar2 = 2.0;
 
-    b.setup_energy_barrier(0.99999, 0.99999, 0.99999, 0.99999, 0.0001, 0.99999,
+    
+
+    b.setup_energy_barrier(0.99999, 0.99999, 0.99999, 0.99999, energy_barrier, 0.99999,
                    0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
                    0.0,
                    unbinding_rebar2,
@@ -275,11 +280,19 @@ int main(int argc, char **argv)
         for (int j = 0; j < 3; j++)
         {
 
+                if(j==2) {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = 2. * sizemix; //destroy the gas phase
+                params(iter, 2) = 0.927;
+                iter++;
+                }
+                else {
 
                 params(iter, 0) = 0.0;
                 params(iter, 1) = 1.4 * sizemix;
                 params(iter, 2) = 0.927;
                 iter++;
+                }
         }
     }
 
@@ -323,6 +336,17 @@ int main(int argc, char **argv)
     double ny4 = 0;
     double nz4 = 1.;
 
+    double nx5 = sqrt(3.)/2.;
+    double ny5 = -1./2.;
+    double nz5 = 0.;
+
+    double nx6 = 0.;
+    double ny6 = 1.;
+    double nz6 = 0.;
+
+    double nx7 = -sqrt(3.) / 2.;
+    double ny7 = -1. / 2.;
+    double nz7 = 0.;
 
 
     orient(0, 0) = nx1;
@@ -357,17 +381,17 @@ int main(int argc, char **argv)
     orient(7, 1) = ny4;
     orient(7, 2) = nz4;
 
-    orient(8, 0) = nx4;
-    orient(8, 1) = ny4;
-    orient(8, 2) = nz4;
+    orient(8, 0) = nx5;
+    orient(8, 1) = ny5;
+    orient(8, 2) = nz5;
 
-    orient(9, 0) = nx4;
-    orient(9, 1) = ny4;
-    orient(9, 2) = -nz4;
+    orient(9, 0) = nx6;
+    orient(9, 1) = ny6;
+    orient(9, 2) = nz6;
 
-    orient(10, 0) = nx4;
-    orient(10, 1) = nz4;
-    orient(10, 2) = ny4;
+    orient(10, 0) = nx7;
+    orient(10, 1) = nz7;
+    orient(10, 2) = ny7;
 
     GeneralPatch c(vec1, numb, params, orient);
 
@@ -456,8 +480,9 @@ int main(int argc, char **argv)
     //pausel();
     //cout << m2 << endl;
     A.obj->setdt(0.005);
+    int every = 1000;
 
-    A.run_singlebond_different_sizes(runtime, 1000, m2, size1, size2, base);
+    A.run_singlebond_different_sizes(runtime, every, m2, size1, size2, base);
 
     //A.run_singlebond_different_sizes(100000, 10,m2, base);
 

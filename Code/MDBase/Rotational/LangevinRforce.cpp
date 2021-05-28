@@ -257,7 +257,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 int wp1, wp2;
                 iny.which_patch(p1, p2, potn, wp1, wp2);
 
+
+
                 // cout << p1 << " " << p2 << " " << wp1 << " " << wp2 << " " << disp << " " << thetam << endl;
+                // pausel();
+
 
                 //different conditions depending on whether there is binding or not.
                 double disp2;
@@ -391,6 +395,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     //     }
     // }
 
+    //boindices contains all the binding data for each 
+
+
 // //   
     PairHistogram(edgelist,boindices,tempbound);
 
@@ -450,8 +457,15 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     vector1<int> ccs(total_number_of_patches);
 
 
-    SingleHistogram(indexes2,boindices2,ccs);    
+    SingleHistogram(indexes2,boindices2,ccs);
 
+    //boindices2 contains the size of each cluster
+
+    // cout << boindices << endl;
+    // cout << boindices2 << endl;
+    // cout << ccs << endl;
+    // cout << tempbound << endl;
+    // pausel();
 
     // //#pragma omp parallel for schedule(static)
     // for (int i = 0; i < total_number_of_patches; ++i)
@@ -637,7 +651,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         c13 = true;
 
                         int nb2 = tempbound[i2];
-                        if (nb1 == 1)
+                        if (nb2 == 1)
                         {
                             c23 = false;
                         }
@@ -712,6 +726,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         // if(a12 != b12)
                         // {
                         //     cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                        //     pausel();
                         // }
                     }
                     else if (a23)
@@ -727,6 +742,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         // {
                         //     //cout << "change" << endl;
                         //     cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                        //     pausel();
                         // }
                     }
                     else if (a13)
@@ -740,6 +756,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         // if (a13 != b13)
                         // {
                         //     cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                        //     pausel();
                         // }
                     }
                     else
@@ -753,6 +770,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 {
 
                     if(size_of_cluster < 10) {
+
                     //firstly, obtain the graph of edges;
                     vector<mdpair> matched;
                     matched.reserve(size_of_cluster*(size_of_cluster-1)/2);
