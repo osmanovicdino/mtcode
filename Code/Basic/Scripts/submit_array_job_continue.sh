@@ -29,8 +29,8 @@ module load gcc/7.5.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/params16.dat
-if [ -e  ${filename} ]; then
+filename=~/Chemistry/Code/Basic/Scripts/params17.dat
+if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    den=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
    i1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $2}'` 
@@ -39,6 +39,7 @@ if [ -e  ${filename} ]; then
    i4=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $5}'`
    m1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $6}'`
    m2=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $7}'`
+   rate=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $8}'`
    echo "read file correctly" 
 else
    den=0.01
@@ -48,15 +49,16 @@ else
    i4=0
    m1=1000
    m2=1000
+   rate=0.01
    echo "did not read file correctly"
 fi
-dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_m1=${m1}_m2=${m2}"
+dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_m1=${m1}_m2=${m2}_rate=${rate}"
 mkdir /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainImport.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron2
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 export OMP_NUM_THREADS=8
-./angron2 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 >log
+./angron2 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 $rate >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
