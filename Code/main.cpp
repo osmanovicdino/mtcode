@@ -56,8 +56,120 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
+
+    for(int size_of_part =  1.0 ; size_of_part < 3.01 ; size_of_part += 1.0) {
+    int nt = 1000;
+
+    double packing_fraction = 0.001;
+    double l = cbrt(pi * CUB(1.)*(double)nt / (6. * packing_fraction));
+
+    Condensate A(l, nt);
+
+    A.size_mol = size_of_part;
+
+    vector1<int> vec1(1);
+    vec1[0] = 3;
+
+    vector1<int> numb(1);
+
+    numb[0] = nt;
+
+    int tot = 0;
+    for (int i = 0; i < 1; i++)
+    {
+        for (int j = i; j < 1; j++)
+        {
+            tot += vec1[i] * vec1[j];
+        }
+    }
+
+    cout << tot << endl;
+
+    matrix<double> params2(tot, 3);
+
+    for (int i = 0; i < tot; i++)
+    {
+        params2(i, 0) = 12.0;
+        params2(i, 1) = 1.4*size_of_part;
+        params2(i, 2) = 0.927;
+    }
+
+    matrix<double> orient(3, 3);
+
+    double nx1 = 0.0;
+    double ny1 = 1.;
+    double nz1 = 0.0;
+
+    double nx2 = -sqrt(12. / 16.);
+    double ny2 = -1. / 2.;
+    double nz2 = 0.0;
+
+    double nx3 = sqrt(12. / 16.);
+    double ny3 = -1. / 2.;
+    double nz3 = 0;
+
+    matrix<double> asd(3, 3);
+
+    asd(0, 0) = nx1;
+    asd(0, 1) = ny1;
+    asd(0, 2) = nz1;
+
+    asd(1, 0) = nx2;
+    asd(1, 1) = ny2;
+    asd(1, 2) = nz2;
+
+    asd(2, 0) = nx3;
+    asd(2, 1) = ny3;
+    asd(2, 2) = nz3;
+
+    int iter2 = 0;
+    for (int i = 0; i < 1; i++)
+    {
+        for (int j = 0; j < vec1[i]; j++)
+        {
+            orient(iter2, 0) = asd(j, 0);
+            orient(iter2, 1) = asd(j, 1);
+            orient(iter2, 2) = asd(j, 2);
+            iter2++;
+        }
+    }
+
+    GeneralPatch c4(vec1, numb, params2, orient);
+
+    BindingModelSingle b2(0.998, 0.002);
+
+
+
+
+    // vector1<bool> pb(3, false);
+    // cube geo(l, pb, 3);
+    //A.obj->setgeometry(geo);
+
+    A.setBindingModel(b2);
+
+    A.setpots(c4);
+
+    
+
+    //double beta = 1.;
+    double beta = 1.0;
+
+    A.obj->setkT(1. / beta);
+
+    stringstream ss;
+    ss << size_of_part;
+
+    string base = "_size=";
+    base += ss.str();
+
+    A.setviscosity(0.1*size_of_part);
+
+    int runtime = 2000000;
+    A.run_singlebond(runtime, 1000, base);
+    }
     //signal(SIGSEGV, handler);
 
+    /*
     double packing_fraction;
     double int1;
     double int2;
@@ -487,7 +599,7 @@ int main(int argc, char **argv)
 
 
     A.run_singlebond_different_sizes_continue(runtime, 1000, m2, 0, bbs2, base);
-
+    */
     //A.run_singlebond_different_sizes(100000, 10,m2, base);
 
     // A.run_singlebond_different_sizes(10000000, 1000, 6000, base);

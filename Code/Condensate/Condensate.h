@@ -7,6 +7,7 @@ struct Condensate {
 
 int num;
 double ls;
+double size_mol = 1.0;
 
 LangevinNVTR *obj;
 

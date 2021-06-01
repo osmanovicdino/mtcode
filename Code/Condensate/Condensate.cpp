@@ -266,15 +266,15 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     bbs.isbound = isbound;
     bbs.boundto =  boundto;
 
-
+    num = floor(ls / (2. * size_mol));
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
 
 
-    matrix<int> *pairs = obj->calculatepairs(boxes, 3.5);
+    matrix<int> *pairs = obj->calculatepairs(boxes, 3.5*size_mol);
 
 
-    WCAPotential wsa(1.0, 1.0, 0.0);
+    WCAPotential wsa(1.0, size_mol, 0.0);
 
 
 
