@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < tot; i++)
     {
-        params2(i, 0) = 12.0;
+        params2(i, 0) = 15.0;
         params2(i, 1) = 1.4*size_of_part;
         params2(i, 2) = 0.927;
     }

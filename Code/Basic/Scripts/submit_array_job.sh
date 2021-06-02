@@ -54,7 +54,7 @@ else
 fi
 dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_m1=${m1}_m2=${m2}_rate=${rate}"
 mkdir /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
-cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
+cp ~/Chemistry/Code/mainlocal.cpp /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainlocal.cpp -o /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}/angron
 cd /u/scratch/d/dinoo/PhaseDiagramBivalent/${dirwemake}
 export OMP_NUM_THREADS=8
