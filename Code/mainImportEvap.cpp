@@ -483,9 +483,18 @@ int main(int argc, char** argv) {
     double T;
     int TT;
     bool vv1,vv2,vv3;
-    matrix<double> postemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/posi.csv", T, vv1);
-    matrix<double> orienttemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/poso.csv", T, vv2);
-    matrix<int> bindtemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/posb.csv", TT, vv3);
+    // matrix<double> postemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/posi.csv", T, vv1);
+    // matrix<double> orienttemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/poso.csv", T, vv2);
+    // matrix<int> bindtemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/posb.csv", TT, vv3);
+
+
+    string dir = "/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/";
+    string dir2 = "/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/";
+
+    matrix<double> postemp = importcsv(dir2+"posi.csv", T, vv1);
+    matrix<double> orienttemp = importcsv(dir2+"poso.csv", T, vv2);
+    matrix<int> bindtemp = importcsv(dir2+"posb.csv", TT, vv3);
+
 
     A.obj->setdat(postemp);
     A.obj->setorientation(orienttemp);
