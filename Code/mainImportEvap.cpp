@@ -491,9 +491,9 @@ int main(int argc, char** argv) {
     string dir = "/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/";
     string dir2 = "/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/";
 
-    matrix<double> postemp = importcsv(dir+"evappos2.csv", T, vv1);
-    matrix<double> orienttemp = importcsv(dir+"evapori.csv", T, vv2);
-    matrix<int> bindtemp = importcsv(dir+"evapbin2.csv", TT, vv3);
+    matrix<double> postemp = importcsv(dir2+"evappos2.csv", T, vv1);
+    matrix<double> orienttemp = importcsv(dir2+"evapori.csv", T, vv2);
+    matrix<int> bindtemp = importcsv(dir2+"evapbin2.csv", TT, vv3);
 
 
     A.obj->setdat(postemp);

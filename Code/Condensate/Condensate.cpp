@@ -647,7 +647,7 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
     // bbs.isbound = isbound;
     // bbs.boundto = boundto;
 
-    num = floor(ls / (2. * size1));
+    num = floor(ls / (3. * size1));
 
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
