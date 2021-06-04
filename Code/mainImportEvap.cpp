@@ -92,9 +92,9 @@ int main(int argc, char** argv) {
     //     params(i, 1) =  1.4; //distance
     //     params(i, 2) = 0.927;
     // }
-    int m1 = 1000;
+    int m1 = 3000;
     int m2 = m1 + 0;
-    int n = m2 + 2000;
+    int n = m2 + 6000;
 
     // int m1  = 2;
     // int m2 = 6;
@@ -385,7 +385,7 @@ int main(int argc, char** argv) {
     //int n2 = 100;
     //double packing_fraction = 0.01;
 
-    double l = cbrt(pi * CUB(size1) * (double)m1 / (6. * 0.02));
+    double l = 116.245; //cbrt(pi * CUB(size1) * (double)m1 / (6. * 0.02));
 
     cout << l << endl;
 
@@ -491,9 +491,9 @@ int main(int argc, char** argv) {
     string dir = "/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/";
     string dir2 = "/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/";
 
-    matrix<double> postemp = importcsv(dir+"posi.csv", T, vv1);
-    matrix<double> orienttemp = importcsv(dir+"poso.csv", T, vv2);
-    matrix<int> bindtemp = importcsv(dir+"posb.csv", TT, vv3);
+    matrix<double> postemp = importcsv(dir+"evappos2.csv", T, vv1);
+    matrix<double> orienttemp = importcsv(dir+"evapori.csv", T, vv2);
+    matrix<int> bindtemp = importcsv(dir+"evapbin2.csv", TT, vv3);
 
 
     A.obj->setdat(postemp);
