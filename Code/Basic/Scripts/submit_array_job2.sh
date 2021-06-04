@@ -50,7 +50,7 @@ fi
 dirwemake="i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_rate=${rate}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainImportEvap.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
-g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainlocal.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
+g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainImportEvap.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 export OMP_NUM_THREADS=8
 ./angron 10000000 $i1 $i2 $i3 $i4 $rate >log
