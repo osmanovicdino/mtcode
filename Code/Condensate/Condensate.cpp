@@ -448,8 +448,8 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
     matrix<double> zeromatrix(NN, 3);
 
     F = obj->calculateforces(*pairsp1, wsa1);
-    F += obj->calculateforces(*pairsp2, wsa2);
-    F += obj->calculateforces(*pairsp1p2, wsa3);
+    F += obj->calculateforces(*pairsp2, wsa3);
+    F += obj->calculateforces(*pairsp1p2, wsa2);
 
     /*make combined pairs*/
     int npp = (pairsp1->getNsafe())+(pairsp2->getNsafe())+(pairsp1p2->getNsafe());
@@ -542,8 +542,8 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
         obj->rotate();
 
         F = obj->calculateforces(*pairsp1, wsa1);
-        F += obj->calculateforces(*pairsp2, wsa2);
-        F += obj->calculateforces(*pairsp1p2, wsa3);
+        F += obj->calculateforces(*pairsp2, wsa3);
+        F += obj->calculateforces(*pairsp1p2, wsa2);
 
         T.reset(0.0);
 
@@ -667,8 +667,12 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
     matrix<double> zeromatrix(NN, 3);
 
     F = obj->calculateforces(*pairsp1, wsa1);
-    F += obj->calculateforces(*pairsp2, wsa2);
-    F += obj->calculateforces(*pairsp1p2, wsa3);
+
+    F += obj->calculateforces(*pairsp2, wsa3);
+
+    F += obj->calculateforces(*pairsp1p2, wsa2);
+
+
 
     /*make combined pairs*/
     int npp = (pairsp1->getNsafe()) + (pairsp2->getNsafe()) + (pairsp1p2->getNsafe());
@@ -705,7 +709,6 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
     {
 
         cout << i << endl;
-        //obj->measured_temperature();
 
         // vector1<double> meas(6);
         // obj->measured_temperature(meas);
@@ -759,8 +762,8 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
         obj->rotate();
 
         F = obj->calculateforces(*pairsp1, wsa1);
-        F += obj->calculateforces(*pairsp2, wsa2);
-        F += obj->calculateforces(*pairsp1p2, wsa3);
+        F += obj->calculateforces(*pairsp2, wsa3);
+        F += obj->calculateforces(*pairsp1p2, wsa2);
 
         T.reset(0.0);
 

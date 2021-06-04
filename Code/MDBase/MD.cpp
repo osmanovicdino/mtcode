@@ -1116,6 +1116,7 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 
 		//un = i-j
 
+
 		double f1  = iny.force(sqrt(dis));
 
 		for(int j = 0 ; j < dimension ; ++j) {
