@@ -29,7 +29,7 @@ module load gcc/7.5.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/params21.dat
+filename=~/Chemistry/Code/Basic/Scripts/params22.dat
 basedir="PhaseDiagramBivalent"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
