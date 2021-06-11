@@ -1119,6 +1119,12 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 
 		double f1  = iny.force(sqrt(dis));
 
+		// if(abs(f1) > 1.E3) {
+		// 	cout << p1 << " " << p2 << endl;
+		// 	cout << f1 << " " << dis << endl;
+		// 	pausel();
+		// }
+
 		for(int j = 0 ; j < dimension ; ++j) {
 			double fac = f1*un[j]/sqrt(dis);
 			(forces).mat[p1*dimension+j] += fac;

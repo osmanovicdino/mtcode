@@ -79,10 +79,10 @@ int main(int argc, char** argv) {
         //error("incorrect arg number");
         runtime = 1000001;
         int1 = 10.0;
-        int2 = 10.0;
-        int3 = 10.0;
-        int4 = 50.0;
-        energy_barrier = 0.01;
+        int2 = 0.0;
+        int3 = 0.0;
+        int4 = 0.0;
+        energy_barrier = 0.9;
     }
 
     cout << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
     // }
     int m1 = 3000;
     int m2 = m1 + 0;
-    int n = m2 + 6000;
+    int n = m2 + 15000;
 
     // int m1  = 2;
     // int m2 = 6;
@@ -489,11 +489,11 @@ int main(int argc, char** argv) {
 
 
     string dir = "/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/";
-    string dir2 = "/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/";
+    string dir2 = "/home/dino/Documents/tylercollab/Repo/Code/Basic/InitialConditions/";
 
-    matrix<double> postemp = importcsv(dir2+"evappos2.csv", T, vv1);
-    matrix<double> orienttemp = importcsv(dir2+"evapori.csv", T, vv2);
-    matrix<int> bindtemp = importcsv(dir2+"evapbin2.csv", TT, vv3);
+    matrix<double> postemp = importcsv(dir2+"evappos3.csv", T, vv1);
+    matrix<double> orienttemp = importcsv(dir2+"evapori3.csv", T, vv2);
+    matrix<int> bindtemp = importcsv(dir2+"evapbin3.csv", TT, vv3);
 
 
     A.obj->setdat(postemp);
