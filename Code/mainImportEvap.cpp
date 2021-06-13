@@ -68,11 +68,11 @@ int main(int argc, char** argv) {
     if (argc == 7)
     {
         runtime = atof(argv[1]);
-        int1 = atof(argv[3]);
-        int2 = atof(argv[4]);
-        int3 = atof(argv[5]);
-        int4 = atof(argv[6]);
-        energy_barrier = atof(argv[9]);
+        int1 = atof(argv[2]);
+        int2 = atof(argv[3]);
+        int3 = atof(argv[4]);
+        int4 = atof(argv[5]);
+        energy_barrier = atof(argv[6]);
     }
     else
     {
@@ -447,11 +447,19 @@ int main(int argc, char** argv) {
     A.obj->setkT(1. / beta);
 
     stringstream ss;
-    ss << unbinding_rebar;
+    ss << int2;
 
-    string base = "_rebar=";
+    string base = "_int2=";
     base += ss.str();
+    base += "_int3=";
+    stringstream ss2;
+    ss2 << int3;
+    base += ss2.str();
 
+    base += "_br=";
+    stringstream ss3;
+    ss3 << energy_barrier;
+    base += ss3.str();
     // cout << "done" << endl;
     //Do processing to make sure everything is fine here
 
@@ -490,11 +498,11 @@ int main(int argc, char** argv) {
 
     string dir = "/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/";
     string dir2 = "/home/dino/Documents/tylercollab/Repo/Code/Basic/InitialConditions/";
+    string dir3 = "/home/dino/Documents/Chemistry/SimulationResults/EvapNoInteraction/";
 
-    matrix<double> postemp = importcsv(dir2+"evappos3.csv", T, vv1);
-    matrix<double> orienttemp = importcsv(dir2+"evapori3.csv", T, vv2);
-    matrix<int> bindtemp = importcsv(dir2+"evapbin3.csv", TT, vv3);
-
+    matrix<double> postemp = importcsv(dir3 + "pos_rebar=-20_i=0911.csv", T, vv1);
+    matrix<double> orienttemp = importcsv(dir3 + "orientation_rebar=-20_i=0911.csv", T, vv2);
+    matrix<int> bindtemp = importcsv(dir3 + "bindings_rebar=-20_i=0911.csv", TT, vv3);
 
     A.obj->setdat(postemp);
     A.obj->setorientation(orienttemp);
