@@ -1,5 +1,5 @@
 #!/bin/bash
 var=$1
-mkdir -p /home/dino/Desktop/Chemistry/SimulationResults/$var/
-cp mainlocal.cpp /home/dino/Desktop/Chemistry/SimulationResults/$var/
-g++ -fopenmp mainlocal.cpp -o /home/dino/Desktop/Chemistry/SimulationResults/$var/angron
+gro=$2
+cp $gro $var/sim.cpp
+g++ -fopenmp $gro -o ${var}/angron

@@ -197,8 +197,6 @@ int main(int argc, char** argv) {
     srand(time(NULL));
     //signal(SIGSEGV, handler);
 
-
-
     double int1;
     double int2;
     double int3;
@@ -646,7 +644,7 @@ int main(int argc, char** argv) {
     string dir2 = "/home/dino/Documents/tylercollab/Repo/Code/Basic/InitialConditions/";
     string dir3 = "/home/dino/Documents/Chemistry/SimulationResults/EvapNoInteraction/";
 
-    string dir4 = "/home/dino/Documents/Chemistry/SimulationResults/GoodSimulations/EvapSweep/";
+    string dir4 = "/home/dino/Documents/Chemistry/SimulationResults/EvapSweep/";
 
     string filename1 = "pos_int2=10_int3=10_br=0.99_i=1999.csv";
     string filename2 = "orientation_int2=10_int3=10_br=0.99_i=1999.csv";
@@ -734,7 +732,7 @@ int main(int argc, char** argv) {
 
 
     //place new particles
-    
+
     A.obj->setdat(postemp2);
     A.obj->setorientation(orienttemp2);
     BinaryBindStore bbs2;
@@ -746,38 +744,6 @@ int main(int argc, char** argv) {
     }
     bbs2.isbound =  iss;
     bbs2.boundto = ist;
-    
-   
-   
-    /*
-    matrix<double> postemp3(3000+num_anti, 3);
-    matrix<double> orienttemp3(3000 + num_anti, 9);
-    matrix<int> bindtemp3(2, 12000 + 4 * num_anti);
-
-    for(int i = 0  ; i <  3000+num_anti ; i ++) {
-        for(int j = 0  ; j < 3 ; j++) {
-        postemp3(i,j) =  postemp2(i,j);
-        }
-        for (int j = 0; j < 9; j++)
-        {
-            orienttemp3(i,j) = orienttemp2(i,j);
-        }
-    }
-
-    A.obj->setdat(postemp3);
-    A.obj->setorientation(orienttemp3);
-    BinaryBindStore bbs3;
-    vector1<bool> iss(bindtemp3.getncols());
-    vector1<int> ist(bindtemp3.getncols());
-    for (int i = 0; i < bindtemp3.getncols(); i++)
-    {
-        iss[i] = (bool)0;
-        ist[i] = 0;
-    }
-    bbs3.isbound = iss;
-    bbs3.boundto = ist;
-    */
-
     //Do processing to make sure everything is fine here
    // pausel();
 

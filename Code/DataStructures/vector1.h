@@ -117,8 +117,13 @@ public:
         template <class Y>
         friend bool operator==(const vector1<Y>&, const vector1<Y>&); //tests
 
+        template <class Y>
+        friend bool operator<(const vector1<Y> &, const vector1<Y> &); //tests
 
-	inline int getsize() const { return size; }
+        template <class Y>
+        friend bool operator>(const vector1<Y> &, const vector1<Y> &); //tests
+
+        inline int getsize() const { return size; }
 	T* getdat() {return data; }
 	void setval(T a); //set all the values in the vector to a
 	void swap(int,int); // swap
@@ -154,7 +159,7 @@ public:
         friend ostream& operator<<=(ostream&,const vector1<Y>&);
         
         template <class Y>
-	   friend ostream& operator<<(ostream&, const vector1<Y>&); //output (formatted for mathematica)
+	friend ostream& operator<<(ostream&, const vector1<Y>&); //output (formatted for mathematica)
 	
         template <class Y>
         friend istream& operator>>(istream&, vector1<Y>&); //input (rarely used)
@@ -269,7 +274,9 @@ public:
         friend void iterator_update(vector1<int> &v, mdpair temp);
         
         friend void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes);
-        friend void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes);
+        
+        template <typename Y>
+        friend void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes);
 
         friend int total_bool(const vector1<bool>&);
 };

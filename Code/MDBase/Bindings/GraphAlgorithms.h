@@ -35,9 +35,14 @@ for(int i = 0 ; i < nbins.getsize()-1 ; i++) {
 */
 vector1<int> ConnectedComponents(matrix<int> &adj, vector1<int> &lens, vector1<int> &indexes);
 
+
+
+
+
 void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes);
 
-void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes);
+template <typename Y>
+void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes);
 
 bool IndependentEdge(const vector<mdpair> &pairs, const vector1<bool> &bonds);
 

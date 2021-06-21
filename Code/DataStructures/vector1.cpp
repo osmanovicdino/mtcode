@@ -283,6 +283,18 @@ return true;
 
 }
 
+// template <class T>
+// bool operator<(const vector1<T> &v1, const vector1<T> &v2)
+// { //check whether vectors are the same
+//     if(v1.size != v2.size) error("cannot compare vectors of different size");
+    
+// }
+
+// template <class T>
+// bool operator>(const vector1<T> &v1, const vector1<T> &v2)
+// { //check whether vectors are the same
+//     return !(v1<v2);
+// }
 
 template <class T>
 vector1<T> operator-(const vector1<T> &v1, const vector1<T> &v2) { /* one vector subtract another*/

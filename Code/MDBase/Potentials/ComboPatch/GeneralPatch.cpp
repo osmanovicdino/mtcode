@@ -216,7 +216,8 @@ inline int GeneralPatch::return_type(int i) {
     for(int j = 0 ; j < no_types; j++ ) 
         if(i < num_per_type[j] ) return j;
 
-
+    error("i does not seem to be within the system");
+    return 0;
 }
 
 inline int GeneralPatch::return_type_patch(int i)
@@ -228,6 +229,9 @@ inline int GeneralPatch::return_type_patch(int i)
     for (int j = 0; j < no_types; j++)
         if (i < total_patches_per_type[j])
             return j ;
+
+    error("i does not seem to be within the system");
+    return 0;        
 }
 
 int GeneralPatch::num_patches(const int &i)

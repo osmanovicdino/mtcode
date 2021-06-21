@@ -1,3 +1,166 @@
+
+void SingleHistogram(vector1<int> &indexes2, matrix<int> &boindices2, vector1<int> &ccs)
+{
+
+    // when the index of the group has been assigned, this function bins them
+    if ((indexes2.getsize() != boindices2.getnrows()) || ((indexes2.getsize() != ccs.getsize())))
+        error("initial arrays must be same size in Single Histogram");
+
+    int sl = boindices2.getncols();
+
+    for (int i = 0; i < indexes2.getsize(); ++i)
+    {
+        int wp1 = indexes2[i];
+        //mtx.lock();
+        //const std::lock_guard<std::mutex> lock(mtx);
+
+        int iterator1 = ccs[wp1];
+        if (iterator1 < sl)
+        {
+
+            boindices2(wp1, iterator1) = i;
+            ccs[wp1]++;
+            // mtx.unlock();
+        }
+        //mtx.unlock();
+    }
+}
+
+matrix<int> SingleHistogram(vector1<int> &indexes2, vector1<int> &ccs)
+{
+    int n = indexes2.getsize();
+    // when the index of the group has been assigned, this function bins them
+    if (((n != ccs.getsize())))
+        error("initial arrays must be same size in Single Histogram");
+
+
+    // vector<int> arr(n);
+    // for(int i = 0  ; i  < n ; i++) {
+    //     arr[i] = indexes2[i];
+    // }
+    // sort(arr.begin(), arr.end());
+
+    // // find the max frequency using linear traversal
+    // int max_count = 1, res = arr[0], curr_count = 1;
+    // for (int i = 1; i < n; i++)
+    // {
+    //     if (arr[i] == arr[i - 1])
+    //         curr_count++;
+    //     else
+    //     {
+    //         if (curr_count > max_count)
+    //         {
+    //             max_count = curr_count;
+    //             res = arr[i - 1];
+    //         }
+    //         curr_count = 1;
+    //     }
+    // }
+
+    // // If last element is most frequent
+    // if (curr_count > max_count)
+    // {
+    //     max_count = curr_count;
+    //     res = arr[n - 1];
+    // }
+
+   // cout << max_count << endl;
+
+
+    //matrix<int> boindices2(n,max_count);
+    //int sl = boindices2.getncols();
+
+    for (int i = 0; i < n; ++i)
+    {
+        int wp1 = indexes2[i];
+        //mtx.lock();
+        //const std::lock_guard<std::mutex> lock(mtx);
+        //int iterator1 = ccs[wp1];
+        //boindices2(wp1, iterator1) = i;
+        ccs[wp1]++;
+            // mtx.unlock();        
+        //mtx.unlock();
+    }
+
+    int sl =  maxval(ccs);
+    vector1<int> counts(n);
+    matrix<int> boindices2(n, sl);
+    for (int i = 0; i < n; ++i)
+    {
+        int wp1 = indexes2[i];
+        //mtx.lock();
+        //const std::lock_guard<std::mutex> lock(mtx);
+        int iterator1 = counts[wp1];
+        boindices2(wp1, iterator1) = i;
+        counts[wp1]++;
+        // mtx.unlock();
+        //mtx.unlock();
+    }
+    return boindices2;
+}
+
+template <typename T>
+void PairHistogram(vector<T> &edgelist, matrix<int> &boindices, vector1<int> &tempbound)
+{
+    //bin an edgelist
+    //Boindices must be wide enough to store the histogram, this is the responsibility of the programmer.
+    for (int i = 0; i < edgelist.size(); i++)
+    {
+        int wp1,wp2;
+        edgelist[i].get(wp1,wp2);
+
+        boindices(wp1, tempbound[wp1]) = wp2;
+        boindices(wp2, tempbound[wp2]) = wp1;
+        tempbound[wp1]++;
+        tempbound[wp2]++;
+    }
+}
+
+void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<mdpairwd> &boindices, vector1<int> &tempbound)
+{
+    //bin an edgelist
+    //Boindices must be wide enough to store the histogram, this is the responsibility of the programmer.
+    int n =  edgelist.size();
+    for (int i = 0; i < n; i++)
+    {
+        int wp1 = edgelist[i].a;
+        int wp2 = edgelist[i].b;
+        double scr = edgelist[i].scr;
+
+
+        mdpairwd m1(wp2, wp2, scr);
+        mdpairwd m2(wp1, wp1, scr);
+
+        boindices(wp1, tempbound[wp1]) = m1;
+        boindices(wp2, tempbound[wp2]) = m2;
+        tempbound[wp1]++;
+        tempbound[wp2]++;
+    }
+}
+
+void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<int> &boindices, matrix<double> &boscores, vector1<int> &tempbound)
+{
+    //bin an edgelist
+    //Boindices must be wide enough to store the histogram, this is the responsibility of the programmer.
+    int n = edgelist.size();
+    for (int i = 0; i < n; i++)
+    {
+        int wp1,wp2;
+        double scr;
+
+        edgelist[i].gets(wp1,wp2,scr);
+      //  mdpairwd m1(wp2, wp2, scr);
+      //  mdpairwd m2(wp1, wp1, scr);
+
+        boindices(wp1, tempbound[wp1]) = wp2;
+        boindices(wp2, tempbound[wp2]) = wp1;
+        boscores(wp1, tempbound[wp1]) = scr;
+        boscores(wp2, tempbound[wp2]) = scr;
+        tempbound[wp1]++;
+        tempbound[wp2]++;
+    }
+}
+
 void DFUtil(int i, vector1<bool> &visited, matrix<int> &adj, vector1<int> &lens)
 {
     visited[i] = true;
@@ -77,6 +240,35 @@ vector1<int> ConnectedComponents(matrix<int> &adj, vector1<int> &lens, vector1<i
     }
 
     return nbins;
+}
+
+template<typename T>
+vector1<int> ConnectedComponents(vector<T> &adj, vector1<int> &indexes)
+{
+    //find connected components of adjacency graph
+    //return the vector of all the demarkers between one component and another
+    //index returns
+    int n = indexes.getsize();
+    vector1<int> lens(n);
+
+    int depth_mat =  n; //can change if this is too much memory
+    matrix<int> boindices(n,depth_mat);
+    PairHistogram(adj, boindices, lens);
+
+    vector1<int> demarkus = ConnectedComponents(boindices,lens,indexes);
+
+    return demarkus;
+
+   
+}
+
+int Maximum_ConnectedComp_Size(const vector1<int>&dd) {
+    int max =  dd.gpcons(1)-dd.gpcons(0);
+    for(int i = 1 ; i < dd.getsize()-1 ; i++) {
+        int newmax = dd.gpcons(i+1)-dd.gpcons(i);
+        if( newmax > max) max = newmax;
+    }
+    return max;
 }
 
 inline void UpdateMin(int &lhs, int &rhs) {
@@ -185,7 +377,10 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
 }
 
 
-void ConnectedComponentsParallel(vector<mdpair> &adj, vector1<int> &indexes) {
+//for all templates Y which have member functions a and b
+
+template <typename Y>
+void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
     
     //WE duplicate the connectivity naturally here
 

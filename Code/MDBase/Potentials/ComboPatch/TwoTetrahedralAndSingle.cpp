@@ -406,6 +406,11 @@ int TwoTetrahedralAndSingle::which_potential(const int &i, const int &j, const i
     case 6:
         return 56;
         break;
+        
+    default:
+        error("mapping function failed in which potential");
+        return 0;
+        break;
     }
 
   

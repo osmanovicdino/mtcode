@@ -1119,11 +1119,46 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 
 		double f1  = iny.force(sqrt(dis));
 
-		// if(abs(f1) > 1.E3) {
-		// 	cout << p1 << " " << p2 << endl;
-		// 	cout << f1 << " " << dis << endl;
-		// 	pausel();
-		// }
+
+		
+		if(abs(f1) > 1.E4) {
+			cout << p1 << " " << p2 << endl;
+			cout << f1 << " " << dis << endl;
+			vector1<int> dim(3);
+			for (int i1 = 0; i1 < 3; i1++)
+			{
+				int ij = 1;
+				for (int j = 0; j < i1; j++)
+				{
+					ij *= 38;
+				}
+				dim[i] = ij;
+			}
+
+			vector1<double> pr1 = (*dat).getrowvector(p1);
+
+			vector1<double> pr2 = (*dat).getrowvector(p2);
+
+			vector1<int> pri1(3);
+			vector1<int> pri2(3);
+
+			for (size_t i2 = 0; i2 < 3; i2++)
+			{
+				pri1[i2] = floor(pr1[i2] / 3.05908);
+				pri2[i2] = floor(pr2[i2] / 3.05908);
+				
+			}
+			
+
+			cout << pr1 << endl;
+			cout << pr2 << endl;
+
+			cout << scalar(dim,pri1) << endl;
+			cout << scalar(dim,pri2) << endl;
+			
+			pausel();
+		}
+		
 
 		for(int j = 0 ; j < dimension ; ++j) {
 			double fac = f1*un[j]/sqrt(dis);

@@ -106,6 +106,7 @@ int TetrahedralWithBivalent::num_patches(const int &i)
     else
     {
         error("out of bounds");
+        return 0;
     }
 }
 

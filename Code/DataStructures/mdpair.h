@@ -8,6 +8,11 @@ struct mdpair
     mdpair() : a(0), b(0) {}
     mdpair(const int i) : a(i), b(i) {}
     mdpair(const int &aa, const int &bb) : a(aa), b(bb) {}
+
+    void get(int &i1, int &i2) {
+        i1 = a;
+        i2 = b;
+    }
     bool operator<(mdpair const &rhs) const
     {
         return a < rhs.a || (a == rhs.a && b < rhs.b);
@@ -43,7 +48,32 @@ struct mdpair
 };
 
 bool mdpairCompare(const mdpair &m1, const mdpair &m2) {
-    return m1.a < m2.a;
+    if(m1.a == m2.a) {
+        return m1.b < m2.b;
+    }
+    else{
+        return m1.a < m2.a;
+    }
+}
+
+struct mdpairwd : mdpair {
+    double scr;
+
+    mdpairwd() : mdpair(), scr(1.0) {}
+    mdpairwd(const int &i) : mdpair(i,i) , scr(1.0) {}
+    mdpairwd(const int &aa, const int &bb, double scrr) : mdpair(aa, bb), scr(scrr) {}
+
+    void gets(int &i1, int &i2, double &scrr) {
+        i1 = a;
+        i2 = b;
+        scrr = scr;
+    }
+
+
+};
+
+bool mdpairwdCompareScore(const mdpairwd & m1, const mdpairwd &m2 ) {
+    return m1.scr < m2.scr;
 }
 
 struct mdtriplet {
