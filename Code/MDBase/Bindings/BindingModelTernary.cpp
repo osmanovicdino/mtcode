@@ -440,7 +440,7 @@ void BindingModelTernary<Q>::setup_energy_barrier(
 }
 
 template <typename Q>
-inline vector1<double> BindingModelTernary<Q>::get_drate(int i, int j)
+inline vector1<double>& BindingModelTernary<Q>::get_drate(int i, int j)
 {
     if(i==j) {
         if(i==1) {
@@ -513,6 +513,8 @@ void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &
 
         rtemp = get_drate(indt1,indt2);
 
+
+
         double r1 = rtemp[i1 * 2 + 0]; //rate to unbound
         double r2 = rtemp[i1 * 2 + 1]; //rate to bound
 
@@ -533,7 +535,7 @@ void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &
 }
 
 template <typename Q>
-inline vector1<double> BindingModelTernary<Q>::get_trate(int i, int j, int k) { //MUST BE SORTEd
+inline vector1<double>& BindingModelTernary<Q>::get_trate(int i, int j, int k) { //MUST BE SORTEd
     if(i==1) {
         if(j==1) {
             if(k==1) {
@@ -577,19 +579,79 @@ inline vector1<double> BindingModelTernary<Q>::get_trate(int i, int j, int k) { 
     }
 }
 
+template <class Q>
+void BindingModelTernary<Q>::print() {
+
+ofstream myfile;
+myfile.open("res.csv");
+
+myfile <<= tripr111;
+myfile << "\n";
+
+myfile <<= tripr112;
+myfile << "\n";
+
+myfile <<= tripr113;
+myfile << "\n";
+
+myfile <<= tripr122;
+myfile << "\n";
+
+myfile <<= tripr123;
+myfile << "\n";
+
+myfile <<= tripr133;
+myfile << "\n";
+
+myfile <<= tripr222;
+myfile << "\n";
+
+myfile <<= tripr223;
+myfile << "\n";
+
+myfile <<= tripr233;
+myfile << "\n";
+
+myfile <<= tripr333;
+myfile << "\n";
+
+myfile.close();
+}
+
 template <typename Q>
 void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13)
 {
+
+    vector1<double> rtemp;
+    int ind1 = func(index1);
+    int ind2 = func(index2);
+    int ind3 = func(index3);
+
+
+
+
+
+
+    int indt1,indt2,indt3;
+    unsigned char o1,o2,o3;
+    sort_triplet_and_save_permutation(ind1,ind2,ind3,indt1,indt2,indt3,o1,o2,o3);
+
+
+    bool tb12,tb23,tb13;
+    bool tc12,tc23,tc13;
+    save_permutation_triple(b12, b23, b13, o1, o2, o3, tb12, tb23, tb13);
+    save_permutation_triple(c12, c23, c13, o1, o2, o3, tc12, tc23, tc13);
+
     int i1;
-    if (b12)
+    if (tb12)
     { //INDEX 1 and INDEX2 bound
         i1 = 0;
     }
-    else if (b23)
+    else if (tb23)
     { //INDEX 2 and INDEX 3 bound
         i1 = 1;
     }
-    else if (b13)
+    else if (tb13)
     { //INDEX 1 and INDEX 3 bound
         i1 = 2;
     }
@@ -597,44 +659,23 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
     { //NO BINDINGS
         i1 = 3;
     }
-    vector1<double> rtemp;
-    int ind1 = func(index1);
-    int ind2 = func(index2);
-    int ind3 = func(index3);
 
-    /*     int ind1,ind2,ind3;
+    // string s1 = to_string(indt1);
+    // string s2 = to_string(indt2);
+    // string s3 = to_string(indt3);
 
-    if(index1 < div1) 
-        ind1 = 1;
-    else if(index1 < div2)
-        ind1 = 2;
-    else 
-        ind1 = 3;
+    // // Concatenate both strings
+    // string s = s1 + s2 + s3;
 
-    if (index2 < div1)
-        ind2 = 1;
-    else if (index2 < div2)
-        ind2 = 2;
-    else
-        ind2 = 3;
+    // // Convert the concatenated string
+    // // to integer
+    // int str = stoi(s);
 
-    if (index3 < div1)
-        ind3 = 1;
-    else if (index3 < div2)
-        ind3 = 2;
-    else
-        ind3 = 3; */
-
-    int indt1,indt2,indt3;
-    sort_triplet(ind1,ind2,ind3,indt1,indt2,indt3);
-
-
-    
     rtemp = get_trate(indt1,indt2,indt3);
 
-    double r1 = c12 * rtemp[i1 * 4 + 0]; //goes to bind 12
-    double r2 = c23 * rtemp(i1 * 4 + 1); //goes to bind 23
-    double r3 = c13 * rtemp[i1 * 4 + 2]; //goes to bind 13
+    double r1 = tc12 * rtemp[i1 * 4 + 0]; //goes to bind 12
+    double r2 = tc23 * rtemp(i1 * 4 + 1); //goes to bind 23
+    double r3 = tc13 * rtemp[i1 * 4 + 2]; //goes to bind 13
     double r4 = rtemp[i1 * 4 + 3];       //goes to none-bound
 
 
@@ -644,30 +685,78 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
 
     double rr = totalr * ((double)rand() / (double)(RAND_MAX));
 
+    bool ta12,ta23,ta13;
+
+
     if (rr < r1)
     {
-        a12 = true;
-        a23 = false;
-        a13 = false;
+        ta12 = true;
+        ta23 = false;
+        ta13 = false;
     }
     else if (rr >= r1 && rr < r1+r2)
     {
-        a12 = false;
-        a23 = true;
-        a13 = false;
+        ta12 = false;
+        ta23 = true;
+        ta13 = false;
     }
     else if (rr >= r1+r2 && rr < r1+r2+r3)
     {
-        a12 = false;
-        a23 = false;
-        a13 = true;
+        ta12 = false;
+        ta23 = false;
+        ta13 = true;
     }
     else
     {
-        a12 = false;
-        a23 = false;
-        a13 = false;
+        ta12 = false;
+        ta23 = false;
+        ta13 = false;
     }
+
+    unsigned char w1,w2,w3;
+    what_order(o1,o2,o3,w1,w2,w3);
+
+    save_permutation_triple(ta12,ta23,ta13,w1,w2,w3, a12, a23,a13);
+
+    // if ((b12 != a12) || (b23 != a23) || (b13 != a13))
+    // {
+    //     if (str == 123)
+    //     {
+    //         cout << 123 << endl;
+    //         cout << "types: " << ind1 << " " << ind2 << " " << ind3 << endl;
+    //         cout << "before: " << b12 << " " << b23 << " " << b13 << endl;
+    //         cout << "temp befores: " << tb12 << " " << tb23 << " " << tb13 << endl;
+    //         cout << "indexes: " << index1 << " " << index2 << " " << index3 << endl;
+    //         cout << "connections: " << c12 << " " << c23 << " " << c13 << endl;
+    //         cout << "temp connections: " << tc12 << " " << tc23 << " " << tc13 << endl;
+    //         cout << "temp afters: " << ta12 << " " << ta23 << " " << ta13 << endl;
+    //         cout << "afters: " << a12 << " " << a23 << " " << a13 << endl;
+    //         pausel();
+    //     }
+    //     // else if (str == 123)
+    //     // {
+    //     //     cout << 113 << endl;
+    //     //     cout << "types: " << ind1 << " " << ind2 << " " << ind3 << endl;
+    //     //     cout << "before: " << b12 << " " << b23 << " " << b13 << endl;
+    //     //     cout << "indexes: " << index1 << " " << index2 << " " << index3 << endl;
+    //     //     cout << "connections: " << c12 << " " << c23 << " " << c13 << endl;
+    //     //     cout << "afters: " << a12 << " " << a23 << " " << a13 << endl;
+    //     //     pausel();
+    //     // }
+    //     // else if (str == 133)
+    //     // {
+    //     //     cout << 113 << endl;
+    //     //     cout << "types: " << ind1 << " " << ind2 << " " << ind3 << endl;
+    //     //     cout << "before: " << b12 << " " << b23 << " " << b13 << endl;
+    //     //     cout << "indexes: " << index1 << " " << index2 << " " << index3 << endl;
+    //     //     cout << "connections: " << c12 << " " << c23 << " " << c13 << endl;
+    //     //     cout << "afters: " << a12 << " " << a23 << " " << a13 << endl;
+    //     //     pausel();
+    //     // }
+    //     else
+    //     {
+    //     }
+    // }
     // if (indt1 != indt2 && indt2 != indt3 && indt1 != indt3 && i1 != 3)
     // {
     //     cout << i1 << endl;

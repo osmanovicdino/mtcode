@@ -12,7 +12,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
-#include <sys/ioctl.h>
+#include <sys/ioctl.h> 
 #include <fcntl.h>
 #include <time.h>
 #include <sys/time.h>
@@ -30,8 +30,8 @@
 #include <omp.h>
 #else
 typedef int omp_int_t;
-inline omp_int_t omp_get_thread_num() { return 0; }
-inline omp_int_t omp_get_max_threads() { return 1; }
+inline omp_int_t omp_get_thread_num() { return 0;}
+inline omp_int_t omp_get_max_threads() { return 1;}
 inline omp_int_t omp_get_num_threads() { return 1; }
 #endif
 
@@ -48,15 +48,156 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 // #include "NCGasR.h"
 // #include "Microtubule.h"
 
+
+
+matrix<double> CreateRandomSample(matrix<double> &pos, int n, double l, int boxes) {
+    int M = pos.getnrows();
+    int d = pos.getncols();
+
+    vector1<int> dim(d);
+    // for (int i = 0; i < d; i++)
+    // {
+    //     int ij = 1;
+    //     for (int j = 0; j < i; j++)
+    //     {
+    //         ij *= boxes;
+    //     }
+    //     dim[i] = ij;
+    // }
+    dim[0]=SQR(boxes);
+    dim[1]=boxes;
+    dim[2]=1;
+
+    vector<int> a; //vector of occupied boxes
+
+    double l2 = l/(double)(boxes);
+
+
+
+
+    for(int i = 0  ; i < M ; i++) {
+        vector1<int> v1(d);
+        for(int j  = 0 ; j < d ; j++) {
+            v1[j] = floor(pos(i,j)/l2);
+        }
+        a.push_back(scalar(dim,v1));
+    }
+
+    sort(a.begin(), a.end());
+    a.erase(unique(a.begin(), a.end()), a.end());
+
+
+    vector<int > possible_boxes;
+
+    for(int i = 0  ; i < boxes ; i++) 
+    {
+        for (int j = 0; j < boxes; j++)
+        {
+            for (int k = 0; k < boxes; k++)
+            {
+                vector1<int> v2(d);
+                v2[0] = i;
+                v2[1] = j;
+                v2[2] = k;
+                possible_boxes.push_back(scalar(dim,v2));
+            }
+        }
+    }
+
+    int b1 = a.size();
+    int b2 = possible_boxes.size();
+    std::vector<int > v(b1+b2); // 0  0  0  0  0  0  0  0  0  0
+    std::vector<int >::iterator it;
+
+    //std::sort(a.begin(), a.begin() + b1);   //  5 10 15 20 25
+    std::sort(possible_boxes.begin(), possible_boxes.end()); // 10 20 30 40 50
+
+    it = std::set_difference(possible_boxes.begin(), possible_boxes.end(), a.begin(), a.end(), v.begin());
+    //  5 15 25  0  0  0  0  0  0  0
+    v.resize(it - v.begin());
+
+
+    std::vector<unsigned int> indices(v.size());
+    std::iota(indices.begin(), indices.end(), 0);
+    std::random_shuffle(indices.begin(), indices.end());
+
+
+/*
+    cout << possible_boxes.size() << endl;
+    cout << a.size() << endl;
+    cout << v.size() << endl;
+    cout << indices.size() << endl;
+    pausel();
+
+    ofstream myfile;
+    myfile.open("temp.csv");
+    for(int i = 0 ; i < possible_boxes.size()-1 ; i++) {
+        myfile << possible_boxes[i] <<",";
+    }
+    myfile << possible_boxes[possible_boxes.size()-1];
+    myfile << endl;
+    
+    for (int i = 0; i < a.size() - 1; i++)
+    {
+        myfile << a[i] << ",";
+    }
+        myfile << a[a.size() - 1];
+        myfile << endl;
+    
+    for (int i = 0; i < v.size() - 1; i++)
+    {
+        myfile << v[i] << ",";
+    }
+    myfile << v[v.size() - 1];
+    myfile << endl;
+    
+    for (int i = 0; i < indices.size() - 1; i++)
+    {
+        myfile << indices[i] << ",";
+    }
+        myfile << indices[indices.size() - 1];
+        myfile << endl;
+    */
+
+    matrix<double> posIn(n,3);
+    for(int i = 0  ; i < n ; i++) {
+            int cho1 = v[indices[i]];
+
+            int num2 = floor(cho1/SQR(boxes));
+            int num3 = floor((cho1-num2*SQR(boxes))/boxes);
+            int num4 = cho1 - num2*SQR(boxes) - num3*boxes;
+            vector1<int> myvec(3);
+
+            myvec[0] = num2;
+            myvec[1] = num3;
+            myvec[2] = num4;
+
+            vector1<int> chg(3);
+        for(int j = 0 ; j < 3 ; j++) 
+        {
+            posIn(i, j) = (l2/2.) + l2*myvec[j];
+            chg[j] = floor(posIn(i,j)/l2);
+        }
+
+        // cout << "choicce and actual" << endl;
+        // cout << dim << endl;
+        // cout << cho1 << endl;
+        // cout << chg << endl;
+        // cout << scalar(dim,chg) << endl;
+        // pausel();
+    }
+    return posIn;
+}
 //#include "MDGPU.cu"
 
 using namespace std;
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
 
     srand(time(NULL));
     //signal(SIGSEGV, handler);
+
+
 
     double int1;
     double int2;
@@ -64,7 +205,8 @@ int main(int argc, char **argv)
     double int4;
     int runtime;
     double energy_barrier;
-    if (argc == 7)
+    int num_anti;
+    if (argc == 8)
     {
         runtime = atof(argv[1]);
         int1 = atof(argv[2]);
@@ -72,6 +214,7 @@ int main(int argc, char **argv)
         int3 = atof(argv[4]);
         int4 = atof(argv[5]);
         energy_barrier = atof(argv[6]);
+        num_anti = atof(argv[7]);
     }
     else
     {
@@ -82,6 +225,7 @@ int main(int argc, char **argv)
         int3 = 0.0;
         int4 = 0.0;
         energy_barrier = 0.9;
+        num_anti = 1000;
     }
 
     cout << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -92,7 +236,7 @@ int main(int argc, char **argv)
     //     params(i, 2) = 0.927;
     // }
     int m1 = 3000;
-    int m2 = m1 + 0;
+    int m2 = m1 + num_anti;
     int n = m2 + 15000;
 
     // int m1  = 2;
@@ -134,6 +278,8 @@ int main(int argc, char **argv)
                            0.0,
                            0.0,
                            0.0);
+
+
 
     bool c1;
 
@@ -267,7 +413,7 @@ int main(int argc, char **argv)
 
             if (j == 2)
             {
-                params(iter, 0) = 0.0;
+                params(iter, 0) = 6.0;
                 params(iter, 1) = 2. * sizemix; //destroy the gas phase
                 params(iter, 2) = 0.927;
                 iter++;
@@ -461,7 +607,10 @@ int main(int argc, char **argv)
     base += ss3.str();
     // cout << "done" << endl;
     //Do processing to make sure everything is fine here
-
+    base += "num_anti=";
+    stringstream ss4;
+    ss4 << num_anti;
+    base += ss4.str();
     //pausel();
     //cout << m2 << endl;
     A.obj->setdt(0.005);
@@ -489,39 +638,161 @@ int main(int argc, char **argv)
 
     double T;
     int TT;
-    bool vv1, vv2, vv3;
+    bool vv1,vv2,vv3;
     // matrix<double> postemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/posi.csv", T, vv1);
     // matrix<double> orienttemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/poso.csv", T, vv2);
     // matrix<int> bindtemp = importcsv("/home/dino/Desktop/tylercollab/Repo/Code/Basic/InitialConditions/posb.csv", TT, vv3);
+
 
     string dir = "/u/home/d/dinoo/Chemistry/Code/Basic/InitialConditions/";
     string dir2 = "/home/dino/Documents/tylercollab/Repo/Code/Basic/InitialConditions/";
     string dir3 = "/home/dino/Documents/Chemistry/SimulationResults/EvapNoInteraction/";
 
+    string dir4 = "/home/dino/Documents/Chemistry/SimulationResults/GoodSimulations/EvapSweep/";
 
-    matrix<double> postemp = importcsv(dir + "pInvasionStart.csv", T, vv1);
-    matrix<double> orienttemp = importcsv(dir + "oInvasionStart.csv", T, vv2);
-    matrix<int> bindtemp = importcsv(dir + "bInvasionStart.csv", TT, vv3);
+    // string filename1 = "pos_int2=10_int3=10_br=0.99_i=1999.csv";
+    // string filename2 = "orientation_int2=10_int3=10_br=0.99_i=1999.csv";
+    // string filename3 = "bindings_int2=10_int3=10_br=0.99_i=1999.csv";
 
-    A.obj->setdat(postemp);
-    A.obj->setorientation(orienttemp);
-    BinaryBindStore bbs2;
-    vector1<bool> iss(bindtemp.getncols());
-    vector1<int> ist(bindtemp.getncols());
-    for (int i = 0; i < bindtemp.getncols(); i++)
-    {
-        iss[i] = (bool)bindtemp(0, i);
-        ist[i] = bindtemp(1, i);
+    string filename1 = "pAntiInvasionStart.csv";
+    string filename2 = "oAntiInvasionStart.csv";
+    string filename3 = "bAntiInvasionStart.csv";
+
+    matrix<double> postemp = importcsv(dir + filename1, T, vv1);
+    matrix<double> orienttemp = importcsv(dir + filename2, T, vv2);
+    matrix<int> bindtemp = importcsv(dir + filename3, TT, vv3);
+
+   // int num_anti = 1000;
+
+    matrix<double> InsertedAntiInvader = CreateRandomSample(postemp,num_anti,l,38);
+
+
+    // cout << InsertedAntiInvader << endl;
+    matrix<double> postemp2(18000+num_anti,3);
+    matrix<double> orienttemp2(18000+num_anti,9);
+    matrix<int> bindtemp2(2,57000+4*num_anti);
+
+
+    vector1<double> unc(9);
+    unc[0] = 1.;
+    unc[4] = 1.;
+    unc[8] = 1.;
+
+    for(int i = 0  ; i < 18000+num_anti ; i++) {
+        if(i < 3000 ) {
+            for(int j = 0  ; j < 3 ; j++) {
+                postemp2(i,j) = postemp(i,j);
+            }
+            for (int j = 0; j < 9; j++)
+            {
+                orienttemp2(i, j) = orienttemp(i, j);
+            }
+
+        }
+        else if(i < 3000+num_anti ) {
+            for (int j = 0; j < 3; j++)
+            {
+                postemp2(i, j) = InsertedAntiInvader(i-(3000), j);
+            }
+            for (int j = 0; j < 9; j++)
+            {
+                orienttemp2(i, j) = unc[j];
+            }
+
+        }
+        else{
+            for (int j = 0; j < 3; j++)
+            {
+                postemp2(i, j) = postemp(i - num_anti, j);
+            }
+            for (int j = 0; j < 9; j++)
+            {
+                orienttemp2(i, j) = orienttemp(i - num_anti, j);
+            }
+        }
     }
-    bbs2.isbound = iss;
+
+    for (int i = 0; i < 57000 + 4 * num_anti ; i++) {
+        if(i < 3000*4) {
+            int vv = bindtemp(1,i);
+            if(vv > 12000) {
+                vv+= num_anti * 4;
+            }
+            bindtemp2(0,i) = bindtemp(0,i);
+            bindtemp2(1,i) = vv;
+        }
+        else if(i < 3000*4+num_anti*4) {
+            bindtemp2(0,i) = 0;
+            bindtemp2(1,i) = 0;
+        }
+        else {
+            int vv = bindtemp(1, i -num_anti * 4);
+            if (vv > 12000)
+            {
+                vv += num_anti * 4;
+            }
+            bindtemp2(0, i) = bindtemp(0, i - num_anti*4);
+            bindtemp2(1, i) = vv;
+        }
+    }
+
+        
+
+
+    //place new particles
+    
+    A.obj->setdat(postemp2);
+    A.obj->setorientation(orienttemp2);
+    BinaryBindStore bbs2;
+    vector1<bool> iss(bindtemp2.getncols());
+    vector1<int> ist(bindtemp2.getncols());
+    for(int i  = 0 ; i < bindtemp2.getncols() ; i++ ) {
+        iss[i] = (bool)bindtemp2(0,i);
+        ist[i] =  bindtemp2(1,i);
+    }
+    bbs2.isbound =  iss;
     bbs2.boundto = ist;
+    
+   
+   
+    /*
+    matrix<double> postemp3(3000+num_anti, 3);
+    matrix<double> orienttemp3(3000 + num_anti, 9);
+    matrix<int> bindtemp3(2, 12000 + 4 * num_anti);
+
+    for(int i = 0  ; i <  3000+num_anti ; i ++) {
+        for(int j = 0  ; j < 3 ; j++) {
+        postemp3(i,j) =  postemp2(i,j);
+        }
+        for (int j = 0; j < 9; j++)
+        {
+            orienttemp3(i,j) = orienttemp2(i,j);
+        }
+    }
+
+    A.obj->setdat(postemp3);
+    A.obj->setorientation(orienttemp3);
+    BinaryBindStore bbs3;
+    vector1<bool> iss(bindtemp3.getncols());
+    vector1<int> ist(bindtemp3.getncols());
+    for (int i = 0; i < bindtemp3.getncols(); i++)
+    {
+        iss[i] = (bool)0;
+        ist[i] = 0;
+    }
+    bbs3.isbound = iss;
+    bbs3.boundto = ist;
+    */
+
     //Do processing to make sure everything is fine here
+   // pausel();
 
     int every = 1000;
 
+
     A.run_singlebond_different_sizes_continue(runtime, every, m2, size1, size2, 0, bbs2, base);
 
-    /*
+/*
 int NN = 10000;
 matrix<double> F(NN, 3);
 matrix<double> T(NN, 3);
@@ -569,5 +840,5 @@ for(int i = 0 ; i < 20000 ; i++) {
  }
 */
 
-    return 0;
+return 0;
 }

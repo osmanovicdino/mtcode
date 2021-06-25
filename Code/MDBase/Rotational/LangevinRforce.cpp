@@ -1559,7 +1559,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
         // //
         PairHistogramExtended(edgelist, boindices, boscores, tempbound);
+        
+        
+        // vector1<int> countub(4);
+        // vector1<int> countb(3);
 
+        // vector1<int> countbtc(3);
+        // vector1<int> countubtc(3);
         //cout << " largest cluster: " << maxval(tempbound) << endl;
         
 
@@ -1584,6 +1590,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 if (outside)
                 {
                     bo.isbound[i] = false;
+                    
+                    // bool cond1 = i < 12000 && bt > 12000 + 4 * 15000 && (bt - 12000 - 15000 * 4) % 3 == 2;
+                    // if(cond1) {
+                    //     countub[3]++;
+                    // }
                 }
             }
         }
@@ -1666,6 +1677,31 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //     if(ccs[i]>1 && print) cout << endl;
         // }
 
+        // struct mysorter
+        // {
+        //     int div1 = 12000;
+        //     int div2 = 12000+15000*4;
+        //     int operator()(const int &index1)
+        //     {
+        //         if (index1 < div1)
+        //             return 1;
+        //         else if (index1 < div2)
+        //             return 2;
+        //         else
+        //         {
+        //             // cout << index1-div2 << endl;
+        //             if ((index1 - div2) % 3 == 2)
+        //                 return 3;
+        //             else
+        //                 return 1;
+        //         }
+        //     }
+        // };
+
+        // mysorter tempor;
+
+
+
         int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
         //        // cout << number_to_reserve << endl;
         vector<mdpair> mypairs; //(number_to_reserve);
@@ -1738,7 +1774,18 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i1] = false;
                         bo.isbound[i2] = false;
                     }
-                    //bool already_bound = prebound(i1,i2);
+
+                    // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
+                    // if(alreadybound_to_eachother && !aft && cond1) {
+                    //     countub[0]++;
+                    // }
+                    // else if(!alreadybound_to_eachother && aft && cond1) {
+                    //     countb[0]++;
+                    // }
+                    // else{
+
+                    // }
+
                 }
                 else if (size_of_cluster == 3)
                 {
@@ -1878,6 +1925,23 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
                     // bool cond2 = i1 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
                     // bool cond3 = i2 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
+                    // int v1 = tempor(i1);
+                    // int v2 = tempor(i2);
+                    // int v3 = tempor(i3);
+                    // int sv1, sv2, sv3;
+                    // sort_triplet(v1, v2, v3, sv1, sv2, sv3);
+                    // // char str[3];
+                    // // sprintf(str, "%d%d%d", sv1, sv2, sv3);
+                    // string s1 = to_string(v1);
+                    // string s2 = to_string(v2);
+                    // string s3 = to_string(v3);
+
+                    // // Concatenate both strings
+                    // string s = s1 + s2 + s3;
+
+                    // // Convert the concatenated string
+                    // // to integer
+                    // int str = stoi(s);
 
                     bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
 
@@ -1889,6 +1953,51 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i2] = true;
                         bo.isbound[i3] = false;
                         mypairs_private.push_back(mdpair(i2, i1));
+/* 
+                        if(a12 != b12 && (cond1 || cond2 || cond3) )
+                        {
+
+                            if(a12 && cond1) { 
+                                countb[1]++;
+
+  
+
+                                if(str==113) {
+                                    countbtc[0]++;
+                                }
+                                else if(str ==123) {
+                                    countbtc[1]++;
+                                }
+                                else if(str == 133) {
+                                    countbtc[2]++;
+                                }
+                                else{
+
+                                }
+
+                                //cout << tempor(i1) << " " << tempor(i2) << " " << tempor(i3) << endl;
+                             }
+                            else if((b23&&cond3) || (b13&&cond2) ) {
+                                //cout << tempor(i1) << " " << tempor(i2) << " " << tempor(i3) << endl;
+                                countub[1]++;
+                                if (str == 113)
+                                {
+                                    countubtc[0]++;
+                                }
+                                else if (str == 123)
+                                {
+                                    countubtc[1]++;
+                                }
+                                else if (str == 133)
+                                {
+                                    countubtc[2]++;
+                                }
+                                else
+                                {
+                                }
+                            }
+                            else {}
+                        } */
                     }
                     else if (a23)
                     {
@@ -1899,7 +2008,52 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i2] = true;
                         bo.isbound[i3] = true;
                         mypairs_private.push_back(mdpair(i3, i2));
-
+                        /* 
+                        if (a23 != b23 && (cond1 || cond2 || cond3))
+                        {
+                            if (a23 && cond3) {
+                                countb[1]++;
+                                if (str == 113)
+                                {
+                                    countbtc[0]++;
+                                }
+                                else if (str == 123)
+                                {
+                                    countbtc[1]++;
+                                }
+                                else if (str == 133)
+                                {
+                                    countbtc[2]++;
+                                }
+                                else
+                                {
+                                }
+                            }
+                            else if( (b12 && cond1) || (b13 && cond2) ) {
+                                countub[1]++;
+                                
+                                if (str == 113)
+                                {
+                                    countubtc[0]++;
+                                }
+                                else if (str == 123)
+                                {
+                                    countubtc[1]++;
+                                }
+                                else if (str == 133)
+                                {
+                                    countubtc[2]++;
+                                }
+                                else
+                                {
+                                }
+                            }
+                            else
+                                ;
+                            //cout << "change" << endl;
+                           // cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                           // pausel();
+                        } */
                     }
                     else if (a13)
                     {
@@ -1908,8 +2062,51 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i1] = true;
                         bo.isbound[i2] = false;
                         bo.isbound[i3] = true;
-                        mypairs_private.push_back(mdpair(i3, i1));
+                        mypairs_private.push_back(mdpair(i3, i1));/* 
+                        if (a13 != b13 && (cond1 || cond2 || cond3) )
+                        {
+                            // cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                            // pausel();
+                            if (a13) {
+                                countb[1]++;
 
+                                if (str == 113)
+                                {
+                                    countbtc[0]++;
+                                }
+                                else if (str == 123)
+                                {
+                                    countbtc[1]++;
+                                }
+                                else if (str == 133)
+                                {
+                                    countbtc[2]++;
+                                }
+                                else
+                                {
+                                }
+                            }
+                            else if((b12 && cond1) || (b23 && cond3) ) {
+                                countub[1]++;
+                                if (str == 113)
+                                {
+                                    countubtc[0]++;
+                                }
+                                else if (str == 123)
+                                {
+                                    countubtc[1]++;
+                                }
+                                else if (str == 133)
+                                {
+                                    countubtc[2]++;
+                                }
+                                else
+                                {
+                                }
+                            }
+                            else
+                                ;
+                        } */
                     }
                     else
                     {
@@ -1917,282 +2114,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bo.isbound[i2] = false;
                         bo.isbound[i3] = false;
                     }
+
+                    
                 }
                 else
                 {
                     large_clusters_private.push_back(i);
-                   
-                   /*
-                    vector<int> unique_indexes(size_of_cluster);
-                    for (int j = 0; j < size_of_cluster; j++)
-                    {
-                        unique_indexes[j] = boindices2(i, j);
-                        // cout << unique_indexes[j] <<",";
-                    }
-                    //cout << endl;
-                    vector1<int> ind(size_of_cluster);
-                    for (int j = 0; j < size_of_cluster; j++)
-                        ind[j] = j;
 
-                    vector<mdpairwd> newedges = RecapitulateEdges(size_of_cluster, boindices2, boindices, tempbound, i, unique_indexes);
-                    //cout << "edges done" << endl;
-                    // the graph here is complete
-                    //cout << unique_indexes << endl;
-                    // for(int j  = 0 ; j < newedges.size() ; j++) {
-                    //     cout << newedges[j].a << " " << newedges[j].b << " " << newedges[j].scr << endl;
-                    // }
-
-                    int maxindv = std::distance(newedges.begin(), std::max_element(newedges.begin(), newedges.end(), mdpairwdCompareScore));
-
-                    newedges.erase(newedges.begin() + maxindv);
-                    // for(int j  = 0 ; j < newedges.size() ; j++) {
-                    //     cout << newedges[j].a << " " << newedges[j].b << " " << newedges[j].scr << endl;
-                    // }
-                    vector1<int> dem = ConnectedComponents(newedges, ind);
-
-                    //cout << "cc done" << endl;
-
-                    while (Maximum_ConnectedComp_Size(dem) > 3)
-                    {
-
-                        //Get_Rid_Worst_Edge(newedges,scoring_function)
-                        int maxindv = std::distance(newedges.begin(), std::max_element(newedges.begin(), newedges.end(), mdpairwdCompareScore));
-
-                        newedges.erase(newedges.begin() + maxindv); //remove edges one at a time until manageable
-                        for (int j = 0; j < size_of_cluster; j++)
-                            ind[j] = j;
-
-                        dem = ConnectedComponents(newedges, ind);
-                        // cout << "cc done again" << endl;
-                    }
-
-                    vector1<int> lensx(size_of_cluster);
-
-                    int depth_mat = 3; //cannot be more than this by our definition
-                    matrix<int> boindicesx(size_of_cluster, depth_mat);
-                    PairHistogram(newedges, boindicesx, lensx);
-
-                    // cout << "sorted correctly" << endl;
-
-                    //if two things are no longer in the same cluster, unbind them
-                    for (int k1 = 0; k1 < size_of_cluster; k1++)
-                    { //check bindings, if distance metric is wrong, break bindings
-                        if (bo.isbound[unique_indexes[k1]])
-                        {                                            //if it is bound
-                            int bt = bo.boundto[unique_indexes[k1]]; //it is bound to what
-
-                            int outside = true;
-                            for (int k = 0; k < lensx[k1]; k++)
-                            {
-                                int pbt = unique_indexes[boindicesx(k1, k)];
-
-                                if (bt == pbt)
-                                {
-                                    outside = false;
-                                    break;
-                                }
-                            }
-                            if (outside)
-                            {
-                                bo.isbound[unique_indexes[k1]] = false;
-                            }
-                        }
-                    }
-
-                    for (int j = 0; j < dem.getsize() - 1; j++)
-                    {
-                        int size_of_sub_cluster = dem[j + 1] - dem[j];
-                        if (size_of_sub_cluster == 1)
-                        {
-                            int k = dem[j];
-                            int ni1 = ind[k];
-                            int i1 = unique_indexes[ni1];
-                            bo.isbound[i1] = false;
-                        }
-                        else if (size_of_sub_cluster == 2)
-                        {
-                            int k1 = dem[j];
-                            int k2 = dem[j] + 1;
-
-                            int ni1 = ind[k1];
-                            int ni2 = ind[k2];
-
-                            int ti1 = unique_indexes[ni1];
-                            int ti2 = unique_indexes[ni2];
-
-                            int i1;
-                            int i2;
-                            sort_doublet(ti1, ti2, i1, i2);
-
-                            bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
-
-                            bool aft;
-
-                            bm.doublet(alreadybound_to_eachother, i1, i2, aft);
-
-                            if (aft)
-                            {
-                                bo.boundto[i1] = i2;
-                                bo.boundto[i2] = i1;
-                                bo.isbound[i1] = true;
-                                bo.isbound[i2] = true;
-                                //tbt++;
-                                mypairs_private.push_back(mdpair(i1, i2));
-                            }
-                            else
-                            {
-
-                                bo.isbound[i1] = false;
-                                bo.isbound[i2] = false;
-                            }
-                        }
-                        else if (size_of_sub_cluster == 3)
-                        {
-                            // int ti1 = boindices2(i, 0);
-                            // int ti2 = boindices2(i, 1);
-                            // int ti3 = boindices2(i, 2);
-                            //SORT THE INDICES (IMPORTANT)
-                            int k1 = dem[j];
-                            int k2 = dem[j] + 1;
-                            int k3 = dem[j] + 2;
-
-                            int ni1 = ind[k1];
-                            int ni2 = ind[k2];
-                            int ni3 = ind[k3];
-
-                            int ti1 = unique_indexes[ni1];
-                            int ti2 = unique_indexes[ni2];
-                            int ti3 = unique_indexes[ni3];
-                            int i1;
-                            int i2;
-                            int i3;
-
-                            int ii1;
-                            int ii2;
-                            int ii3;
-
-                            sort_triplet(ti1, ti2, ti3, i1, i2, i3);
-
-                            sort_triplet(ni1, ni2, ni3, ii1, ii2, ii3);
-
-                            //DETERMINE WHETHER THEY ARE BOUND
-                            bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
-                            bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
-                            bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
-
-                            //DETERMINE THE CONNECTIVENESS OF THE GRAPH
-                            //remember, that in order to count as a triplet
-                            bool c12 = false;
-                            bool c23 = false;
-                            bool c13 = false;
-
-                            int nb1 = lensx[ii1];
-                            int nb2 = lensx[ii2];
-                            int nb3 = lensx[ii3];
-
-                            // if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
-
-                            //     cout << i1 << " " << i2 << " " << i3 << endl;
-
-                            //     outfunc(tempbound, "t1");
-                            //     outfunc(boindices, "t2");
-
-                            //     pausel();
-                            //     error("something weird in code");
-                            // }
-
-                            if (nb1 == 1)
-                            {
-                                int tempi = boindicesx(ii1, 0);
-                                if (tempi == ii2)
-                                {
-                                    c12 = true;
-                                    c13 = false;
-                                    c23 = true; //in order to be a triplet
-                                }
-                                else if (tempi == ii3)
-                                {
-                                    c13 = true;
-                                    c12 = false;
-                                    c23 = true;
-                                }
-                                else
-                                    error("something weird");
-
-                                //check the other
-                            }
-                            else if (nb1 == 2)
-                            {
-                                c12 = true;
-                                c13 = true;
-
-                                int nb2 = lensx[ii2];
-                                if (nb2 == 1)
-                                {
-                                    c23 = false;
-                                }
-                                else
-                                {
-                                    c23 = true;
-                                }
-                            }
-                            else
-                            {
-                                error("error in clustering algorithm triplet split");
-                            }
-
-                            bool a12;
-                            bool a23;
-                            bool a13;
-                            //cout << "triplet called: " << i1 << " " << i2 << " " << i3 << endl;
-                            // //pausel();
-                            // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
-                            // bool cond2 = i1 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
-                            // bool cond3 = i2 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
-
-                            bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
-
-                            if (a12)
-                            {
-                                bo.boundto[i1] = i2;
-                                bo.boundto[i2] = i1;
-                                bo.isbound[i1] = true;
-                                bo.isbound[i2] = true;
-                                bo.isbound[i3] = false;
-                                mypairs_private.push_back(mdpair(i2, i1));
-                            }
-                            else if (a23)
-                            {
-
-                                bo.boundto[i2] = i3;
-                                bo.boundto[i3] = i2;
-                                bo.isbound[i1] = false;
-                                bo.isbound[i2] = true;
-                                bo.isbound[i3] = true;
-                                mypairs_private.push_back(mdpair(i3, i2));
-                            }
-                            else if (a13)
-                            {
-                                bo.boundto[i1] = i3;
-                                bo.boundto[i3] = i1;
-                                bo.isbound[i1] = true;
-                                bo.isbound[i2] = false;
-                                bo.isbound[i3] = true;
-                                mypairs_private.push_back(mdpair(i3, i1));
-                            }
-                            else
-                            {
-                                bo.isbound[i1] = false;
-                                bo.isbound[i2] = false;
-                                bo.isbound[i3] = false;
-                            }
-                        }
-                        else
-                        {
-                            error("no this should not be possible, somehow our n cluster hasn't been broken up");
-                        }
-                    }
-                    */
                 }
             }
 
@@ -2299,6 +2227,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         if (outside)
                         {
                             bo.isbound[unique_indexes[k1]] = false;
+
+                            // bool cond1 = i < 12000 && bt > 12000 + 4 * 15000 && (bt - 12000 - 15000 * 4) % 3 == 2;
+                            // if(cond1) {
+                            //     countub[3]++;
+                            // }
                         }
                     }
                 }
@@ -2349,6 +2282,18 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                             bo.isbound[i1] = false;
                             bo.isbound[i2] = false;
                         }
+
+                        // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
+                        // if(alreadybound_to_eachother && !aft && cond1) {
+                        //     countub[0]++;
+                        // }
+                        // else if(!alreadybound_to_eachother && aft && cond1) {
+                        //     countb[0]++;
+                        // }
+                        // else{
+
+                        // }
+
                     }
                     else if (size_of_sub_cluster == 3)
                     {
@@ -2453,8 +2398,22 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
                         // bool cond2 = i1 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
                         // bool cond3 = i2 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
+                        // int v1 = tempor(i1);
+                        // int v2 = tempor(i2);
+                        // int v3 = tempor(i3);
+                        // int sv1, sv2, sv3;
+                        // sort_triplet(v1, v2, v3, sv1, sv2, sv3);
+                        // string s1 = to_string(v1);
+                        // string s2 = to_string(v2);
+                        // string s3 = to_string(v3);
 
-                        bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+                        // // Concatenate both strings
+                        // string s = s1 + s2 + s3;
+
+                        // // Convert the concatenated string
+                        // // to integer
+                        // int str = stoi(s);
+
 
                         if (a12)
                         {
@@ -2464,6 +2423,49 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                             bo.isbound[i2] = true;
                             bo.isbound[i3] = false;
                             mypairs_private.push_back(mdpair(i2, i1));
+                            /* 
+                            if(a12 != b12 && (cond1 || cond2 || cond3) )
+                            {
+                                //cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                                //pausel();
+                                if(a12 && cond1) { 
+                                    countb[1]++;
+                                    if (str == 113)
+                                    {
+                                        countbtc[0]++;
+                                    }
+                                    else if (str == 123)
+                                    {
+                                        countbtc[1]++;
+                                    }
+                                    else if (str == 133)
+                                    {
+                                        countbtc[2]++;
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                                else if((b23&&cond3) || (b13&&cond2) ) {
+                                    countub[1]++;
+                                    if (str == 113)
+                                    {
+                                        countubtc[0]++;
+                                    }
+                                    else if (str == 123)
+                                    {
+                                        countubtc[1]++;
+                                    }
+                                    else if (str == 133)
+                                    {
+                                        countubtc[2]++;
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                                else {}
+                            } */
                         }
                         else if (a23)
                         {
@@ -2474,6 +2476,51 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                             bo.isbound[i2] = true;
                             bo.isbound[i3] = true;
                             mypairs_private.push_back(mdpair(i3, i2));
+                            /* 
+                            if (a23 != b23 && (cond1 || cond2 || cond3))
+                            {
+                                if (a23 && cond3) {
+                                    countb[1]++;
+                                    if (str == 113)
+                                    {
+                                        countbtc[0]++;
+                                    }
+                                    else if (str == 123)
+                                    {
+                                        countbtc[1]++;
+                                    }
+                                    else if (str == 133)
+                                    {
+                                        countbtc[2]++;
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                                else if( (b12 && cond1) || (b13 && cond2) ) {
+                                    countub[1]++;
+                                    if (str == 113)
+                                    {
+                                        countubtc[0]++;
+                                    }
+                                    else if (str == 123)
+                                    {
+                                        countubtc[1]++;
+                                    }
+                                    else if (str == 133)
+                                    {
+                                        countubtc[2]++;
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                                else
+                                    ;
+                                //cout << "change" << endl;
+                               // cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                               // pausel();
+                            } */
                         }
                         else if (a13)
                         {
@@ -2483,6 +2530,50 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                             bo.isbound[i2] = false;
                             bo.isbound[i3] = true;
                             mypairs_private.push_back(mdpair(i3, i1));
+/*                             if (a13 != b13 && (cond1 || cond2 || cond3) )
+                            {
+                                // cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
+                                // pausel();
+                                if (a13) {
+                                    countb[1]++;
+                                    if (str == 113)
+                                    {
+                                        countbtc[0]++;
+                                    }
+                                    else if (str == 123)
+                                    {
+                                        countbtc[1]++;
+                                    }
+                                    else if (str == 133)
+                                    {
+                                        countbtc[2]++;
+                                    }
+                                    else
+                                    {
+                                    }
+
+                                }
+                                else if((b12 && cond1) || (b23 && cond3) ) {
+                                    countub[1]++;
+                                    if (str == 113)
+                                    {
+                                        countubtc[0]++;
+                                    }
+                                    else if (str == 123)
+                                    {
+                                        countubtc[1]++;
+                                    }
+                                    else if (str == 133)
+                                    {
+                                        countubtc[2]++;
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                                else
+                                    ;
+                            } */
                         }
                         else
                         {
@@ -2504,96 +2595,106 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             #pragma omp ordered
                 mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
             }
-        } 
-                // for(int i = 0  ; i < large_clusters.size() ; i++) {
-                //     cout << large_clusters[i] << " ";
-                // }
-                // cout << endl;
+        }
 
-                // cout << "mypairs done" << endl;
 
-                // int tb2 = 0;
+        // cout << countb << endl;
+        // cout << countub << endl;
 
-                // for (int i = 0; i < 12000; i++)
-                // {
+        // cout << countbtc << endl;
+        // cout << countubtc << endl;
+        // cout << endl;
+        // pausel();
 
-                //     if (bo.isbound[i])
-                //     {
+        // for(int i = 0  ; i < large_clusters.size() ; i++) {
+        //     cout << large_clusters[i] << " ";
+        // }
+        // cout << endl;
 
-                //         //bool isgood;
-                //         int bt = bo.boundto[i];
-                //         if (bt > 12000 + 15000 * 4)
-                //         {
-                //             if ((bt - 12000 - 15000 * 4) % 3 == 2)
-                //             {
-                //                 tb2++;
-                //             }
-                //         }
-                //     }
-                // }
-                // cout << tb << " " << tb2 << endl;
-                // // cout << countb << endl;
-                // // cout << countub << endl;
-                // cout << endl;
-                // pausel();
+        // cout << "mypairs done" << endl;
 
-                // cout << "end bound:" << endl;
-                // for(int i = 0  ; i < mypairs.size() ; i++) {
+        // int tb2 = 0;
 
-                //     bool print = false;
+        // for (int i = 0; i < 12000; i++)
+        // {
 
-                //     if( (mypairs[i].a-80 )%3 ==2 || (mypairs[i].b-80 )%3 ==2  ) {
-                //         print=true;
-                //     }
+        //     if (bo.isbound[i])
+        //     {
 
-                //     if(print)
-                //     cout << mypairs[i].a << " " << mypairs[i].b << endl;
-                // }
+        //         //bool isgood;
+        //         int bt = bo.boundto[i];
+        //         if (bt > 12000 + 15000 * 4)
+        //         {
+        //             if ((bt - 12000 - 15000 * 4) % 3 == 2)
+        //             {
+        //                 tb2++;
+        //             }
+        //         }
+        //     }
+        // }
+        // cout << tb << " " << tb2 << endl;
+        // // cout << countb << endl;
+        // // cout << countub << endl;
+        // cout << endl;
+        // pausel();
 
-                //pausel();
+        // cout << "end bound:" << endl;
+        // for(int i = 0  ; i < mypairs.size() ; i++) {
 
-                //     //    cout << "calc patches" << endl;
+        //     bool print = false;
 
-                //         //Having gone through all the patches to determine the bindings, we can now calculate the forces
+        //     if( (mypairs[i].a-80 )%3 ==2 || (mypairs[i].b-80 )%3 ==2  ) {
+        //         print=true;
+        //     }
 
-                // /*         vector1<bool> visited(total_number_of_patches); //keep track of patches that we already calculated
-                //         vector1<int> par1(tbt);
-                //         vector1<int> par2(tbt);
-                //         int tb = 0;
-                //         int tb2 = 0;
-                //         int iter3 = 0;
-                //         for (int i = 0; i < total_number_of_patches; i++)
-                //         {
-                //             tb2 += bo.isbound[i];
-                //             if (bo.isbound[i] == true &&  visited[i] == false)
-                //             {
-                //                 visited[i] = true;
-                //                 visited[bo.boundto[i]] = true;
-                //                 //tb += bo.isbound[i];
-                //                 par1[iter3] = i;
-                //                 par2[iter3] = bo.boundto[i];
-                //                 iter3++;
-                //             }
-                //         }
+        //     if(print)
+        //     cout << mypairs[i].a << " " << mypairs[i].b << endl;
+        // }
 
-                //         cout << par1 << endl;
-                //         cout << par2 << endl;
-                //         for(int j  = 0  ; j < mypairs.size() ; j++) {
-                //             cout << mypairs[j].a << ", ";
-                //         }
-                //         cout << endl;
-                //         for (int j = 0; j < mypairs.size(); j++)
-                //         {
-                //             cout << mypairs[j].b << ", ";
-                //         }
-                //         cout << endl;
+        //pausel();
 
-                //         cout << mypairs.size() << endl;
+        //     //    cout << "calc patches" << endl;
 
-                //         cout << tbt << endl;
-                //         cout << tb2 << endl;
-                //         cout << tb << endl;
-                //         pausel(); */
+        //         //Having gone through all the patches to determine the bindings, we can now calculate the forces
+
+        // /*         vector1<bool> visited(total_number_of_patches); //keep track of patches that we already calculated
+        //         vector1<int> par1(tbt);
+        //         vector1<int> par2(tbt);
+        //         int tb = 0;
+        //         int tb2 = 0;
+        //         int iter3 = 0;
+        //         for (int i = 0; i < total_number_of_patches; i++)
+        //         {
+        //             tb2 += bo.isbound[i];
+        //             if (bo.isbound[i] == true &&  visited[i] == false)
+        //             {
+        //                 visited[i] = true;
+        //                 visited[bo.boundto[i]] = true;
+        //                 //tb += bo.isbound[i];
+        //                 par1[iter3] = i;
+        //                 par2[iter3] = bo.boundto[i];
+        //                 iter3++;
+        //             }
+        //         }
+
+        //         cout << par1 << endl;
+        //         cout << par2 << endl;
+        //         for(int j  = 0  ; j < mypairs.size() ; j++) {
+        //             cout << mypairs[j].a << ", ";
+        //         }
+        //         cout << endl;
+        //         for (int j = 0; j < mypairs.size(); j++)
+        //         {
+        //             cout << mypairs[j].b << ", ";
+        //         }
+        //         cout << endl;
+
+        //         cout << mypairs.size() << endl;
+
+        //         cout << tbt << endl;
+        //         cout << tb2 << endl;
+        //         cout << tb << endl;
+        //         pausel(); */
 
                 #pragma omp parallel for
                 for (int i = 0; i < mypairs.size(); i++)

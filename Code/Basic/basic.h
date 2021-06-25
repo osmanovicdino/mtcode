@@ -162,9 +162,173 @@ inline void sort_triplet(int t1, int t2, int t3, int &i1, int &i2, int &i3) {
     }
 }
 
+inline void sort_triplet_and_save_permutation(int t1, int t2, int t3, int &i1, int &i2, int &i3, unsigned char &p1, unsigned char &p2, unsigned char &p3)
+{
+    if (t1 < t2)
+    {
+        if (t2 < t3)
+        {
+            i1 = t1;
+            i2 = t2;
+            i3 = t3;
+
+            p1 = 1;
+            p2 = 2;
+            p3 = 3;
+        }
+        else
+        {
+            if (t1 < t3)
+            {
+                i1 = t1;
+                i2 = t3;
+                i3 = t2;
+
+                p1 = 1;
+                p2 = 3;
+                p3 = 2;
+            }
+            else
+            {
+                i1 = t3;
+                i2 = t1;
+                i3 = t2;
+
+                p1 = 3;
+                p2 = 1;
+                p3 = 2;
+            }
+        }
+    }
+    else
+    {
+        if (t3 < t2)
+        {
+            i1 = t3;
+            i2 = t2;
+            i3 = t1;
+
+            p1 = 3;
+            p2 = 2;
+            p3 = 1;
+        }
+        else
+        {
+            if (t3 > t1)
+            {
+                i1 = t2;
+                i2 = t1;
+                i3 = t3;
+
+                p1 = 2;
+                p2 = 1;
+                p3 = 3;
+            }
+            else
+            {
+                i1 = t2;
+                i2 = t3;
+                i3 = t1;
+
+                p1 = 2;
+                p2 = 3;
+                p3 = 1;
+            }
+        }
+    }
+}
+
+inline void save_permutation_triple(const bool &b1, const bool &b2, const bool &b3, const unsigned char &o1,const unsigned char &o2, const unsigned char &o3, bool &a1, bool &a2, bool &a3) {
+//save the bools b1,b2,b3 in the order given by the permutation o1,o2,o3
+//oi must be an integer between 1 and 3. If o1,o2,o3 are not unique, garbage will also be produced 
+
+    if(o1 == 1 ) {
+        if(o2 == 2) {
+            a1 = b1;
+            a2 = b2;
+            a3 = b3;
+        }
+        else {
+            a1 = b1;
+            a2 = b3;
+            a3 = b2;
+        }
+    }
+    else if (o1 == 2) {
+        if(o2  == 1) {
+            a1 = b2;
+            a2 = b1;
+            a3 = b3;
+        }
+        else{
+            a1 = b2;
+            a2 = b3;
+            a3 = b1;
+        }
+    }
+    else{
+        if(o2 == 1) {
+            a1 = b3;
+            a2 = b1;
+            a3 = b2;
+        }
+        else{
+            a1 = b3;
+            a2 = b2;
+            a3 = b1;
+        }
+    }
+
+
+}
+
+inline void what_order(const unsigned char &o1, const unsigned char &o2, const unsigned char &o3, unsigned char &no1, unsigned char &no2, unsigned char &no3)
+{
+//what order is it necessary to arrange o1,o2,o3 to get 1 2 3
+    if(o1 == 1) {
+        if(o2 == 2) {
+            no1 = 1;
+            no2 = 2;
+            no3 = 3;
+        }
+        else{
+            no1 = 1;
+            no2 = 3;
+            no3 = 2;
+        }
+    }
+    else if (o1 == 2) {
+        if(o2 == 1) {
+            no1 = 2;
+            no2 = 1;
+            no3 = 3;
+        }
+        else{
+            no1 = 3;
+            no2 = 1;
+            no3 = 2;
+        }
+    }
+    else {
+        if(o2 == 1) {
+            no1 = 2;
+            no2 = 3;
+            no3 = 1;
+        }
+        else{
+            no1 = 3;
+            no2 = 2;
+            no3 = 1;
+        }
+
+    }
+
+}
+
 template <class T>
-int sign(T y) { //return -1 if negative and 1 otherwise
-	if ( y>0 ) return 1;
+int sign(T y)
+{ //return -1 if negative and 1 otherwise
+    if ( y>0 ) return 1;
 	return -1;
 }
 
