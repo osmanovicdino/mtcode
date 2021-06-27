@@ -11,6 +11,51 @@
 #include "../Bindings/BindingModelTernary.h"
 #include "../Potentials/ComboPatch/combopatch.h"
 
+struct thetapair
+{
+	double thetai;
+	double thetaj;
+};
+
+struct patchint { //for storing information about all possible pairs
+	unsigned int particle_index1;
+	unsigned int particle_index2;
+	unsigned int patch_index1;
+	unsigned int patch_index2;
+	unsigned int potn;
+
+	inline void get_all(int &a1, int &a2, int &p, int &pi1, int &pi2) {
+		a1= particle_index1;
+		a2= particle_index2;
+		p=potn;
+		pi1=patch_index1;
+		pi2=patch_index2;
+	}
+
+	inline void get_particle(int &a1, int &a2) {
+		a1 = particle_index1;
+		a2 = particle_index2;
+	}
+
+	inline void get_patch(int &p, int &pi1, int &pi2) {
+		p = potn;
+		pi1 = patch_index1;
+		pi2 = patch_index2;
+	}
+
+	friend inline bool check_same_particle(const patchint &a1, const patchint &a2) {
+		if(a1.particle_index2 == a2.particle_index2) {
+			if(a1.particle_index1 == a2.particle_index1) {
+				return true;
+			}
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
+};
+
 class LangevinNVTR : public LangevinNVT {
 protected:
 	//double gamma;
@@ -163,13 +208,15 @@ public:
 	matrix<int> CreateEdgeList(matrix<int> &adj, vector1<int> &lens);
 	void calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ComboPatch&, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
 	void calculate_forces_and_torques3D_onlyone_nonlets(matrix<int> &pairs, ComboPatch &, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
+	void calculate_forces_and_torques3D_onlyone_nonlets(vector<patchint> &pairs, vector<int> &divs, ComboPatch &, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
 
 	//matrix<double> calculateforcestheta_pos(matrix<int> &pairs, potentialtheta &);
 	//matrix<double> calculateforces_ang(matrix<int> &pairs,potentialtheta&);
 	void advancemom_halfstep(matrix<double> &, matrix<double> &);
 	//void advance_pos();
 	// void advancemom_fullstep();
-	
+	vector<thetapair> check_arg_thetas_per_pair(matrix<int> &pairs, ComboPatch &iny);
+	vector<patchint> calculate_patch_list(matrix<int> &pairs, ComboPatch &iny);
 	virtual void adv(matrix<int>&);
 
 	//virtual void advm(matrix<int>&,vector1<int>&,vector1<bool>&,intmatrix&); //advance with forces that depend on the internal state of the particle

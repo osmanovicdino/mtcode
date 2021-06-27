@@ -23,7 +23,7 @@ echo " "
 # load the job environment:
 . /u/local/Modules/default/init/modules.sh
 ## Edit the line below as needed:
-module load gcc/7.5.0
+module load gcc/9.3.0
 
 ## substitute the command to run your code
 ## in the two lines below:
@@ -42,7 +42,7 @@ fi
 dirwemake="den=${den}_beta=${beta}"
 mkdir /u/scratch/d/dinoo/PhaseDiagramTrivalent/${dirwemake}
 cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/PhaseDiagramTrivalent/${dirwemake}
-g++ -std=c++11 -fopenmp ~/Chemistry/Code/main.cpp -o /u/scratch/d/dinoo/PhaseDiagramTrivalent/${dirwemake}/angron
+g++ -fopenmp ~/Chemistry/Code/main.cpp -o /u/scratch/d/dinoo/PhaseDiagramTrivalent/${dirwemake}/angron
 cd /u/scratch/d/dinoo/PhaseDiagramTrivalent/${dirwemake}
 export OMP_NUM_THREADS=8
 ./angron 1000000 0.05 $beta >log

@@ -93,7 +93,10 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
                                 //cout << "create normal" << endl;
                             mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
                             //}
-
+                            if (pot1->interaction_distance > max_check)
+                                max_check = pot1->interaction_distance;
+                            if (cos(pot1->thetam) < max_ang)
+                                max_ang = cos(pot1->thetam);
                             potential_bundle[iter] = pot1->clone();
                             delete pot1;
                             iter++;     
@@ -199,6 +202,7 @@ GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnro
                     mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
                     //}
                     if(pot1->interaction_distance > max_check) max_check = pot1->interaction_distance;
+                    if(cos(pot1->thetam) < max_ang) max_ang = cos(pot1->thetam);
                     potential_bundle[iter] = pot1->clone();
                     delete pot1;
                     iter++;

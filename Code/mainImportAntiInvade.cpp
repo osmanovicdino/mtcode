@@ -6,24 +6,26 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-#include <limits>
-#include <cmath>
-#include <complex>
+// #include <limits>
+// #include <cmath>
+// #include <complex>
 #include <sstream>
 #include <string>
 #include <iomanip>
-#include <sys/ioctl.h> 
-#include <fcntl.h>
-#include <time.h>
-#include <sys/time.h>
+// #include <sys/ioctl.h> 
+// #include <fcntl.h>
+// #include <time.h>
+// #include <sys/time.h>
 #include <sys/stat.h>
 #include <random>
-#include <mutex>
-#include <atomic>
-#include <dirent.h>
-#include <execinfo.h>
-#include <signal.h>
-#include <unistd.h>
+#include <algorithm>
+#include <parallel/algorithm>
+// #include <mutex>
+// #include <atomic>
+// #include <dirent.h>
+// #include <execinfo.h>
+// #include <signal.h>
+// #include <unistd.h>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -219,13 +221,13 @@ int main(int argc, char** argv) {
     else
     {
         //error("incorrect arg number");
-        runtime = 1000001;
+        runtime = 1001;
         int1 = 10.0;
         int2 = 0.0;
         int3 = 0.0;
         int4 = 0.0;
-        energy_barrier = 0.9;
-        num_anti = 1000;
+        energy_barrier = 0.001;
+        num_anti = 15000;
     }
 
     cout << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -654,13 +656,15 @@ int main(int argc, char** argv) {
     // string filename2 = "orientation_int2=10_int3=10_br=0.99_i=1999.csv";
     // string filename3 = "bindings_int2=10_int3=10_br=0.99_i=1999.csv";
 
+    string dir5 = "/home/dino/Documents/tylercollab/Repo/Code/Basic/InitialConditions/";
+
     string filename1 = "pAntiInvasionStart.csv";
     string filename2 = "oAntiInvasionStart.csv";
     string filename3 = "bAntiInvasionStart.csv";
 
-    matrix<double> postemp = importcsv(dir + filename1, T, vv1);
-    matrix<double> orienttemp = importcsv(dir + filename2, T, vv2);
-    matrix<int> bindtemp = importcsv(dir + filename3, TT, vv3);
+    matrix<double> postemp = importcsv(dir5 + filename1, T, vv1);
+    matrix<double> orienttemp = importcsv(dir5 + filename2, T, vv2);
+    matrix<int> bindtemp = importcsv(dir5 + filename3, TT, vv3);
 
    // int num_anti = 1000;
 
@@ -790,9 +794,10 @@ int main(int argc, char** argv) {
     int every = 1000;
 
 
+    //A.run_singlebond_different_sizes_continue(runtime, every, m2, size1, size2, 0, bbs2, base);
     A.run_singlebond_different_sizes_continue(runtime, every, m2, size1, size2, 0, bbs2, base);
 
-/*
+    /*
 int NN = 10000;
 matrix<double> F(NN, 3);
 matrix<double> T(NN, 3);
@@ -840,5 +845,5 @@ for(int i = 0 ; i < 20000 ; i++) {
  }
 */
 
-return 0;
+    return 0;
 }

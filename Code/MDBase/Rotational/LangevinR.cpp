@@ -1097,41 +1097,375 @@ void LangevinNVTR::adv(matrix<int> &pairs) {
 
 }
 
-// matrix<double> forces((*dat).getNsafe(), dimension);
-// //vec_vec<double> outputs(pairs.getn());
-// // ofstream myfile;
-// // myfile.open("forces.csv", ios::out | ios::app);
-// //cout << pairs.getNsafe() << endl;
-// //potential * pot = ints(0,1,0).clone();
 
-// #pragma omp parallel for
-// for (int i = 0; i < pairs.getNsafe(); i++)
-// {
-//     int p1 = pairs.mat[i * 2 + 0];
-//     int p2 = pairs.mat[i * 2 + 1];
-//     //int i1 = pairs(i,2);
-//     double dis;
-//     //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
-//     vector1<double> un(dimension);
-//     geo->distance_vector(*dat, p1, p2, un, dis);
 
-//     //un = i-j
+vector<thetapair> LangevinNVTR::check_arg_thetas_per_pair(matrix<int> &pairs, ComboPatch &iny)
+{
 
-//     double f1 = iny.force(sqrt(dis));
+    vector<thetapair> edgelist;
+    edgelist.reserve(pairs.getnrows());
 
-//     for (int j = 0; j < dimension; j++)
-//     {
-//         double fac = f1 * un[j] / sqrt(dis);
-//         (forces).mat[p1 * dimension + j] += fac;
-//         (forces).mat[p2 * dimension + j] += -fac;
-//     }
-// }
+    unsigned int i;
 
-// return forces;
+#pragma omp parallel
+    {
+        vector<thetapair> edgelist_private;
+        edgelist_private.reserve(pairs.getnrows());
 
-// double theta = (*orient)(i, 0);
-// double phi = (*orient)(i, 1);
-// double x = cos(phi) * sin(theta);
-// double y = sin(phi) * sin(theta);
-// double z = cos(theta);
+    #pragma omp for nowait schedule(dynamic)
+        for (i = 0; i < pairs.getNsafe(); ++i)
+        {
+            int p1 = pairs(i, 0);
+            int p2 = pairs(i, 1);
+            if (p2 < p1)
+            { //INDICES NEED TO BE SORTED FOR IT TO WORK
+                int tp1 = p1;
+                p1 = p2;
+                p2 = tp1;
+            }
+            //int i1 = pairs(i,2);
+            double dis;
+            //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+            vector1<double> un(dimension);
+            geo->distance_vector(*dat, p1, p2, un, dis);
 
+            //un = i-j
+
+            dis = sqrt(dis);
+
+            if (/*dis < iny.max_check*/ true)
+            {
+                un /= dis;
+                double dx = un.gpcons(0);
+                double dy = un.gpcons(1);
+                double dz = un.gpcons(2);
+
+                double qtemp0 = orient->gpcons(p1, 0);
+                double qtemp1 = orient->gpcons(p1, 1);
+                double qtemp2 = orient->gpcons(p1, 2);
+                double qtemp3 = orient->gpcons(p1, 3);
+                double qtemp4 = orient->gpcons(p1, 4);
+                double qtemp5 = orient->gpcons(p1, 5);
+                double qtemp6 = orient->gpcons(p1, 6);
+                double qtemp7 = orient->gpcons(p1, 7);
+                double qtemp8 = orient->gpcons(p1, 8);
+
+                double gtemp0 = orient->gpcons(p2, 0);
+                double gtemp1 = orient->gpcons(p2, 1);
+                double gtemp2 = orient->gpcons(p2, 2);
+                double gtemp3 = orient->gpcons(p2, 3);
+                double gtemp4 = orient->gpcons(p2, 4);
+                double gtemp5 = orient->gpcons(p2, 5);
+                double gtemp6 = orient->gpcons(p2, 6);
+                double gtemp7 = orient->gpcons(p2, 7);
+                double gtemp8 = orient->gpcons(p2, 8);
+
+                // for (int j = 0; j < iny.num_patches(p1) ; j++)
+                // {
+                //     for (int k = 0; k < iny.num_patches(p2); k++)
+                //     {
+
+                //int potn = np1 * j + k;
+
+                int **q = new int *;
+                if (iny.safe)
+                {
+                    iny.UpdateIterator(p1, p2);
+                    *q = *iny.p;
+                }
+                else
+                {
+                    iny.UpdateIteratorSafe(p1, p2, q);
+                }
+
+                //int **q = iny.p;
+
+                for (int tp = 1; tp < (*q)[0] + 1; tp++)
+                {
+                    int potn = (*q)[tp];
+
+                    mypot *temppot = iny.potential_bundle[potn];
+
+
+                    double nxb1 = temppot->nxb1;
+                    double nxb2 = temppot->nxb2;
+                    double nyb1 = temppot->nyb1;
+                    double nyb2 = temppot->nyb2;
+                    double nzb1 = temppot->nzb1;
+                    double nzb2 = temppot->nzb2;
+                    double disp = temppot->interaction_distance;
+                    double thetam = temppot->thetam;
+
+
+                    double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+                    double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+                    double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+                    double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+                    double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+                    double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+                    double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
+                    double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
+
+                    int wp1, wp2;
+                    iny.which_patch(p1, p2, potn, wp1, wp2);
+
+
+                        thetapair test;
+                        test.thetai = argthetai;
+                        test.thetaj = argthetaj;
+                        edgelist_private.push_back(test);
+
+                    
+                }
+                //pausel();
+                delete q;
+            }
+        }
+        #pragma omp for schedule(static) ordered
+        for (int i = 0; i < omp_get_num_threads(); i++)
+        {
+            #pragma omp ordered
+            edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
+        }
+    }
+
+    return edgelist;
+}
+
+vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPatch &iny)
+{
+    vector<patchint> edgelist;
+    edgelist.reserve(10*pairs.getnrows());
+    unsigned int i;
+    double max_angle = iny.max_ang;
+    double max_dis = iny.max_check + 1.;
+
+    #pragma omp parallel
+    {
+        vector<patchint> edgelist_private;
+        edgelist_private.reserve(10*pairs.getnrows());
+
+        #pragma omp for nowait schedule(dynamic)
+        for (i = 0; i < pairs.getNsafe(); ++i)
+        {
+            int p1 = pairs(i, 0);
+            int p2 = pairs(i, 1);
+            if (p2 < p1)
+            { //INDICES NEED TO BE SORTED FOR IT TO WORK
+                int tp1 = p1;
+                p1 = p2;
+                p2 = tp1;
+            }
+            //int i1 = pairs(i,2);
+            double dis;
+            //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+            vector1<double> un(dimension);
+            geo->distance_vector(*dat, p1, p2, un, dis);
+
+            //un = i-j
+            
+
+            dis = sqrt(dis);
+
+            if (dis < max_dis)
+            {
+                un /= dis;
+                double dx = un.gpcons(0);
+                double dy = un.gpcons(1);
+                double dz = un.gpcons(2);
+
+                double qtemp0 = orient->gpcons(p1, 0);
+                double qtemp1 = orient->gpcons(p1, 1);
+                double qtemp2 = orient->gpcons(p1, 2);
+                double qtemp3 = orient->gpcons(p1, 3);
+                double qtemp4 = orient->gpcons(p1, 4);
+                double qtemp5 = orient->gpcons(p1, 5);
+                double qtemp6 = orient->gpcons(p1, 6);
+                double qtemp7 = orient->gpcons(p1, 7);
+                double qtemp8 = orient->gpcons(p1, 8);
+
+                double gtemp0 = orient->gpcons(p2, 0);
+                double gtemp1 = orient->gpcons(p2, 1);
+                double gtemp2 = orient->gpcons(p2, 2);
+                double gtemp3 = orient->gpcons(p2, 3);
+                double gtemp4 = orient->gpcons(p2, 4);
+                double gtemp5 = orient->gpcons(p2, 5);
+                double gtemp6 = orient->gpcons(p2, 6);
+                double gtemp7 = orient->gpcons(p2, 7);
+                double gtemp8 = orient->gpcons(p2, 8);
+
+                // for (int j = 0; j < iny.num_patches(p1) ; j++)
+                // {
+                //     for (int k = 0; k < iny.num_patches(p2); k++)
+                //     {
+
+                //int potn = np1 * j + k;
+
+                int **q = new int *;
+                if (iny.safe)
+                {
+                    iny.UpdateIterator(p1, p2);
+                    *q = *iny.p;
+                }
+                else
+                {
+                    iny.UpdateIteratorSafe(p1, p2, q);
+                }
+
+                //int **q = iny.p;
+
+                for (int tp = 1; tp < (*q)[0] + 1; tp++)
+                {
+                    int potn = (*q)[tp];
+
+                    mypot *temppot = iny.potential_bundle[potn];
+
+                    double nxb1 = temppot->nxb1;
+                    double nxb2 = temppot->nxb2;
+                    double nyb1 = temppot->nyb1;
+                    double nyb2 = temppot->nyb2;
+                    double nzb1 = temppot->nzb1;
+                    double nzb2 = temppot->nzb2;
+                    double disp = temppot->interaction_distance;
+                    double thetam = temppot->thetam;
+
+                    double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+                    double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+                    double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+                    double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+                    double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+                    double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+                    double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
+                    double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
+
+                    if ((argthetai - max_angle) + (argthetaj-max_angle) >-0.4 )
+                    {
+                        // this is an empirically established formula for how large the total difference betweenn the angles
+                        // from the time when they switch on has to be for no new bonds to form after 10 time
+                        int wp1, wp2;
+                        iny.which_patch(p1, p2, potn, wp1, wp2);
+
+                        patchint test;
+                        test.particle_index1 = p1;
+                        test.particle_index2 = p2;
+                        test.potn = potn;
+                        test.patch_index1 = wp1;
+                        test.patch_index2 = wp2;
+                        edgelist_private.push_back(test);
+                    }
+                    else{
+                        //don't add
+                    }
+                }
+                //pausel();
+                delete q;
+            }
+        }
+        #pragma omp for schedule(static) ordered
+        for (int i = 0; i < omp_get_num_threads(); i++)
+        {
+            #pragma omp ordered
+            edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
+        }
+    }
+
+
+
+
+    return edgelist;
+}
+
+vector<int> adjacency(const vector<patchint> &c1) {
+    int n = c1.size();
+    vector1<bool> c2(n);
+    #pragma omp parallel for 
+    for(int i = 1 ; i < n ; i++) {
+        bool diff = !(check_same_particle(c1[i],c1[i-1]));
+        c2[i] = diff;
+    }
+
+    vector<int> indexes;
+    indexes.reserve(n/3);
+    
+    #pragma omp parallel 
+    {
+    vector<int> indexes_private;
+    indexes_private.reserve(n/3);
+    #pragma omp for nowait schedule(dynamic)
+    for(int i = 0  ; i < n ; i++) {
+        if(c2[i]) {
+            indexes_private.push_back(i);
+        }
+    }
+    #pragma omp for schedule(static) ordered
+    for (int i = 0; i < omp_get_num_threads(); i++)
+    {
+    #pragma omp ordered
+        indexes.insert(indexes.end(), indexes_private.begin(), indexes_private.end());
+    }
+
+    }
+    #if defined(_OPENMP)
+    __gnu_parallel::sort(indexes.begin(), indexes.end());
+    #else
+        std::sort(indexes.begin(),indexes.end());
+    #endif
+
+    return indexes;
+
+
+}
+
+void print_single_thetas(vector<thetapair> &a1, string pre, int j)
+{
+    int n = a1.size();
+
+    stringstream ss;
+    ss << j;
+    string s1 = "theta";
+    string s2 = ss.str();
+    string s3 = ".csv";
+
+    ofstream myfile;
+    myfile.open((s1 + pre + s2 + s3).c_str());
+    for (int i = 0; i < n; i++)
+    {
+        myfile << a1[i].thetai << "," << a1[i].thetaj << endl;
+    }
+    myfile.close();
+    //pausel();
+}
+
+void print_two_different_thetas(vector<thetapair> &a1, vector<thetapair> &a2) {
+    int n = a1.size();
+    ofstream myfile;
+    myfile.open("thetachange.csv");
+    for(int i = 0  ; i < n ; i++) {
+        myfile << a1[i].thetai - a2[i].thetai << ","  << a1[i].thetaj - a2[i].thetaj << endl;
+    
+    }
+    myfile.close();
+    //pausel();
+}
+
+void print_two_different_thetas(vector<thetapair> &a1, vector<thetapair> &a2, int j)
+{
+    int n = a1.size();
+    ofstream myfile;
+    stringstream ss;
+    ss << j;
+    string s1 = "thetachange";
+    string s2 = ss.str();
+    string s3 = ".csv";
+    myfile.open((s1+s2+s3).c_str());
+    for (int i = 0; i < n; i++)
+    {
+        myfile << a1[i].thetai - a2[i].thetai << "," << a1[i].thetaj - a2[i].thetaj << endl;
+    }
+    myfile.close();
+    //pausel();
+}

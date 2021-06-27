@@ -10,8 +10,9 @@ int **p; //pointer to array where potentials are
 bool safe; // is this combo patch parallel safe?
 vector1<mypot*> potential_bundle; //list of potentials
 double max_check;
+double max_ang;
 
-ComboPatch(int n) : potential_bundle(vector1<mypot*>(n)), safe(true) { p = new int*; max_check = 1.0; }
+ComboPatch(int n) : potential_bundle(vector1<mypot*>(n)), safe(true) { p = new int*; max_check = 1.0; max_ang = 0.6;}
 
 virtual int num_patches(const int&) = 0; //return the number of patches on particle int
 virtual void UpdateIterator(const int&, const int&) = 0; //reassign the pointer to point to something else

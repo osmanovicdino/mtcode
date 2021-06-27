@@ -131,6 +131,7 @@ void Condensate::run(int runtime, int every, string strbase = "")
     matrix<double> RT(NN, 6);
     matrix<double> zeromatrix(NN,3);
 
+
     F = obj->calculateforces(*pairs, wsa);
     
     obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
@@ -287,9 +288,16 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
     obj->calculateforces(*pairs, wsa);
 
+    vector<patchint> opairs;
+    opairs.reserve(NN * 10 * 10);
+    vector<int> runs_diff;
+    runs_diff.reserve(NN * 20);
+    opairs = obj->calculate_patch_list(*pairs, *pots);
+    runs_diff = adjacency(opairs);
+
     //cout << "fi" << endl;
     //cout << "fi" << endl;
-    obj->calculate_forces_and_torques3D_onlyone_nonlets(*pairs, *pots, bbs , *bm, F, T);
+    obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs , *bm, F, T);
     //cout << "fi2" << endl;
 
 
@@ -311,6 +319,10 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
             delete pairs;
             pairs = obj->calculatepairs(boxes, 3.5);
         }
+        if(i > 0 && i %10 ==0 ){
+            opairs = obj->calculate_patch_list(*pairs, *pots);
+            runs_diff = adjacency(opairs);
+        }
 
        
         //obj->measured_temperature();
@@ -326,7 +338,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
         T.reset(0.0);
 
-        obj->calculate_forces_and_torques3D_onlyone_nonlets(*pairs, *pots, bbs, *bm, F, T);
+        obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs, *bm, F, T);
 
         generate_uniform_random_matrix(RT);
         obj->create_forces_and_torques_sphere(F, T, RT);
@@ -474,8 +486,14 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
     }
 
     pairs = pairstemp;
+    vector<patchint> opairs;
+    opairs.reserve(NN * 10 * 10);
+    vector<int> runs_diff;
+    runs_diff.reserve(NN * 20);
+    opairs = obj->calculate_patch_list(pairs, *pots);
+    runs_diff = adjacency(opairs);
 
-    obj->calculate_forces_and_torques3D_onlyone_nonlets(pairs, *pots, bbs, *bm, F, T);
+    obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs, *bm, F, T);
     generate_uniform_random_matrix(RT);
     obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
@@ -529,6 +547,11 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
             pairs = pairstemp2;
         }
 
+        if(i>0 && i %10 ==0 ) {
+            opairs = obj->calculate_patch_list(pairs, *pots);
+            runs_diff = adjacency(opairs);
+        }
+
         //obj->measured_temperature();
 
         obj->advancemom_halfstep(F, T);
@@ -546,7 +569,7 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
 
         T.reset(0.0);
 
-        obj->calculate_forces_and_torques3D_onlyone_nonlets(pairs, *pots, bbs, *bm, F, T);
+        obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff,  *pots, bbs, *bm, F, T);
         generate_uniform_random_matrix(RT);
         obj->create_forces_and_torques_sphere(F, T, RT);
 
@@ -698,8 +721,259 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
     }
 
     pairs = pairstemp;
+    vector<patchint> opairs;
+    opairs.reserve(NN * 10 * 10);
+    vector<int> runs_diff;
+    runs_diff.reserve(NN * 20);
+    opairs = obj->calculate_patch_list(pairs, *pots);
+    runs_diff = adjacency(opairs);
+
+    obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff ,*pots, bbs, *bm, F, T);
+    generate_uniform_random_matrix(RT);
+    obj->create_forces_and_torques_sphere(F, T, RT);
+    //vector1<double> tottemp(6);
+
+
+    for (int i = 0; i < runtime; i++)
+    {
+
+        cout << i << endl;
+
+        // vector1<double> meas(6);
+        // obj->measured_temperature(meas);
+        // tottemp += meas;
+        // cout << tottemp / (double)(i + 1) << endl;
+        if (i > 0 && i % 10 == 0)
+        {
+            // cout << "pairs recalculated" << endl;
+
+
+            delete pairsp1;
+            delete pairsp2;
+            delete pairsp1p2;
+
+            pairsp1 = obj->calculatepairs(boxes, p1, 3.5 * size1);
+
+            pairsp2 = obj->calculatepairs(boxes, p2, 3.5 * size2);
+
+            pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5 * (size1 + size2) / 2.);
+
+            npp = (pairsp1->getNsafe()) + (pairsp2->getNsafe()) + (pairsp1p2->getNsafe());
+
+            matrix<int> pairstemp2(npp, 2);
+            int iter = 0;
+            for (int j = 0; j < pairsp1->getNsafe(); j++)
+            {
+                pairstemp2(iter, 0) = pairsp1->operator()(j, 0);
+                pairstemp2(iter, 1) = pairsp1->operator()(j, 1);
+                iter++;
+            }
+            for (int j = 0; j < pairsp2->getNsafe(); j++)
+            {
+                pairstemp2(iter, 0) = pairsp2->operator()(j, 0);
+                pairstemp2(iter, 1) = pairsp2->operator()(j, 1);
+                iter++;
+            }
+            for (int j = 0; j < pairsp1p2->getNsafe(); j++)
+            {
+                pairstemp2(iter, 0) = pairsp1p2->operator()(j, 0);
+                pairstemp2(iter, 1) = pairsp1p2->operator()(j, 1);
+                iter++;
+            }
+
+            pairs = pairstemp2;
+        }
+        if(i>0 && i%10==0) {
+            opairs = obj->calculate_patch_list(pairs, *pots);
+            runs_diff = adjacency(opairs);
+        }
+
+        //obj->measured_temperature();
+
+        obj->advancemom_halfstep(F, T);
+
+        obj->advance_pos();
+
+        //matrix<double> tempor = obj->getorientation();
+
+        
+
+        obj->rotate();
+
+
+        // tempor =  absmatrix(tempor - obj->getorientation());
+        // double valb;
+        // tempor.maxima(valb);
+        // cout << valb << endl;
+        // pausel();
+
+        F = obj->calculateforces(*pairsp1, wsa1);
+        F += obj->calculateforces(*pairsp2, wsa3);
+        F += obj->calculateforces(*pairsp1p2, wsa2);
+
+        T.reset(0.0);
+
+        obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs, *bm, F, T);
+        generate_uniform_random_matrix(RT);
+        obj->create_forces_and_torques_sphere(F, T, RT);
+
+        obj->advancemom_halfstep(F, T);
+
+        if (i % every == 0)
+        {
+
+            //cout << i << endl;
+
+            stringstream ss;
+
+            ss << setw(number_of_digits) << setfill('0') << starval + (i / every);
+
+            cout << "outputting file" << endl;
+            cout << ss.str() << endl;
+
+           // pausel();
+
+
+            matrix<double> orient = obj->getorientation();
+            matrix<double> pos = obj->getdat();
+
+            string poss = "pos";
+            poss = poss + strbase;
+            string oris = "orientation";
+            oris = oris + strbase;
+            string bins = "bindings";
+            bins = bins + strbase;
+
+            poss += "_i=";
+            oris += "_i=";
+            bins += "_i=";
+
+            string extension = ".csv";
+
+            poss += ss.str();
+            oris += ss.str();
+            bins += ss.str();
+
+            poss += extension;
+            oris += extension;
+            bins += extension;
+
+            ofstream myfile;
+            myfile.open(poss.c_str());
+
+            ofstream myfile2;
+            myfile2.open(oris.c_str());
+
+            ofstream myfile3;
+            myfile3.open(bins.c_str());
+
+            myfile <<= pos;
+            myfile2 << setprecision(10) <<= orient;
+            myfile3 <<= bbs.isbound;
+            myfile3 << "\n";
+            myfile3 <<= bbs.boundto;
+
+            myfile.close();
+            myfile2.close();
+            myfile3.close();
+        }
+    }
+}
+
+void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, int every, int div, double size1, double size2, int starval, BinaryBindStore &bbs2, string strbase = "")
+{
+
+    int ccc;
+
+    int tf = ceil((double)runtime / (double)every);
+    int number_of_digits = 0;
+    do
+    {
+        ++number_of_digits;
+        tf /= 10;
+    } while (tf);
+
+    int NN = obj->getN();
+
+    vector1<int> p1(div);
+    vector1<int> p2(NN - div);
+    for (int i = 0; i < div; i++)
+    {
+        p1[i] = i;
+    }
+    for (int i = div; i < NN; i++)
+    {
+        p2[i - div] = i;
+    }
+
+    BinaryBindStore bbs = bbs2;
+
+    int nh = (*pots).get_total_patches(NN);
+
+    if (nh != bbs2.boundto.getsize())
+        error("passing bindings incorrectly in run_singlebond_different_sizes_continue");
+    // vector1<bool> isbound(nh);
+
+    // vector1<int> boundto(nh);
+
+    // bbs.isbound = isbound;
+    // bbs.boundto = boundto;
+
+    num = floor(ls / (3. * size1));
+
+    matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+    matrix<int> *pairsp1 = obj->calculatepairs(boxes, p1, 3.5 * size1);
+
+    matrix<int> *pairsp2 = obj->calculatepairs(boxes, p2, 3.5 * size2);
+
+    matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5 * (size1 + size2) / 2.);
+
+    WCAPotential wsa1(3.0, size1, 0.0);
+    WCAPotential wsa2(3.0, (size1 + size2) / 2., 0.0);
+    WCAPotential wsa3(3.0, size2, 0.0);
+
+    matrix<double> F(NN, 3);
+    matrix<double> T(NN, 3);
+    matrix<double> RT(NN, 6);
+    matrix<double> zeromatrix(NN, 3);
+
+    F = obj->calculateforces(*pairsp1, wsa1);
+
+    F += obj->calculateforces(*pairsp2, wsa3);
+
+    F += obj->calculateforces(*pairsp1p2, wsa2);
+
+    /*make combined pairs*/
+    int npp = (pairsp1->getNsafe()) + (pairsp2->getNsafe()) + (pairsp1p2->getNsafe());
+    matrix<int> pairs;
+    matrix<int> pairstemp(npp, 2);
+    int iter = 0;
+    for (int j = 0; j < pairsp1->getNsafe(); j++)
+    {
+        pairstemp(iter, 0) = pairsp1->operator()(j, 0);
+        pairstemp(iter, 1) = pairsp1->operator()(j, 1);
+        iter++;
+    }
+    for (int j = 0; j < pairsp2->getNsafe(); j++)
+    {
+        pairstemp(iter, 0) = pairsp2->operator()(j, 0);
+        pairstemp(iter, 1) = pairsp2->operator()(j, 1);
+        iter++;
+    }
+    for (int j = 0; j < pairsp1p2->getNsafe(); j++)
+    {
+        pairstemp(iter, 0) = pairsp1p2->operator()(j, 0);
+        pairstemp(iter, 1) = pairsp1p2->operator()(j, 1);
+        iter++;
+    }
+
+    pairs = pairstemp;
+
+
 
     obj->calculate_forces_and_torques3D_onlyone_nonlets(pairs, *pots, bbs, *bm, F, T);
+
     generate_uniform_random_matrix(RT);
     obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
@@ -716,6 +990,7 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
         if (i > 0 && i % 20 == 0)
         {
             // cout << "pairs recalculated" << endl;
+
             delete pairsp1;
             delete pairsp2;
             delete pairsp1p2;
@@ -752,21 +1027,33 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
             pairs = pairstemp2;
         }
 
+
         //obj->measured_temperature();
 
         obj->advancemom_halfstep(F, T);
 
         obj->advance_pos();
 
+        //matrix<double> tempor = obj->getorientation();
+
         obj->rotate();
+
+        // tempor =  absmatrix(tempor - obj->getorientation());
+        // double valb;
+        // tempor.maxima(valb);
+        // cout << valb << endl;
+        // pausel();
 
         F = obj->calculateforces(*pairsp1, wsa1);
         F += obj->calculateforces(*pairsp2, wsa3);
         F += obj->calculateforces(*pairsp1p2, wsa2);
 
         T.reset(0.0);
-
+        
         obj->calculate_forces_and_torques3D_onlyone_nonlets(pairs, *pots, bbs, *bm, F, T);
+        //obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs,runs_diff, *pots, bbs3, *bm, F, T);
+       
+     
         generate_uniform_random_matrix(RT);
         obj->create_forces_and_torques_sphere(F, T, RT);
 
@@ -784,8 +1071,7 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
             cout << "outputting file" << endl;
             cout << ss.str() << endl;
 
-           // pausel();
-
+            // pausel();
 
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();

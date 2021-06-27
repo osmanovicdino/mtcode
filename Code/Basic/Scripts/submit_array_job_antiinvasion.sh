@@ -23,7 +23,7 @@ echo " "
 # load the job environment:
 . /u/local/Modules/default/init/modules.sh
 ## Edit the line below as needed:
-module load gcc/7.5.0
+module load gcc/9.3.0
 
 ## substitute the command to run your code
 ## in the two lines below:
@@ -54,7 +54,7 @@ fi
 dirwemake="i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_rate=${rate}_m2=${m2}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainImportAntiInvade.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
-g++ -std=c++11 -fopenmp ~/Chemistry/Code/mainImportAntiInvade.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angronai
+g++ -fopenmp ~/Chemistry/Code/mainImportAntiInvade.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angronai
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 export OMP_NUM_THREADS=16
 ./angronai 10000000 $i1 $i2 $i3 $i4 $rate $m2 >log
