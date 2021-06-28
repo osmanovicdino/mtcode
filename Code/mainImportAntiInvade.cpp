@@ -662,9 +662,9 @@ int main(int argc, char** argv) {
     string filename2 = "oAntiInvasionStart.csv";
     string filename3 = "bAntiInvasionStart.csv";
 
-    matrix<double> postemp = importcsv(dir5 + filename1, T, vv1);
-    matrix<double> orienttemp = importcsv(dir5 + filename2, T, vv2);
-    matrix<int> bindtemp = importcsv(dir5 + filename3, TT, vv3);
+    matrix<double> postemp = importcsv(dir + filename1, T, vv1);
+    matrix<double> orienttemp = importcsv(dir + filename2, T, vv2);
+    matrix<int> bindtemp = importcsv(dir + filename3, TT, vv3);
 
    // int num_anti = 1000;
 
