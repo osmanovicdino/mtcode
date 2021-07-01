@@ -24,6 +24,7 @@ int operator()(const int &index1) {
 struct SortingFunctionNonUniform {
     int div1;
     int div2;
+    int np;
     int operator()(const int &index1) {
         if (index1 < div1)
             return 1;
@@ -31,7 +32,7 @@ struct SortingFunctionNonUniform {
             return 2;
         else {
            // cout << index1-div2 << endl;
-            if((index1-div2)%3 == 2) return 3;
+            if((index1-div2)%np == np-1) return 3;
             else return 1;
         }
     }

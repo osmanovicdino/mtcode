@@ -24,6 +24,8 @@ void setpots(ComboPatch&);
 
 void setBindingModel(AbstractBindingModel&);
 
+void setup_tight_packing(double size);
+
 void run(int,int, string strbase);
 
 void run_singlebond(int,int,string strbase);

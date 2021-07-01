@@ -140,6 +140,7 @@ void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<mdpairwd> &boindic
 
 void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<int> &boindices, matrix<double> &boscores, vector1<int> &tempbound)
 {
+    int val = boindices.getncols();
     //bin an edgelist
     //Boindices must be wide enough to store the histogram, this is the responsibility of the programmer.
     int n = edgelist.size();
@@ -151,14 +152,22 @@ void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<int> &boindices, m
         edgelist[i].gets(wp1,wp2,scr);
       //  mdpairwd m1(wp2, wp2, scr);
       //  mdpairwd m2(wp1, wp1, scr);
-
+        if(tempbound[wp1]<val&&tempbound[wp2]<val) {
         boindices(wp1, tempbound[wp1]) = wp2;
         boindices(wp2, tempbound[wp2]) = wp1;
         boscores(wp1, tempbound[wp1]) = scr;
         boscores(wp2, tempbound[wp2]) = scr;
+        }   
         tempbound[wp1]++;
         tempbound[wp2]++;
     }
+
+
+
+    // int mi =  maxindex(tempbound);
+
+    // cout << boindices.getrowvector(mi) << endl;
+    // pausel();
 }
 
 void DFUtil(int i, vector1<bool> &visited, matrix<int> &adj, vector1<int> &lens)

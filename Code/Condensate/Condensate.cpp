@@ -80,6 +80,83 @@ Condensate::Condensate(double ll, int N)  {
 
 }
 
+void Condensate::setup_tight_packing(double size) {
+    int pp = floor(ls/size);
+    
+    vector<double> possible_pos_x;
+    vector<double> possible_pos_y;
+    vector<double> possible_pos_z;
+
+    // for (int i = 0; i < pp; i++)
+    // {
+    //     for (int j = 0; j < pp; j++)
+    //     {
+    //         for (int k = 0; k < pp; k++)
+    //         {
+    //             double x = 0.5 * size + i * size;
+    //             double y = 0.5 * size + j * size;
+    //             double z = 0.5 * size + k * size;
+    //             possible_pos_x.push_back(x);
+    //             possible_pos_y.push_back(y);
+    //             possible_pos_z.push_back(z);
+    //         }
+    //     }
+    // }
+    for (int i = 0; i < pp; i++) {
+        double x = 0.5 * size + i * size;
+        possible_pos_x.push_back(x);
+    }
+
+    int NN = obj->getN();
+
+    int nc = (int)ceil(cbrt(double(NN)));
+
+    int sp = rand() % (possible_pos_x.size()-nc);
+
+    int iter = 0;
+
+    matrix<double> dat(NN,3);
+
+
+    vector<int> iters;
+    iters.reserve(NN);
+    for(int i = 0  ; i < NN ; i++) {
+        iters.push_back(i);
+    }
+
+    std::random_shuffle(iters.begin(), iters.end());
+
+    for (int i = sp; i < sp + nc; i++)
+    {
+        for (int j = sp; j < sp + nc; j++)
+        {
+            for (int k = sp; k < sp + nc; k++)
+            {
+                if(iter < NN ) {
+
+
+                int g = rand() % (iters.size());
+                
+                int g2 = iters[g];
+
+                iters.erase(iters.begin() + g);
+
+                dat(g2, 0) = possible_pos_x[i];
+                dat(g2, 1) = possible_pos_x[j];
+                dat(g2, 2) = possible_pos_x[k];
+                }
+                iter++;
+
+            }
+        }
+    }
+
+
+
+    obj->setdat(dat);
+
+}
+
 void Condensate::setviscosity(double a)
 {
     double hdradius = 0.5;

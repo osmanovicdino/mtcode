@@ -3024,7 +3024,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
                                 // cout << p1 << " " << p2 << " " << wp1 << " " << wp2 << " " << disp << " " << thetam << endl;
                                 // pausel();
-
+                                //cout << disp << endl;
                                 //different conditions depending on whether there is binding or not.
                             
                                 double disp2;
@@ -3132,70 +3132,15 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     }
                 }
 
+                
 
-                // int tb = 0;
-
-                // for (int i = 0; i < 12000; i++)
-                // {
-
-                //     if (bo.isbound[i])
-                //     {
-
-                //         //bool isgood;
-                //         int bt = bo.boundto[i];
-                //         if (bt > 12000 + 15000 * 4)
-                //         {
-                //             if ((bt - 12000 - 15000 * 4) % 3 == 2)
-                //             {
-                //                 tb++;
-                //             }
-                //         }
-                //     }
-                // }
-
-                //tenuousness score, find the most tenuous links and remove them for any cluster > 4;
-
-                // cout << "which patch" << endl;
-                //pausel();
-
-                // for(int i =  0 ; i <total_number_of_patches ; i++) {
-                //     for(int j = 0 ; j < tempbound[i] ; j++) {
-                //         if(tempbound[i] >0 && tempbound[boindices(i,j)] == 0) {
-
-                //             int bk = boindices(i,j);
-                //             cout << "parts" << endl;
-                //             cout << i << endl;
-                //             cout << bk << endl;
-                //             cout << "lens" << endl;
-                //             cout << tempbound[i] << endl;
-                //             cout << tempbound[bk] << endl;
-
-                //             for(int l1 = 0  ; l1 < tempbound[i] ; l1++)
-                //                 cout << boindices(i,l1) <<  " ";
-                //             cout << endl;
-
-                //             for(int l2 = 0  ; l2 < tempbound[bk] ; l2++)
-                //                 cout << boindices(bk, l2) << " ";
-                //             cout << endl;
-
-                //             for (int l1 = 0; l1 < depth_of_matrix; l1++)
-                //                 cout << boindices(i, l1) << " ";
-                //             cout << endl;
-
-                //             for (int l2 = 0; l2 < depth_of_matrix; l2++)
-                //                 cout << boindices(bk, l2) << " ";
-                //             cout << endl;
-
-                //             error("asymmetry in bond list");
-                //         }
-                //     }
-                // }
 
                 //boindices contains all the binding data for each
 
                 // //
                 PairHistogramExtended(edgelist, boindices, boscores, tempbound);
-
+                
+                
                 // vector1<int> countub(4);
                 // vector1<int> countb(3);
 
@@ -3231,7 +3176,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                         }
                     }
                 }
-
+                
                 //save connectivity
                 // for(int i = 0  ; i < edgelist.size() ; i++) {
                 //     int wp1 = edgelist[i].a;
@@ -3250,7 +3195,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 //std::vector<mdpair> jhg(total_number_of_patches);
 
                 ConnectedComponentsParallel(edgelist, indexes2);
-
+                
                 //int depth_of_matrix2 = 15;
                 //matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
                 vector1<int> ccs(total_number_of_patches);
@@ -3258,6 +3203,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 //SingleHistogram(indexes2, boindices2, ccs);
 
                 matrix<int> boindices2 = SingleHistogram(indexes2, ccs);
+                
                 // cout << "size: " <<  boindices2.getncols() << endl;
                 // if(boindices2.getncols() > 10 ) {
                 //     pausel();
@@ -3339,7 +3285,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 vector<int> large_clusters;
                 mypairs.reserve(number_to_reserve);
                 large_clusters.reserve(number_to_reserve);
-
+                
+                
                 #pragma omp parallel
                 {
                     vector<mdpair> mypairs_private;
@@ -3763,8 +3710,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     //     large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
                     // }
                 }
-
+                
                 int number_of_large_clusters = large_clusters.size();
+
+
 
                 #pragma omp parallel
                 {
@@ -3772,7 +3721,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     //vector<int> large_clusters_private;
                     mypairs_private.reserve(number_to_reserve / 2);
 
-#pragma omp for nowait schedule(dynamic)
+                    #pragma omp for nowait schedule(dynamic)
                     for (int allc = 0; allc < number_of_large_clusters; allc++)
                     {
                         int i = large_clusters[allc];
@@ -4215,104 +4164,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                         mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
                     }
                 }
-
-                // cout << countb << endl;
-                // cout << countub << endl;
-
-                // cout << countbtc << endl;
-                // cout << countubtc << endl;
-                // cout << endl;
-                // pausel();
-
-                // for(int i = 0  ; i < large_clusters.size() ; i++) {
-                //     cout << large_clusters[i] << " ";
-                // }
-                // cout << endl;
-
-                // cout << "mypairs done" << endl;
-
-                // int tb2 = 0;
-
-                // for (int i = 0; i < 12000; i++)
-                // {
-
-                //     if (bo.isbound[i])
-                //     {
-
-                //         //bool isgood;
-                //         int bt = bo.boundto[i];
-                //         if (bt > 12000 + 15000 * 4)
-                //         {
-                //             if ((bt - 12000 - 15000 * 4) % 3 == 2)
-                //             {
-                //                 tb2++;
-                //             }
-                //         }
-                //     }
-                // }
-                // cout << tb << " " << tb2 << endl;
-                // // cout << countb << endl;
-                // // cout << countub << endl;
-                // cout << endl;
-                // pausel();
-
-                // cout << "end bound:" << endl;
-                // for(int i = 0  ; i < mypairs.size() ; i++) {
-
-                //     bool print = false;
-
-                //     if( (mypairs[i].a-80 )%3 ==2 || (mypairs[i].b-80 )%3 ==2  ) {
-                //         print=true;
-                //     }
-
-                //     if(print)
-                //     cout << mypairs[i].a << " " << mypairs[i].b << endl;
-                // }
-
-                //pausel();
-
-                //     //    cout << "calc patches" << endl;
-
-                //         //Having gone through all the patches to determine the bindings, we can now calculate the forces
-
-                // /*         vector1<bool> visited(total_number_of_patches); //keep track of patches that we already calculated
-                //         vector1<int> par1(tbt);
-                //         vector1<int> par2(tbt);
-                //         int tb = 0;
-                //         int tb2 = 0;
-                //         int iter3 = 0;
-                //         for (int i = 0; i < total_number_of_patches; i++)
-                //         {
-                //             tb2 += bo.isbound[i];
-                //             if (bo.isbound[i] == true &&  visited[i] == false)
-                //             {
-                //                 visited[i] = true;
-                //                 visited[bo.boundto[i]] = true;
-                //                 //tb += bo.isbound[i];
-                //                 par1[iter3] = i;
-                //                 par2[iter3] = bo.boundto[i];
-                //                 iter3++;
-                //             }
-                //         }
-
-                //         cout << par1 << endl;
-                //         cout << par2 << endl;
-                //         for(int j  = 0  ; j < mypairs.size() ; j++) {
-                //             cout << mypairs[j].a << ", ";
-                //         }
-                //         cout << endl;
-                //         for (int j = 0; j < mypairs.size(); j++)
-                //         {
-                //             cout << mypairs[j].b << ", ";
-                //         }
-                //         cout << endl;
-
-                //         cout << mypairs.size() << endl;
-
-                //         cout << tbt << endl;
-                //         cout << tb2 << endl;
-                //         cout << tb << endl;
-                //         pausel(); */
+             
 
 #pragma omp parallel for
                 for (int i = 0; i < mypairs.size(); i++)
@@ -4436,7 +4288,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
                 }
                 //UP TO HERE
-
+                
                 /* 
         #pragma omp parallel for
         for (int i = 0; i < total_number_of_patches; ++i)
