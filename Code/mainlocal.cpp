@@ -79,14 +79,14 @@ int main(int argc, char **argv)
     {
         //error("incorrect arg number");
         runtime = 1000001;
-        packing_fraction = 0.02;
-        int1 = 10.0;
-        int2 = 10.0;
-        int3 = 10.0;
-        int4 = 50.0;
+        packing_fraction = 0.0075;
+        int1 = 12.0;
+        int2 = 12.0;
+        int3 = 12.0;
+        int4 = 60.0;
         m5 = 1000;
         m6 = 1000;
-        energy_barrier = 0.00;
+        energy_barrier = 0.99;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -100,6 +100,8 @@ int main(int argc, char **argv)
     int m2 = m1 + m5;
     int n = m2 + m6;
 
+
+
     // int m1  = 2;
     // int m2 = 6;
     // int n = 10;
@@ -111,6 +113,9 @@ int main(int argc, char **argv)
     my_sorter.div2 = (m1 * 4 + 4 * (m2 - m1));
     my_sorter.np = 4;
     //BindingModelTernary b(m1 * 4, m1*4 + 4 * (m2-m1));
+
+
+
 
     BindingModelTernary<SortingFunctionNonUniform> b(my_sorter);
     //BindingModelTernary b(my_sorter);
@@ -142,8 +147,6 @@ int main(int argc, char **argv)
                            0.0);
 
     bool c1;
-
-
 
     // vector1<int> cc(4);
 

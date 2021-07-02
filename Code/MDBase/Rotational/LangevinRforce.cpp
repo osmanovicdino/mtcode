@@ -3277,7 +3277,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 //     }
                 // };
 
-                // mysorter tempor;
+                // SortingFunctionNonUniform my_sorter;
+                // my_sorter.div1 = (1000 * 4);
+                // my_sorter.div2 = (1000 * 4 + 4 * (1000 - 1000));
+                // my_sorter.np = 4;
 
                 int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
                 //        // cout << number_to_reserve << endl;
@@ -3351,16 +3354,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                 bo.isbound[i2] = false;
                             }
 
-                            // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
-                            // if(alreadybound_to_eachother && !aft && cond1) {
-                            //     countub[0]++;
-                            // }
-                            // else if(!alreadybound_to_eachother && aft && cond1) {
-                            //     countb[0]++;
-                            // }
-                            // else{
+                            // stringstream ss2;
 
-                            // }
+                            // ss2 << "\n Index1: " << i1 << " Index2: " << i2 << "\n";
+                            // ss2 << "p1: " << my_sorter(i1) << " p2: " << my_sorter(i2) << "\n";
+                            // ss2 << "before: " << alreadybound_to_eachother;
+                            // ss2 << "\n after: " << aft;
+
+                            // cout << ss2.str();
+
+                            // pausel();
                         }
                         else if (size_of_cluster == 3)
                         {
@@ -3688,6 +3691,19 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                 bo.isbound[i2] = false;
                                 bo.isbound[i3] = false;
                             }
+
+                           
+
+                            // ss2 << "\n Index1: " << i1 << " Index2: " << i2 << " Index3: " << i3 << "\n";
+                            // ss2 << "p1: " << my_sorter(i1) << " p2: " << my_sorter(i2) << " p3: " << my_sorter(i3) << "\n";
+                            // ss2 << "before: " << b12 << " " << b23 << " " << b13 ;
+                            // ss2 << "\nconnections: " << c12 << " " << c23 << " " << c13;
+                            // ss2 << "\n after: " << a12 << " " << a23 << " " << a13;
+
+                            // cout << ss2.str();
+
+                            // pausel();
+
                         }
                         else
                         {

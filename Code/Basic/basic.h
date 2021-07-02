@@ -120,14 +120,14 @@ inline void sort_doublet(int ti1, int ti2, int &i1, int &i2) {
 }
 
 inline void sort_triplet(int t1, int t2, int t3, int &i1, int &i2, int &i3) {
-    if(t1 < t2) {
-        if(t2 < t3) {
+    if(t1 <= t2) {
+        if(t2 <= t3) {
             i1 = t1;
             i2 = t2;
             i3 = t3;
         }
         else{
-            if(t1<t3) {
+            if(t1<=t3) {
                 i1 = t1;
                 i2 = t3;
                 i3 = t2;
@@ -141,20 +141,20 @@ inline void sort_triplet(int t1, int t2, int t3, int &i1, int &i2, int &i3) {
 
     }
     else{
-        if(t3 < t2) {
-            i1 = t3;
-            i2 = t2;
-            i3 = t1;
+        if(t1 <= t3) {
+            i1 = t2;
+            i2 = t1;
+            i3 = t3;
         }
         else{
-            if(t3 > t1) {
-                i1 = t2;
-                i2 = t1;
-                i3 = t3;
-            }
-            else{
+            if(t2 <= t3) {
                 i1 = t2;
                 i2 = t3;
+                i3 = t1;
+            }
+            else{
+                i1 = t3;
+                i2 = t2;
                 i3 = t1;
             }
         }
@@ -164,9 +164,9 @@ inline void sort_triplet(int t1, int t2, int t3, int &i1, int &i2, int &i3) {
 
 inline void sort_triplet_and_save_permutation(int t1, int t2, int t3, int &i1, int &i2, int &i3, unsigned char &p1, unsigned char &p2, unsigned char &p3)
 {
-    if (t1 < t2)
+    if (t1 <= t2)
     {
-        if (t2 < t3)
+        if (t2 <= t3)
         {
             i1 = t1;
             i2 = t2;
@@ -178,7 +178,7 @@ inline void sort_triplet_and_save_permutation(int t1, int t2, int t3, int &i1, i
         }
         else
         {
-            if (t1 < t3)
+            if (t1 <= t3)
             {
                 i1 = t1;
                 i2 = t3;
@@ -202,29 +202,19 @@ inline void sort_triplet_and_save_permutation(int t1, int t2, int t3, int &i1, i
     }
     else
     {
-        if (t3 < t2)
+        if (t1 <= t3)
         {
-            i1 = t3;
-            i2 = t2;
-            i3 = t1;
+            i1 = t2;
+            i2 = t1;
+            i3 = t3;
 
-            p1 = 3;
-            p2 = 2;
-            p3 = 1;
+            p1 = 2;
+            p2 = 1;
+            p3 = 3;
         }
         else
         {
-            if (t3 > t1)
-            {
-                i1 = t2;
-                i2 = t1;
-                i3 = t3;
-
-                p1 = 2;
-                p2 = 1;
-                p3 = 3;
-            }
-            else
+            if(t2 <= t3)
             {
                 i1 = t2;
                 i2 = t3;
@@ -232,6 +222,16 @@ inline void sort_triplet_and_save_permutation(int t1, int t2, int t3, int &i1, i
 
                 p1 = 2;
                 p2 = 3;
+                p3 = 1;
+            }
+            else
+            {
+                i1 = t3;
+                i2 = t2;
+                i3 = t1;
+
+                p1 = 3;
+                p2 = 2;
                 p3 = 1;
             }
         }

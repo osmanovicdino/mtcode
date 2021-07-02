@@ -637,6 +637,7 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
     sort_triplet_and_save_permutation(ind1,ind2,ind3,indt1,indt2,indt3,o1,o2,o3);
 
 
+
     bool tb12,tb23,tb13;
     bool tc12,tc23,tc13;
     save_permutation_triple(b12, b23, b13, o1, o2, o3, tb12, tb23, tb13);
@@ -717,6 +718,26 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
     what_order(o1,o2,o3,w1,w2,w3);
 
     save_permutation_triple(ta12,ta23,ta13,w1,w2,w3, a12, a23,a13);
+
+    // if(indt1 == 3 || indt2 == 3 || indt3 == 3) {
+    //             //cout << 123 << endl;
+    //             stringstream ss;
+    //             ss << "types: " << ind1 << " " << ind2 << " " << ind3 << endl;
+    //             printf("%u", o1);
+    //             printf("%u", o2);
+    //             printf("%u", o3);
+    //             cout << endl;
+    //             ss << "before: " << b12 << " " << b23 << " " << b13 << endl;
+    //             ss << "temp befores: " << tb12 << " " << tb23 << " " << tb13 << endl;
+    //             ss << "indexes: " << index1 << " " << index2 << " " << index3 << endl;
+    //             ss << "connections: " << c12 << " " << c23 << " " << c13 << endl;
+    //             ss << "temp connections: " << tc12 << " " << tc23 << " " << tc13 << endl;
+    //             ss << "temp afters: " << ta12 << " " << ta23 << " " << ta13 << endl;
+    //             ss << "afters: " << a12 << " " << a23 << " " << a13 << endl;
+    //             ss << rtemp;
+    //             cout << ss.str();
+    //             pausel();
+    // }
 
     // if ((b12 != a12) || (b23 != a23) || (b13 != a13))
     // {
