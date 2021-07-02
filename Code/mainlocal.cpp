@@ -86,7 +86,7 @@ int main(int argc, char **argv)
         int4 = 50.0;
         m5 = 1000;
         m6 = 1000;
-        energy_barrier = 0.01;
+        energy_barrier = 0.00;
     }
 
     cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -317,17 +317,21 @@ int main(int argc, char **argv)
     double ny4 = 0;
     double nz4 = 1.;
 
-    double nx5 = sqrt(3.) / 2.;
-    double ny5 = -1. / 2.;
+    double nx5 = 1.;
+    double ny5 = 0.;
     double nz5 = 0.;
 
-    double nx6 = 0.;
-    double ny6 = 1.;
+    double nx6 = -1. / 2.;
+    double ny6 = sqrt(3.) / 2.;
     double nz6 = 0.;
 
-    double nx7 = -sqrt(3.) / 2.;
-    double ny7 = -1. / 2.;
+    double nx7 = -1. / 2. ;
+    double ny7 = -sqrt(3.) / 2.;
     double nz7 = 0.;
+
+    double nx8 =  1./2.;
+    double ny8 = sqrt(3)/2.;
+    double nz8 = 0.0;
 
     orient(0, 0) = nx1;
     orient(0, 1) = ny1;
@@ -373,9 +377,9 @@ int main(int argc, char **argv)
     orient(10, 1) = nz7;
     orient(10, 2) = ny7;
 
-    orient(11, 0) = nx4;
-    orient(11, 1) = ny4;
-    orient(11, 2) = nz4;
+    orient(11, 0) = nx8;
+    orient(11, 1) = ny8;
+    orient(11, 2) = nz8;
 
     GeneralPatch c(vec1, numb, params, orient);
 
