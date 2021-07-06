@@ -402,9 +402,9 @@ int main(int argc, char **argv)
     orient(10, 1) = ny7;
     orient(10, 2) = nz7;
 
-    orient(11, 0) = nx8;
-    orient(11, 1) = ny8;
-    orient(11, 2) = nz8;
+    orient(11, 0) = nx4;
+    orient(11, 1) = ny4;
+    orient(11, 2) = nz4;
 
     // orient(11, 0) = 0.;
     // orient(11, 1) = 0.;
