@@ -553,7 +553,7 @@ void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &
 
         double totalr = r1 + r2;
 
-        double rando = ((double)rand() / (double)(RAND_MAX));
+       
 
         double rr = totalr * ((double)rand() / (double)(RAND_MAX));
 
@@ -617,7 +617,7 @@ double BindingModelTernary<Q>::calculate_score(int index1, int index2, bool befo
     rtemp = get_drate(indt1, indt2);
 
     if(before) {
-    return rtemp[i1 * 2 + 0]; //rate to unbound
+    return rtemp[i1 * 2 + 1]; //rate to unbound
     }
     else{
     return rtemp[i1 * 2 + 1]; //rate to bound

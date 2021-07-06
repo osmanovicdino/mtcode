@@ -3104,9 +3104,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                                     disp2 = disp;
                                 }
 
-                                //disp2 = disp;
 
-                                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp)
+                                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp2)
                                 {
                                  
                                     double scr1 = 1 - (argthetai - cos(thetam));
@@ -3151,14 +3150,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                 PairHistogramExtended(edgelist, boindices, boscores, tempbound);
 
-                    //cout << edgelist.size() << endl;
 
-                    // vector1<int> countub(4);
-                    // vector1<int> countb(3);
 
-                    // vector1<int> countbtc(3);
-                    // vector1<int> countubtc(3);
-                    //cout << " largest cluster: " << maxval(tempbound) << endl;
+                //cout << edgelist.size() << endl;
+
+                // vector1<int> countub(4);
+                // vector1<int> countb(3);
+
+                // vector1<int> countbtc(3);
+                // vector1<int> countubtc(3);
+                //cout << " largest cluster: " << maxval(tempbound) << endl;
 
                 #pragma omp parallel for schedule(static)
                 for (int i = 0; i < total_number_of_patches; i++)

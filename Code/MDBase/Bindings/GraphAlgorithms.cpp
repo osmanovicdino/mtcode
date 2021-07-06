@@ -160,7 +160,38 @@ void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<int> &boindices, m
         }  
         else{
         //     error("overboard");
-        cout << "overboard" << endl;
+        cout << wp1 << " " << wp2 << endl;
+        cout << maxval(tempbound) << endl;
+        
+        if(tempbound[wp1]==val) {
+            for(int j = 0 ; j < edgelist.size() ; j++) {
+                int wpt1, wpt2;
+                double scrt;
+
+                edgelist[j].gets(wpt1, wpt2, scrt);
+
+                if(wpt1 == wp1 || wpt2 == wp1) {
+                    cout << wpt1 << " " << wpt2 << " " << scrt << endl;
+                }
+            }
+        }
+        if (tempbound[wp2] == val)
+        {
+            for (int j = 0; j < edgelist.size(); j++)
+            {
+                int wpt1, wpt2;
+                double scrt;
+
+                edgelist[j].gets(wpt1, wpt2, scrt);
+
+                if (wpt1 == wp2 || wpt2 == wp2)
+                {
+                    cout << wpt1 << " " << wpt2 << " " << scrt << endl;
+                }
+            }
+        }
+        error("what happened");
+
         } 
         tempbound[wp1]++;
         tempbound[wp2]++;
