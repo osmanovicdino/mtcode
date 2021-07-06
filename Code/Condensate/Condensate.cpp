@@ -1213,9 +1213,6 @@ void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, 
             myfile2.close();
             myfile3.close();
 
-            cout << "out" << endl;
-            
-            pausel();
         }
     }
 }

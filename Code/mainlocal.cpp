@@ -140,7 +140,7 @@ int main(int argc, char **argv)
     // 0.0);
 
     double unbinding_rebar = -20.0;
-    double unbinding_rebar2 = 0.0;
+    double unbinding_rebar2 = 2.0;
 
     b.setup_energy_barrier(0.99999, 0.99999, energy_barrier, 0.99999, energy_barrier, 0.99999,
                            0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
