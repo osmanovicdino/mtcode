@@ -229,6 +229,26 @@ void BindingModelTernary<Q>::setup(double st11, double st22, double st33, double
     */
 }
 
+double baserates2(double st11on, double st11off) {
+    if(st11on < 1E-12) st11on = 1E-12;
+    if(1-st11on < 1E-12 ) st11on =  1-1E-12;
+    if(st11off < 1E-12) st11off = 1E-12;
+    if(1-st11off < 1E-12 ) st11off =  1-1E-12;
+
+    return 1. / sqrt(SQR(log(1 - st11on)) - 2 * st11off * SQR(log(1 - st11on)) +SQR(st11off) * SQR(log(1 - st11on)));
+}
+
+double myexp(double st11on, double st11off) {
+    if(st11on < 1.E-12) st11on = 1.E-12;
+    if(1.-st11on < 1.E-12 ) st11on =  1.-1.E-12;
+    if(st11off < 1E-12) st11off = 1.E-12;
+    if(1.-st11off < 1.E-12 ) st11off =  1.-1.E-12;
+
+
+
+    return log(1.-st11off);
+}
+
 template <typename Q>
 void BindingModelTernary<Q>::setup_energy_barrier(
     double st11_on, double st22_on, double st33_on, double st12_on, double st13_on, double st23_on,
@@ -315,18 +335,25 @@ void BindingModelTernary<Q>::setup_energy_barrier(
     // double assym_23_33;
 
     //only keep allowed transitions
-    double baserates = 0.1;
-    double baserates2 = 1.0;
+    double baserates = 0.01;
+    //double baserates2 = 1.0;
     double baserates3 = 0.001;
 
     //base rates will be related to the double rates
 
-    double pos_11 = log((1. - st11_on) / st11_off);
-    double pos_12 = log((1. - st12_on) / st12_off);
-    double pos_22 = log((1. - st22_on) / st22_off);
-    double pos_13 = log((1. - st13_on) / st13_off);
-    double pos_23 = log((1. - st23_on) / st23_off);
-    double pos_33 = log((1. - st33_on) / st33_off);
+    // double pos_11 = log((1. - st11_on) / st11_off);
+    // double pos_12 = log((1. - st12_on) / st12_off);
+    // double pos_22 = log((1. - st22_on) / st22_off);
+    // double pos_13 = log((1. - st13_on) / st13_off);
+    // double pos_23 = log((1. - st23_on) / st23_off);
+    // double pos_33 = log((1. - st33_on) / st33_off);
+
+    double pos_11 = myexp(st11_on, st11_off);
+    double pos_12 = myexp(st12_on, st12_off);
+    double pos_22 = myexp(st22_on, st22_off);
+    double pos_13 = myexp(st13_on, st13_off);
+    double pos_23 = myexp(st23_on, st23_off);
+    double pos_33 = myexp(st33_on, st33_off);
 
     // set_stable_triple(tripr111, baserates3, baserates3, baserates2, baserates3, baserates2, baserates2, 0.0, 0.0, pos_11, 0.0, pos_11, pos_11);
     // set_stable_triple(tripr112, baserates, baserates, baserates2, baserates, baserates2, baserates2, assym_11_12 , assym_11_12 ,pos_11, 0.0 /*assym_12_12*/  , pos_12, pos_12);
@@ -346,12 +373,17 @@ void BindingModelTernary<Q>::setup_energy_barrier(
     double base_sub_23 = baserates * st23_on;
     double base_sub_33 = baserates * st33_on;
 
-    double base_sub_11_off = baserates2 * (1 - st11_off) / (1-st11_on);
-    double base_sub_12_off = baserates2 * (1 - st12_off) / (1 - st12_on);
-    double base_sub_13_off = baserates2 * (1 - st13_off) / (1 - st13_on);
-    double base_sub_22_off = baserates2 * (1 - st22_off) / (1 - st22_on);
-    double base_sub_23_off = baserates2 * (1 - st23_off) / (1 - st23_on);
-    double base_sub_33_off = baserates2 * (1 - st33_off) / (1 - st33_on);
+
+    //WAS PREVIOUSLY (1-STOFF)/(1-STON)
+    double base_sub_11_off = -baserates2(st11_on, st11_off) * (1 - st11_off) * log(1 - st11_on);
+    double base_sub_12_off = -baserates2(st12_on, st12_off) * (1 - st12_off) * log(1 - st12_on);
+    double base_sub_13_off = -baserates2(st13_on, st13_off) * (1 - st13_off) * log(1 - st13_on);
+    double base_sub_22_off = -baserates2(st22_on, st22_off) * (1 - st22_off) * log(1 - st22_on);
+    double base_sub_23_off = -baserates2(st23_on, st23_off) * (1 - st23_off) * log(1 - st23_on);
+    double base_sub_33_off = -baserates2(st33_on, st33_off) * (1 - st33_off) * log(1 - st33_on);
+
+  
+
 
     set_stable_triple(tripr111, base_sub_11, base_sub_11, base_sub_11_off, base_sub_11, base_sub_11_off, base_sub_11_off, 0.0, 0.0, pos_11, 0.0, pos_11, pos_11);
     set_stable_triple(tripr112, base_sub_12, base_sub_12, base_sub_11_off, base_sub_12, base_sub_12_off, base_sub_12_off, assym_11_12, assym_11_12, pos_11, 0.0 /*assym_12_12*/, pos_12, pos_12);
@@ -469,6 +501,7 @@ inline vector1<double>& BindingModelTernary<Q>::get_drate(int i, int j)
     
 }
 
+
 template <typename Q>
 void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &after)
 {
@@ -520,6 +553,8 @@ void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &
 
         double totalr = r1 + r2;
 
+        double rando = ((double)rand() / (double)(RAND_MAX));
+
         double rr = totalr * ((double)rand() / (double)(RAND_MAX));
 
         if (rr < r1)
@@ -531,7 +566,69 @@ void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &
             after = true; //becomes bound
         }
 
+        // if(indt1 == 1 && indt2 == 3 && before == false && after == true) {
+        //     cout << ind1 << " " << ind2 << endl;
+        //     cout << rtemp << endl;
+        //     cout << i1 << endl;
+        //     pausel();
+        // }
 
+}
+
+template <typename Q>
+double BindingModelTernary<Q>::calculate_score(int index1, int index2, bool before)
+{
+
+    int i1;
+    if (before == false)
+    {
+        i1 = 0;
+    }
+    else
+    {
+        i1 = 1;
+    }
+
+    vector1<double> rtemp;
+    //int ind1, ind2;
+
+    int ind1 = func(index1);
+    int ind2 = func(index2);
+
+    // cout << ind1 << " " << ind2 << endl;
+
+    /*if (index1 < div1)
+            ind1 = 1;
+        else if (index1 < div2)
+            ind1 = 2;
+        else
+            ind1 = 3;
+
+        if (index2 < div1)
+            ind2 = 1;
+        else if (index2 < div2)
+            ind2 = 2;
+        else
+            ind2 = 3; */
+
+    int indt1, indt2;
+    sort_doublet(ind1, ind2, indt1, indt2);
+
+    rtemp = get_drate(indt1, indt2);
+
+    if(before) {
+    return rtemp[i1 * 2 + 0]; //rate to unbound
+    }
+    else{
+    return rtemp[i1 * 2 + 1]; //rate to bound
+    }
+
+    // if(indt1 == 1 && indt2 == 3 && before == false && after == true) {
+    //     cout << ind1 << " " << ind2 << endl;
+    //     cout << rtemp << endl;
+    //     cout << i1 << endl;
+    //     pausel();
+    // }
 }
 
 template <typename Q>
@@ -585,6 +682,26 @@ void BindingModelTernary<Q>::print() {
 ofstream myfile;
 myfile.open("res.csv");
 
+myfile <<= doubr11;
+myfile << "\n";
+
+myfile <<= doubr22;
+myfile << "\n";
+
+myfile <<= doubr33;
+myfile << "\n";
+
+myfile <<= doubr12;
+myfile << "\n";
+
+myfile <<= doubr13;
+myfile << "\n";
+
+myfile <<= doubr23;
+myfile << "\n";
+
+
+
 myfile <<= tripr111;
 myfile << "\n";
 
@@ -618,6 +735,41 @@ myfile << "\n";
 myfile.close();
 }
 
+// stringstream global_triplet_analyze8_12;
+// stringstream global_triplet_analyze8_23;
+// stringstream global_triplet_analyze8_13;
+// stringstream global_triplet_analyze9_12;
+// stringstream global_triplet_analyze9_23;
+// stringstream global_triplet_analyze9_13;
+// stringstream global_triplet_analyze10_12;
+// stringstream global_triplet_analyze10_23;
+// stringstream global_triplet_analyze10_13;
+int totalsl = 0;
+
+int fv(int i) {
+    if( i < 4000) {
+        return i % 4;
+    }
+    else {
+        return 8 + (i-4000)%4;
+    }
+}
+
+void output_ss_to_file(string file1, stringstream &ss) {
+ofstream myfile;
+myfile.open(file1.c_str());
+myfile << ss.str();
+myfile.close();
+}
+
+void append_ss_to_file(string file1, stringstream &ss)
+{
+    ofstream myfile;
+    myfile.open(file1.c_str(), std::ios_base::app);
+    myfile << ss.str();
+    myfile.close();
+}
+
 template <typename Q>
 void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13)
 {
@@ -640,8 +792,8 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
 
     bool tb12,tb23,tb13;
     bool tc12,tc23,tc13;
-    save_permutation_triple(b12, b23, b13, o1, o2, o3, tb12, tb23, tb13);
-    save_permutation_triple(c12, c23, c13, o1, o2, o3, tc12, tc23, tc13);
+    save_to_type(b12, b23, b13, o1, o2, o3, tb12, tb23, tb13);
+    save_to_type(c12, c23, c13, o1, o2, o3, tc12, tc23, tc13);
 
     int i1;
     if (tb12)
@@ -685,6 +837,7 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
     double totalr = r1 + r2 + r3 + r4;
 
     double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+    
 
     bool ta12,ta23,ta13;
 
@@ -714,100 +867,11 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
         ta13 = false;
     }
 
-    unsigned char w1,w2,w3;
-    what_order(o1,o2,o3,w1,w2,w3);
+    //unsigned char w1,w2,w3;
+    //what_order(o1,o2,o3,w1,w2,w3);
 
-    save_permutation_triple(ta12,ta23,ta13,w1,w2,w3, a12, a23,a13);
+    inverse_save_to_type(ta12, ta23, ta13, o1, o2, o3, a12, a23, a13);
 
-    // if(indt1 == 3 || indt2 == 3 || indt3 == 3) {
-    //             //cout << 123 << endl;
-    //             stringstream ss;
-    //             ss << "types: " << ind1 << " " << ind2 << " " << ind3 << endl;
-    //             printf("%u", o1);
-    //             printf("%u", o2);
-    //             printf("%u", o3);
-    //             cout << endl;
-    //             ss << "before: " << b12 << " " << b23 << " " << b13 << endl;
-    //             ss << "temp befores: " << tb12 << " " << tb23 << " " << tb13 << endl;
-    //             ss << "indexes: " << index1 << " " << index2 << " " << index3 << endl;
-    //             ss << "connections: " << c12 << " " << c23 << " " << c13 << endl;
-    //             ss << "temp connections: " << tc12 << " " << tc23 << " " << tc13 << endl;
-    //             ss << "temp afters: " << ta12 << " " << ta23 << " " << ta13 << endl;
-    //             ss << "afters: " << a12 << " " << a23 << " " << a13 << endl;
-    //             ss << rtemp;
-    //             cout << ss.str();
-    //             pausel();
-    // }
-
-    // if ((b12 != a12) || (b23 != a23) || (b13 != a13))
-    // {
-    //     if (str == 123)
-    //     {
-    //         cout << 123 << endl;
-    //         cout << "types: " << ind1 << " " << ind2 << " " << ind3 << endl;
-    //         cout << "before: " << b12 << " " << b23 << " " << b13 << endl;
-    //         cout << "temp befores: " << tb12 << " " << tb23 << " " << tb13 << endl;
-    //         cout << "indexes: " << index1 << " " << index2 << " " << index3 << endl;
-    //         cout << "connections: " << c12 << " " << c23 << " " << c13 << endl;
-    //         cout << "temp connections: " << tc12 << " " << tc23 << " " << tc13 << endl;
-    //         cout << "temp afters: " << ta12 << " " << ta23 << " " << ta13 << endl;
-    //         cout << "afters: " << a12 << " " << a23 << " " << a13 << endl;
-    //         pausel();
-    //     }
-    //     // else if (str == 123)
-    //     // {
-    //     //     cout << 113 << endl;
-    //     //     cout << "types: " << ind1 << " " << ind2 << " " << ind3 << endl;
-    //     //     cout << "before: " << b12 << " " << b23 << " " << b13 << endl;
-    //     //     cout << "indexes: " << index1 << " " << index2 << " " << index3 << endl;
-    //     //     cout << "connections: " << c12 << " " << c23 << " " << c13 << endl;
-    //     //     cout << "afters: " << a12 << " " << a23 << " " << a13 << endl;
-    //     //     pausel();
-    //     // }
-    //     // else if (str == 133)
-    //     // {
-    //     //     cout << 113 << endl;
-    //     //     cout << "types: " << ind1 << " " << ind2 << " " << ind3 << endl;
-    //     //     cout << "before: " << b12 << " " << b23 << " " << b13 << endl;
-    //     //     cout << "indexes: " << index1 << " " << index2 << " " << index3 << endl;
-    //     //     cout << "connections: " << c12 << " " << c23 << " " << c13 << endl;
-    //     //     cout << "afters: " << a12 << " " << a23 << " " << a13 << endl;
-    //     //     pausel();
-    //     // }
-    //     else
-    //     {
-    //     }
-    // }
-    // if (indt1 != indt2 && indt2 != indt3 && indt1 != indt3 && i1 != 3)
-    // {
-    //     cout << i1 << endl;
-    //     cout << rtemp << endl;
-    //     cout << rr << endl;
-    //     cout << indt1 << " " << indt2 << " " << indt3 << endl;
-    //     cout << r1 << " " << r2 << " " << r3 << " " << r4 << endl;
-
-    //     int i2;
-    //     if (a12)
-    //     { //INDEX 1 and INDEX2 bound
-    //         i2 = 0;
-    //     }
-    //     else if (a23)
-    //     { //INDEX 2 and INDEX 3 bound
-    //         i2 = 1;
-    //     }
-    //     else if (a13)
-    //     { //INDEX 1 and INDEX 3 bound
-    //         i2 = 2;
-    //     }
-    //     else
-    //     { //NO BINDINGS
-    //         i2 = 3;
-    //     }
-
-    //     if(i1 != i2) { cout << "changed" << endl; cout << i1 << " " << i2 << endl; pausel(); }
-    //     else { cout << "unchanged" << endl; }
-
-    // }
 }
 
 template <typename Q>

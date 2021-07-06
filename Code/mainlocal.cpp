@@ -54,6 +54,14 @@ int main(int argc, char **argv)
     srand(time(NULL));
     //signal(SIGSEGV, handler);
 
+
+
+    
+
+
+
+
+    
     double packing_fraction;
     double int1;
     double int2;
@@ -89,7 +97,7 @@ int main(int argc, char **argv)
         energy_barrier = 0.99;
     }
 
-    cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
+    //cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
 
     // for(int i = 0 ; i < 28 ; i++) {
     //     params(i, 0) =  10.0; //strength
@@ -132,46 +140,25 @@ int main(int argc, char **argv)
     // 0.0);
 
     double unbinding_rebar = -20.0;
-    double unbinding_rebar2 = 2.0;
+    double unbinding_rebar2 = 0.0;
 
-    b.setup_energy_barrier(0.99999, 0.99999, 0.99999, 0.99999, energy_barrier, 0.99999,
+    b.setup_energy_barrier(0.99999, 0.99999, energy_barrier, 0.99999, energy_barrier, 0.99999,
                            0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
                            0.0,
                            unbinding_rebar2,
                            0.0,
                            0.0,
+                           unbinding_rebar,
+                           unbinding_rebar,
                            0.0,
-                           unbinding_rebar,
-                           unbinding_rebar,
                            0.0,
                            0.0);
 
     bool c1;
 
-    // vector1<int> cc(4);
 
-    // for(int k = 0; k < 100000 ; k++) {
-    // bool after1, after2,after3;
-    // b.triplet(false,false,true,true,true,true, 6000,20000,28000,after1,after2,after3);
+    b.print();
 
-    // if(after1) {
-    //     cc[0]++;
-    // }
-    // else if(after2) {
-    //     cc[1]++;
-    // }
-    // else if(after3) {
-    //     cc[2]++;
-    // }
-    // else {
-    //     cc[3]++;
-    // }
-    // }
-    // cout << cc << endl;
-    // pausel();
-
-    // double size1 = 1.0;
-    // double size2 = 1.0;
 
     // double sizemix = (size1+size2)/2.;
     // pausel();
@@ -302,6 +289,8 @@ int main(int argc, char **argv)
         }
     }
 
+
+
     matrix<double> orient(12, 3);
 
     double nx1 = sqrt(8. / 9.);
@@ -320,20 +309,36 @@ int main(int argc, char **argv)
     double ny4 = 0;
     double nz4 = 1.;
 
-    double nx5 = 1.;
-    double ny5 = 0.;
+    // double nx5 = 1.;
+    // double ny5 = 0.;
+    // double nz5 = 0.;
+
+    // double nx6 = -0.5;
+    // double ny6 = 0.5*sqrt(3.);
+    // double nz6 = 0.;
+
+    // double nx7 = -0.5 ;
+    // double ny7 = -0.5*sqrt(3.);
+    // double nz7 = 0.;
+
+    // double nx8 =  0.5;
+    // double ny8 = 0.5*sqrt(3);
+    // double nz8 = 0.0;
+
+    double nx5 = 0.7100399393804211;
+    double ny5 = 0.7041614051370949;
     double nz5 = 0.;
 
-    double nx6 = -1. / 2.;
-    double ny6 = sqrt(3.) / 2.;
+    double nx6 = -0.9648416349034807;
+    double ny6 = 0.2628319226364604;
     double nz6 = 0.;
 
-    double nx7 = -1. / 2. ;
-    double ny7 = -sqrt(3.) / 2.;
+    double nx7 = 0.25480169552305926;
+    double ny7 = -0.9669933277735551;
     double nz7 = 0.;
 
-    double nx8 =  1./2.;
-    double ny8 = sqrt(3)/2.;
+    double nx8 = -0.2548016955230598;
+    double ny8 = 0.966993327773555;
     double nz8 = 0.0;
 
     orient(0, 0) = nx1;
@@ -368,6 +373,22 @@ int main(int argc, char **argv)
     orient(7, 1) = ny4;
     orient(7, 2) = nz4;
 
+    // orient(8, 0) = nx5;
+    // orient(8, 1) = ny5;
+    // orient(8, 2) = nz5;
+
+    // orient(9, 0) = nx6;
+    // orient(9, 1) = ny6;
+    // orient(9, 2) = nz6;
+
+    // orient(10, 0) = nx7;
+    // orient(10, 1) = ny7;
+    // orient(10, 2) = nz7;
+
+    // orient(11, 0) = nx8;
+    // orient(11, 1) = ny8;
+    // orient(11, 2) = nz8;
+
     orient(8, 0) = nx5;
     orient(8, 1) = ny5;
     orient(8, 2) = nz5;
@@ -377,31 +398,61 @@ int main(int argc, char **argv)
     orient(9, 2) = nz6;
 
     orient(10, 0) = nx7;
-    orient(10, 1) = nz7;
-    orient(10, 2) = ny7;
+    orient(10, 1) = ny7;
+    orient(10, 2) = nz7;
 
     orient(11, 0) = nx8;
     orient(11, 1) = ny8;
     orient(11, 2) = nz8;
 
+    // orient(11, 0) = 0.;
+    // orient(11, 1) = 0.;
+    // orient(11, 2) = 1.;
+
     GeneralPatch c(vec1, numb, params, orient);
 
-    cout << "created patch" << endl;
+   // cout << "created patch" << endl;
 
-    //int n2 = 100;
-    //double packing_fraction = 0.01;
+    //TwoTetrahedral c2(10., 1.4, 0.927, 10., 1.4, 0.927, 10., 1.4, 0.927, 1000, 2000);
+        //int n2 = 100;
+        //double packing_fraction = 0.01;
+
+
 
     double l = cbrt(pi * CUB(size) * (double)m1 / (6. * packing_fraction));
 
-    cout << l << endl;
+    //l = 20.34;
 
     Condensate A(l, n);
 
 
+
+    // matrix<double> dat(2,3);
+    // dat(0,0) =  l/2.;
+    // dat(0,1) =  l/2.;
+    // dat(0,2) =  l/2.;
+
+    // double x1 = gaussian_rand();
+    // double y1 = gaussian_rand();
+    // double z1 = gaussian_rand();
+
+    // double norm = 1./sqrt(SQR(x1)+SQR(y1)+SQR(z1));
+
+    // double radius = 1.4;
+    // x1 *= norm * radius;
+    // y1 *= norm * radius;
+    // z1 *= norm * radius;
+
+    // dat(1, 0) = (l / 2.) +  x1;
+    // dat(1, 1) = (l / 2.) + y1;
+    // dat(1, 2) = (l / 2.) + z1;
+
+    // A.obj->setdat(dat);
+
     A.setup_tight_packing(1.8*size);
 
 
-    cout << "created condensate" << endl;
+   // cout << "created condensate" << endl;
     //TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
 
     // string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
@@ -498,6 +549,7 @@ int main(int argc, char **argv)
     ss5 << m6;
     base += ss5.str();
 
+
     // cout << "done" << endl;
     //Do processing to make sure everything is fine here
 
@@ -506,15 +558,32 @@ int main(int argc, char **argv)
     A.obj->setdt(0.005);
     int every = 1000;
 
-    A.run_singlebond(runtime, every, base);
+    //cout << "bout to run" << endl;
 
-    //A.run_singlebond_different_sizes(100000, 10,m2, base);
+   A.run_singlebond(runtime, every, base);
+    // BinaryBindStore bbs2;
+    // int vak =  n*4;
+    // vector1<bool> iss(vak);
+    // vector1<int> ist(vak);
+    // for (int i = 0; i < vak; i++)
+    // {
+    //     iss[i] = (bool)0;
+    //     ist[i] = 0;
+    // }
+    // bbs2.isbound = iss;
+    // bbs2.boundto = ist;
 
-    // A.run_singlebond_different_sizes(10000000, 1000, 6000, base);
+    // cout << "start" << endl;
+    // A.run_singlebond_different_sizes_continue_thetalist(runtime, every, 1, size, size, 0, bbs2, base);
+ 
 
-    //A.run_singlebond_different_sizes(runtime, 1000, nt, base);
+  //A.run_singlebond_different_sizes(100000, 10,m2, base);
 
-    /*
+        // A.run_singlebond_different_sizes(10000000, 1000, 6000, base);
+
+        //A.run_singlebond_different_sizes(runtime, 1000, nt, base);
+
+        /*
 int NN = 10000;
 matrix<double> F(NN, 3);
 matrix<double> T(NN, 3);
@@ -562,5 +631,5 @@ for(int i = 0 ; i < 20000 ; i++) {
  }
 */
 
-    return 0;
+        return 0;
 }

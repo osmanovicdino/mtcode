@@ -30,7 +30,7 @@ module load gcc/9.3.0
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
 filename=~/Chemistry/Code/Basic/Scripts/params5.dat
-basedir="PhaseDiagramBivalent"
+basedir="PhaseDiagramDesign2"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    den=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`

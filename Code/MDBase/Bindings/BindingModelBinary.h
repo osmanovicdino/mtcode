@@ -24,6 +24,8 @@ struct BindingModelBinary : AbstractBindingModel
 
     void doublet(bool before, int index1, int index2, bool &after);
 
+    double calculate_score(int index1, int index2, bool b);
+
     void triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &after1, bool &after2, bool &after3);
 
     void nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters);

@@ -1218,7 +1218,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(matrix<int> &pairs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
     {
-
+        //cout << "called" << endl;
         //for all the pairs, for all bindings
 
         //for a given sphere geometry
@@ -1502,6 +1502,43 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
         }
 
+        // vector1<int> count(3);
+        // int nj =  edgelist.size();
+        // for(int i = 0 ; i < nj ; i++ ) {
+        //     int i1 = edgelist[i].a;
+        //     int i2 = edgelist[i].b;
+
+        //     int fv1 = fv(i1);
+        //     int fv2 = fv(i2);
+
+        //     bool cond1 = fv1 < 4 && fv2 == 8;
+        //     bool cond2 = fv1 ==8 && fv2 < 4;
+
+        //     bool pair8 = cond1 || cond2;
+
+        //     bool cond3 = fv1 < 4 && fv2 ==9;
+        //     bool cond4 = fv1 == 9 && fv2 < 4;
+
+        //     bool pair9 = cond3 || cond4;
+
+        //     bool cond5 = fv1 < 4 && fv2 == 10;
+        //     bool cond6 = fv1 == 10 && fv2 < 4;
+
+        //     bool pair10 = cond5 || cond6;
+
+        //     if(pair8) {
+        //         count[0]++;
+        //     }
+        //     if (pair9)
+        //     {
+        //         count[1]++;
+        //     }
+        //     if (pair10)
+        //     {
+        //         count[2]++;
+        //     }
+        // }
+        // cout <<= count;
 
         // int tb = 0;
 
@@ -1706,7 +1743,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
         // mysorter tempor;
 
-
+        bool do_triplets = true;
 
         int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
         //        // cout << number_to_reserve << endl;
@@ -1793,7 +1830,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     // }
 
                 }
-                else if (size_of_cluster == 3)
+                else if (size_of_cluster == 3 && do_triplets)
                 {
                    
 
@@ -2304,7 +2341,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         // }
 
                     }
-                    else if (size_of_sub_cluster == 3)
+                    else if (size_of_sub_cluster == 3 && do_triplets)
                     {
                         // int ti1 = boindices2(i, 0);
                         // int ti2 = boindices2(i, 1);
@@ -2593,7 +2630,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     }
                     else
                     {
-                        error("no this should not be possible, somehow our n cluster hasn't been broken up");
+                       //cout << "no this should not be possible, somehow our n cluster hasn't been broken up" << endl;
                     }
                 }
             }
@@ -2902,7 +2939,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 //now we have only the real forces, we no longer need to calculate the forces for the non-bound particles:
             }
 
-void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
+            void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
             {
 
                 //for all the pairs, for all bindings
@@ -2927,8 +2964,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 //int total_checks = 0;
                 int tn_pairs = pairs.size();
                 int t_u_pairs = divs.size();
+            
 
-                //unsigned int ik;
 
                 #pragma omp parallel
                 {
@@ -2940,8 +2977,19 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     {
                         int i,fi; //the start and end indices
                         if(ik == 0 ) {
+                            if(tn_pairs == 0) {
+                                i = 0;
+                                fi = 0;
+                                error("no pairs");
+                            }
+                            else if(t_u_pairs == 0 ) {
+                                i = 0;
+                                fi =  tn_pairs;
+                            }
+                            else{
                             i = 0;
                             fi = divs[ik];
+                            }
                         }
                         else if (ik == t_u_pairs ) {
                             i = divs[ik-1];
@@ -2951,7 +2999,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                             i = divs[ik-1];
                             fi = divs[ik];
                         }
-
+                        
                         int p1,p2;
                         pairs[i].get_particle(p1,p2);
                         // patchint tempo = pairs[i];
@@ -2967,6 +3015,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                         //un = i-j
 
                         dis = sqrt(dis);
+
+
 
                         if (dis < iny.max_check)
                         {
@@ -2998,6 +3048,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
                             for (int j = i ; j < fi ; j++)
                             {
+                                //pairschecked++;
                                 int potn,wp1,wp2;
                                 pairs[j].get_patch(potn, wp1, wp2);
                                 mypot *temppot = iny.potential_bundle[potn];
@@ -3026,9 +3077,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                 // pausel();
                                 //cout << disp << endl;
                                 //different conditions depending on whether there is binding or not.
-                            
+
+
                                 double disp2;
-                                bool cond1 = bo.boundto[wp1] == wp2;
+                                bool cond1 = bo.boundto[wp1] == wp2 && bo.boundto[wp2] == wp1;
                                 bool b1, b2;
 
                                 b1 = bo.isbound[wp1];
@@ -3052,71 +3104,32 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                     disp2 = disp;
                                 }
 
-                                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp2)
+                                //disp2 = disp;
+
+                                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp)
                                 {
-                                    //cout << argthetai <<  " " << argthetaj << endl;
-                                    // cout << p1 << " " << p2 << endl;
-                                    // cout << "params: " << endl;
-                                    // cout << qtemp0 << " " << qtemp1 << " " << qtemp2 << " " << qtemp3 << " " << qtemp4 << " " << qtemp5 << " " << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
-                                    // cout << gtemp0 << " " << gtemp1 << " " << gtemp2 << " " << gtemp3 << " " << gtemp4 << " " << gtemp5 << " " << gtemp6 << " " << gtemp7 << " " << gtemp8 << endl;
-                                    // cout << un.gpcons(0) << " " << un.gpcons(1) << " " << un.gpcons(2) << endl;
-                                    // cout << nxb1 << " " << nyb1 << " " << nzb1 << endl;
-                                    // cout << nxb2 << " " << nyb2 << " " << nzb2 << endl;
-                                    // cout << nx1 << " " << ny1 << " " << nz1 << endl;
-                                    // cout << nx2 << " " << ny2 << " " << nz2 << endl;
-                                    // cout << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
-                                    // cout << endl;
-                                    // if((wp1 > 400 &&wp2 > 400)) {
-                                    //     cout << "\n\n\n";
-                                    //     cout << "possible patch" << endl;
-                                    //     cout << p1 << " " << p2 << endl;
-                                    //     cout << wp1 << " " << wp2 << endl;
-                                    //     cout <<  dis << " " << disp << endl;
-                                    //     cout << argthetai << " " << argthetaj << " " <<cos(thetam) << endl;
-                                    //     cout << potn << endl;
-                                    //     cout << bo.isbound[wp1] << " " << bo.isbound[wp2] << endl;
-                                    //     cout << bo.boundto[wp1] << " " << bo.boundto[wp2] << endl;
-                                    //     cout << "\n\n\n next";
-                                    //     pausel();
-                                    // }
-                                    // cout << potn << endl;
-
-                                    //#pragma omp atomic read
-                                    //mtx.lock();
-                                    // cout << argthetai << endl;
-                                    // cout << argthetaj << endl;
-                                    // cout << disp2 << endl;
-                                    // cout << cos(thetam) << endl;
-
-                                    // double scr = (dis/disp2);
-                                    // cout << scr << endl;
-                                    // pausel();
-
-                                    //calculate the "score" of how good the bond is
+                                 
                                     double scr1 = 1 - (argthetai - cos(thetam));
                                     double scr2 = 1 - (argthetaj - cos(thetam));
 
                                     double scr3 = 2 * (dis / disp2);
 
-                                    double scr = scr1 + scr2 + scr3;
+                                    double scr4 = -log(1E-10+bm.calculate_score(wp1,wp2,b1 && b2 && cond1));
 
+
+
+                                    double scr = scr1 + scr2 + scr3 + scr4;
+  
                                     mdpairwd test(wp1, wp2, scr);
                                     edgelist_private.push_back(test);
-                                    // int iterator1 = tempbound[wp1];
-                                    // //#pragma omp atomic read
-                                    // int iterator2 = tempbound[wp2];
 
-                                    // tempbound9665[wp1]++;
-                                    // tempbound[wp2]++;
-
-                                    // //mtx.unlock();
-
-                                    // boindices(wp1, iterator1) = wp2;
-
-                                    // boindices(wp2, iterator2) = wp1;
                                 }
+
                             }
                         }
+                        // else { 
+                        //     pairschecked += fi-i;
+                        // }
                             //pausel();
                             
                         }
@@ -3132,21 +3145,20 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     }
                 }
 
-                
 
 
-                //boindices contains all the binding data for each
+                    
 
-                // //
                 PairHistogramExtended(edgelist, boindices, boscores, tempbound);
-                
-                
-                // vector1<int> countub(4);
-                // vector1<int> countb(3);
 
-                // vector1<int> countbtc(3);
-                // vector1<int> countubtc(3);
-                //cout << " largest cluster: " << maxval(tempbound) << endl;
+                    //cout << edgelist.size() << endl;
+
+                    // vector1<int> countub(4);
+                    // vector1<int> countb(3);
+
+                    // vector1<int> countbtc(3);
+                    // vector1<int> countubtc(3);
+                    //cout << " largest cluster: " << maxval(tempbound) << endl;
 
                 #pragma omp parallel for schedule(static)
                 for (int i = 0; i < total_number_of_patches; i++)
@@ -3195,6 +3207,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 //std::vector<mdpair> jhg(total_number_of_patches);
 
                 ConnectedComponentsParallel(edgelist, indexes2);
+
+                //compare the triplets in ConnectedComponentsParallel and the normal connected components
                 
                 //int depth_of_matrix2 = 15;
                 //matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
@@ -3203,95 +3217,27 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 //SingleHistogram(indexes2, boindices2, ccs);
 
                 matrix<int> boindices2 = SingleHistogram(indexes2, ccs);
-                
-                // cout << "size: " <<  boindices2.getncols() << endl;
-                // if(boindices2.getncols() > 10 ) {
-                //     pausel();
-                // }
-                //boindices2 contains the size of each cluster
 
-                // cout << boindices << endl;
-                // cout << boindices2 << endl;
-                // cout << ccs << endl;
-                // cout << tempbound << endl;
-                // pausel();
 
-                // //#pragma omp parallel for schedule(static)
-                // for (int i = 0; i < total_number_of_patches; ++i)
-                // {
-                //     int wp1 = indexes2[i];
-                //     //mtx.lock();
-                //     //const std::lock_guard<std::mutex> lock(mtx);
 
-                //     int iterator1 = ccs[wp1];
-                //     if(iterator1 < 10) {
 
-                //         boindices2(wp1, iterator1) = i;
-                //         ccs[wp1]++;
-                //         // mtx.unlock();
-                //     }
-                //     //mtx.unlock();
-                // }
+                    int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
+                    //        // cout << number_to_reserve << endl;
+                    vector<mdpair> mypairs; //(number_to_reserve);
+                    vector<int> large_clusters;
+                    mypairs.reserve(number_to_reserve);
+                    large_clusters.reserve(number_to_reserve);
 
-                // cout << "possibles:" << endl;
-                // for(int i = 0  ; i < total_number_of_patches ; i++) {
-                //     bool print = false;
-                //     if(ccs[i]>1) {
+                    bool need_large_c = true;
 
-                //         for(int j = 0  ; j < ccs[i] ; j++) {
-                //             // cout << boindices2(i,j) << ",";
-                //             if(boindices2(i,j) >= 80) {
-                //                 if((boindices2(i,j)-80)%3==2)
-                //                 print = true;
-                //             }
 
-                //         }
-                //         if(print) {
-                //             for (int j = 0; j < ccs[i]; j++)
-                //             {
-                //                 cout << boindices2(i,j) << ",";
-                //             }
-                //         }
-                //     }
-                //     if(ccs[i]>1 && print) cout << endl;
-                // }
 
-                // struct mysorter
-                // {
-                //     int div1 = 12000;
-                //     int div2 = 12000+15000*4;
-                //     int operator()(const int &index1)
-                //     {
-                //         if (index1 < div1)
-                //             return 1;
-                //         else if (index1 < div2)
-                //             return 2;
-                //         else
-                //         {
-                //             // cout << index1-div2 << endl;
-                //             if ((index1 - div2) % 3 == 2)
-                //                 return 3;
-                //             else
-                //                 return 1;
-                //         }
-                //     }
-                // };
-
-                // SortingFunctionNonUniform my_sorter;
-                // my_sorter.div1 = (1000 * 4);
-                // my_sorter.div2 = (1000 * 4 + 4 * (1000 - 1000));
-                // my_sorter.np = 4;
-
-                int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
-                //        // cout << number_to_reserve << endl;
-                vector<mdpair> mypairs; //(number_to_reserve);
-                vector<int> large_clusters;
-                mypairs.reserve(number_to_reserve);
-                large_clusters.reserve(number_to_reserve);
-                
-                
                 #pragma omp parallel
                 {
+                    //int ag2 = int(rand()) ^ omp_get_thread_num();
+                    //cout << ag2 << endl;
+                    //srand(int(time(NULL)) ^ omp_get_thread_num());
+
                     vector<mdpair> mypairs_private;
                     vector<int> large_clusters_private;
                     mypairs_private.reserve(number_to_reserve);
@@ -3394,10 +3340,12 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                             bool c23 = false;
                             bool c13 = false;
 
-                            int nb1 = tempbound[i1];
+                            //why is c23 so much less than the other ones???
 
+                            int nb1 = tempbound[i1];
                             int nb2 = tempbound[i2];
                             int nb3 = tempbound[i3];
+
 
                             // if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
 
@@ -3497,193 +3445,63 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                             bool a12;
                             bool a23;
                             bool a13;
-                            //cout << "triplet called: " << i1 << " " << i2 << " " << i3 << endl;
-                            // //pausel();
-                            // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
-                            // bool cond2 = i1 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
-                            // bool cond3 = i2 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
-                            // int v1 = tempor(i1);
-                            // int v2 = tempor(i2);
-                            // int v3 = tempor(i3);
-                            // int sv1, sv2, sv3;
-                            // sort_triplet(v1, v2, v3, sv1, sv2, sv3);
-                            // // char str[3];
-                            // // sprintf(str, "%d%d%d", sv1, sv2, sv3);
-                            // string s1 = to_string(v1);
-                            // string s2 = to_string(v2);
-                            // string s3 = to_string(v3);
 
-                            // // Concatenate both strings
-                            // string s = s1 + s2 + s3;
-
-                            // // Convert the concatenated string
-                            // // to integer
-                            // int str = stoi(s);
 
                             bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
 
                             if (a12)
                             {
+   
                                 bo.boundto[i1] = i2;
                                 bo.boundto[i2] = i1;
                                 bo.isbound[i1] = true;
                                 bo.isbound[i2] = true;
                                 bo.isbound[i3] = false;
-                                mypairs_private.push_back(mdpair(i2, i1));
-                                /* 
-                        if(a12 != b12 && (cond1 || cond2 || cond3) )
-                        {
+                                mypairs_private.push_back(mdpair(i1, i2));
 
-                            if(a12 && cond1) { 
-                                countb[1]++;
 
-  
-
-                                if(str==113) {
-                                    countbtc[0]++;
-                                }
-                                else if(str ==123) {
-                                    countbtc[1]++;
-                                }
-                                else if(str == 133) {
-                                    countbtc[2]++;
-                                }
-                                else{
-
-                                }
-
-                                //cout << tempor(i1) << " " << tempor(i2) << " " << tempor(i3) << endl;
-                             }
-                            else if((b23&&cond3) || (b13&&cond2) ) {
-                                //cout << tempor(i1) << " " << tempor(i2) << " " << tempor(i3) << endl;
-                                countub[1]++;
-                                if (str == 113)
-                                {
-                                    countubtc[0]++;
-                                }
-                                else if (str == 123)
-                                {
-                                    countubtc[1]++;
-                                }
-                                else if (str == 133)
-                                {
-                                    countubtc[2]++;
-                                }
-                                else
-                                {
-                                }
-                            }
-                            else {}
-                        } */
+                                // int frum1 = my_sorter(i1);
+                                // int frum2 = my_sorter(i2);
+                                // if((frum1==1 && frum2 == 3)||(frum1==3 && frum2 == 1) ) {
+                                //     cout << "sanity" << endl;
+                                //     pausel();
+                                // }
                             }
                             else if (a23)
                             {
+
 
                                 bo.boundto[i2] = i3;
                                 bo.boundto[i3] = i2;
                                 bo.isbound[i1] = false;
                                 bo.isbound[i2] = true;
                                 bo.isbound[i3] = true;
-                                mypairs_private.push_back(mdpair(i3, i2));
-                                /* 
-                        if (a23 != b23 && (cond1 || cond2 || cond3))
-                        {
-                            if (a23 && cond3) {
-                                countb[1]++;
-                                if (str == 113)
-                                {
-                                    countbtc[0]++;
-                                }
-                                else if (str == 123)
-                                {
-                                    countbtc[1]++;
-                                }
-                                else if (str == 133)
-                                {
-                                    countbtc[2]++;
-                                }
-                                else
-                                {
-                                }
-                            }
-                            else if( (b12 && cond1) || (b13 && cond2) ) {
-                                countub[1]++;
-                                
-                                if (str == 113)
-                                {
-                                    countubtc[0]++;
-                                }
-                                else if (str == 123)
-                                {
-                                    countubtc[1]++;
-                                }
-                                else if (str == 133)
-                                {
-                                    countubtc[2]++;
-                                }
-                                else
-                                {
-                                }
-                            }
-                            else
-                                ;
-                            //cout << "change" << endl;
-                           // cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
-                           // pausel();
-                        } */
+                                mypairs_private.push_back(mdpair(i2, i3));
+                                // int frum1 = my_sorter(i2);
+                                // int frum2 = my_sorter(i3);
+                                // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                                // {
+                                //     cout << "sanity" << endl;
+                                //     pausel();
+                                // }
                             }
                             else if (a13)
                             {
+
                                 bo.boundto[i1] = i3;
                                 bo.boundto[i3] = i1;
                                 bo.isbound[i1] = true;
                                 bo.isbound[i2] = false;
                                 bo.isbound[i3] = true;
-                                mypairs_private.push_back(mdpair(i3, i1)); /* 
-                        if (a13 != b13 && (cond1 || cond2 || cond3) )
-                        {
-                            // cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
-                            // pausel();
-                            if (a13) {
-                                countb[1]++;
+                                mypairs_private.push_back(mdpair(i1, i3));
 
-                                if (str == 113)
-                                {
-                                    countbtc[0]++;
-                                }
-                                else if (str == 123)
-                                {
-                                    countbtc[1]++;
-                                }
-                                else if (str == 133)
-                                {
-                                    countbtc[2]++;
-                                }
-                                else
-                                {
-                                }
-                            }
-                            else if((b12 && cond1) || (b23 && cond3) ) {
-                                countub[1]++;
-                                if (str == 113)
-                                {
-                                    countubtc[0]++;
-                                }
-                                else if (str == 123)
-                                {
-                                    countubtc[1]++;
-                                }
-                                else if (str == 133)
-                                {
-                                    countubtc[2]++;
-                                }
-                                else
-                                {
-                                }
-                            }
-                            else
-                                ;
-                        } */
+                                // int frum1 = my_sorter(i1);
+                                // int frum2 = my_sorter(i3);
+                                // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                                // {
+                                //     cout << "sanity" << endl;
+                                //     pausel();
+                                // }
                             }
                             else
                             {
@@ -3692,19 +3510,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                 bo.isbound[i3] = false;
                             }
 
-                           
-
-                            // ss2 << "\n Index1: " << i1 << " Index2: " << i2 << " Index3: " << i3 << "\n";
-                            // ss2 << "p1: " << my_sorter(i1) << " p2: " << my_sorter(i2) << " p3: " << my_sorter(i3) << "\n";
-                            // ss2 << "before: " << b12 << " " << b23 << " " << b13 ;
-                            // ss2 << "\nconnections: " << c12 << " " << c23 << " " << c13;
-                            // ss2 << "\n after: " << a12 << " " << a23 << " " << a13;
-
-                            // cout << ss2.str();
-
-                            // pausel();
-
                         }
+
                         else
                         {
                             large_clusters_private.push_back(i);
@@ -3727,12 +3534,18 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     // }
                 }
                 
+                //pausel();
+
                 int number_of_large_clusters = large_clusters.size();
 
+                
+                
 
 
+                if(need_large_c) {
                 #pragma omp parallel
                 {
+                    //srand(int(time(NULL)) ^ omp_get_thread_num());
                     vector<mdpair> mypairs_private;
                     //vector<int> large_clusters_private;
                     mypairs_private.reserve(number_to_reserve / 2);
@@ -3747,8 +3560,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                         for (int j = 0; j < size_of_cluster; j++)
                         {
                             unique_indexes[j] = boindices2(i, j);
-                            // cout << unique_indexes[j] <<",";
+                          //  cout << fv(unique_indexes[j]) <<",";
                         }
+
+                        //cout << endl;
                         //cout << endl;
                         vector1<int> ind(size_of_cluster, sg);
                         // for (int j = 0; j < size_of_cluster; j++)
@@ -3783,6 +3598,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
                             dem = ConnectedComponents(newedges, ind);
                         }
+                        // cout << ind << endl;
+                        // cout << dem << endl;
+                        // pausel();
+
+                        // CHECK FROM HERE
                         // cout << "all cc done" << endl;
                         vector1<int> lensx(size_of_cluster);
 
@@ -3909,7 +3729,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
                                 sort_triplet(ni1, ni2, ni3, ii1, ii2, ii3);
 
-                                //DETERMINE WHETHER THEY ARE BOUND
+                                  //DETERMINE WHETHER THEY ARE BOUND
                                 bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
                                 bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
                                 bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
@@ -3975,30 +3795,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                     error("error in clustering algorithm triplet split");
                                 }
 
+
                                 bool a12;
                                 bool a23;
                                 bool a13;
-                                //cout << "triplet called: " << i1 << " " << i2 << " " << i3 << endl;
-                                // //pausel();
-                                // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
-                                // bool cond2 = i1 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
-                                // bool cond3 = i2 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
-                                // int v1 = tempor(i1);
-                                // int v2 = tempor(i2);
-                                // int v3 = tempor(i3);
-                                // int sv1, sv2, sv3;
-                                // sort_triplet(v1, v2, v3, sv1, sv2, sv3);
-                                // string s1 = to_string(v1);
-                                // string s2 = to_string(v2);
-                                // string s3 = to_string(v3);
 
-                                // // Concatenate both strings
-                                // string s = s1 + s2 + s3;
-
-                                // // Convert the concatenated string
-                                // // to integer
-                                // int str = stoi(s);
-
+                                bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+                                
                                 if (a12)
                                 {
                                     bo.boundto[i1] = i2;
@@ -4006,50 +3809,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                     bo.isbound[i1] = true;
                                     bo.isbound[i2] = true;
                                     bo.isbound[i3] = false;
-                                    mypairs_private.push_back(mdpair(i2, i1));
-                                    /* 
-                            if(a12 != b12 && (cond1 || cond2 || cond3) )
-                            {
-                                //cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
-                                //pausel();
-                                if(a12 && cond1) { 
-                                    countb[1]++;
-                                    if (str == 113)
-                                    {
-                                        countbtc[0]++;
-                                    }
-                                    else if (str == 123)
-                                    {
-                                        countbtc[1]++;
-                                    }
-                                    else if (str == 133)
-                                    {
-                                        countbtc[2]++;
-                                    }
-                                    else
-                                    {
-                                    }
-                                }
-                                else if((b23&&cond3) || (b13&&cond2) ) {
-                                    countub[1]++;
-                                    if (str == 113)
-                                    {
-                                        countubtc[0]++;
-                                    }
-                                    else if (str == 123)
-                                    {
-                                        countubtc[1]++;
-                                    }
-                                    else if (str == 133)
-                                    {
-                                        countubtc[2]++;
-                                    }
-                                    else
-                                    {
-                                    }
-                                }
-                                else {}
-                            } */
+                                    mypairs_private.push_back(mdpair(i1, i2));
+                                    // int frum1 = my_sorter(i1);
+                                    // int frum2 = my_sorter(i2);
+                                    // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                                    // {
+                                    //     cout << "12 sanity bc" << endl;
+                                    //     pausel();
+                                    // }
                                 }
                                 else if (a23)
                                 {
@@ -4059,52 +3826,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                     bo.isbound[i1] = false;
                                     bo.isbound[i2] = true;
                                     bo.isbound[i3] = true;
-                                    mypairs_private.push_back(mdpair(i3, i2));
-                                    /* 
-                            if (a23 != b23 && (cond1 || cond2 || cond3))
-                            {
-                                if (a23 && cond3) {
-                                    countb[1]++;
-                                    if (str == 113)
-                                    {
-                                        countbtc[0]++;
-                                    }
-                                    else if (str == 123)
-                                    {
-                                        countbtc[1]++;
-                                    }
-                                    else if (str == 133)
-                                    {
-                                        countbtc[2]++;
-                                    }
-                                    else
-                                    {
-                                    }
-                                }
-                                else if( (b12 && cond1) || (b13 && cond2) ) {
-                                    countub[1]++;
-                                    if (str == 113)
-                                    {
-                                        countubtc[0]++;
-                                    }
-                                    else if (str == 123)
-                                    {
-                                        countubtc[1]++;
-                                    }
-                                    else if (str == 133)
-                                    {
-                                        countubtc[2]++;
-                                    }
-                                    else
-                                    {
-                                    }
-                                }
-                                else
-                                    ;
-                                //cout << "change" << endl;
-                               // cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
-                               // pausel();
-                            } */
+                                    mypairs_private.push_back(mdpair(i2, i3));
+                                    // int frum1 = my_sorter(i2);
+                                    // int frum2 = my_sorter(i3);
+                                    // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                                    // {
+                                    //     cout << "23 sanity bc" << endl;
+                                    //     pausel();
+                                    // }
                                 }
                                 else if (a13)
                                 {
@@ -4113,51 +3842,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                     bo.isbound[i1] = true;
                                     bo.isbound[i2] = false;
                                     bo.isbound[i3] = true;
-                                    mypairs_private.push_back(mdpair(i3, i1));
-                                    /*                             if (a13 != b13 && (cond1 || cond2 || cond3) )
-                            {
-                                // cout << i1 << "," << i2 << "," << i3 << "," << b12 << "," << b23 << "," << b13 << "," << a12 << "," << a23 << "," << a13 << endl;
-                                // pausel();
-                                if (a13) {
-                                    countb[1]++;
-                                    if (str == 113)
-                                    {
-                                        countbtc[0]++;
-                                    }
-                                    else if (str == 123)
-                                    {
-                                        countbtc[1]++;
-                                    }
-                                    else if (str == 133)
-                                    {
-                                        countbtc[2]++;
-                                    }
-                                    else
-                                    {
-                                    }
-
-                                }
-                                else if((b12 && cond1) || (b23 && cond3) ) {
-                                    countub[1]++;
-                                    if (str == 113)
-                                    {
-                                        countubtc[0]++;
-                                    }
-                                    else if (str == 123)
-                                    {
-                                        countubtc[1]++;
-                                    }
-                                    else if (str == 133)
-                                    {
-                                        countubtc[2]++;
-                                    }
-                                    else
-                                    {
-                                    }
-                                }
-                                else
-                                    ;
-                            } */
+                                    mypairs_private.push_back(mdpair(i1, i3));
+                                    // int frum1 = my_sorter(i1);
+                                    // int frum2 = my_sorter(i3);
+                                    // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                                    // {
+                                    //     cout << "13 sanity bc" << endl;
+                                    //     pausel();
+                                    // }
                                 }
                                 else
                                 {
@@ -4165,24 +3857,45 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                     bo.isbound[i2] = false;
                                     bo.isbound[i3] = false;
                                 }
-                            }
+}
                             else
                             {
-                                error("no this should not be possible, somehow our n cluster hasn't been broken up");
+                                //error("no this should not be possible, somehow our n cluster hasn't been broken up");
                             }
                         }
                     }
 
-#pragma omp for schedule(static) ordered
+                #pragma omp for schedule(static) ordered
                     for (int i = 0; i < omp_get_num_threads(); i++)
                     {
-#pragma omp ordered
+                #pragma omp ordered
                         mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
                     }
                 }
-             
+            }
+/* 
+            stringstream ss1;
+            stringstream ss2;
+            stringstream ss3;
+            for(int i = 0  ; i < pairs.size() ; i++) {
+                ss1 << fv(pairs[i].patch_index1) << "," << fv(pairs[i].patch_index2) << endl;
+            }
+            for (int i = 0; i < edgelist.size(); i++)
+            {
+                ss2 << fv(edgelist[i].a) << "," << fv(edgelist[i].b) << endl;
+            }
+            for (int i = 0; i < mypairs.size(); i++)
+            {
+                ss3 << fv(mypairs[i].a) << "," << fv(mypairs[i].b) << endl;
+            }
 
-#pragma omp parallel for
+            output_ss_to_file("res1.csv", ss1);
+            output_ss_to_file("res2.csv", ss2);
+            output_ss_to_file("res3.csv", ss3);
+
+            pausel(); */
+
+            #pragma omp parallel for
                 for (int i = 0; i < mypairs.size(); i++)
                 {
                     int p1;
@@ -4203,6 +3916,15 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
                     int potn = iny.which_potential(p1, p2, wp1, wp2);
 
+                    
+                    // if(potn != iny.which_potential(p1, p2,wp2,wp1)) {
+                    //     cout << p1 <<  " " << p2 << " " << wp1 << " " << wp2 << endl;
+                    //     cout << potn << endl;
+                    //     cout << iny.which_potential(p1, p2,wp2,wp1) << endl;
+                    //     //and it should be
+                    //    cout << fv(wp1) << " " <<  fv(wp2) << endl;
+                    //     error("why is the potential not fine if patches are reversed?");
+                    // }
                     dis = sqrt(dis);
 
                     un /= dis;
@@ -4218,6 +3940,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     double tjx;
                     double tjy;
                     double tjz;
+
+
 
                     (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
 
@@ -4285,8 +4009,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
             cout << "n: " << nx1 << " " << ny1 << " " << nz1 << endl;
             cout << "n2: " << nx2 << " " << ny2 << " " << nz2 << endl;
             cout << "arguments: " << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
-            pausel();   */
-
+            pausel();   
+ */
                     forces(p1, 0) += fx;
                     forces(p1, 1) += fy;
                     forces(p1, 2) += fz;
@@ -4304,7 +4028,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
                 }
                 //UP TO HERE
-                
+
                 /* 
         #pragma omp parallel for
         for (int i = 0; i < total_number_of_patches; ++i)
@@ -4377,6 +4101,6 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 // cout << "calc forces" << endl;
 
                 //now we have only the real forces, we no longer need to calculate the forces for the non-bound particles:
-            }
+                }
 
 #endif /* LANGEVINRFORCE_CPP */

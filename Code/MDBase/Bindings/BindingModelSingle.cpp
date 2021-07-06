@@ -22,6 +22,21 @@ void BindingModelSingle::doublet(bool before, int index1, int index2, bool &afte
 
 }
 
+double BindingModelSingle::calculate_score(int index1, int index2, bool are_b)
+{
+
+    double totalr = tr;
+
+    //double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+
+    if(are_b) {
+        return off_rate;
+    }
+    else {
+        return on_rate;
+    }
+}
+
 void BindingModelSingle::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13)
 {
 

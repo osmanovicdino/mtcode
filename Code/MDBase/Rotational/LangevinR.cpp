@@ -162,20 +162,60 @@ void LangevinNVTR::initialize(matrix<double> &positions)
 
     matrix<double> orientations(NN,SQR(nc));
     
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(int i = 0 ; i < NN ; i++) {
-        double Psi = 2 * pi * ((double)rand() / (double)RAND_MAX);
-        double Phi = 2 * pi * ((double)rand() / (double)RAND_MAX);
-        double Theta = acos(-1.+2.*((double)rand() / (double)RAND_MAX));
-        orientations(i, 0) = (cos(Psi) * (SQR(cos(Theta)) + SQR(1./tan(Phi))) + SQR(sin(Theta))) * SQR(sin(Phi));
-        orientations(i, 1) = SQR(sin(Theta)) * sin(2 * Phi) * SQR(sin(Psi / 2.)) - cos(Theta) * sin(Psi);
-        orientations(i, 2) = sin(2 * Theta) * sin(Phi) * SQR(sin(Psi / 2.)) + cos(Phi) * sin(Theta) * sin(Psi);
-        orientations(i, 3) = SQR(sin(Theta)) * sin(2 * Phi) * SQR(sin(Psi / 2.)) + cos(Theta) * sin(Psi);
-        orientations(i, 4) = (cos(Psi) + SQR(cos(Theta)) * cos(Psi) * SQR(1./tan(Phi)) + SQR(1./tan(Phi)) * SQR(sin(Theta))) * SQR(sin(Phi));
-        orientations(i, 5) = sin(Theta) * sin(Phi) * (2 * cos(Theta) * (1./tan(Phi)) * SQR(sin(Psi / 2.)) - sin(Psi));
-        orientations(i, 6) = sin(2 * Theta) * sin(Phi) * SQR(sin(Psi / 2.)) - cos(Phi) * sin(Theta) * sin(Psi);
-        orientations(i, 7) = sin(Theta) * sin(Phi) * (2 * cos(Theta) * (1./tan(Phi)) * SQR(sin(Psi / 2.)) + sin(Psi));
-        orientations(i, 8) = SQR(cos(Theta)) + cos(Psi) * SQR(sin(Theta));
+
+        double x1 = (double)rand() / (double)(RAND_MAX);
+        double x2 = (double)rand() / (double)(RAND_MAX);
+        double x3 = (double)rand() / (double)(RAND_MAX);
+        double v1 = cos(2 * pi * x2) * sqrt(x3);
+        double v2 = sin(2 * pi * x2) * sqrt(x3);
+        double v3 = sqrt(1.- x3);
+
+        double r1 = cos(2*pi*x1);
+        double r2 = sin(2*pi*x1);
+
+        // // orientations(i, 0) = -(r1 * (1 - SQR(v1))) - r2 * v1 * v2;
+        // // orientations(i, 1) = -(r2 * (1 - Power(v1, 2))) + r1 * v1 * v2;
+        // // orientations(i, 2) = v1 * v3;
+        // // orientations(i, 3) = r1 * v1 * v2 + r2 * (1 - SQR(v2));
+        // // orientations(i, 4) = r2 * v1 * v2 - r1 * (1 - SQR(v2));
+        // // orientations(i, 5) = v2*v3;
+        // // orientations(i, 6) = r1 * v1 * v3 - r2 * v2 * v3;
+        // // orientations(i, 7) = r2 * v1 * v3 + r1 * v2 * v3;
+        // // orientations(i, 8) = -1 + SQR(v3);
+
+        orientations(i, 0) = -(r1 * (1 - 2 * SQR(v1))) - 2 * r2 * v1 * v2;
+        orientations(i, 1) = -(r2 * (1 - 2 * SQR(v1))) + 2 * r1 * v1 * v2;
+        orientations(i, 2) = 2 * v1 * v3;
+        orientations(i, 3) = 2 * r1 * v1 * v2 + r2 * (1 - 2 * SQR(v2));
+        orientations(i, 4) = 2 * r2 * v1 * v2 - r1 * (1 - 2 * SQR(v2));
+        orientations(i, 5) = 2 * v2 * v3;
+        orientations(i, 6) = 2 * r1 * v1 * v3 - 2 * r2 * v2 * v3;
+        orientations(i, 7) = 2 * r2 * v1 * v3 + 2 * r1 * v2 * v3;
+        orientations(i, 8) = -1 + 2 * SQR(v3);
+
+        // cout << -orientations(i, 2) * orientations(i, 4) * orientations(i, 6) + orientations(i, 1) * orientations(i, 5) * orientations(i, 6) + orientations(i, 2) * orientations(i, 3) * orientations(i, 7) - orientations(i, 0) * orientations(i, 5) * orientations(i, 7) - orientations(i, 1) * orientations(i, 3) * orientations(i, 8) + orientations(i, 0) * orientations(i, 4) * orientations(i, 8) << endl;
+        // cout << orientations.getrowvector(i) << endl;
+
+
+        // double Psi = 2 * pi * ((double)rand() / (double)RAND_MAX);
+        // double Phi = 2 * pi * ((double)rand() / (double)RAND_MAX);
+        // double Theta = acos(-1.+2.*((double)rand() / (double)RAND_MAX));
+        // orientations(i, 0) = (cos(Psi) * (SQR(cos(Theta)) + SQR(1./tan(Phi))) + SQR(sin(Theta))) * SQR(sin(Phi));
+        // orientations(i, 1) = SQR(sin(Theta)) * sin(2 * Phi) * SQR(sin(Psi / 2.)) - cos(Theta) * sin(Psi);
+        // orientations(i, 2) = sin(2 * Theta) * sin(Phi) * SQR(sin(Psi / 2.)) + cos(Phi) * sin(Theta) * sin(Psi);
+        // orientations(i, 3) = SQR(sin(Theta)) * sin(2 * Phi) * SQR(sin(Psi / 2.)) + cos(Theta) * sin(Psi);
+        // orientations(i, 4) = (cos(Psi) + SQR(cos(Theta)) * cos(Psi) * SQR(1./tan(Phi)) + SQR(1./tan(Phi)) * SQR(sin(Theta))) * SQR(sin(Phi));
+        // orientations(i, 5) = sin(Theta) * sin(Phi) * (2 * cos(Theta) * (1./tan(Phi)) * SQR(sin(Psi / 2.)) - sin(Psi));
+        // orientations(i, 6) = sin(2 * Theta) * sin(Phi) * SQR(sin(Psi / 2.)) - cos(Phi) * sin(Theta) * sin(Psi);
+        // orientations(i, 7) = sin(Theta) * sin(Phi) * (2 * cos(Theta) * (1./tan(Phi)) * SQR(sin(Psi / 2.)) + sin(Psi));
+        // orientations(i, 8) = SQR(cos(Theta)) + cos(Psi) * SQR(sin(Theta));
+        // cout << -orientations(i, 2) * orientations(i, 4) * orientations(i, 6) + orientations(i, 1) * orientations(i, 5) * orientations(i, 6) + orientations(i, 2) * orientations(i, 3) * orientations(i, 7) - orientations(i, 0) * orientations(i, 5) * orientations(i, 7) - orientations(i, 1) * orientations(i, 3) * orientations(i, 8) + orientations(i, 0) * orientations(i, 4) * orientations(i, 8) << endl;
+
+
+        // cout << orientations.getrowvector(i) << endl;
+        // pausel();
     }
 
     // if (orientations.getNsafe() != this->getN() || orientations.getncols() != SQR(this->getdimension()))
@@ -1242,6 +1282,7 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
     double max_angle = iny.max_ang;
     double max_dis = iny.max_check + 1.;
 
+
     #pragma omp parallel
     {
         vector<patchint> edgelist_private;
@@ -1414,11 +1455,55 @@ vector<int> adjacency(const vector<patchint> &c1) {
     #else
         std::sort(indexes.begin(),indexes.end());
     #endif
+/* 
+    int tn_pairs = c1.size();
+    int t_u_pairs = indexes.size();
 
-    return indexes;
+    vector<patchint> pairs = c1;
+    int starti,startj;
 
+    for (int ik = 0; ik < t_u_pairs + 1; ++ik)
+    {
+        int i, fi; //the start and end indices
+        if (ik == 0)
+        {
+            i = 0;
+            fi = indexes[ik];
+        }
+        else if (ik == t_u_pairs)
+        {
+            i = indexes[ik - 1];
+            fi = tn_pairs;
+        }
+        else
+        {
+            i = indexes[ik - 1];
+            fi = indexes[ik];
+        }
 
-}
+        int p1, p2;
+        if(i != startj) {
+            cout << i << " " << fi << endl;
+            pausel();
+        }
+        pairs[i].get_particle(p1, p2);
+        for (int j = i; j < fi; j++)
+            {
+            int potn, wp1, wp2;
+            pairs[j].get_patch(potn, wp1, wp2);
+            cout << p1 << " " << p2 << " " << wp1 << " " << wp2 << " " << potn << endl;
+            }
+            starti = i;
+            startj = fi;
+            cout << endl;
+
+        }
+
+        cout << "done" << endl;
+        pausel(); */
+
+        return indexes;
+    }
 
 void print_single_thetas(vector<thetapair> &a1, string pre, int j)
 {

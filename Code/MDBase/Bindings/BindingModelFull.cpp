@@ -66,6 +66,22 @@ void BindingModelFull::doublet(bool before, int index1, int index2, bool &after)
         // }
     }
 
+
+double BindingModelFull::calculate_score(int index1, int index2, bool b) {
+    int i1;
+    int ing = index1 * N + index2;
+
+    if (b)
+    {
+        return doubrates(ing, int(b) * 2 + 0);
+    }
+    else
+    {
+        return doubrates(ing, int(b) * 2 + 1);
+    }
+
+
+}
 //FULL CHARACERITZATION WOULD NEED US TO DEFINE 16 matrices for every possible combo here
 void BindingModelFull::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13)
 {

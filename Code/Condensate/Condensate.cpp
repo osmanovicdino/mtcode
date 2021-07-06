@@ -335,6 +335,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     
     int nh  = (*pots).get_total_patches(NN);
 
+
  
 
     vector1<bool>isbound(nh);
@@ -352,7 +353,10 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     matrix<int> *pairs = obj->calculatepairs(boxes, 3.5*size_mol);
 
 
-    WCAPotential wsa(1.0, size_mol, 0.0);
+    
+
+
+    WCAPotential wsa(3.0, size_mol, 0.0);
 
 
 
@@ -363,7 +367,9 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
 
 
-    obj->calculateforces(*pairs, wsa);
+    F = obj->calculateforces(*pairs, wsa);
+
+
 
     vector<patchint> opairs;
     opairs.reserve(NN * 10 * 10);
@@ -372,13 +378,16 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     opairs = obj->calculate_patch_list(*pairs, *pots);
     runs_diff = adjacency(opairs);
 
+
+
     //cout << "fi" << endl;
     //cout << "fi" << endl;
     obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs , *bm, F, T);
     //cout << "fi2" << endl;
 
-
     generate_uniform_random_matrix(RT);
+
+
     obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
 
@@ -417,7 +426,10 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
         obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs, *bm, F, T);
 
+
+
         generate_uniform_random_matrix(RT);
+
         obj->create_forces_and_torques_sphere(F, T, RT);
 
         obj->advancemom_halfstep(F, T);
@@ -703,6 +715,9 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
             myfile.close();
             myfile2.close();
             myfile3.close();
+            
+            cout << "output done" << endl;
+            pausel();
         }
     }
 }
@@ -1021,6 +1036,8 @@ void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, 
 
     F += obj->calculateforces(*pairsp1p2, wsa2);
 
+
+
     /*make combined pairs*/
     int npp = (pairsp1->getNsafe()) + (pairsp2->getNsafe()) + (pairsp1p2->getNsafe());
     matrix<int> pairs;
@@ -1051,9 +1068,12 @@ void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, 
 
     obj->calculate_forces_and_torques3D_onlyone_nonlets(pairs, *pots, bbs, *bm, F, T);
 
+
     generate_uniform_random_matrix(RT);
     obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
+
+
 
     for (int i = 0; i < runtime; i++)
     {
@@ -1129,8 +1149,8 @@ void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, 
         
         obj->calculate_forces_and_torques3D_onlyone_nonlets(pairs, *pots, bbs, *bm, F, T);
         //obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs,runs_diff, *pots, bbs3, *bm, F, T);
-       
-     
+
+
         generate_uniform_random_matrix(RT);
         obj->create_forces_and_torques_sphere(F, T, RT);
 
@@ -1145,8 +1165,8 @@ void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, 
 
             ss << setw(number_of_digits) << setfill('0') << starval + (i / every);
 
-            cout << "outputting file" << endl;
-            cout << ss.str() << endl;
+            // cout << "outputting file" << endl;
+            // cout << ss.str() << endl;
 
             // pausel();
 
@@ -1192,6 +1212,10 @@ void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, 
             myfile.close();
             myfile2.close();
             myfile3.close();
+
+            cout << "out" << endl;
+            
+            pausel();
         }
     }
 }

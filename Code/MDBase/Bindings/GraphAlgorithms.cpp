@@ -157,7 +157,10 @@ void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<int> &boindices, m
         boindices(wp2, tempbound[wp2]) = wp1;
         boscores(wp1, tempbound[wp1]) = scr;
         boscores(wp2, tempbound[wp2]) = scr;
-        }   
+        }  
+        else{
+            error("overboard");
+        } 
         tempbound[wp1]++;
         tempbound[wp2]++;
     }

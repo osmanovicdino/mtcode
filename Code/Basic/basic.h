@@ -107,7 +107,7 @@ void SWAP( T &a, T &b ) { //swap the values of two objects a and b
 }
 
 inline void sort_doublet(int ti1, int ti2, int &i1, int &i2) {
-    if (ti1 < ti2)
+    if (ti1 <= ti2)
     {
         i1 = ti1;
         i2 = ti2;
@@ -282,6 +282,50 @@ inline void save_permutation_triple(const bool &b1, const bool &b2, const bool &
 
 }
 
+inline void rearrange_triple(const bool &b12, const bool &b23, const bool &b13, const unsigned char &o1, const unsigned char &o2, const unsigned char &o3, bool &a12, bool &a23, bool &a13) {
+    if (o1 == 1)
+    {
+        if (o2 == 2)
+        {
+            a12 = b12;
+            a23 = b23;
+            a13 = b13;
+        }
+        else {
+            a13 = b12;
+            a23 = b23;
+            a12 = b13; 
+        }
+    }
+    else if (o1 == 2) {
+        if (o2 == 1)
+        {
+            a12 = b12;
+            a23 = b13;
+            a13 = b23;
+        }
+        else
+        {
+            a23 = b12;
+            a12 = b13;
+            a13 = b23;
+        }
+    }
+    else{
+        if(o2 == 1) {
+            a13 = b12;
+            a12 = b23;
+            a23 = b13;
+        }
+        else{
+            a23 = b12;
+            a12 = b23;
+            a13 = b13;
+        }
+    }
+
+}
+/* 
 inline void what_order(const unsigned char &o1, const unsigned char &o2, const unsigned char &o3, unsigned char &no1, unsigned char &no2, unsigned char &no3)
 {
 //what order is it necessary to arrange o1,o2,o3 to get 1 2 3
@@ -323,7 +367,157 @@ inline void what_order(const unsigned char &o1, const unsigned char &o2, const u
 
     }
 
+} */
+
+inline void save_to_type(bool &b12, bool &b23, bool &b13, const unsigned char &o1, const unsigned char &o2, const unsigned char &o3, bool &a12, bool &a23, bool &a13) {
+    if (o1 == 1)
+    {
+        if (o2 == 2)
+        {
+            a12 = b12;
+            a23 = b23;
+            a13 = b13;
+        }
+        else
+        {
+            a12 = b13;
+            a23 = b23;
+            a13 = b12;
+        }
+    }
+    else if (o1 == 2)
+    {
+        if (o2 == 1)
+        {
+            a12 = b12;
+            a23 = b13;
+            a13 = b23;
+        }
+        else
+        {
+            a12 = b23;
+            a13 = b12;
+            a23 = b13;
+        }
+    }
+    else
+    {
+        if (o2 == 1)
+        {
+            a12 = b23;
+            a23 = b13;
+            a13 = b12;
+        }
+        else
+        {
+            a23 = b12;
+            a12 = b23;
+            a13 = b13;
+        }
+    }
 }
+
+inline void inverse_save_to_type(bool &b12, bool &b23, bool &b13, const unsigned char &o1, const unsigned char &o2, const unsigned char &o3, bool &a12, bool &a23, bool &a13)
+{
+        //given an order (a,b,c) what do these correspond to in the bindings (a,b) (b,c) (a,c)
+    
+    if (o1 == 1)
+    {
+        if (o2 == 2)
+        {
+            a12 = b12;
+            a23 = b23;
+            a13 = b13;
+        }
+        else
+        {
+            a13 = b12;
+            a23 = b23;
+            a12 = b13;
+        }
+    }
+    else if (o1 == 2)
+    {
+        if (o2 == 1)
+        {
+            a12 = b12;
+            a13 = b23;
+            a23 = b13;
+        }
+        else
+        {
+            a23 = b12;
+            a12 = b13;
+            a13 = b23;
+        }
+    }
+    else
+    {
+        if (o2 == 1)
+        {
+            a13 = b12;
+            a12 = b23;
+            a23 = b13;
+        }
+        else
+        {
+            a23 = b12;
+            a12 = b23;
+            a13 = b13;
+        }
+    }
+}
+
+// inline void what_order(const unsigned char &o1, const unsigned char &o2, const unsigned char &o3, unsigned char &no1, unsigned char &no2, unsigned char &no3)
+// {
+//         //given an order (a,b,c) what do these correspond to in the bindings (a,b) (b,c) (a,c)
+
+//     if (o1 == 1)
+//     {
+//         if (o2 == 2)
+//         {
+//             no1 = 1;
+//             no2 = 2;
+//             no3 = 3;
+//         }
+//         else
+//         {
+//             no1 = 3;
+//             no2 = 2;
+//             no3 = 1;
+//         }
+//     }
+//     else if (o1 == 2)
+//     {
+//         if (o2 == 1)
+//         {
+//             no1 = 1;
+//             no2 = 3;
+//             no3 = 2;
+//         }
+//         else
+//         {
+//             no1 = 2;
+//             no2 = 3;
+//             no3 = 1;
+//         }
+//     }
+//     else
+//     {
+//         if (o2 == 1)
+//         {
+//             no1 = 3;
+//             no2 = 1;
+//             no3 = 2;
+//         }
+//         else
+//         {
+//             no1 = 2;
+//             no2 = 1;
+//             no3 = 3;
+//         }
+//     }
+// }
 
 template <class T>
 int sign(T y)
@@ -373,6 +567,12 @@ inline long double arccos(long double x) {
     if (x > 1) return 0.;
     if ( x < -1) return pi;
     else return acos(x);
+}
+
+inline double gaussian_rand() {
+    double u1 = (double)rand() / (double)(RAND_MAX);
+    double u2 = (double)rand() / (double)(RAND_MAX);
+    return sqrt(-2*log(u1) )*cos(2*pi*u2);
 }
 
 template <class T, class Q, class F>

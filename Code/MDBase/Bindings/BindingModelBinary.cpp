@@ -191,6 +191,48 @@ void BindingModelBinary::doublet(bool before, int index1, int index2, bool &afte
 
 }
 
+double BindingModelBinary::calculate_score(int index1, int index2, bool before) {
+    if (index1 < div && index2 < div)
+    {
+       
+        if (before)
+        {
+            
+            return  doubr11[int(before) * 2 + 1]; //if bound return off_rate
+        }
+        else
+        {
+            return doubr11[int(before) * 2 + 0]; //if not bound return on_rate
+        }
+
+    }
+    else if (index1 < div && index2 >= div)
+    {
+        if (before)
+        {
+
+            return doubr12[int(before) * 2 + 1]; //if bound return off_rate
+        }
+        else
+        {
+            return doubr12[int(before) * 2 + 0]; //if not bound return on_rate
+        }
+
+    }
+    else
+    {
+        if (before)
+        {
+
+            return doubr22[int(before) * 2 + 1]; //if bound return off_rate
+        }
+        else
+        {
+            return doubr22[int(before) * 2 + 0]; //if not bound return on_rate
+        }
+    }
+}
+
 void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13) {
 
     if(index1 < div && index2 < div && index3 < div) {
