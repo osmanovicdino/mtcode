@@ -402,9 +402,9 @@ int main(int argc, char **argv)
     orient(10, 1) = ny7;
     orient(10, 2) = nz7;
 
-    orient(11, 0) = nx4;
-    orient(11, 1) = ny4;
-    orient(11, 2) = nz4;
+    orient(11, 0) = nx8;
+    orient(11, 1) = ny8;
+    orient(11, 2) = nz8;
 
     // orient(11, 0) = 0.;
     // orient(11, 1) = 0.;
@@ -428,60 +428,10 @@ int main(int argc, char **argv)
 
 
 
-    // matrix<double> dat(2,3);
-    // dat(0,0) =  l/2.;
-    // dat(0,1) =  l/2.;
-    // dat(0,2) =  l/2.;
-
-    // double x1 = gaussian_rand();
-    // double y1 = gaussian_rand();
-    // double z1 = gaussian_rand();
-
-    // double norm = 1./sqrt(SQR(x1)+SQR(y1)+SQR(z1));
-
-    // double radius = 1.4;
-    // x1 *= norm * radius;
-    // y1 *= norm * radius;
-    // z1 *= norm * radius;
-
-    // dat(1, 0) = (l / 2.) +  x1;
-    // dat(1, 1) = (l / 2.) + y1;
-    // dat(1, 2) = (l / 2.) + z1;
-
-    // A.obj->setdat(dat);
 
     A.setup_tight_packing(1.8*size);
 
 
-   // cout << "created condensate" << endl;
-    //TwoTetrahedral c(10.0, 1.4, pi / 4., 0.0, 1., pi / 6., 0.0, 1., pi / 6., 1000, 1000);
-
-    // string filp = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/pos_beta=1_i=0455.csv";
-    // string filo = "/home/dino/Desktop/Chemistry/SimulationResults/ChemicalOscillator/sim-20-12-14-19:43:58/orientation_beta=1_i=0455.csv";
-
-    // string filp = "/home/dino/Documents/Condensate/TernaryFluid2/pos_beta=1_i=02097.csv";
-    // string filo = "/home/dino/Documents/Condensate/TernaryFluid2/orientation_beta=1_i=02097.csv";
-
-    // double T;
-    // bool err1;
-    // bool err2;
-    // matrix<double> temppos = importcsv(filp, T, err1);
-    // matrix<double> tempori = importcsv(filo, T, err1);
-
-    // matrix<double> newpos(2000,3);
-    // matrix<double> newori(2000,3);
-
-    // A.obj->setdat(temppos);
-    // A.obj->setorientation(tempori);
-
-    // cout << b.tripr111 << endl;
-    // cout << b.doubr11 << endl;
-    // cout << b.doubr22 << endl;
-    // cout << b2.on_rate << endl;
-    // cout << b2.off_rate << endl;
-    // pausel();
-
-    //TetrahedralPatch c2(10.0,1.4,0.927);
 
     A.setBindingModel(b);
 
