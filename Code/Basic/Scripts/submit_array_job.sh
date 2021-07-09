@@ -29,8 +29,8 @@ module load gcc/9.3.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/params7.dat
-basedir="PhaseDiagramDesign4"
+filename=~/Chemistry/Code/Basic/Scripts/params8.dat
+basedir="PhaseDiagramDesign5"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    den=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
