@@ -6,24 +6,20 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-#include <limits>
-#include <cmath>
-#include <complex>
+// #include <limits>
+// #include <cmath>
+// #include <complex>
 #include <sstream>
 #include <string>
 #include <iomanip>
-#include <sys/ioctl.h> 
-#include <fcntl.h>
-#include <time.h>
-#include <sys/time.h>
+// #include <sys/ioctl.h>
+// #include <fcntl.h>
+// #include <time.h>
+// #include <sys/time.h>
 #include <sys/stat.h>
 #include <random>
-#include <mutex>
-#include <atomic>
-#include <dirent.h>
-#include <execinfo.h>
-#include <signal.h>
-#include <unistd.h>
+#include <algorithm>
+#include <parallel/algorithm>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -529,7 +525,6 @@ int main(int argc, char** argv) {
     bbs2.boundto = ist;
     //Do processing to make sure everything is fine here
 
-    int every = 1000;
 
     A.run_singlebond_different_sizes_continue(runtime, every, m2, size, size, posfiles.size(), bbs2, base);
 
