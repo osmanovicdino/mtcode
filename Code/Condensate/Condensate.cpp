@@ -492,6 +492,158 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     }
 }
 
+void Condensate::run_singlebond_eq(int runtime, int every, string strbase = "")
+{
+
+    int ccc;
+
+    int tf = ceil((double)runtime / (double)every);
+    int number_of_digits = 0;
+    do
+    {
+        ++number_of_digits;
+        tf /= 10;
+    } while (tf);
+
+    int NN = obj->getN();
+
+    BinaryBindStore bbs;
+
+    int nh = (*pots).get_total_patches(NN);
+
+    vector1<bool> isbound(nh);
+
+    vector1<int> boundto(nh);
+
+    bbs.isbound = isbound;
+    bbs.boundto = boundto;
+
+    num = floor(ls / (2. * size_mol));
+    matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+    matrix<int> *pairs = obj->calculatepairs(boxes, 3.5 * size_mol);
+
+    WCAPotential wsa(3.0, size_mol, 0.0);
+
+    matrix<double> F(NN, 3);
+    matrix<double> T(NN, 3);
+    matrix<double> RT(NN, 6);
+    matrix<double> zeromatrix(NN, 3);
+
+    F = obj->calculateforces(*pairs, wsa);
+
+    vector<patchint> opairs;
+    opairs.reserve(NN * 10 * 10);
+    vector<int> runs_diff;
+    runs_diff.reserve(NN * 20);
+    opairs = obj->calculate_patch_list(*pairs, *pots);
+    runs_diff = adjacency(opairs);
+
+    //cout << "fi" << endl;
+    //cout << "fi" << endl;
+    obj->calculate_forces_and_torques3D_onlyone_nonlets_eq(opairs, runs_diff, *pots, bbs, *bm, F, T);
+    //cout << "fi2" << endl;
+
+    generate_uniform_random_matrix(RT);
+
+    obj->create_forces_and_torques_sphere(F, T, RT);
+    //vector1<double> tottemp(6);
+
+    for (int i = 0; i < runtime; i++)
+    {
+
+        cout << i << endl;
+        // vector1<double> meas(6);
+        // obj->measured_temperature(meas);
+        // tottemp += meas;
+        // cout << tottemp / (double)(i + 1) << endl;
+        if (i > 0 && i % 20 == 0)
+        {
+            // cout << "pairs recalculated" << endl;
+            delete pairs;
+            pairs = obj->calculatepairs(boxes, 3.5);
+        }
+        if (i > 0 && i % 10 == 0)
+        {
+            opairs = obj->calculate_patch_list(*pairs, *pots);
+            runs_diff = adjacency(opairs);
+        }
+
+        //obj->measured_temperature();
+
+        obj->advancemom_halfstep(F, T);
+
+        obj->advance_pos();
+
+        obj->rotate();
+
+        F = obj->calculateforces(*pairs, wsa);
+
+        T.reset(0.0);
+
+        obj->calculate_forces_and_torques3D_onlyone_nonlets_eq(opairs, runs_diff, *pots, bbs, *bm, F, T);
+
+        generate_uniform_random_matrix(RT);
+
+        obj->create_forces_and_torques_sphere(F, T, RT);
+
+        obj->advancemom_halfstep(F, T);
+
+        if (i % every == 0)
+        {
+
+            //cout << i << endl;
+
+            stringstream ss;
+
+            ss << setw(number_of_digits) << setfill('0') << (i / every);
+
+            matrix<double> orient = obj->getorientation();
+            matrix<double> pos = obj->getdat();
+
+            string poss = "pos";
+            poss = poss + strbase;
+            string oris = "orientation";
+            oris = oris + strbase;
+            string bins = "bindings";
+            bins = bins + strbase;
+
+            poss += "_i=";
+            oris += "_i=";
+            bins += "_i=";
+
+            string extension = ".csv";
+
+            poss += ss.str();
+            oris += ss.str();
+            bins += ss.str();
+
+            poss += extension;
+            oris += extension;
+            bins += extension;
+
+            ofstream myfile;
+            myfile.open(poss.c_str());
+
+            ofstream myfile2;
+            myfile2.open(oris.c_str());
+
+            ofstream myfile3;
+            myfile3.open(bins.c_str());
+
+            myfile <<= pos;
+            myfile2 << setprecision(10) <<= orient;
+            myfile3 <<= bbs.isbound;
+            myfile3 << "\n";
+            myfile3 <<= bbs.boundto;
+
+            myfile.close();
+            myfile2.close();
+            myfile3.close();
+        }
+    }
+}
+
 void Condensate::run_singlebond_different_sizes(int runtime, int every, int div, double size1, double size2, string strbase = "")
 {
 

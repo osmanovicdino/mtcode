@@ -2939,239 +2939,692 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 //now we have only the real forces, we no longer need to calculate the forces for the non-bound particles:
             }
 
-            void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
+    void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
+    {
+
+        //for all the pairs, for all bindings
+
+        //for a given sphere geometry
+
+        //int np1 = sqrt(iny.getsize());
+        int total_number_of_patches = bo.boundto.getsize(); //iny.get_total_patches(this->getN());
+
+        vector1<int> tempbound(total_number_of_patches, 0); //no binding to begin wtih
+
+        int depth_of_matrix = 10; //Choose this value to be deep enough such that all values can be stored
+
+        matrix<int> boindices(total_number_of_patches, depth_of_matrix);
+        matrix<double> boscores(total_number_of_patches, depth_of_matrix);
+
+        vector<mdpairwd> edgelist;
+        edgelist.reserve(total_number_of_patches);
+
+        //std::mutex mtx;
+
+        //int total_checks = 0;
+        int tn_pairs = pairs.size();
+        int t_u_pairs = divs.size();
+    
+
+
+        #pragma omp parallel
+        {
+            vector<mdpairwd> edgelist_private;
+            edgelist_private.reserve(total_number_of_patches);
+
+            #pragma omp for nowait schedule(dynamic)
+            for (int ik = 0; ik < t_u_pairs+1; ++ik)
             {
-
-                //for all the pairs, for all bindings
-
-                //for a given sphere geometry
-
-                //int np1 = sqrt(iny.getsize());
-                int total_number_of_patches = bo.boundto.getsize(); //iny.get_total_patches(this->getN());
-
-                vector1<int> tempbound(total_number_of_patches, 0); //no binding to begin wtih
-
-                int depth_of_matrix = 10; //Choose this value to be deep enough such that all values can be stored
-
-                matrix<int> boindices(total_number_of_patches, depth_of_matrix);
-                matrix<double> boscores(total_number_of_patches, depth_of_matrix);
-
-                vector<mdpairwd> edgelist;
-                edgelist.reserve(total_number_of_patches);
-
-                //std::mutex mtx;
-
-                //int total_checks = 0;
-                int tn_pairs = pairs.size();
-                int t_u_pairs = divs.size();
-            
-
-
-                #pragma omp parallel
-                {
-                    vector<mdpairwd> edgelist_private;
-                    edgelist_private.reserve(total_number_of_patches);
-
-                    #pragma omp for nowait schedule(dynamic)
-                    for (int ik = 0; ik < t_u_pairs+1; ++ik)
-                    {
-                        int i,fi; //the start and end indices
-                        if(ik == 0 ) {
-                            if(tn_pairs == 0) {
-                                i = 0;
-                                fi = 0;
-                                error("no pairs");
-                            }
-                            else if(t_u_pairs == 0 ) {
-                                i = 0;
-                                fi =  tn_pairs;
-                            }
-                            else{
-                            i = 0;
-                            fi = divs[ik];
-                            }
-                        }
-                        else if (ik == t_u_pairs ) {
-                            i = divs[ik-1];
-                            fi = tn_pairs;
-                        }
-                        else{
-                            i = divs[ik-1];
-                            fi = divs[ik];
-                        }
-                        
-                        int p1,p2;
-                        pairs[i].get_particle(p1,p2);
-                        // patchint tempo = pairs[i];
-                        // int p1 = tempo.particle_index1;
-                        // int p2 = tempo.particle_index2;
-
-                        //int i1 = pairs(i,2);
-                        double dis;
-                        //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
-                        vector1<double> un(dimension);
-                        geo->distance_vector(*dat, p1, p2, un, dis);
-
-                        //un = i-j
-
-                        dis = sqrt(dis);
-
-
-
-                        if (dis < iny.max_check)
-                        {
-
-                            un /= dis;
-                            double dx = un.gpcons(0);
-                            double dy = un.gpcons(1);
-                            double dz = un.gpcons(2);
-
-                            double qtemp0 = orient->gpcons(p1, 0);
-                            double qtemp1 = orient->gpcons(p1, 1);
-                            double qtemp2 = orient->gpcons(p1, 2);
-                            double qtemp3 = orient->gpcons(p1, 3);
-                            double qtemp4 = orient->gpcons(p1, 4);
-                            double qtemp5 = orient->gpcons(p1, 5);
-                            double qtemp6 = orient->gpcons(p1, 6);
-                            double qtemp7 = orient->gpcons(p1, 7);
-                            double qtemp8 = orient->gpcons(p1, 8);
-
-                            double gtemp0 = orient->gpcons(p2, 0);
-                            double gtemp1 = orient->gpcons(p2, 1);
-                            double gtemp2 = orient->gpcons(p2, 2);
-                            double gtemp3 = orient->gpcons(p2, 3);
-                            double gtemp4 = orient->gpcons(p2, 4);
-                            double gtemp5 = orient->gpcons(p2, 5);
-                            double gtemp6 = orient->gpcons(p2, 6);
-                            double gtemp7 = orient->gpcons(p2, 7);
-                            double gtemp8 = orient->gpcons(p2, 8);
-
-                            for (int j = i ; j < fi ; j++)
-                            {
-                                //pairschecked++;
-                                int potn,wp1,wp2;
-                                pairs[j].get_patch(potn, wp1, wp2);
-                                mypot *temppot = iny.potential_bundle[potn];
-
-                                double nxb1 = temppot->nxb1;
-                                double nxb2 = temppot->nxb2;
-                                double nyb1 = temppot->nyb1;
-                                double nyb2 = temppot->nyb2;
-                                double nzb1 = temppot->nzb1;
-                                double nzb2 = temppot->nzb2;
-                                double disp = temppot->interaction_distance;
-                                double thetam = temppot->thetam;
-
-                                double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
-                                double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
-                                double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
-
-                                double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
-                                double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
-                                double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
-
-                                double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
-                                double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
-
-                                // cout << p1 << " " << p2 << " " << wp1 << " " << wp2 << " " << disp << " " << thetam << endl;
-                                // pausel();
-                                //cout << disp << endl;
-                                //different conditions depending on whether there is binding or not.
-
-
-                                double disp2;
-                                bool cond1 = bo.boundto[wp1] == wp2 && bo.boundto[wp2] == wp1;
-                                bool b1, b2;
-
-                                b1 = bo.isbound[wp1];
-                                b2 = bo.isbound[wp2];
-
-                                if (b1 && b2 && cond1)
-                                { //both bound and to each other
-                                    disp2 = disp;
-                                }
-                                else if (b1 && b2 && !cond1) //both bound and not to each other
-                                {
-                                    disp2 = 0.5 * disp; //if both bound, make the conditions more onerous
-                                }
-                                else if (!b1 != !b2) //only one bound
-                                {
-                                    disp2 = 0.7 * disp; //more onerous
-                                }
-                                else
-                                {
-                                    //neither bound
-                                    disp2 = disp;
-                                }
-
-
-                                if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp2)
-                                {
-                                 
-                                    double scr1 = 1 - (argthetai - cos(thetam));
-                                    double scr2 = 1 - (argthetaj - cos(thetam));
-
-                                    double scr3 = 2 * (dis / disp2);
-
-                                    double scr4 = -log(1E-10+bm.calculate_score(wp1,wp2,b1 && b2 && cond1));
-
-
-
-                                    double scr = scr1 + scr2 + scr3 + scr4;
-  
-                                    mdpairwd test(wp1, wp2, scr);
-                                    edgelist_private.push_back(test);
-
-                                }
-
-                            }
-                        }
-                        // else { 
-                        //     pairschecked += fi-i;
-                        // }
-                            //pausel();
-                            
-                        }
-
-                        //     }
-                        // }
-                    
-                    #pragma omp for schedule(static) ordered
-                    for (int i = 0; i < omp_get_num_threads(); i++)
-                    {
-                    #pragma omp ordered
-                        edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
+                int i,fi; //the start and end indices
+                if(ik == 0 ) {
+                    if(tn_pairs == 0) {
+                        i = 0;
+                        fi = 0;
+                        error("no pairs");
+                    }
+                    else if(t_u_pairs == 0 ) {
+                        i = 0;
+                        fi =  tn_pairs;
+                    }
+                    else{
+                    i = 0;
+                    fi = divs[ik];
                     }
                 }
+                else if (ik == t_u_pairs ) {
+                    i = divs[ik-1];
+                    fi = tn_pairs;
+                }
+                else{
+                    i = divs[ik-1];
+                    fi = divs[ik];
+                }
+                
+                int p1,p2;
+                pairs[i].get_particle(p1,p2);
+                // patchint tempo = pairs[i];
+                // int p1 = tempo.particle_index1;
+                // int p2 = tempo.particle_index2;
+
+                //int i1 = pairs(i,2);
+                double dis;
+                //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+                vector1<double> un(dimension);
+                geo->distance_vector(*dat, p1, p2, un, dis);
+
+                //un = i-j
+
+                dis = sqrt(dis);
 
 
 
+                if (dis < iny.max_check)
+                {
+
+                    un /= dis;
+                    double dx = un.gpcons(0);
+                    double dy = un.gpcons(1);
+                    double dz = un.gpcons(2);
+
+                    double qtemp0 = orient->gpcons(p1, 0);
+                    double qtemp1 = orient->gpcons(p1, 1);
+                    double qtemp2 = orient->gpcons(p1, 2);
+                    double qtemp3 = orient->gpcons(p1, 3);
+                    double qtemp4 = orient->gpcons(p1, 4);
+                    double qtemp5 = orient->gpcons(p1, 5);
+                    double qtemp6 = orient->gpcons(p1, 6);
+                    double qtemp7 = orient->gpcons(p1, 7);
+                    double qtemp8 = orient->gpcons(p1, 8);
+
+                    double gtemp0 = orient->gpcons(p2, 0);
+                    double gtemp1 = orient->gpcons(p2, 1);
+                    double gtemp2 = orient->gpcons(p2, 2);
+                    double gtemp3 = orient->gpcons(p2, 3);
+                    double gtemp4 = orient->gpcons(p2, 4);
+                    double gtemp5 = orient->gpcons(p2, 5);
+                    double gtemp6 = orient->gpcons(p2, 6);
+                    double gtemp7 = orient->gpcons(p2, 7);
+                    double gtemp8 = orient->gpcons(p2, 8);
+
+                    for (int j = i ; j < fi ; j++)
+                    {
+                        //pairschecked++;
+                        int potn,wp1,wp2;
+                        pairs[j].get_patch(potn, wp1, wp2);
+                        mypot *temppot = iny.potential_bundle[potn];
+
+                        double nxb1 = temppot->nxb1;
+                        double nxb2 = temppot->nxb2;
+                        double nyb1 = temppot->nyb1;
+                        double nyb2 = temppot->nyb2;
+                        double nzb1 = temppot->nzb1;
+                        double nzb2 = temppot->nzb2;
+                        double disp = temppot->interaction_distance;
+                        double thetam = temppot->thetam;
+
+                        double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+                        double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+                        double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+                        double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+                        double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+                        double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+                        double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
+                        double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
+
+                        // cout << p1 << " " << p2 << " " << wp1 << " " << wp2 << " " << disp << " " << thetam << endl;
+                        // pausel();
+                        //cout << disp << endl;
+                        //different conditions depending on whether there is binding or not.
+
+
+                        double disp2;
+                        bool cond1 = bo.boundto[wp1] == wp2 && bo.boundto[wp2] == wp1;
+                        bool b1, b2;
+
+                        b1 = bo.isbound[wp1];
+                        b2 = bo.isbound[wp2];
+
+                        if (b1 && b2 && cond1)
+                        { //both bound and to each other
+                            disp2 = disp;
+                        }
+                        else if (b1 && b2 && !cond1) //both bound and not to each other
+                        {
+                            disp2 = 0.5 * disp; //if both bound, make the conditions more onerous
+                        }
+                        else if (!b1 != !b2) //only one bound
+                        {
+                            disp2 = 0.7 * disp; //more onerous
+                        }
+                        else
+                        {
+                            //neither bound
+                            disp2 = disp;
+                        }
+
+
+                        if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp2)
+                        {
+                            
+                            double scr1 = 1 - (argthetai - cos(thetam));
+                            double scr2 = 1 - (argthetaj - cos(thetam));
+
+                            double scr3 = 2 * (dis / disp2);
+
+                            double scr4 = -log(1E-10+bm.calculate_score(wp1,wp2,b1 && b2 && cond1));
+
+
+
+                            double scr = scr1 + scr2 + scr3 + scr4;
+
+                            mdpairwd test(wp1, wp2, scr);
+                            edgelist_private.push_back(test);
+
+                        }
+
+                    }
+                }
+                // else { 
+                //     pairschecked += fi-i;
+                // }
+                    //pausel();
                     
+                }
 
-                PairHistogramExtended(edgelist, boindices, boscores, tempbound);
+                //     }
+                // }
+            
+            #pragma omp for schedule(static) ordered
+            for (int i = 0; i < omp_get_num_threads(); i++)
+            {
+            #pragma omp ordered
+                edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
+            }
+        }
 
 
 
-                //cout << edgelist.size() << endl;
+            
 
-                // vector1<int> countub(4);
-                // vector1<int> countb(3);
+        PairHistogramExtended(edgelist, boindices, boscores, tempbound);
 
-                // vector1<int> countbtc(3);
-                // vector1<int> countubtc(3);
-                //cout << " largest cluster: " << maxval(tempbound) << endl;
 
-                #pragma omp parallel for schedule(static)
-                for (int i = 0; i < total_number_of_patches; i++)
+
+        //cout << edgelist.size() << endl;
+
+        // vector1<int> countub(4);
+        // vector1<int> countb(3);
+
+        // vector1<int> countbtc(3);
+        // vector1<int> countubtc(3);
+        //cout << " largest cluster: " << maxval(tempbound) << endl;
+
+        #pragma omp parallel for schedule(static)
+        for (int i = 0; i < total_number_of_patches; i++)
+        { //check bindings, if distance metric is wrong, break bindings
+            if (bo.isbound[i])
+            {                           //if it is bound
+                int bt = bo.boundto[i]; //it is bound to what
+
+                int outside = true;
+                for (int k = 0; k < tempbound[i]; k++)
+                {
+                    int pbt = boindices(i, k);
+                    if (bt == pbt)
+                    {
+                        outside = false;
+                        break;
+                    }
+                }
+                if (outside)
+                {
+                    bo.isbound[i] = false;
+
+                    // bool cond1 = i < 12000 && bt > 12000 + 4 * 15000 && (bt - 12000 - 15000 * 4) % 3 == 2;
+                    // if(cond1) {
+                    //     countub[3]++;
+                    // }
+                }
+            }
+        }
+        
+        //save connectivity
+        // for(int i = 0  ; i < edgelist.size() ; i++) {
+        //     int wp1 = edgelist[i].a;
+        //     int wp2 = edgelist[i].b;
+
+        //     boindices(wp1, tempbound[wp1]) = wp2;
+        //     boindices(wp2, tempbound[wp2]) = wp1;
+        //     tempbound[wp1]++;
+        //     tempbound[wp2]++;
+        // }
+
+        //matrix<int> edgelist = this->CreateEdgeList(boindices, tempbound);
+
+        string sg = "a";
+        vector1<int> indexes2(total_number_of_patches, sg);
+        //std::vector<mdpair> jhg(total_number_of_patches);
+
+        ConnectedComponentsParallel(edgelist, indexes2);
+
+        //compare the triplets in ConnectedComponentsParallel and the normal connected components
+        
+        //int depth_of_matrix2 = 15;
+        //matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
+        vector1<int> ccs(total_number_of_patches);
+
+        //SingleHistogram(indexes2, boindices2, ccs);
+
+        matrix<int> boindices2 = SingleHistogram(indexes2, ccs);
+
+
+
+
+            int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
+            //        // cout << number_to_reserve << endl;
+            vector<mdpair> mypairs; //(number_to_reserve);
+            vector<int> large_clusters;
+            mypairs.reserve(number_to_reserve);
+            large_clusters.reserve(number_to_reserve);
+
+            bool need_large_c = true;
+
+
+
+        #pragma omp parallel
+        {
+            //int ag2 = int(rand()) ^ omp_get_thread_num();
+            //cout << ag2 << endl;
+            //srand(int(time(NULL)) ^ omp_get_thread_num());
+
+            vector<mdpair> mypairs_private;
+            vector<int> large_clusters_private;
+            mypairs_private.reserve(number_to_reserve);
+            large_clusters_private.reserve(number_to_reserve);
+
+            #pragma omp for nowait schedule(dynamic)
+            for (int i = 0; i < total_number_of_patches; i++)
+            {
+                int size_of_cluster = ccs[i];
+
+                if (size_of_cluster == 0)
+                {
+                }
+
+                else if (size_of_cluster == 1)
+                {
+
+                    //do nothing
+                    //int i1 = indexes[nbins[i]];
+                    int i1 = boindices2(i, 0);
+                    //isbound[i1]=false;
+
+                    bo.isbound[i1] = false;
+
+                    //not bound to anything.
+                }
+                else if (size_of_cluster == 2)
+                {
+
+                    //all fine, bindings
+                    // int ti1 = indexes[nbins[i]];
+                    // int ti2 = indexes[nbins[i] + 1];
+
+                    int ti1 = boindices2(i, 0);
+                    int ti2 = boindices2(i, 1);
+
+                    int i1;
+                    int i2;
+                    sort_doublet(ti1, ti2, i1, i2);
+
+                    bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+
+                    bool aft;
+
+                    bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+
+                    if (aft)
+                    {
+                        bo.boundto[i1] = i2;
+                        bo.boundto[i2] = i1;
+                        bo.isbound[i1] = true;
+                        bo.isbound[i2] = true;
+                        //tbt++;
+                        mypairs_private.push_back(mdpair(i1, i2));
+                    }
+                    else
+                    {
+
+                        bo.isbound[i1] = false;
+                        bo.isbound[i2] = false;
+                    }
+
+                    // stringstream ss2;
+
+                    // ss2 << "\n Index1: " << i1 << " Index2: " << i2 << "\n";
+                    // ss2 << "p1: " << my_sorter(i1) << " p2: " << my_sorter(i2) << "\n";
+                    // ss2 << "before: " << alreadybound_to_eachother;
+                    // ss2 << "\n after: " << aft;
+
+                    // cout << ss2.str();
+
+                    // pausel();
+                }
+                else if (size_of_cluster == 3)
+                {
+
+                    // int ti1 = indexes[nbins[i]];
+                    // int ti2 = indexes[nbins[i] + 1];
+                    // int ti3 = indexes[nbins[i] + 2];
+
+                    int ti1 = boindices2(i, 0);
+                    int ti2 = boindices2(i, 1);
+                    int ti3 = boindices2(i, 2);
+                    //SORT THE INDICES (IMPORTANT)
+
+                    int i1;
+                    int i2;
+                    int i3;
+
+                    sort_triplet(ti1, ti2, ti3, i1, i2, i3);
+
+                    //DETERMINE WHETHER THEY ARE BOUND
+                    bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+                    bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
+                    bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
+
+                    //DETERMINE THE CONNECTIVENESS OF THE GRAPH
+                    //remember, that in order to count as a triplet
+                    bool c12 = false;
+                    bool c23 = false;
+                    bool c13 = false;
+
+                    //why is c23 so much less than the other ones???
+
+                    int nb1 = tempbound[i1];
+                    int nb2 = tempbound[i2];
+                    int nb3 = tempbound[i3];
+
+
+                    // if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
+
+                    //     cout << i1 << " " << i2 << " " << i3 << endl;
+
+                    //     outfunc(tempbound, "t1");
+                    //     outfunc(boindices, "t2");
+
+                    //     pausel();
+                    //     error("something weird in code");
+                    // }
+
+                    if (nb1 == 1)
+                    {
+                        int tempi = boindices(i1, 0);
+                        if (tempi == i2)
+                        {
+                            c12 = true;
+                            c13 = false;
+                            c23 = true; //in order to be a triplet
+                        }
+                        else if (tempi == i3)
+                        {
+                            c13 = true;
+                            c12 = false;
+                            c23 = true;
+                        }
+                        else
+                            error("something weird");
+
+                        //check the other
+                    }
+                    else if (nb1 == 2)
+                    {
+                        c12 = true;
+                        c13 = true;
+
+                        int nb2 = tempbound[i2];
+                        if (nb2 == 1)
+                        {
+                            c23 = false;
+                        }
+                        else
+                        {
+                            c23 = true;
+                        }
+                    }
+                    else
+                    {
+                        cout << ccs[i] << " " << endl;
+                        cout << size_of_cluster << endl;
+                        cout << b12 << " " << b23 << " " << b13 << endl;
+                        cout << i1 << " " << i2 << " " << i3 << endl;
+                        cout << tempbound[i1] << " " << tempbound[i2] << " " << tempbound[i3] << endl;
+
+                        cout << indexes2[i1] << " " << indexes2[i2] << " " << indexes2[i3] << endl;
+
+                        for (int k = 0; k < total_number_of_patches; k++)
+                        {
+                            if (indexes2[k] == indexes2[i1])
+                            {
+                                cout << k << " ";
+                            }
+                        }
+                        cout << endl;
+                        cout << "indexes done" << endl;
+                        cout << "parallel vs serial" << endl;
+                        for (int k = 0; k < depth_of_matrix; k++)
+                        {
+                            cout << boindices2(i, k) << endl;
+                        }
+                        cout << endl;
+
+                        for (int k = 0; k < depth_of_matrix; k++)
+                        {
+                            cout << boindices(i1, k) << " " << indexes2[boindices(i1, k)] << endl;
+                            // cout << indexes2[boindices(i1, k)] << endl;
+                        }
+                        cout << endl;
+
+                        for (int k = 0; k < depth_of_matrix; k++)
+                        {
+                            cout << boindices(i2, k) << " " << indexes2[boindices(i2, k)] << endl;
+                        }
+                        cout << endl;
+
+                        for (int k = 0; k < depth_of_matrix; k++)
+                        {
+                            cout << boindices(i3, k) << " " << indexes2[boindices(i3, k)] << endl;
+                        }
+
+                        cout << endl;
+
+                        error("error in clustering algorithm");
+                    }
+
+                    bool a12;
+                    bool a23;
+                    bool a13;
+
+
+                    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+
+                    if (a12)
+                    {
+
+                        bo.boundto[i1] = i2;
+                        bo.boundto[i2] = i1;
+                        bo.isbound[i1] = true;
+                        bo.isbound[i2] = true;
+                        bo.isbound[i3] = false;
+                        mypairs_private.push_back(mdpair(i1, i2));
+
+
+                        // int frum1 = my_sorter(i1);
+                        // int frum2 = my_sorter(i2);
+                        // if((frum1==1 && frum2 == 3)||(frum1==3 && frum2 == 1) ) {
+                        //     cout << "sanity" << endl;
+                        //     pausel();
+                        // }
+                    }
+                    else if (a23)
+                    {
+
+
+                        bo.boundto[i2] = i3;
+                        bo.boundto[i3] = i2;
+                        bo.isbound[i1] = false;
+                        bo.isbound[i2] = true;
+                        bo.isbound[i3] = true;
+                        mypairs_private.push_back(mdpair(i2, i3));
+                        // int frum1 = my_sorter(i2);
+                        // int frum2 = my_sorter(i3);
+                        // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                        // {
+                        //     cout << "sanity" << endl;
+                        //     pausel();
+                        // }
+                    }
+                    else if (a13)
+                    {
+
+                        bo.boundto[i1] = i3;
+                        bo.boundto[i3] = i1;
+                        bo.isbound[i1] = true;
+                        bo.isbound[i2] = false;
+                        bo.isbound[i3] = true;
+                        mypairs_private.push_back(mdpair(i1, i3));
+
+                        // int frum1 = my_sorter(i1);
+                        // int frum2 = my_sorter(i3);
+                        // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                        // {
+                        //     cout << "sanity" << endl;
+                        //     pausel();
+                        // }
+                    }
+                    else
+                    {
+                        bo.isbound[i1] = false;
+                        bo.isbound[i2] = false;
+                        bo.isbound[i3] = false;
+                    }
+
+                }
+
+                else
+                {
+                    large_clusters_private.push_back(i);
+                }
+            }
+
+            #pragma omp for schedule(static) ordered
+            for (int i = 0; i < omp_get_num_threads(); i++)
+            {
+                #pragma omp ordered
+                mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
+                #pragma omp ordered
+                large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
+            }
+            // #pragma omp for schedule(static) ordered
+            // for (int i = 0; i < omp_get_num_threads(); i++)
+            // {
+            // #pragma omp ordered
+            //     large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
+            // }
+        }
+        
+        //pausel();
+
+        int number_of_large_clusters = large_clusters.size();
+
+        
+        
+
+
+        if(need_large_c) {
+        #pragma omp parallel
+        {
+            //srand(int(time(NULL)) ^ omp_get_thread_num());
+            vector<mdpair> mypairs_private;
+            //vector<int> large_clusters_private;
+            mypairs_private.reserve(number_to_reserve / 2);
+
+            #pragma omp for nowait schedule(dynamic)
+            for (int allc = 0; allc < number_of_large_clusters; allc++)
+            {
+                int i = large_clusters[allc];
+                int size_of_cluster = ccs[i];
+
+                vector<int> unique_indexes(size_of_cluster);
+                for (int j = 0; j < size_of_cluster; j++)
+                {
+                    unique_indexes[j] = boindices2(i, j);
+                    //  cout << fv(unique_indexes[j]) <<",";
+                }
+
+                //cout << endl;
+                //cout << endl;
+                vector1<int> ind(size_of_cluster, sg);
+                // for (int j = 0; j < size_of_cluster; j++)
+                //     ind[j] = j;
+                vector<mdpairwd> newedges;
+                newedges.reserve(2 * size_of_cluster);
+                RecapitulateEdges(size_of_cluster, boindices2, boindices, boscores, tempbound, i, unique_indexes, newedges);
+                // cout << "edges done" << endl;
+                // // the graph here is complete
+                // //cout << unique_indexes << endl;
+                // for(int j  = 0 ; j < newedges.size() ; j++) {
+                //     cout << newedges[j].a << " " << newedges[j].b << " " << newedges[j].scr << endl;
+                // }
+
+                int maxindv = std::distance(newedges.begin(), std::max_element(newedges.begin(), newedges.end(), mdpairwdCompareScore));
+
+                newedges.erase(newedges.begin() + maxindv);
+
+                vector1<int> dem = ConnectedComponents(newedges, ind);
+
+                // cout << "cc done" << endl;
+
+                while (Maximum_ConnectedComp_Size(dem) > 3)
+                {
+
+                    //Get_Rid_Worst_Edge(newedges,scoring_function)
+                    int maxindv = std::distance(newedges.begin(), std::max_element(newedges.begin(), newedges.end(), mdpairwdCompareScore));
+
+                    newedges.erase(newedges.begin() + maxindv); //remove edges one at a time until manageable
+                    for (int j = 0; j < size_of_cluster; j++)
+                        ind[j] = j;
+
+                    dem = ConnectedComponents(newedges, ind);
+                }
+                // cout << ind << endl;
+                // cout << dem << endl;
+                // pausel();
+
+                // CHECK FROM HERE
+                // cout << "all cc done" << endl;
+                vector1<int> lensx(size_of_cluster);
+
+                int depth_mat = 3; //cannot be more than this by our definition
+                matrix<int> boindicesx(size_of_cluster, depth_mat);
+                PairHistogram(newedges, boindicesx, lensx);
+
+                //cout << "sorted correctly" << endl;
+
+                //if two things are no longer in the same cluster, unbind them
+                for (int k1 = 0; k1 < size_of_cluster; k1++)
                 { //check bindings, if distance metric is wrong, break bindings
-                    if (bo.isbound[i])
-                    {                           //if it is bound
-                        int bt = bo.boundto[i]; //it is bound to what
+                    if (bo.isbound[unique_indexes[k1]])
+                    {                                            //if it is bound
+                        int bt = bo.boundto[unique_indexes[k1]]; //it is bound to what
 
                         int outside = true;
-                        for (int k = 0; k < tempbound[i]; k++)
+                        for (int k = 0; k < lensx[k1]; k++)
                         {
-                            int pbt = boindices(i, k);
+                            int pbt = unique_indexes[boindicesx(k1, k)];
+
                             if (bt == pbt)
                             {
                                 outside = false;
@@ -3180,7 +3633,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         }
                         if (outside)
                         {
-                            bo.isbound[i] = false;
+                            bo.isbound[unique_indexes[k1]] = false;
 
                             // bool cond1 = i < 12000 && bt > 12000 + 4 * 15000 && (bt - 12000 - 15000 * 4) % 3 == 2;
                             // if(cond1) {
@@ -3189,361 +3642,1066 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         }
                     }
                 }
-                
-                //save connectivity
-                // for(int i = 0  ; i < edgelist.size() ; i++) {
-                //     int wp1 = edgelist[i].a;
-                //     int wp2 = edgelist[i].b;
 
-                //     boindices(wp1, tempbound[wp1]) = wp2;
-                //     boindices(wp2, tempbound[wp2]) = wp1;
-                //     tempbound[wp1]++;
-                //     tempbound[wp2]++;
-                // }
-
-                //matrix<int> edgelist = this->CreateEdgeList(boindices, tempbound);
-
-                string sg = "a";
-                vector1<int> indexes2(total_number_of_patches, sg);
-                //std::vector<mdpair> jhg(total_number_of_patches);
-
-                ConnectedComponentsParallel(edgelist, indexes2);
-
-                //compare the triplets in ConnectedComponentsParallel and the normal connected components
-                
-                //int depth_of_matrix2 = 15;
-                //matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
-                vector1<int> ccs(total_number_of_patches);
-
-                //SingleHistogram(indexes2, boindices2, ccs);
-
-                matrix<int> boindices2 = SingleHistogram(indexes2, ccs);
-
-
-
-
-                    int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
-                    //        // cout << number_to_reserve << endl;
-                    vector<mdpair> mypairs; //(number_to_reserve);
-                    vector<int> large_clusters;
-                    mypairs.reserve(number_to_reserve);
-                    large_clusters.reserve(number_to_reserve);
-
-                    bool need_large_c = true;
-
-
-
-                #pragma omp parallel
+                for (int j = 0; j < dem.getsize() - 1; j++)
                 {
-                    //int ag2 = int(rand()) ^ omp_get_thread_num();
-                    //cout << ag2 << endl;
-                    //srand(int(time(NULL)) ^ omp_get_thread_num());
-
-                    vector<mdpair> mypairs_private;
-                    vector<int> large_clusters_private;
-                    mypairs_private.reserve(number_to_reserve);
-                    large_clusters_private.reserve(number_to_reserve);
-
-                    #pragma omp for nowait schedule(dynamic)
-                    for (int i = 0; i < total_number_of_patches; i++)
+                    int size_of_sub_cluster = dem[j + 1] - dem[j];
+                    if (size_of_sub_cluster == 1)
                     {
-                        int size_of_cluster = ccs[i];
+                        int k = dem[j];
+                        int ni1 = ind[k];
+                        int i1 = unique_indexes[ni1];
+                        bo.isbound[i1] = false;
+                    }
+                    else if (size_of_sub_cluster == 2)
+                    {
+                        int k1 = dem[j];
+                        int k2 = dem[j] + 1;
 
-                        if (size_of_cluster == 0)
+                        int ni1 = ind[k1];
+                        int ni2 = ind[k2];
+
+                        int ti1 = unique_indexes[ni1];
+                        int ti2 = unique_indexes[ni2];
+
+                        int i1;
+                        int i2;
+                        sort_doublet(ti1, ti2, i1, i2);
+
+                        bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+
+                        bool aft;
+
+                        bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+
+                        if (aft)
                         {
+                            bo.boundto[i1] = i2;
+                            bo.boundto[i2] = i1;
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = true;
+                            //tbt++;
+                            mypairs_private.push_back(mdpair(i1, i2));
                         }
-
-                        else if (size_of_cluster == 1)
-                        {
-
-                            //do nothing
-                            //int i1 = indexes[nbins[i]];
-                            int i1 = boindices2(i, 0);
-                            //isbound[i1]=false;
-
-                            bo.isbound[i1] = false;
-
-                            //not bound to anything.
-                        }
-                        else if (size_of_cluster == 2)
-                        {
-
-                            //all fine, bindings
-                            // int ti1 = indexes[nbins[i]];
-                            // int ti2 = indexes[nbins[i] + 1];
-
-                            int ti1 = boindices2(i, 0);
-                            int ti2 = boindices2(i, 1);
-
-                            int i1;
-                            int i2;
-                            sort_doublet(ti1, ti2, i1, i2);
-
-                            bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
-
-                            bool aft;
-
-                            bm.doublet(alreadybound_to_eachother, i1, i2, aft);
-
-                            if (aft)
-                            {
-                                bo.boundto[i1] = i2;
-                                bo.boundto[i2] = i1;
-                                bo.isbound[i1] = true;
-                                bo.isbound[i2] = true;
-                                //tbt++;
-                                mypairs_private.push_back(mdpair(i1, i2));
-                            }
-                            else
-                            {
-
-                                bo.isbound[i1] = false;
-                                bo.isbound[i2] = false;
-                            }
-
-                            // stringstream ss2;
-
-                            // ss2 << "\n Index1: " << i1 << " Index2: " << i2 << "\n";
-                            // ss2 << "p1: " << my_sorter(i1) << " p2: " << my_sorter(i2) << "\n";
-                            // ss2 << "before: " << alreadybound_to_eachother;
-                            // ss2 << "\n after: " << aft;
-
-                            // cout << ss2.str();
-
-                            // pausel();
-                        }
-                        else if (size_of_cluster == 3)
-                        {
-
-                            // int ti1 = indexes[nbins[i]];
-                            // int ti2 = indexes[nbins[i] + 1];
-                            // int ti3 = indexes[nbins[i] + 2];
-
-                            int ti1 = boindices2(i, 0);
-                            int ti2 = boindices2(i, 1);
-                            int ti3 = boindices2(i, 2);
-                            //SORT THE INDICES (IMPORTANT)
-
-                            int i1;
-                            int i2;
-                            int i3;
-
-                            sort_triplet(ti1, ti2, ti3, i1, i2, i3);
-
-                            //DETERMINE WHETHER THEY ARE BOUND
-                            bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
-                            bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
-                            bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
-
-                            //DETERMINE THE CONNECTIVENESS OF THE GRAPH
-                            //remember, that in order to count as a triplet
-                            bool c12 = false;
-                            bool c23 = false;
-                            bool c13 = false;
-
-                            //why is c23 so much less than the other ones???
-
-                            int nb1 = tempbound[i1];
-                            int nb2 = tempbound[i2];
-                            int nb3 = tempbound[i3];
-
-
-                            // if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
-
-                            //     cout << i1 << " " << i2 << " " << i3 << endl;
-
-                            //     outfunc(tempbound, "t1");
-                            //     outfunc(boindices, "t2");
-
-                            //     pausel();
-                            //     error("something weird in code");
-                            // }
-
-                            if (nb1 == 1)
-                            {
-                                int tempi = boindices(i1, 0);
-                                if (tempi == i2)
-                                {
-                                    c12 = true;
-                                    c13 = false;
-                                    c23 = true; //in order to be a triplet
-                                }
-                                else if (tempi == i3)
-                                {
-                                    c13 = true;
-                                    c12 = false;
-                                    c23 = true;
-                                }
-                                else
-                                    error("something weird");
-
-                                //check the other
-                            }
-                            else if (nb1 == 2)
-                            {
-                                c12 = true;
-                                c13 = true;
-
-                                int nb2 = tempbound[i2];
-                                if (nb2 == 1)
-                                {
-                                    c23 = false;
-                                }
-                                else
-                                {
-                                    c23 = true;
-                                }
-                            }
-                            else
-                            {
-                                cout << ccs[i] << " " << endl;
-                                cout << size_of_cluster << endl;
-                                cout << b12 << " " << b23 << " " << b13 << endl;
-                                cout << i1 << " " << i2 << " " << i3 << endl;
-                                cout << tempbound[i1] << " " << tempbound[i2] << " " << tempbound[i3] << endl;
-
-                                cout << indexes2[i1] << " " << indexes2[i2] << " " << indexes2[i3] << endl;
-
-                                for (int k = 0; k < total_number_of_patches; k++)
-                                {
-                                    if (indexes2[k] == indexes2[i1])
-                                    {
-                                        cout << k << " ";
-                                    }
-                                }
-                                cout << endl;
-                                cout << "indexes done" << endl;
-                                cout << "parallel vs serial" << endl;
-                                for (int k = 0; k < depth_of_matrix; k++)
-                                {
-                                    cout << boindices2(i, k) << endl;
-                                }
-                                cout << endl;
-
-                                for (int k = 0; k < depth_of_matrix; k++)
-                                {
-                                    cout << boindices(i1, k) << " " << indexes2[boindices(i1, k)] << endl;
-                                    // cout << indexes2[boindices(i1, k)] << endl;
-                                }
-                                cout << endl;
-
-                                for (int k = 0; k < depth_of_matrix; k++)
-                                {
-                                    cout << boindices(i2, k) << " " << indexes2[boindices(i2, k)] << endl;
-                                }
-                                cout << endl;
-
-                                for (int k = 0; k < depth_of_matrix; k++)
-                                {
-                                    cout << boindices(i3, k) << " " << indexes2[boindices(i3, k)] << endl;
-                                }
-
-                                cout << endl;
-
-                                error("error in clustering algorithm");
-                            }
-
-                            bool a12;
-                            bool a23;
-                            bool a13;
-
-
-                            bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
-
-                            if (a12)
-                            {
-   
-                                bo.boundto[i1] = i2;
-                                bo.boundto[i2] = i1;
-                                bo.isbound[i1] = true;
-                                bo.isbound[i2] = true;
-                                bo.isbound[i3] = false;
-                                mypairs_private.push_back(mdpair(i1, i2));
-
-
-                                // int frum1 = my_sorter(i1);
-                                // int frum2 = my_sorter(i2);
-                                // if((frum1==1 && frum2 == 3)||(frum1==3 && frum2 == 1) ) {
-                                //     cout << "sanity" << endl;
-                                //     pausel();
-                                // }
-                            }
-                            else if (a23)
-                            {
-
-
-                                bo.boundto[i2] = i3;
-                                bo.boundto[i3] = i2;
-                                bo.isbound[i1] = false;
-                                bo.isbound[i2] = true;
-                                bo.isbound[i3] = true;
-                                mypairs_private.push_back(mdpair(i2, i3));
-                                // int frum1 = my_sorter(i2);
-                                // int frum2 = my_sorter(i3);
-                                // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
-                                // {
-                                //     cout << "sanity" << endl;
-                                //     pausel();
-                                // }
-                            }
-                            else if (a13)
-                            {
-
-                                bo.boundto[i1] = i3;
-                                bo.boundto[i3] = i1;
-                                bo.isbound[i1] = true;
-                                bo.isbound[i2] = false;
-                                bo.isbound[i3] = true;
-                                mypairs_private.push_back(mdpair(i1, i3));
-
-                                // int frum1 = my_sorter(i1);
-                                // int frum2 = my_sorter(i3);
-                                // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
-                                // {
-                                //     cout << "sanity" << endl;
-                                //     pausel();
-                                // }
-                            }
-                            else
-                            {
-                                bo.isbound[i1] = false;
-                                bo.isbound[i2] = false;
-                                bo.isbound[i3] = false;
-                            }
-
-                        }
-
                         else
                         {
-                            large_clusters_private.push_back(i);
+
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = false;
+                        }
+
+                        // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
+                        // if(alreadybound_to_eachother && !aft && cond1) {
+                        //     countub[0]++;
+                        // }
+                        // else if(!alreadybound_to_eachother && aft && cond1) {
+                        //     countb[0]++;
+                        // }
+                        // else{
+
+                        // }
+                    }
+                    else if (size_of_sub_cluster == 3)
+                    {
+                        // int ti1 = boindices2(i, 0);
+                        // int ti2 = boindices2(i, 1);
+                        // int ti3 = boindices2(i, 2);
+                        //SORT THE INDICES (IMPORTANT)
+                        int k1 = dem[j];
+                        int k2 = dem[j] + 1;
+                        int k3 = dem[j] + 2;
+
+                        int ni1 = ind[k1];
+                        int ni2 = ind[k2];
+                        int ni3 = ind[k3];
+
+                        int ti1 = unique_indexes[ni1];
+                        int ti2 = unique_indexes[ni2];
+                        int ti3 = unique_indexes[ni3];
+                        int i1;
+                        int i2;
+                        int i3;
+
+                        int ii1;
+                        int ii2;
+                        int ii3;
+
+                        sort_triplet(ti1, ti2, ti3, i1, i2, i3);
+
+                        sort_triplet(ni1, ni2, ni3, ii1, ii2, ii3);
+
+                            //DETERMINE WHETHER THEY ARE BOUND
+                        bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+                        bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
+                        bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
+
+                        //DETERMINE THE CONNECTIVENESS OF THE GRAPH
+                        //remember, that in order to count as a triplet
+                        bool c12 = false;
+                        bool c23 = false;
+                        bool c13 = false;
+
+                        int nb1 = lensx[ii1];
+                        int nb2 = lensx[ii2];
+                        int nb3 = lensx[ii3];
+
+                        // if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
+
+                        //     cout << i1 << " " << i2 << " " << i3 << endl;
+
+                        //     outfunc(tempbound, "t1");
+                        //     outfunc(boindices, "t2");
+
+                        //     pausel();
+                        //     error("something weird in code");
+                        // }
+
+                        if (nb1 == 1)
+                        {
+                            int tempi = boindicesx(ii1, 0);
+                            if (tempi == ii2)
+                            {
+                                c12 = true;
+                                c13 = false;
+                                c23 = true; //in order to be a triplet
+                            }
+                            else if (tempi == ii3)
+                            {
+                                c13 = true;
+                                c12 = false;
+                                c23 = true;
+                            }
+                            else
+                                error("something weird");
+
+                            //check the other
+                        }
+                        else if (nb1 == 2)
+                        {
+                            c12 = true;
+                            c13 = true;
+
+                            int nb2 = lensx[ii2];
+                            if (nb2 == 1)
+                            {
+                                c23 = false;
+                            }
+                            else
+                            {
+                                c23 = true;
+                            }
+                        }
+                        else
+                        {
+                            error("error in clustering algorithm triplet split");
+                        }
+
+
+                        bool a12;
+                        bool a23;
+                        bool a13;
+
+                        bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+                        
+                        if (a12)
+                        {
+                            bo.boundto[i1] = i2;
+                            bo.boundto[i2] = i1;
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = true;
+                            bo.isbound[i3] = false;
+                            mypairs_private.push_back(mdpair(i1, i2));
+                            // int frum1 = my_sorter(i1);
+                            // int frum2 = my_sorter(i2);
+                            // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                            // {
+                            //     cout << "12 sanity bc" << endl;
+                            //     pausel();
+                            // }
+                        }
+                        else if (a23)
+                        {
+
+                            bo.boundto[i2] = i3;
+                            bo.boundto[i3] = i2;
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = true;
+                            bo.isbound[i3] = true;
+                            mypairs_private.push_back(mdpair(i2, i3));
+                            // int frum1 = my_sorter(i2);
+                            // int frum2 = my_sorter(i3);
+                            // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                            // {
+                            //     cout << "23 sanity bc" << endl;
+                            //     pausel();
+                            // }
+                        }
+                        else if (a13)
+                        {
+                            bo.boundto[i1] = i3;
+                            bo.boundto[i3] = i1;
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = false;
+                            bo.isbound[i3] = true;
+                            mypairs_private.push_back(mdpair(i1, i3));
+                            // int frum1 = my_sorter(i1);
+                            // int frum2 = my_sorter(i3);
+                            // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                            // {
+                            //     cout << "13 sanity bc" << endl;
+                            //     pausel();
+                            // }
+                        }
+                        else
+                        {
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = false;
+                            bo.isbound[i3] = false;
+                        }
+}
+                    else
+                    {
+                        //error("no this should not be possible, somehow our n cluster hasn't been broken up");
+                    }
+                }
+            }
+
+        #pragma omp for schedule(static) ordered
+            for (int i = 0; i < omp_get_num_threads(); i++)
+            {
+        #pragma omp ordered
+                mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
+            }
+        }
+    }
+/* 
+    stringstream ss1;
+    stringstream ss2;
+    stringstream ss3;
+    for(int i = 0  ; i < pairs.size() ; i++) {
+        ss1 << fv(pairs[i].patch_index1) << "," << fv(pairs[i].patch_index2) << endl;
+    }
+    for (int i = 0; i < edgelist.size(); i++)
+    {
+        ss2 << fv(edgelist[i].a) << "," << fv(edgelist[i].b) << endl;
+    }
+    for (int i = 0; i < mypairs.size(); i++)
+    {
+        ss3 << fv(mypairs[i].a) << "," << fv(mypairs[i].b) << endl;
+    }
+
+    output_ss_to_file("res1.csv", ss1);
+    output_ss_to_file("res2.csv", ss2);
+    output_ss_to_file("res3.csv", ss3);
+
+    pausel(); */
+
+    #pragma omp parallel for
+        for (int i = 0; i < mypairs.size(); i++)
+        {
+            int p1;
+            int p2;
+            int wp1 = mypairs[i].a;
+            int wp2 = mypairs[i].b;
+            iny.which_particle(wp1, wp2, p1, p2);
+
+            if (p2 < p1)
+            { //INDICES NEED TO BE SORTED FOR IT TO WORK
+                int tp1 = p1;
+                p1 = p2;
+                p2 = tp1;
+            }
+            double dis;
+            vector1<double> un(dimension);
+            geo->distance_vector(*dat, p1, p2, un, dis);
+
+            int potn = iny.which_potential(p1, p2, wp1, wp2);
+
+            
+            // if(potn != iny.which_potential(p1, p2,wp2,wp1)) {
+            //     cout << p1 <<  " " << p2 << " " << wp1 << " " << wp2 << endl;
+            //     cout << potn << endl;
+            //     cout << iny.which_potential(p1, p2,wp2,wp1) << endl;
+            //     //and it should be
+            //    cout << fv(wp1) << " " <<  fv(wp2) << endl;
+            //     error("why is the potential not fine if patches are reversed?");
+            // }
+            dis = sqrt(dis);
+
+            un /= dis;
+
+            double fx;
+            double fy;
+            double fz;
+
+            double tix;
+            double tiy;
+            double tiz;
+
+            double tjx;
+            double tjy;
+            double tjz;
+
+
+
+            (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
+
+            /* 
+    double dx = un.gpcons(0);
+    double dy = un.gpcons(1);
+    double dz = un.gpcons(2);
+
+    double qtemp0 = orient->gpcons(p1, 0);
+    double qtemp1 = orient->gpcons(p1, 1);
+    double qtemp2 = orient->gpcons(p1, 2);
+    double qtemp3 = orient->gpcons(p1, 3);
+    double qtemp4 = orient->gpcons(p1, 4);
+    double qtemp5 = orient->gpcons(p1, 5);
+    double qtemp6 = orient->gpcons(p1, 6);
+    double qtemp7 = orient->gpcons(p1, 7);
+    double qtemp8 = orient->gpcons(p1, 8);
+
+    double gtemp0 = orient->gpcons(p2, 0);
+    double gtemp1 = orient->gpcons(p2, 1);
+    double gtemp2 = orient->gpcons(p2, 2);
+    double gtemp3 = orient->gpcons(p2, 3);
+    double gtemp4 = orient->gpcons(p2, 4);
+    double gtemp5 = orient->gpcons(p2, 5);
+    double gtemp6 = orient->gpcons(p2, 6);
+    double gtemp7 = orient->gpcons(p2, 7);
+    double gtemp8 = orient->gpcons(p2, 8);
+
+    
+    double nxb1; // = params[0]; //iny[potn]->nxb1;
+    double nyb1; // = params[1]; //iny[potn]->nyb1;
+    double nzb1; // = params[2]; //iny[potn]->nzb1;
+
+    double nxb2; // = params[3]; //iny[potn]->nxb2;
+    double nyb2; // = params[4]; //iny[potn]->nyb2;
+    double nzb2; // = params[5]; //iny[potn]->nzb2;
+
+    double disp; // = params[6];
+
+    double thetam; // = params[8];
+
+    //                cout << p1 << " " << p2 << " " << potn << endl;
+    iny.get_params(p1, p2, potn, nxb1, nyb1, nzb1, nxb2, nyb2, nzb2, disp, thetam); //for this potential, get all the parameters
+
+    double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+    double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+    double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+    double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+    double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+    double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+    double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
+    double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
+    cout << (iny.potential_bundle)[potn]->getparameters() << endl;
+    cout << "particles:  " <<p1 << " " << p2 << endl;
+    cout << "distance: " << dis << endl;
+    cout << "potential number: " << potn << endl;
+    cout << "which patch: " << wp1 << " " << wp2 << endl;
+    cout << "force: " << fx << " " << fy << " " << fz << endl;
+    cout << "torques: " << tix << " " << tiy << " " << tiz << endl;
+    cout << "orientation1: " << qtemp0 << " " << qtemp1 << " " << qtemp2 << " " << qtemp3 << " " << qtemp4 << " " << qtemp5 << " " << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
+    cout << "orientation2: " << gtemp0 << " " << gtemp1 << " " << gtemp2 << " " << gtemp3 << " " << gtemp4 << " " << gtemp5 << " " << gtemp6 << " " << gtemp7 << " " << gtemp8 << endl;
+    cout << "dx: " << dx << " " << dy << " " << dz << endl;
+    cout << "n: " << nx1 << " " << ny1 << " " << nz1 << endl;
+    cout << "n2: " << nx2 << " " << ny2 << " " << nz2 << endl;
+    cout << "arguments: " << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
+    pausel();   
+*/
+            forces(p1, 0) += fx;
+            forces(p1, 1) += fy;
+            forces(p1, 2) += fz;
+
+            forces(p2, 0) += -fx;
+            forces(p2, 1) += -fy;
+            forces(p2, 2) += -fz;
+
+            torques(p1, 0) += tix;
+            torques(p1, 1) += tiy;
+            torques(p1, 2) += tiz;
+
+            torques(p2, 0) += tjx; // - dis * (fz * un[1] - fy * un[2]);
+            torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
+            torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
+        }
+        //UP TO HERE
+
+        /* 
+#pragma omp parallel for
+for (int i = 0; i < total_number_of_patches; ++i)
+{
+    if (bo.isbound[i] == true && visited[i] == false) //only for bound patches we haven't visisted do we calculate forces
+    {
+
+        visited[i] = true;             // We have now visisted this patch
+        visited[bo.boundto[i]] = true; //we have also visisted the patch that it is bound to
+
+        // int p1 = floor(i / np1);             //particle number 1
+        // int p2 = floor(bo.boundto[i] / np1); //particle number 2
+
+        //get the particle numbers from the patch numbers:
+
+        int p1;
+        int p2;
+
+        iny.which_particle(i, bo.boundto[i], p1, p2);
+
+        double dis;
+        //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+        vector1<double> un(dimension);
+        geo->distance_vector(*dat, p1, p2, un, dis);
+
+        //un = i-j
+
+        int potn = iny.which_potential(p1, p2, i, bo.boundto[i]);
+        // int potn = (i % np1) * np1 + (bo.boundto[i] % np1);
+        dis = sqrt(dis);
+
+        un /= dis;
+
+        double fx;
+        double fy;
+        double fz;
+
+        double tix;
+        double tiy;
+        double tiz;
+
+        double tjx;
+        double tjy;
+        double tjz;
+
+        (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
+
+
+        forces(p1, 0) += fx;
+        forces(p1, 1) += fy;
+        forces(p1, 2) += fz;
+
+        forces(p2, 0) += -fx;
+        forces(p2, 1) += -fy;
+        forces(p2, 2) += -fz;
+
+        torques(p1, 0) += tix;
+        torques(p1, 1) += tiy;
+        torques(p1, 2) += tiz;
+
+        torques(p2, 0) += tjx; // - dis * (fz * un[1] - fy * un[2]);
+        torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
+        torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
+    }
+    else
+    {
+        //do nothing
+    }
+} */
+        // cout << "calc forces" << endl;
+
+        //now we have only the real forces, we no longer need to calculate the forces for the non-bound particles:
+        }
+
+        void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets_eq(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
+        {
+
+            //for all the pairs, for all bindings
+
+            //for a given sphere geometry
+
+            //int np1 = sqrt(iny.getsize());
+            int total_number_of_patches = bo.boundto.getsize(); //iny.get_total_patches(this->getN());
+
+            vector1<int> tempbound(total_number_of_patches, 0); //no binding to begin wtih
+
+            int depth_of_matrix = 10; //Choose this value to be deep enough such that all values can be stored
+
+            matrix<int> boindices(total_number_of_patches, depth_of_matrix);
+            matrix<double> boenergies(total_number_of_patches, depth_of_matrix);
+
+            vector<mdpairwd> edgelist;
+            edgelist.reserve(total_number_of_patches);
+
+            //std::mutex mtx;
+
+            //int total_checks = 0;
+            int tn_pairs = pairs.size();
+            int t_u_pairs = divs.size();
+
+            #pragma omp parallel
+            {
+                vector<mdpairwd> edgelist_private;
+                edgelist_private.reserve(total_number_of_patches);
+
+                #pragma omp for nowait schedule(dynamic)
+                for (int ik = 0; ik < t_u_pairs + 1; ++ik)
+                {
+                    int i, fi; //the start and end indices
+                    if (ik == 0)
+                    {
+                        if (tn_pairs == 0)
+                        {
+                            i = 0;
+                            fi = 0;
+                            error("no pairs");
+                        }
+                        else if (t_u_pairs == 0)
+                        {
+                            i = 0;
+                            fi = tn_pairs;
+                        }
+                        else
+                        {
+                            i = 0;
+                            fi = divs[ik];
+                        }
+                    }
+                    else if (ik == t_u_pairs)
+                    {
+                        i = divs[ik - 1];
+                        fi = tn_pairs;
+                    }
+                    else
+                    {
+                        i = divs[ik - 1];
+                        fi = divs[ik];
+                    }
+
+                    int p1, p2;
+                    pairs[i].get_particle(p1, p2);
+                    // patchint tempo = pairs[i];
+                    // int p1 = tempo.particle_index1;
+                    // int p2 = tempo.particle_index2;
+
+                    //int i1 = pairs(i,2);
+                    double dis;
+                    //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+                    vector1<double> un(dimension);
+                    geo->distance_vector(*dat, p1, p2, un, dis);
+
+                    //un = i-j
+
+                    dis = sqrt(dis);
+
+                    if (dis < iny.max_check)
+                    {
+
+                        un /= dis;
+                        double dx = un.gpcons(0);
+                        double dy = un.gpcons(1);
+                        double dz = un.gpcons(2);
+
+                        double qtemp0 = orient->gpcons(p1, 0);
+                        double qtemp1 = orient->gpcons(p1, 1);
+                        double qtemp2 = orient->gpcons(p1, 2);
+                        double qtemp3 = orient->gpcons(p1, 3);
+                        double qtemp4 = orient->gpcons(p1, 4);
+                        double qtemp5 = orient->gpcons(p1, 5);
+                        double qtemp6 = orient->gpcons(p1, 6);
+                        double qtemp7 = orient->gpcons(p1, 7);
+                        double qtemp8 = orient->gpcons(p1, 8);
+
+                        double gtemp0 = orient->gpcons(p2, 0);
+                        double gtemp1 = orient->gpcons(p2, 1);
+                        double gtemp2 = orient->gpcons(p2, 2);
+                        double gtemp3 = orient->gpcons(p2, 3);
+                        double gtemp4 = orient->gpcons(p2, 4);
+                        double gtemp5 = orient->gpcons(p2, 5);
+                        double gtemp6 = orient->gpcons(p2, 6);
+                        double gtemp7 = orient->gpcons(p2, 7);
+                        double gtemp8 = orient->gpcons(p2, 8);
+
+                        for (int j = i; j < fi; j++)
+                        {
+                            //pairschecked++;
+                            int potn, wp1, wp2;
+                            pairs[j].get_patch(potn, wp1, wp2);
+                            mypot *temppot = iny.potential_bundle[potn];
+
+                            double nxb1 = temppot->nxb1;
+                            double nxb2 = temppot->nxb2;
+                            double nyb1 = temppot->nyb1;
+                            double nyb2 = temppot->nyb2;
+                            double nzb1 = temppot->nzb1;
+                            double nzb2 = temppot->nzb2;
+                            double disp = temppot->interaction_distance;
+                            double thetam = temppot->thetam;
+
+                            double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+                            double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+                            double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+                            double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+                            double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+                            double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+                            double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
+                            double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
+
+                            // cout << p1 << " " << p2 << " " << wp1 << " " << wp2 << " " << disp << " " << thetam << endl;
+                            // pausel();
+                            //cout << disp << endl;
+                            //different conditions depending on whether there is binding or not.
+
+                            double disp2;
+                            bool cond1 = bo.boundto[wp1] == wp2 && bo.boundto[wp2] == wp1;
+                            bool b1, b2;
+
+                            b1 = bo.isbound[wp1];
+                            b2 = bo.isbound[wp2];
+
+                            if (b1 && b2 && cond1)
+                            { //both bound and to each other
+                                disp2 = disp;
+                            }
+                            else if (b1 && b2 && !cond1) //both bound and not to each other
+                            {
+                                disp2 = 0.5 * disp; //if both bound, make the conditions more onerous
+                            }
+                            else if (!b1 != !b2) //only one bound
+                            {
+                                disp2 = 0.7 * disp; //more onerous
+                            }
+                            else
+                            {
+                                //neither bound
+                                disp2 = disp;
+                            }
+
+                            if (argthetai > cos(thetam) && argthetaj > cos(thetam) && dis < disp2)
+                            {
+
+                                // double scr1 = 1 - (argthetai - cos(thetam));
+                                // double scr2 = 1 - (argthetaj - cos(thetam));
+
+                                // double scr3 = 2 * (dis / disp2);
+
+                                // double scr4 = -log(1E-10 + bm.calculate_score(wp1, wp2, b1 && b2 && cond1));
+
+                                // double scr = scr1 + scr2 + scr3 + scr4;
+
+
+                                double en = temppot->energy(dis, argthetai, argthetaj);
+
+                                mdpairwd test(wp1, wp2, en); //now our score is the energy
+                                edgelist_private.push_back(test);
+                            }
+                        }
+                    }
+                    // else {
+                    //     pairschecked += fi-i;
+                    // }
+                    //pausel();
+                }
+
+                //     }
+                // }
+
+                #pragma omp for schedule(static) ordered
+                for (int i = 0; i < omp_get_num_threads(); i++)
+                {
+                    #pragma omp ordered
+                    edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
+                }
+            }
+
+            PairHistogramExtended(edgelist, boindices, boenergies, tempbound);
+
+            //cout << edgelist.size() << endl;
+
+            // vector1<int> countub(4);
+            // vector1<int> countb(3);
+
+            // vector1<int> countbtc(3);
+            // vector1<int> countubtc(3);
+            //cout << " largest cluster: " << maxval(tempbound) << endl;
+
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < total_number_of_patches; i++)
+            { //check bindings, if distance metric is wrong, break bindings
+                if (bo.isbound[i])
+                {                           //if it is bound
+                    int bt = bo.boundto[i]; //it is bound to what
+
+                    int outside = true;
+                    for (int k = 0; k < tempbound[i]; k++)
+                    {
+                        int pbt = boindices(i, k);
+                        if (bt == pbt)
+                        {
+                            outside = false;
+                            break;
+                        }
+                    }
+                    if (outside)
+                    {
+                        bo.isbound[i] = false;
+
+                        // bool cond1 = i < 12000 && bt > 12000 + 4 * 15000 && (bt - 12000 - 15000 * 4) % 3 == 2;
+                        // if(cond1) {
+                        //     countub[3]++;
+                        // }
+                    }
+                }
+            }
+
+            //save connectivity
+            // for(int i = 0  ; i < edgelist.size() ; i++) {
+            //     int wp1 = edgelist[i].a;
+            //     int wp2 = edgelist[i].b;
+
+            //     boindices(wp1, tempbound[wp1]) = wp2;
+            //     boindices(wp2, tempbound[wp2]) = wp1;
+            //     tempbound[wp1]++;
+            //     tempbound[wp2]++;
+            // }
+
+            //matrix<int> edgelist = this->CreateEdgeList(boindices, tempbound);
+
+            string sg = "a";
+            vector1<int> indexes2(total_number_of_patches, sg);
+            //std::vector<mdpair> jhg(total_number_of_patches);
+
+            ConnectedComponentsParallel(edgelist, indexes2);
+
+            //compare the triplets in ConnectedComponentsParallel and the normal connected components
+
+            //int depth_of_matrix2 = 15;
+            //matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
+            vector1<int> ccs(total_number_of_patches);
+
+            //SingleHistogram(indexes2, boindices2, ccs);
+
+            matrix<int> boindices2 = SingleHistogram(indexes2, ccs);
+
+            int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
+            //        // cout << number_to_reserve << endl;
+            vector<mdpair> mypairs; //(number_to_reserve);
+            vector<int> large_clusters;
+            mypairs.reserve(number_to_reserve);
+            large_clusters.reserve(number_to_reserve);
+
+            bool need_large_c = true;
+
+            #pragma omp parallel
+            {
+                //int ag2 = int(rand()) ^ omp_get_thread_num();
+                //cout << ag2 << endl;
+                //srand(int(time(NULL)) ^ omp_get_thread_num());
+
+                vector<mdpair> mypairs_private;
+                vector<int> large_clusters_private;
+                mypairs_private.reserve(number_to_reserve);
+                large_clusters_private.reserve(number_to_reserve);
+
+                #pragma omp for nowait schedule(dynamic)
+                for (int i = 0; i < total_number_of_patches; i++)
+                {
+                    int size_of_cluster = ccs[i];
+
+                    if (size_of_cluster == 0)
+                    {
+                    }
+
+                    else if (size_of_cluster == 1)
+                    {
+
+                        //do nothing
+                        //int i1 = indexes[nbins[i]];
+                        int i1 = boindices2(i, 0);
+                        //isbound[i1]=false;
+
+                        bo.isbound[i1] = false;
+
+                        //not bound to anything.
+                    }
+                    else if (size_of_cluster == 2)
+                    {
+
+                        //all fine, bindings
+                        // int ti1 = indexes[nbins[i]];
+                        // int ti2 = indexes[nbins[i] + 1];
+
+                        int ti1 = boindices2(i, 0);
+                        int ti2 = boindices2(i, 1);
+
+                        int i1;
+                        int i2;
+
+                        
+                        sort_doublet(ti1, ti2, i1, i2);
+
+                        bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+
+                        bool aft;
+
+                        double energy_before = boenergies(i1,0); //as there is only a single bound particle, we can know the energy in this way
+
+                        bm.doublet_eq(alreadybound_to_eachother, i1, i2, aft, energy_before);
+
+                        if (aft)
+                        {
+                            bo.boundto[i1] = i2;
+                            bo.boundto[i2] = i1;
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = true;
+                            //tbt++;
+                            mypairs_private.push_back(mdpair(i1, i2));
+                        }
+                        else
+                        {
+
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = false;
+                        }
+
+                        // stringstream ss2;
+
+                        // ss2 << "\n Index1: " << i1 << " Index2: " << i2 << "\n";
+                        // ss2 << "p1: " << my_sorter(i1) << " p2: " << my_sorter(i2) << "\n";
+                        // ss2 << "before: " << alreadybound_to_eachother;
+                        // ss2 << "\n after: " << aft;
+
+                        // cout << ss2.str();
+
+                        // pausel();
+                    }
+                    else if (size_of_cluster == 3)
+                    {
+
+                        // int ti1 = indexes[nbins[i]];
+                        // int ti2 = indexes[nbins[i] + 1];
+                        // int ti3 = indexes[nbins[i] + 2];
+
+                        int ti1 = boindices2(i, 0);
+                        int ti2 = boindices2(i, 1);
+                        int ti3 = boindices2(i, 2);
+                        //SORT THE INDICES (IMPORTANT)
+
+                        int i1;
+                        int i2;
+                        int i3;
+
+                        sort_triplet(ti1, ti2, ti3, i1, i2, i3);
+
+                        //DETERMINE WHETHER THEY ARE BOUND
+                        bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
+                        bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
+                        bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
+
+                        //DETERMINE THE CONNECTIVENESS OF THE GRAPH
+                        //remember, that in order to count as a triplet
+                        bool c12 = false;
+                        bool c23 = false;
+                        bool c13 = false;
+
+                        //why is c23 so much less than the other ones???
+
+                        int nb1 = tempbound[i1];
+                        int nb2 = tempbound[i2];
+                        int nb3 = tempbound[i3];
+
+                        // if(nb1 > 2 || nb2 > 2 || nb3 > 2) {
+
+                        //     cout << i1 << " " << i2 << " " << i3 << endl;
+
+                        //     outfunc(tempbound, "t1");
+                        //     outfunc(boindices, "t2");
+
+                        //     pausel();
+                        //     error("something weird in code");
+                        // }
+
+                        if (nb1 == 1)
+                        {
+                            int tempi = boindices(i1, 0);
+                            if (tempi == i2)
+                            {
+                                c12 = true;
+                                c13 = false;
+                                c23 = true; //in order to be a triplet
+                            }
+                            else if (tempi == i3)
+                            {
+                                c13 = true;
+                                c12 = false;
+                                c23 = true;
+                            }
+                            else
+                                error("something weird");
+
+                            //check the other
+                        }
+                        else if (nb1 == 2)
+                        {
+                            c12 = true;
+                            c13 = true;
+
+                            int nb2 = tempbound[i2];
+                            if (nb2 == 1)
+                            {
+                                c23 = false;
+                            }
+                            else
+                            {
+                                c23 = true;
+                            }
+                        }
+                        else
+                        {
+                            cout << ccs[i] << " " << endl;
+                            cout << size_of_cluster << endl;
+                            cout << b12 << " " << b23 << " " << b13 << endl;
+                            cout << i1 << " " << i2 << " " << i3 << endl;
+                            cout << tempbound[i1] << " " << tempbound[i2] << " " << tempbound[i3] << endl;
+
+                            cout << indexes2[i1] << " " << indexes2[i2] << " " << indexes2[i3] << endl;
+
+                            for (int k = 0; k < total_number_of_patches; k++)
+                            {
+                                if (indexes2[k] == indexes2[i1])
+                                {
+                                    cout << k << " ";
+                                }
+                            }
+                            cout << endl;
+                            cout << "indexes done" << endl;
+                            cout << "parallel vs serial" << endl;
+                            for (int k = 0; k < depth_of_matrix; k++)
+                            {
+                                cout << boindices2(i, k) << endl;
+                            }
+                            cout << endl;
+
+                            for (int k = 0; k < depth_of_matrix; k++)
+                            {
+                                cout << boindices(i1, k) << " " << indexes2[boindices(i1, k)] << endl;
+                                // cout << indexes2[boindices(i1, k)] << endl;
+                            }
+                            cout << endl;
+
+                            for (int k = 0; k < depth_of_matrix; k++)
+                            {
+                                cout << boindices(i2, k) << " " << indexes2[boindices(i2, k)] << endl;
+                            }
+                            cout << endl;
+
+                            for (int k = 0; k < depth_of_matrix; k++)
+                            {
+                                cout << boindices(i3, k) << " " << indexes2[boindices(i3, k)] << endl;
+                            }
+
+                            cout << endl;
+
+                            error("error in clustering algorithm");
+                        }
+
+                        bool a12;
+                        bool a23;
+                        bool a13;
+
+                        //find the energy of each previous bond
+
+                        double e12;
+                        double e23;
+                        double e13;
+
+                        get_energies(i1,i2,i3,nb1,nb2,nb3,boindices,boenergies,e12,e23,e13);
+
+
+
+                        bm.triplet_eq(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, e12, e23, e13);
+
+                        if (a12)
+                        {
+
+                            bo.boundto[i1] = i2;
+                            bo.boundto[i2] = i1;
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = true;
+                            bo.isbound[i3] = false;
+                            mypairs_private.push_back(mdpair(i1, i2));
+
+                            // int frum1 = my_sorter(i1);
+                            // int frum2 = my_sorter(i2);
+                            // if((frum1==1 && frum2 == 3)||(frum1==3 && frum2 == 1) ) {
+                            //     cout << "sanity" << endl;
+                            //     pausel();
+                            // }
+                        }
+                        else if (a23)
+                        {
+
+                            bo.boundto[i2] = i3;
+                            bo.boundto[i3] = i2;
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = true;
+                            bo.isbound[i3] = true;
+                            mypairs_private.push_back(mdpair(i2, i3));
+                            // int frum1 = my_sorter(i2);
+                            // int frum2 = my_sorter(i3);
+                            // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                            // {
+                            //     cout << "sanity" << endl;
+                            //     pausel();
+                            // }
+                        }
+                        else if (a13)
+                        {
+
+                            bo.boundto[i1] = i3;
+                            bo.boundto[i3] = i1;
+                            bo.isbound[i1] = true;
+                            bo.isbound[i2] = false;
+                            bo.isbound[i3] = true;
+                            mypairs_private.push_back(mdpair(i1, i3));
+
+                            // int frum1 = my_sorter(i1);
+                            // int frum2 = my_sorter(i3);
+                            // if ((frum1 == 1 && frum2 == 3) || (frum1 == 3 && frum2 == 1))
+                            // {
+                            //     cout << "sanity" << endl;
+                            //     pausel();
+                            // }
+                        }
+                        else
+                        {
+                            bo.isbound[i1] = false;
+                            bo.isbound[i2] = false;
+                            bo.isbound[i3] = false;
                         }
                     }
 
-                    #pragma omp for schedule(static) ordered
-                    for (int i = 0; i < omp_get_num_threads(); i++)
+                    else
                     {
-                        #pragma omp ordered
-                        mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
-                        #pragma omp ordered
-                        large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
+                        large_clusters_private.push_back(i);
                     }
-                    // #pragma omp for schedule(static) ordered
-                    // for (int i = 0; i < omp_get_num_threads(); i++)
-                    // {
-                    // #pragma omp ordered
-                    //     large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
-                    // }
                 }
-                
-                //pausel();
 
-                int number_of_large_clusters = large_clusters.size();
+#pragma omp for schedule(static) ordered
+                for (int i = 0; i < omp_get_num_threads(); i++)
+                {
+#pragma omp ordered
+                    mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
+#pragma omp ordered
+                    large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
+                }
+                // #pragma omp for schedule(static) ordered
+                // for (int i = 0; i < omp_get_num_threads(); i++)
+                // {
+                // #pragma omp ordered
+                //     large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
+                // }
+            }
 
-                
-                
+            //pausel();
 
+            int number_of_large_clusters = large_clusters.size();
 
-                if(need_large_c) {
+            if (need_large_c)
+            {
                 #pragma omp parallel
                 {
                     //srand(int(time(NULL)) ^ omp_get_thread_num());
@@ -3561,7 +4719,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         for (int j = 0; j < size_of_cluster; j++)
                         {
                             unique_indexes[j] = boindices2(i, j);
-                          //  cout << fv(unique_indexes[j]) <<",";
+                            //  cout << fv(unique_indexes[j]) <<",";
                         }
 
                         //cout << endl;
@@ -3571,7 +4729,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         //     ind[j] = j;
                         vector<mdpairwd> newedges;
                         newedges.reserve(2 * size_of_cluster);
-                        RecapitulateEdges(size_of_cluster, boindices2, boindices, boscores, tempbound, i, unique_indexes, newedges);
+                        RecapitulateEdges(size_of_cluster, boindices2, boindices, boenergies, tempbound, i, unique_indexes, newedges);
                         // cout << "edges done" << endl;
                         // // the graph here is complete
                         // //cout << unique_indexes << endl;
@@ -3672,7 +4830,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                                 bool aft;
 
-                                bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+                                double energ = boenergies(i1,0);
+                                bm.doublet_eq(alreadybound_to_eachother, i1, i2, aft, energ);
 
                                 if (aft)
                                 {
@@ -3730,7 +4889,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                                 sort_triplet(ni1, ni2, ni3, ii1, ii2, ii3);
 
-                                  //DETERMINE WHETHER THEY ARE BOUND
+                                //DETERMINE WHETHER THEY ARE BOUND
                                 bool b12 = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
                                 bool b23 = bo.boundto[i2] == i3 && bo.boundto[i3] == i2 && bo.isbound[i2] && bo.isbound[i3];
                                 bool b13 = bo.boundto[i1] == i3 && bo.boundto[i3] == i1 && bo.isbound[i1] && bo.isbound[i3];
@@ -3796,13 +4955,18 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                                     error("error in clustering algorithm triplet split");
                                 }
 
-
                                 bool a12;
                                 bool a23;
                                 bool a13;
 
-                                bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
-                                
+                                double e12;
+                                double e23;
+                                double e13;
+
+                                get_energies(i1, i2, i3, nb1, nb2, nb3, boindices, boenergies, e12, e23, e13);
+
+                                bm.triplet_eq(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13,e12,e23,e13);
+
                                 if (a12)
                                 {
                                     bo.boundto[i1] = i2;
@@ -3858,7 +5022,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                                     bo.isbound[i2] = false;
                                     bo.isbound[i3] = false;
                                 }
-}
+                            }
                             else
                             {
                                 //error("no this should not be possible, somehow our n cluster hasn't been broken up");
@@ -3866,199 +5030,37 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         }
                     }
 
-                #pragma omp for schedule(static) ordered
+                    #pragma omp for schedule(static) ordered
                     for (int i = 0; i < omp_get_num_threads(); i++)
                     {
-                #pragma omp ordered
+                        #pragma omp ordered
                         mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
                     }
                 }
             }
-/* 
-            stringstream ss1;
-            stringstream ss2;
-            stringstream ss3;
-            for(int i = 0  ; i < pairs.size() ; i++) {
-                ss1 << fv(pairs[i].patch_index1) << "," << fv(pairs[i].patch_index2) << endl;
-            }
-            for (int i = 0; i < edgelist.size(); i++)
-            {
-                ss2 << fv(edgelist[i].a) << "," << fv(edgelist[i].b) << endl;
-            }
+
+
+#pragma omp parallel for
             for (int i = 0; i < mypairs.size(); i++)
             {
-                ss3 << fv(mypairs[i].a) << "," << fv(mypairs[i].b) << endl;
-            }
-
-            output_ss_to_file("res1.csv", ss1);
-            output_ss_to_file("res2.csv", ss2);
-            output_ss_to_file("res3.csv", ss3);
-
-            pausel(); */
-
-            #pragma omp parallel for
-                for (int i = 0; i < mypairs.size(); i++)
-                {
-                    int p1;
-                    int p2;
-                    int wp1 = mypairs[i].a;
-                    int wp2 = mypairs[i].b;
-                    iny.which_particle(wp1, wp2, p1, p2);
-
-                    if (p2 < p1)
-                    { //INDICES NEED TO BE SORTED FOR IT TO WORK
-                        int tp1 = p1;
-                        p1 = p2;
-                        p2 = tp1;
-                    }
-                    double dis;
-                    vector1<double> un(dimension);
-                    geo->distance_vector(*dat, p1, p2, un, dis);
-
-                    int potn = iny.which_potential(p1, p2, wp1, wp2);
-
-                    
-                    // if(potn != iny.which_potential(p1, p2,wp2,wp1)) {
-                    //     cout << p1 <<  " " << p2 << " " << wp1 << " " << wp2 << endl;
-                    //     cout << potn << endl;
-                    //     cout << iny.which_potential(p1, p2,wp2,wp1) << endl;
-                    //     //and it should be
-                    //    cout << fv(wp1) << " " <<  fv(wp2) << endl;
-                    //     error("why is the potential not fine if patches are reversed?");
-                    // }
-                    dis = sqrt(dis);
-
-                    un /= dis;
-
-                    double fx;
-                    double fy;
-                    double fz;
-
-                    double tix;
-                    double tiy;
-                    double tiz;
-
-                    double tjx;
-                    double tjy;
-                    double tjz;
-
-
-
-                    (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
-
-                    /* 
-            double dx = un.gpcons(0);
-            double dy = un.gpcons(1);
-            double dz = un.gpcons(2);
-
-            double qtemp0 = orient->gpcons(p1, 0);
-            double qtemp1 = orient->gpcons(p1, 1);
-            double qtemp2 = orient->gpcons(p1, 2);
-            double qtemp3 = orient->gpcons(p1, 3);
-            double qtemp4 = orient->gpcons(p1, 4);
-            double qtemp5 = orient->gpcons(p1, 5);
-            double qtemp6 = orient->gpcons(p1, 6);
-            double qtemp7 = orient->gpcons(p1, 7);
-            double qtemp8 = orient->gpcons(p1, 8);
-
-            double gtemp0 = orient->gpcons(p2, 0);
-            double gtemp1 = orient->gpcons(p2, 1);
-            double gtemp2 = orient->gpcons(p2, 2);
-            double gtemp3 = orient->gpcons(p2, 3);
-            double gtemp4 = orient->gpcons(p2, 4);
-            double gtemp5 = orient->gpcons(p2, 5);
-            double gtemp6 = orient->gpcons(p2, 6);
-            double gtemp7 = orient->gpcons(p2, 7);
-            double gtemp8 = orient->gpcons(p2, 8);
-
-           
-            double nxb1; // = params[0]; //iny[potn]->nxb1;
-            double nyb1; // = params[1]; //iny[potn]->nyb1;
-            double nzb1; // = params[2]; //iny[potn]->nzb1;
-
-            double nxb2; // = params[3]; //iny[potn]->nxb2;
-            double nyb2; // = params[4]; //iny[potn]->nyb2;
-            double nzb2; // = params[5]; //iny[potn]->nzb2;
-
-            double disp; // = params[6];
-
-            double thetam; // = params[8];
-
-            //                cout << p1 << " " << p2 << " " << potn << endl;
-            iny.get_params(p1, p2, potn, nxb1, nyb1, nzb1, nxb2, nyb2, nzb2, disp, thetam); //for this potential, get all the parameters
-
-            double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
-            double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
-            double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
-
-            double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
-            double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
-            double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
-
-            double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
-            double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
-            cout << (iny.potential_bundle)[potn]->getparameters() << endl;
-            cout << "particles:  " <<p1 << " " << p2 << endl;
-            cout << "distance: " << dis << endl;
-            cout << "potential number: " << potn << endl;
-            cout << "which patch: " << wp1 << " " << wp2 << endl;
-            cout << "force: " << fx << " " << fy << " " << fz << endl;
-            cout << "torques: " << tix << " " << tiy << " " << tiz << endl;
-            cout << "orientation1: " << qtemp0 << " " << qtemp1 << " " << qtemp2 << " " << qtemp3 << " " << qtemp4 << " " << qtemp5 << " " << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
-            cout << "orientation2: " << gtemp0 << " " << gtemp1 << " " << gtemp2 << " " << gtemp3 << " " << gtemp4 << " " << gtemp5 << " " << gtemp6 << " " << gtemp7 << " " << gtemp8 << endl;
-            cout << "dx: " << dx << " " << dy << " " << dz << endl;
-            cout << "n: " << nx1 << " " << ny1 << " " << nz1 << endl;
-            cout << "n2: " << nx2 << " " << ny2 << " " << nz2 << endl;
-            cout << "arguments: " << argthetai << " " << argthetaj << " " << cos(thetam) << endl;
-            pausel();   
- */
-                    forces(p1, 0) += fx;
-                    forces(p1, 1) += fy;
-                    forces(p1, 2) += fz;
-
-                    forces(p2, 0) += -fx;
-                    forces(p2, 1) += -fy;
-                    forces(p2, 2) += -fz;
-
-                    torques(p1, 0) += tix;
-                    torques(p1, 1) += tiy;
-                    torques(p1, 2) += tiz;
-
-                    torques(p2, 0) += tjx; // - dis * (fz * un[1] - fy * un[2]);
-                    torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
-                    torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
-                }
-                //UP TO HERE
-
-                /* 
-        #pragma omp parallel for
-        for (int i = 0; i < total_number_of_patches; ++i)
-        {
-            if (bo.isbound[i] == true && visited[i] == false) //only for bound patches we haven't visisted do we calculate forces
-            {
-
-                visited[i] = true;             // We have now visisted this patch
-                visited[bo.boundto[i]] = true; //we have also visisted the patch that it is bound to
-
-                // int p1 = floor(i / np1);             //particle number 1
-                // int p2 = floor(bo.boundto[i] / np1); //particle number 2
-
-                //get the particle numbers from the patch numbers:
-
                 int p1;
                 int p2;
+                int wp1 = mypairs[i].a;
+                int wp2 = mypairs[i].b;
+                iny.which_particle(wp1, wp2, p1, p2);
 
-                iny.which_particle(i, bo.boundto[i], p1, p2);
-
+                if (p2 < p1)
+                { //INDICES NEED TO BE SORTED FOR IT TO WORK
+                    int tp1 = p1;
+                    p1 = p2;
+                    p2 = tp1;
+                }
                 double dis;
-                //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
                 vector1<double> un(dimension);
                 geo->distance_vector(*dat, p1, p2, un, dis);
 
-                //un = i-j
+                int potn = iny.which_potential(p1, p2, wp1, wp2);
 
-                int potn = iny.which_potential(p1, p2, i, bo.boundto[i]);
-                // int potn = (i % np1) * np1 + (bo.boundto[i] % np1);
                 dis = sqrt(dis);
 
                 un /= dis;
@@ -4077,7 +5079,6 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                 (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
 
-
                 forces(p1, 0) += fx;
                 forces(p1, 1) += fy;
                 forces(p1, 2) += fz;
@@ -4094,14 +5095,5 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
                 torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
             }
-            else
-            {
-                //do nothing
-            }
-        } */
-                // cout << "calc forces" << endl;
-
-                //now we have only the real forces, we no longer need to calculate the forces for the non-bound particles:
-                }
-
+  }
 #endif /* LANGEVINRFORCE_CPP */

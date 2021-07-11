@@ -46,9 +46,58 @@ matrix<int> LangevinNVTR::CreateEdgeList(matrix<int> &adj, vector1<int> &len)
     return a;
 }
 
+void get_energies(int i1, int i2, int i3, int nb1, int nb2, int nb3, const matrix<int> &boindices, const matrix<double> &boenergies, double &e12, double &e23, double &e13) {
+
+    for(int i = 0 ; i < nb1 ; i++) {
+    if(boindices.gpcons(i1,i) == i2) {
+        e12 = boenergies.gpcons(i1,i);
+    }
+    else if(boindices.gpcons(i1,i) == i3) {
+        e13 = boenergies.gpcons(i1,i);
+    }
+    else{
+
+    }
+
+    }
+
+    for (int i = 0; i < nb2; i++)
+    {
+        if (boindices.gpcons(i2, i) == i1)
+        {
+            e12 = boenergies.gpcons(i2, i);
+        }
+        else if (boindices.gpcons(i2, i) == i3)
+        {
+            e23 = boenergies.gpcons(i2, i);
+        }
+        else
+        {
+        }
+    }
+
+    for (int i = 0; i < nb3; i++)
+    {
+        if (boindices.gpcons(i3, i) == i1)
+        {
+            e13 = boenergies.gpcons(i3, i);
+        }
+        else if (boindices.gpcons(i3, i) == i2)
+        {
+            e23 = boenergies.gpcons(i3, i);
+        }
+        else
+        {
+        }
+    }
+
+    
+}
 
 
-vector<mdpairwd> RecapitulateEdges(int size_of_cluster, const matrix<int> &boindices2, const matrix<mdpairwd> &boindices, const vector1<int> &tempbound, int i, vector<int> &unique_indexes) {
+
+vector<mdpairwd> RecapitulateEdges(int size_of_cluster, const matrix<int> &boindices2, const matrix<mdpairwd> &boindices, const vector1<int> &tempbound, int i, vector<int> &unique_indexes)
+{
     vector<mdpairwd> matched;
     matched.reserve(size_of_cluster * (size_of_cluster - 1) / 2);
 
@@ -97,7 +146,6 @@ vector<mdpairwd> RecapitulateEdges(int size_of_cluster, const matrix<int> &boind
     matched.erase(unique(matched.begin(), matched.end()), matched.end());
 
     return matched;
-
 }
 
 void RecapitulateEdges(int size_of_cluster, const matrix<int> &boindices2, const matrix<int> &boindices, const matrix<double> &boscores, const vector1<int> &tempbound, int i, vector<int> &unique_indexes, vector<mdpairwd> &matched)

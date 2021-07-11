@@ -11,7 +11,7 @@ struct potentialtheta3D
 
     virtual potentialtheta3D *clone() const = 0;
 
-    // virtual double energy(double, double) = 0;
+    virtual double energy(double rij, double ang1, double ang2) = 0;
     // virtual double force(vector1<double> &pos, const matrix<double> &A1,const matrix<double> &A2 ) = 0;
     virtual void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &, double &, double &, double &, double &, double &, double &, double &, double &) = 0;
     // virtual double torque(double,double) = 0;
@@ -63,6 +63,25 @@ struct KernFrenkelOnePatch : potentialtheta3D {
         thetam = thetamm;
         //v = vv;
         v =  vv;
+    }
+
+    double energy(double rij, double argthetai, double argthetaj) {
+        if (argthetai > 1.)
+            argthetai = 0.999999;
+
+        if (argthetaj > 1.)
+            argthetaj = 0.999999;
+
+        double thetai = acos(argthetai);
+
+        double thetaj = acos(argthetaj);
+
+        double f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam)); 
+        double fac = (dis / (rij));
+        double fac2 = SQR(fac);
+        double fac6 = CUB(fac2);
+
+        return 4 * att * (-fac6) * f;
     }
 
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
@@ -333,6 +352,30 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
         thetam = thetamm;
         //v = vv;
         v = vv;
+    }
+
+    double energy(double rij, double argthetai, double argthetaj) {
+        if (argthetai > 1.)
+            argthetai = 0.999999;
+
+        if (argthetaj > 1.)
+            argthetaj = 0.999999;
+
+        double thetai = acos(argthetai);
+
+        double thetaj = acos(argthetaj);
+
+        double f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
+
+        double fac = (rij / dis);
+        double fac2 = SQR(fac);
+        double fac4 = SQR(fac2);
+        double fac8 = SQR(fac4);
+        double fac10 = fac2 * fac8;
+
+        double expf = exp(-0.5 * fac10);
+
+        return -att * expf * f;
     }
 
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
@@ -697,6 +740,34 @@ struct KernFrenkelOnePatchFlatBottom : potentialtheta3D
         
         //v = vv;
         v = vv;
+    }
+
+    double energy(double rij, double argthetai, double argthetaj) {
+        if (argthetai > 1.)
+            argthetai = 0.999999;
+
+        if (argthetaj > 1.)
+            argthetaj = 0.999999;
+
+        double thetai = acos(argthetai);
+
+        double thetaj = acos(argthetaj);
+
+        //f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
+
+        double f = flat(thetai) * flat(thetaj);
+
+        double fac = (rij / dis);
+        double fac2 = SQR(fac);
+        double fac4 = SQR(fac2);
+        double fac8 = SQR(fac4);
+        double fac10 = fac2 * fac8;
+
+        double expf = exp(-0.5 * fac10);
+
+        double pot = -att * expf;
+
+        return pot*f;
     }
 
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)

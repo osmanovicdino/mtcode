@@ -17,6 +17,11 @@ virtual void triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13,
 virtual void nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters) = 0;
 
 
+void doublet_eq(bool before, int index1, int index2, bool &after, double energ);
+
+void triplet_eq(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &after1, bool &after2, bool &after3, double e12, double e23, double e13);
+
+void nlet_eq(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool>> &possibles, vector1<bool> &afters, vector1<double> &energies);
 
 virtual AbstractBindingModel *clone() const = 0;
 
@@ -47,5 +52,7 @@ void set_stable_triple(vector1<double> &t111,
     t111[14] = f * exp(-fs); //fromnothingtoi,k
     t111[15] = 1.;           //fromnothingtonothing
 }
+
+#include "BindingModeAbstract.cpp"
 
 #endif

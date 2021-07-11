@@ -209,6 +209,7 @@ public:
 	void calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ComboPatch&, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
 	void calculate_forces_and_torques3D_onlyone_nonlets(matrix<int> &pairs, ComboPatch &, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
 	void calculate_forces_and_torques3D_onlyone_nonlets(vector<patchint> &pairs, vector<int> &divs, ComboPatch &, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
+	void calculate_forces_and_torques3D_onlyone_nonlets_eq(vector<patchint> &pairs, vector<int> &divs, ComboPatch &, BinaryBindStore &, AbstractBindingModel &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle
 
 	//matrix<double> calculateforcestheta_pos(matrix<int> &pairs, potentialtheta &);
 	//matrix<double> calculateforces_ang(matrix<int> &pairs,potentialtheta&);

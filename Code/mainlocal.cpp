@@ -511,7 +511,7 @@ int main(int argc, char **argv)
 
     //cout << "bout to run" << endl;
 
-   A.run_singlebond(runtime, every, base);
+   A.run_singlebond_eq(runtime, every, base);
     // BinaryBindStore bbs2;
     // int vak =  n*4;
     // vector1<bool> iss(vak);
