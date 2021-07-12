@@ -53,7 +53,7 @@ else
    rate=0.01
    echo "did not read file correctly"
 fi
-dirwemake="i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_rate=${rate}_m2=${m2}"
+dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_m1=${m1}_m2=${m2}_rate=${rate}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainImportAntiInvade.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp ~/Chemistry/Code/mainImportAntiInvade.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angronai
