@@ -8,12 +8,12 @@
 #$ -l h_rt=12:00:00,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 16
+#$ -pe shared 8
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-7:1
+#$ -t 1-20:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -29,16 +29,18 @@ module load gcc/9.3.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/params3.dat
-basedir="PhaseDiagramBivalent"
+filename=~/Chemistry/Code/Basic/Scripts/params9.dat
+basedir="ParamDesign4Check"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
-   i1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'` 
-   i2=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $2}'` 
-   i3=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $3}'`
-   i4=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $4}'`
-   rate=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $5}'`
-   m2=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $6}'`
+   den=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
+   i1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $2}'` 
+   i2=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $3}'` 
+   i3=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $4}'`
+   i4=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $5}'`
+   m1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $6}'`
+   m2=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $7}'`
+   rate=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $8}'`
    echo "read file correctly" 
 else
    den=0.01
@@ -56,8 +58,8 @@ mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainImportAntiInvade.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp ~/Chemistry/Code/mainImportAntiInvade.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angronai
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
-export OMP_NUM_THREADS=16
-./angronai 10000000 $i1 $i2 $i3 $i4 $rate $m2 >log
+export OMP_NUM_THREADS=8
+./angronai 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 $rate >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `

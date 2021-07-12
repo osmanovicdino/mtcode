@@ -917,10 +917,10 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
 
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
+
+
     matrix<int> *pairsp1 = obj->calculatepairs(boxes, p1, 3.5 * size1);
-
     matrix<int> *pairsp2 = obj->calculatepairs(boxes, p2, 3.5 * size2);
-
     matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5 * (size1 + size2) / 2.);
 
     WCAPotential wsa1(3.0, size1, 0.0);
@@ -933,12 +933,8 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
     matrix<double> zeromatrix(NN, 3);
 
     F = obj->calculateforces(*pairsp1, wsa1);
-
     F += obj->calculateforces(*pairsp2, wsa3);
-
     F += obj->calculateforces(*pairsp1p2, wsa2);
-
-
 
     /*make combined pairs*/
     int npp = (pairsp1->getNsafe()) + (pairsp2->getNsafe()) + (pairsp1p2->getNsafe());
@@ -971,12 +967,10 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
     runs_diff.reserve(NN * 20);
     opairs = obj->calculate_patch_list(pairs, *pots);
     runs_diff = adjacency(opairs);
-
     obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff ,*pots, bbs, *bm, F, T);
     generate_uniform_random_matrix(RT);
     obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
-
 
     for (int i = 0; i < runtime; i++)
     {
