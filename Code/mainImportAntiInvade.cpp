@@ -672,7 +672,7 @@ int main(int argc, char** argv) {
     string filename3 = "bAntiInvasionStart.csv";
 
 
-    string mydir = dir5;
+    string mydir = dir;
 
     matrix<double> postemp = importcsv(mydir + filename1, T, vv1);
     matrix<double> orienttemp = importcsv(mydir + filename2, T, vv2);
