@@ -200,8 +200,6 @@ int main(int argc, char **argv)
         }
     }
 
-    cout << orient << endl;
-    pausel();
 
     GeneralPatch c4(vec1, numb, params2, orient);
 
