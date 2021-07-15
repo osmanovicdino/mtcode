@@ -345,12 +345,12 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     bbs.isbound = isbound;
     bbs.boundto =  boundto;
 
-    num = floor(ls / (2. * size_mol));
+    num = floor(ls / (3.5 * size_mol));
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
 
 
-    matrix<int> *pairs = obj->calculatepairs(boxes, 3.5*size_mol);
+    matrix<int> *pairs = obj->calculatepairs(boxes, 3.*size_mol);
 
 
     

@@ -2967,6 +2967,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     
 
 
+        if(tn_pairs > 0) {
         #pragma omp parallel
         {
             vector<mdpairwd> edgelist_private;
@@ -2980,7 +2981,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     if(tn_pairs == 0) {
                         i = 0;
                         fi = 0;
-                        error("no pairs");
+                        error("should get here");
                     }
                     else if(t_u_pairs == 0 ) {
                         i = 0;
@@ -3142,6 +3143,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             #pragma omp ordered
                 edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
             }
+        }
+
         }
 
 
@@ -4104,7 +4107,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
         //now we have only the real forces, we no longer need to calculate the forces for the non-bound particles:
         }
 
-        void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets_eq(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
+    void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets_eq(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
         {
 
             //for all the pairs, for all bindings
