@@ -115,7 +115,6 @@ int main(int argc, char **argv)
 
     matrix<double> orient(num_arms, 3);
 
-    cout << orient << endl;
 
     double nx1 = 0.0;
     double ny1 = 1.;
@@ -192,9 +191,9 @@ int main(int argc, char **argv)
             iter2++;
             }
             else if(num_arms == 4) {
-            orient(iter2, 0) = asd(j, 0);
-            orient(iter2, 1) = asd(j, 1);
-            orient(iter2, 2) = asd(j, 2);
+            orient(iter2, 0) = asd2(j, 0);
+            orient(iter2, 1) = asd2(j, 1);
+            orient(iter2, 2) = asd2(j, 2);
             iter2++;
             }
         }
