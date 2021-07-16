@@ -108,7 +108,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < tot * tot; i++)
     {
         params2(i, 0) = energ;
-        params2(i, 1) = 1.4*size_of_part;
+        params2(i, 1) = 0.4+size_of_part;
         params2(i, 2) = angs;
     }
 
