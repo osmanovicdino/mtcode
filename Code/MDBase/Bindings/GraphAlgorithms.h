@@ -44,6 +44,15 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes);
 template <typename Y>
 void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes);
 
+template <typename Y>
+void ConnectedComponentsParallel(vector<Y> &adj, vector<int> &indexes);
+
+// template <typename Y>
+// vector1<int> ConnectedComponentsParallel(vector<Y> &adj, int num_vertices);
+
+template <typename Y>
+vector<int> ConnectedComponentsParallel(vector<Y> &adj, int num_vertcies);
+
 bool IndependentEdge(const vector<mdpair> &pairs, const vector1<bool> &bonds);
 
 #include "GraphAlgorithms.cpp"

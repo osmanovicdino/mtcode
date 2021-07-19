@@ -527,10 +527,50 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
 
 
     }
-
    // pausel();
-    
+}
 
+template <typename Y>
+void ConnectedComponentsParallel(vector<Y> &adj, vector<int> &indexes) {
+
+
+//vector<int> must be large enough to hold all the values
+    int n =  indexes.size();
+    vector1<int> indexestemp(n);
+
+    for(int i = 0  ; i < n ; i++) {
+        indexestemp[i] = indexes[i];
+    }
+
+    ConnectedComponentsParallel(adj,indexestemp);
+
+    for(int i  = 0 ; i < n ; i++) {
+        indexes[i] = indexestemp[i];
+    }
+
+}
+
+// template <typename Y>
+// vector1<int> ConnectedComponentsParallel(vector<Y> &adj, int n)
+// {
+//     string sg = "a";
+//     vector1<int> indexes2(n,sg);
+
+//     ConnectedComponentsParallel(adj, indexes2);
+//     return indexes2;
+// }
+
+template <typename Y>
+vector<int> ConnectedComponentsParallel(vector<Y> &adj, int n)
+{
+    string sg = "a";
+    vector<int> indexes2(n);
+    for(int i = 0  ; i < n ; i++)
+        indexes2[i] = i;
+
+    ConnectedComponentsParallel(adj, indexes2);
+    
+    return indexes2;
 }
 
 bool IndependentEdge(const vector<mdpair> &pairs, const vector1<bool> &bonds) {
