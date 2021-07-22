@@ -20,7 +20,7 @@
 #include <random>
 #include <algorithm>
 #include <parallel/algorithm>
-#include <chrone>
+#include <chrono>
 
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
