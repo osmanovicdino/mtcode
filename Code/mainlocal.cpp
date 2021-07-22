@@ -20,6 +20,8 @@
 #include <random>
 #include <algorithm>
 #include <parallel/algorithm>
+#include <chrone>
+
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -47,6 +49,7 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 //#include "MDGPU.cu"
 
 using namespace std;
+using namespace std::chrono;
 
 int main(int argc, char **argv)
 {
@@ -511,7 +514,17 @@ int main(int argc, char **argv)
 
     //cout << "bout to run" << endl;
 
-   A.run_singlebond(runtime, every, base);
+    auto start = high_resolution_clock::now();
+
+    A.run_singlebond(runtime, every, base);
+
+    auto stop = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>(stop - start);
+
+    cout << "Time taken by function: "
+         << duration.count() << " microseconds" << endl;
+
     // BinaryBindStore bbs2;
     // int vak =  n*4;
     // vector1<bool> iss(vak);
