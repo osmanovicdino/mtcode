@@ -30,6 +30,8 @@ void run(int,int, string strbase);
 
 void run_singlebond(int,int,string strbase);
 
+void run_singlebond_continue(int, int, int startval, BinaryBindStore &bbs2, string strbase);
+
 void run_singlebond_eq(int,int,string strbase);
 
 void run_singlebond_different_sizes(int runtime, int every, int div, double size1, double size2, string strbase);

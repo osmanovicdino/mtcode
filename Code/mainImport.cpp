@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     //     params(i, 1) =  1.4; //distance
     //     params(i, 2) = 0.927;
     // }
-    int m1 = 1000;
+    int m1 = 4000;
     int m2 = m1 + m5;
     int n = m2 + m6;
 
@@ -407,7 +407,7 @@ int main(int argc, char** argv) {
 
     Condensate A(l, n);
 
-    A.setup_tight_packing(1.8 * size);
+    //A.setup_tight_packing(1.8 * size);
 
     A.setBindingModel(b);
 
@@ -526,7 +526,7 @@ int main(int argc, char** argv) {
     //Do processing to make sure everything is fine here
 
 
-    A.run_singlebond_different_sizes_continue(runtime, every, m2, size, size, posfiles.size(), bbs2, base);
+    A.run_singlebond_continue(runtime, every, posfiles.size(), bbs2, base);
 
 /*
 int NN = 10000;

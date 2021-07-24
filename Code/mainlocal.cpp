@@ -434,7 +434,7 @@ int main(int argc, char **argv)
     //A.setup_tight_packing(1.8*size);
 
     
-    outfunc(A.obj->getdat(),"dat");
+    //outfunc(A.obj->getdat(),"dat");
     A.setBindingModel(b);
 
     //cout << "set up 1" << endl;
