@@ -129,8 +129,10 @@ public:
 	void swap(int,int); // swap
         void resize(int); // resize a vector to size int
         void resize_keep(int); //keep the first int elements of the vector
+        void resize_parallel(int); //keep the first int elements of the vector
+        void resize_parallel_ascending(int); //keep the first int elements of the vector
 
-	void trisols(vector1&,vector1&,vector1,vector1&); // solution to a tridiagonal matrix equation with 3 vectors being the diagonals and one the solution
+        void trisols(vector1&,vector1&,vector1,vector1&); // solution to a tridiagonal matrix equation with 3 vectors being the diagonals and one the solution
         void trisols(const vector1&,const vector1&, const vector1, const vector1&); // overloaded function
         void trimult(vector1&, vector1&, vector1&, vector1&); // A * vector where A is tridiagonal matrix
         void cyclic(const vector1&, const vector1, const vector1&, const T&, const T&, const vector1&); // solves tridiagonal where there are elements in the corners
@@ -180,7 +182,10 @@ public:
         template <class Y>
 	friend Y maxval(const vector1<Y>&); // find maximum value of vector
 
-	template <class Y>
+        template <class Y>
+        friend Y maxval_parallel(const vector1<Y> &); // find maximum value of vector
+
+        template <class Y>
 	friend Y minvalabs(const vector1<Y>&); // find minimum value of vector
 
         template <class Y>

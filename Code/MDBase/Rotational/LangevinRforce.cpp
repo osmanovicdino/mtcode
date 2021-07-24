@@ -25,7 +25,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     //std::mutex mtx;
 
     unsigned int i;
-
+    double mk = SQR(iny.max_check);
     #pragma omp parallel
     {
     vector<mdpair> edgelist_private;
@@ -46,46 +46,46 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         double dis;
         //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
         vector1<double> un(dimension);
-        geo->distance_vector(*dat, p1, p2, un, dis);
+        geo.distance_vector(*dat, p1, p2, un, dis);
 
         //un = i-j
         
         
-        dis = sqrt(dis);
+        
 
-        if(dis < iny.max_check) {
+        if(dis < SQR(mk)) {
+            dis = sqrt(dis);
+            un /= dis;
+            double dx = un.gpcons(0);
+            double dy = un.gpcons(1);
+            double dz = un.gpcons(2);
 
-        un /= dis;
-        double dx = un.gpcons(0);
-        double dy = un.gpcons(1);
-        double dz = un.gpcons(2);
+            double qtemp0 = orient->gpcons(p1, 0);
+            double qtemp1 = orient->gpcons(p1, 1);
+            double qtemp2 = orient->gpcons(p1, 2);
+            double qtemp3 = orient->gpcons(p1, 3);
+            double qtemp4 = orient->gpcons(p1, 4);
+            double qtemp5 = orient->gpcons(p1, 5);
+            double qtemp6 = orient->gpcons(p1, 6);
+            double qtemp7 = orient->gpcons(p1, 7);
+            double qtemp8 = orient->gpcons(p1, 8);
 
-        double qtemp0 = orient->gpcons(p1, 0);
-        double qtemp1 = orient->gpcons(p1, 1);
-        double qtemp2 = orient->gpcons(p1, 2);
-        double qtemp3 = orient->gpcons(p1, 3);
-        double qtemp4 = orient->gpcons(p1, 4);
-        double qtemp5 = orient->gpcons(p1, 5);
-        double qtemp6 = orient->gpcons(p1, 6);
-        double qtemp7 = orient->gpcons(p1, 7);
-        double qtemp8 = orient->gpcons(p1, 8);
+            double gtemp0 = orient->gpcons(p2, 0);
+            double gtemp1 = orient->gpcons(p2, 1);
+            double gtemp2 = orient->gpcons(p2, 2);
+            double gtemp3 = orient->gpcons(p2, 3);
+            double gtemp4 = orient->gpcons(p2, 4);
+            double gtemp5 = orient->gpcons(p2, 5);
+            double gtemp6 = orient->gpcons(p2, 6);
+            double gtemp7 = orient->gpcons(p2, 7);
+            double gtemp8 = orient->gpcons(p2, 8);
 
-        double gtemp0 = orient->gpcons(p2, 0);
-        double gtemp1 = orient->gpcons(p2, 1);
-        double gtemp2 = orient->gpcons(p2, 2);
-        double gtemp3 = orient->gpcons(p2, 3);
-        double gtemp4 = orient->gpcons(p2, 4);
-        double gtemp5 = orient->gpcons(p2, 5);
-        double gtemp6 = orient->gpcons(p2, 6);
-        double gtemp7 = orient->gpcons(p2, 7);
-        double gtemp8 = orient->gpcons(p2, 8);
+            // for (int j = 0; j < iny.num_patches(p1) ; j++)
+            // {
+            //     for (int k = 0; k < iny.num_patches(p2); k++)
+            //     {
 
-        // for (int j = 0; j < iny.num_patches(p1) ; j++)
-        // {
-        //     for (int k = 0; k < iny.num_patches(p2); k++)
-        //     {
-
-                //int potn = np1 * j + k;
+            //int potn = np1 * j + k;
                 
             int **q = new int*;
             if(iny.safe) {
@@ -1028,7 +1028,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
             double dis;
             vector1<double> un(dimension);
-            geo->distance_vector(*dat, p1, p2, un, dis);
+            geo.distance_vector(*dat, p1, p2, un, dis);
 
             int potn = iny.which_potential(p1, p2, wp1, wp2);
 
@@ -1165,7 +1165,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double dis;
                 //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
                 vector1<double> un(dimension);
-                geo->distance_vector(*dat, p1, p2, un, dis);
+                geo.distance_vector(*dat, p1, p2, un, dis);
 
                 //un = i-j
 
@@ -1242,6 +1242,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
         unsigned int i;
 
+        double mk = SQR(iny.max_check);
         #pragma omp parallel
         {
             vector<mdpairwd> edgelist_private;
@@ -1262,16 +1263,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double dis;
                 //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
                 vector1<double> un(dimension);
-                geo->distance_vector(*dat, p1, p2, un, dis);
+                geo.distance_vector(*dat, p1, p2, un, dis);
 
                 //un = i-j
 
-                dis = sqrt(dis);
+                
 
 
-                if (dis < iny.max_check)
+                if (dis < SQR(mk))
                 {
-
+                    dis = sqrt(dis);
                     un /= dis;
                     double dx = un.gpcons(0);
                     double dy = un.gpcons(1);
@@ -2759,7 +2760,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     }
                     double dis;
                     vector1<double> un(dimension);
-                    geo->distance_vector(*dat, p1, p2, un, dis);
+                    geo.distance_vector(*dat, p1, p2, un, dis);
 
                     int potn = iny.which_potential(p1, p2, wp1, wp2);
 
@@ -2888,7 +2889,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double dis;
                 //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
                 vector1<double> un(dimension);
-                geo->distance_vector(*dat, p1, p2, un, dis);
+                geo.distance_vector(*dat, p1, p2, un, dis);
 
                 //un = i-j
 
@@ -2949,12 +2950,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //int np1 = sqrt(iny.getsize());
         int total_number_of_patches = bo.boundto.getsize(); //iny.get_total_patches(this->getN());
 
-        vector1<int> tempbound(total_number_of_patches, 0); //no binding to begin wtih
+        vector1<int> tempbound;
+        tempbound.resize_parallel(total_number_of_patches); //no binding to begin wtih
 
         int depth_of_matrix = 10; //Choose this value to be deep enough such that all values can be stored
 
-        matrix<int> boindices(total_number_of_patches, depth_of_matrix);
-        matrix<double> boscores(total_number_of_patches, depth_of_matrix);
+        matrix<int> boindices;//(total_number_of_patches, depth_of_matrix);
+        matrix<double> boscores;//(total_number_of_patches, depth_of_matrix);
+
+        boindices.resize_parallel(total_number_of_patches, depth_of_matrix);
+        boscores.resize_parallel(total_number_of_patches, depth_of_matrix);
 
         vector<mdpairwd> edgelist;
         edgelist.reserve(total_number_of_patches);
@@ -2964,7 +2969,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //int total_checks = 0;
         int tn_pairs = pairs.size();
         int t_u_pairs = divs.size();
-    
+        double mk = iny.max_check;    
 
 
         if(tn_pairs > 0) {
@@ -3011,17 +3016,17 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 double dis;
                 //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
                 vector1<double> un(dimension);
-                geo->distance_vector(*dat, p1, p2, un, dis);
+                geo.distance_vector(*dat, p1, p2, un, dis);
 
                 //un = i-j
 
-                dis = sqrt(dis);
+                
 
 
 
-                if (dis < iny.max_check)
+                if (dis < SQR(mk))
                 {
-
+                    dis = sqrt(dis);
                     un /= dis;
                     double dx = un.gpcons(0);
                     double dy = un.gpcons(1);
@@ -3151,12 +3156,20 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
             
 
-        PairHistogramExtended(edgelist, boindices, boscores, tempbound);
+        PairHistogramExtendedParallel(edgelist, boindices, boscores, tempbound);
+
+        // matrix<int> boindicesx;   //(total_number_of_patches, depth_of_matrix);
+        // matrix<double> boscoresx; //(total_number_of_patches, depth_of_matrix);
+
+        // vector1<int> tempb(total_number_of_patches);
+        // boindicesx.resize_parallel(total_number_of_patches, depth_of_matrix);
+        // boscoresx.resize_parallel(total_number_of_patches, depth_of_matrix);
+        // PairHistogramExtended(edgelist,boindicesx,boscoresx,tempb);
+        // //cout << edgelist.size() << endl;
 
 
-
-        //cout << edgelist.size() << endl;
-
+        // cout << (tempb == tempbound) << endl;
+        // pausel();
         // vector1<int> countub(4);
         // vector1<int> countb(3);
 
@@ -3206,8 +3219,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
         //matrix<int> edgelist = this->CreateEdgeList(boindices, tempbound);
 
-        string sg = "a";
-        vector1<int> indexes2(total_number_of_patches, sg);
+        //string sg = "a";
+        vector1<int> indexes2;//(total_number_of_patches, sg);
+        indexes2.resize_parallel_ascending(total_number_of_patches);
         //std::vector<mdpair> jhg(total_number_of_patches);
 
         ConnectedComponentsParallel(edgelist, indexes2);
@@ -3216,23 +3230,38 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         
         //int depth_of_matrix2 = 15;
         //matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
-        vector1<int> ccs(total_number_of_patches);
+        vector1<int> ccs;//(total_number_of_patches);
+        ccs.resize_parallel(total_number_of_patches);
+        //vector1<int> ccs2(total_number_of_patches);
 
         //SingleHistogram(indexes2, boindices2, ccs);
+        matrix<int> boindices2;
+        SingleHistogramParallel(indexes2, ccs, boindices2);
+        //int wid =  boindices2.getncols();
 
-        matrix<int> boindices2 = SingleHistogram(indexes2, ccs);
+        //outfunc(indexes2,"hola");
+        
+        // matrix<int> boindices3;
+        // SingleHistogramParallel(indexes2,ccs2,boindices3);
+
+        // cout << (boindices2 == boindices3) << endl;
+        // cout << (ccs == ccs2) << endl;
+
+        // outfunc(boindices2, "bo2");
+        // outfunc(boindices3, "bo3");
+        // pausel();
 
 
 
 
-            int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
-            //        // cout << number_to_reserve << endl;
-            vector<mdpair> mypairs; //(number_to_reserve);
-            vector<int> large_clusters;
-            mypairs.reserve(number_to_reserve);
-            large_clusters.reserve(number_to_reserve);
+        int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
+        //        // cout << number_to_reserve << endl;
+        vector<mdpair> mypairs; //(number_to_reserve);
+        vector<int> large_clusters;
+        mypairs.reserve(number_to_reserve);
+        large_clusters.reserve(number_to_reserve);
 
-            bool need_large_c = true;
+        bool need_large_c = true;
 
 
 
@@ -3527,15 +3556,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             {
                 #pragma omp ordered
                 mypairs.insert(mypairs.end(), mypairs_private.begin(), mypairs_private.end());
-                #pragma omp ordered
+            }
+            
+            #pragma omp for schedule(static) ordered
+            for (int i = 0; i < omp_get_num_threads(); i++)
+            {
+            #pragma omp ordered
                 large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
             }
-            // #pragma omp for schedule(static) ordered
-            // for (int i = 0; i < omp_get_num_threads(); i++)
-            // {
-            // #pragma omp ordered
-            //     large_clusters.insert(large_clusters.end(), large_clusters_private.begin(), large_clusters_private.end());
-            // }
         }
         
         //pausel();
@@ -3569,6 +3597,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                 //cout << endl;
                 //cout << endl;
+                string sg = "a";
                 vector1<int> ind(size_of_cluster, sg);
                 // for (int j = 0; j < size_of_cluster; j++)
                 //     ind[j] = j;
@@ -3899,7 +3928,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     pausel(); */
 
-    #pragma omp parallel for
+        #pragma omp parallel for
         for (int i = 0; i < mypairs.size(); i++)
         {
             int p1;
@@ -3916,7 +3945,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             }
             double dis;
             vector1<double> un(dimension);
-            geo->distance_vector(*dat, p1, p2, un, dis);
+            geo.distance_vector(*dat, p1, p2, un, dis);
 
             int potn = iny.which_potential(p1, p2, wp1, wp2);
 
@@ -4056,7 +4085,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
         double dis;
         //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
         vector1<double> un(dimension);
-        geo->distance_vector(*dat, p1, p2, un, dis);
+        geo.distance_vector(*dat, p1, p2, un, dis);
 
         //un = i-j
 
@@ -4132,6 +4161,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
             //int total_checks = 0;
             int tn_pairs = pairs.size();
             int t_u_pairs = divs.size();
+            double mk = iny.max_check;
 
             #pragma omp parallel
             {
@@ -4182,15 +4212,15 @@ for (int i = 0; i < total_number_of_patches; ++i)
                     double dis;
                     //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
                     vector1<double> un(dimension);
-                    geo->distance_vector(*dat, p1, p2, un, dis);
+                    geo.distance_vector(*dat, p1, p2, un, dis);
 
                     //un = i-j
 
-                    dis = sqrt(dis);
+                    
 
-                    if (dis < iny.max_check)
+                    if (dis < SQR(mk))
                     {
-
+                        dis = sqrt(dis);
                         un /= dis;
                         double dx = un.gpcons(0);
                         double dy = un.gpcons(1);
@@ -5060,7 +5090,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
                 }
                 double dis;
                 vector1<double> un(dimension);
-                geo->distance_vector(*dat, p1, p2, un, dis);
+                geo.distance_vector(*dat, p1, p2, un, dis);
 
                 int potn = iny.which_potential(p1, p2, wp1, wp2);
 

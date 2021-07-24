@@ -89,15 +89,15 @@ int main(int argc, char **argv)
     else
     {
         //error("incorrect arg number");
-        runtime = 1000001;
-        packing_fraction = 0.0075;
+        runtime = 10001;
+        packing_fraction = 0.005;
         int1 = 12.0;
         int2 = 12.0;
-        int3 = 12.0;
+        int3 = 4.0;
         int4 = 60.0;
-        m5 = 1000;
-        m6 = 1000;
-        energy_barrier = 0.99;
+        m5 = 16000;
+        m6 = 16000;
+        energy_barrier = 0.001;
     }
 
     //cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -142,8 +142,7 @@ int main(int argc, char **argv)
     // 0.0,
     // 0.0);
 
-    "1082 den=0.005_i1=12._i2=12._i3=4._i4=60._m1=4000_m2=4000_rate=0.001/posden=0.005_int1=12_int2=12_int3=4_int4=60_br=0.001num_anti=4000num_inv=4000_i=00000.csv";
-
+    
     double unbinding_rebar = -20.0;
     double unbinding_rebar2 = 2.0;
 
@@ -432,10 +431,10 @@ int main(int argc, char **argv)
 
 
 
-    A.setup_tight_packing(1.8*size);
+    //A.setup_tight_packing(1.8*size);
 
-
-
+    
+    outfunc(A.obj->getdat(),"dat");
     A.setBindingModel(b);
 
     //cout << "set up 1" << endl;

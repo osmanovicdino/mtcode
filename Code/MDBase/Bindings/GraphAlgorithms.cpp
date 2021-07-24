@@ -26,6 +26,61 @@ void SingleHistogram(vector1<int> &indexes2, matrix<int> &boindices2, vector1<in
     }
 }
 
+void SingleHistogramParallel(vector1<int> indexes2, vector1<int> &ccs, matrix<int> &boiindices2) {
+    int n = indexes2.getsize();
+    // when the index of the group has been assigned, this function bins them
+
+    //matrix<int> boindices2(n,wid);
+
+    // if (((boiindices2.getnrows() != ccs.getsize())))
+    //     error("initial arrays must be same size in Single Histogram Parallel");
+
+    #pragma omp parallel for
+    for (int i = 0; i < n; ++i)
+    {
+        int wp1 = indexes2[i];
+        //mtx.lock();
+        //const std::lock_guard<std::mutex> lock(mtx);
+        //int iterator1 = ccs[wp1];
+        //boindices2(wp1, iterator1) = i;
+        #pragma omp atomic update 
+        ccs[wp1]++;
+        
+        // mtx.unlock();
+        //mtx.unlock();
+    }
+
+    int sl = maxval_parallel(ccs);
+    boiindices2.resize_parallel(n,sl);
+    vector1<int> count;//(n);
+    count.resize_parallel(n);
+
+    #pragma omp parallel for schedule(static)
+        for (int i = 0; i < n; ++i)
+        {
+            int wp1 = indexes2[i];
+            int ind; // = ccs[wp1];
+            //boindices2(wp1, ind) = i;
+
+            #pragma omp atomic capture
+            {
+                ind = count[wp1];
+                count[wp1]++;
+            }
+
+            boiindices2(wp1, ind) = i;
+        }
+
+    
+}
+
+matrix<int> SingleHistogramParallel(vector1<int> indexes2, vector1<int> &ccs) {
+    matrix<int> bo;
+    SingleHistogramParallel(indexes2,ccs,bo);
+    return bo;
+
+}
+
 matrix<int> SingleHistogram(vector1<int> &indexes2, vector1<int> &ccs)
 {
     int n = indexes2.getsize();
@@ -107,7 +162,7 @@ void PairHistogram(vector<T> &edgelist, matrix<int> &boindices, vector1<int> &te
     for (int i = 0; i < edgelist.size(); i++)
     {
         int wp1,wp2;
-        edgelist[i].get(wp1,wp2);
+        edgelist[i].get(wp1,wp2); //thread safe
 
         boindices(wp1, tempbound[wp1]) = wp2;
         boindices(wp2, tempbound[wp2]) = wp1;
@@ -198,11 +253,84 @@ void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<int> &boindices, m
     }
 
 
+}
 
-    // int mi =  maxindex(tempbound);
+void PairHistogramExtendedParallel(vector<mdpairwd> &edgelist, matrix<int> &boindices, matrix<double> &boscores, vector1<int> &tempbound)
+{
+    int val = boindices.getncols();
+    //bin an edgelist
+    //Boindices must be wide enough to store the histogram, this is the responsibility of the programmer.
+    int n = edgelist.size();
+    #pragma omp parallel for schedule(static)
+    for (int i = 0; i < n; i++)
+    {
+        int wp1, wp2;
+        double scr;
+        int ind1,ind2;
 
-    // cout << boindices.getrowvector(mi) << endl;
-    // pausel();
+        edgelist[i].gets(wp1, wp2, scr); //thread safe
+
+            #pragma omp atomic capture 
+            {
+            ind1 = tempbound[wp1];
+            tempbound[wp1]++;
+            }
+
+
+            #pragma omp atomic capture 
+            {
+            ind2 = tempbound[wp2];
+            tempbound[wp2]++;
+            }
+        //  mdpairwd m1(wp2, wp2, scr);
+        //  mdpairwd m2(wp1, wp1, scr);
+        if (ind1 < val && ind2 < val)
+        {
+            boindices(wp1, ind1) = wp2;
+            boindices(wp2, ind2) = wp1;
+            boscores(wp1, ind1) = scr;
+            boscores(wp2, ind2) = scr;
+        }
+        else
+        {
+            //     error("overboard");
+            cout << wp1 << " " << wp2 << endl;
+            cout << maxval(tempbound) << endl;
+
+            if (tempbound[wp1] == val)
+            {
+                for (int j = 0; j < edgelist.size(); j++)
+                {
+                    int wpt1, wpt2;
+                    double scrt;
+
+                    edgelist[j].gets(wpt1, wpt2, scrt);
+
+                    if (wpt1 == wp1 || wpt2 == wp1)
+                    {
+                        cout << wpt1 << " " << wpt2 << " " << scrt << endl;
+                    }
+                }
+            }
+            if (tempbound[wp2] == val)
+            {
+                for (int j = 0; j < edgelist.size(); j++)
+                {
+                    int wpt1, wpt2;
+                    double scrt;
+
+                    edgelist[j].gets(wpt1, wpt2, scrt);
+
+                    if (wpt1 == wp2 || wpt2 == wp2)
+                    {
+                        cout << wpt1 << " " << wpt2 << " " << scrt << endl;
+                    }
+                }
+            }
+            error("what happened");
+        }
+
+    }
 }
 
 void DFUtil(int i, vector1<bool> &visited, matrix<int> &adj, vector1<int> &lens)

@@ -1,15 +1,17 @@
-MD::MD()  {
+MD::MD() : geo(cube())
+{
 	//dat = new matrix<double>();
 	//cout << "abstract base class MD called" << endl;
 }
 
-MD::MD(const MD &old) {
+MD::MD(const MD &old) : geo(old.geo) {
 	// geometry *geotemp = (old.geo);
 	// //geo = &(old.geo);
 	//cout << "copy constructor MD called" << endl;
 	
-	geometry *geotemp = (old.geo)->clone();
-	geo = geotemp;
+	// cube *geotemp = (old.geo)->clone();
+	// geo = geotemp;
+
 	//cout << "yo" << endl;
 	//geo = old.geo;
 	//dat = new matrix<double>;
@@ -22,7 +24,7 @@ MD::MD(const MD &old) {
 
 	dimension = dat->getncols();
 
-	if (dimension != (*(this->geo)).dimension) error("copy constructor dimensions must match in MD");
+	if (dimension != geo.dimension) error("copy constructor dimensions must match in MD");
 }
 
 
@@ -31,9 +33,9 @@ MD::~MD() {
 	// delete geo;
 }
 
-void MD::setgeometry(geometry &a) {
-	geometry* q = a.clone();
-	geo = q;
+void MD::setgeometry(cube &a) {
+	//cube* q = a.clone();
+	geo = a;
 
 
 }
@@ -42,8 +44,8 @@ void MD::setdat(matrix<double> &a) {
 	matrix<double> *res =  a.clone();
 	dat = res;
 	dimension = dat->getncols();
-	if (dimension != (*(this->geo)).dimension) {
-		cout << dimension << " " << (*(this->geo)).dimension << endl;
+	if (dimension != (geo.dimension) ) {
+		cout << dimension << " " << geo.dimension << endl;
 		error("set dat dimensions must match in MD");
 	}
 }
@@ -71,8 +73,8 @@ matrix<double>& MD::getdat() {
 	return *(this->dat);
 }
 
-geometry& MD::getgeo() {
-	return *(this->geo);
+cube& MD::getgeo() {
+	return geo;
 }
 
 potential& MD::getints() {
@@ -80,11 +82,11 @@ potential& MD::getints() {
 }
 
 void MD::disvec(int &i1, int &i2, vector1<double> &un, double &dis) {
-	geo->distance_vector(*dat,i1,i2,un,dis);
+	geo.distance_vector(*dat,i1,i2,un,dis);
 }
 
 double MD::distance(const int &i,const int &j) {
-return (*this->geo).distance(*dat,i,j);
+return geo.distance(*dat,i,j);
 }
 
 // bool MD::distance_less_than(const int &i,const int &j, double R) {
@@ -142,7 +144,7 @@ return (*this->geo).distance(*dat,i,j);
 
 // 	for(int i = 0 ; i < this->getN() ; i++) {
 
-// 		int c = geo->assign_box((*dat)[i],dim,cubes_per_length);
+// 		int c = geo.assign_box((*dat)[i],dim,cubes_per_length);
 
 // 		b[c].push_back(i);
 // 	}
@@ -303,7 +305,7 @@ return (*this->geo).distance(*dat,i,j);
 
 // 	for(int i = 0 ; i < this->getN() ; i++) {
 
-// 		int c = geo->assign_box((*dat)[i],dim,cubes_per_length);
+// 		int c = geo.assign_box((*dat)[i],dim,cubes_per_length);
 
 // 		b[c].push_back(i);
 // 	}
@@ -559,16 +561,19 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 		for(int c2 = 0 ; c2 < ss ; c2++) {
 			int box1 = c1;
 			int box2 = boxlist(c1,c2);
+			int b1s = b[box1].size();
+			int b2s = b[box2].size();
+
 			if(box1==box2) {
-				for(int i = 0 ; i < b[box1].size() ; i++) {
-					for(int j = i+1 ;  j < b[box2].size() ; j++) {
+				for(int i = 0 ; i < b1s ; i++) {
+					for(int j = i+1 ;  j < b2s ; j++) {
 						int iterator1 = (b[box1])[i];
 						int iterator2 = (b[box2])[j];
 						//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
 							//int q = ints.get_potential_number(iterator1,iterator2,l);
 
 							//if(int_dl[q]) {
-						bool cond = geo->distance_less_than(*dat,iterator1,iterator2,cut_off);
+						bool cond = geo.distance_less_than(*dat,iterator1,iterator2,cut_off);
 						//bool cond =  distance_less_than(iterator1,iterator2,cut_off);
 		
 						if(cond) {
@@ -583,12 +588,12 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 				}
 			}
 			else if(box2>box1) {
-				for(int i = 0 ; i < b[box1].size() ; i++) {
-					for(int j = 0 ;  j < b[box2].size() ; j++) {
+				for(int i = 0 ; i < b1s ; i++) {
+					for(int j = 0 ;  j < b2s ; j++) {
 						int iterator1 = (b[box1])[i];
 						int iterator2 = (b[box2])[j];
 
-						bool cond = geo->distance_less_than(*dat,iterator1,iterator2,cut_off);
+						bool cond = geo.distance_less_than(*dat,iterator1,iterator2,cut_off);
 		
 						if(cond) {
 							//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
@@ -636,8 +641,10 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 	}
 
 	}
-	matrix<int> a(index1.size(),2);
+	matrix<int> a;//(index1.size(),2);
+	a.resize_parallel(index1.size(),2);
 	//s_matrix<int> pairs(index1.size(),3);
+	#pragma omp parallel for
 	for(int i = 0 ; i < (a).getNsafe() ; i++) {
 		(a)(i,0) = index1[i];
 		(a)(i,1) = index2[i];
@@ -646,8 +653,157 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 	
 	
 	return a;
-
 }
+
+matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& sizes, matrix<int> &boxlist, double cut_off)
+{
+
+	//estimate the total number
+
+	int ss = boxlist.getncols();
+	int totn = 0;
+	for (int c1 = 0; c1 < boxlist.getNsafe(); c1++)
+	{
+		for (int c2 = 0; c2 < ss; c2++)
+		{
+			int box1 = c1;
+			int box2 = boxlist(c1, c2);
+			if (box1 == box2)
+			{
+				totn += ((sizes.gpcons(box1)) * (sizes.gpcons(box1) - 1)) / 2;
+			}
+			else
+			{
+				totn += (sizes.gpcons(box1)) * (sizes.gpcons(box2));
+			}
+		}
+	}
+
+	//estimate the total number
+	vector<int> index1;
+	vector<int> index2;
+
+	index1.reserve(totn);
+	index2.reserve(totn);
+
+	//cout << "reserved: " << totn << endl;
+
+#pragma omp parallel
+	{
+		vector<int> index1_private;
+		vector<int> index2_private;
+
+		index1_private.reserve(totn);
+		index2_private.reserve(totn);
+//vector<int> index3_private;
+#pragma omp for nowait schedule(static)
+		for (int c1 = 0; c1 < boxlist.getNsafe(); c1++)
+			for (int c2 = 0; c2 < ss; c2++)
+			{
+				int box1 = c1;
+				int box2 = boxlist(c1, c2);
+				int b1s = sizes.gpcons(box1);//[box1];
+				int b2s = sizes.gpcons(box2);
+
+				if (box1 == box2)
+				{
+					for (int i = 0; i < b1s; i++)
+					{
+						for (int j = i + 1; j < b2s; j++)
+						{
+							int iterator1 = b.gpcons(box1,i);
+							int iterator2 = b.gpcons(box2, j);
+							//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
+							//int q = ints.get_potential_number(iterator1,iterator2,l);
+
+							//if(int_dl[q]) {
+							bool cond = geo.distance_less_than(*dat, iterator1, iterator2, cut_off);
+							//bool cond =  distance_less_than(iterator1,iterator2,cut_off);
+
+							if (cond)
+							{
+								//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
+								//int q = ints.get_potential_number(iterator1,iterator2,l);
+								index1_private.push_back(iterator1);
+								index2_private.push_back(iterator2);
+								//index3_private.push_back(0);
+								//}
+							}
+						}
+					}
+				}
+				else if (box2 > box1)
+				{
+					for (int i = 0; i < b1s; i++)
+					{
+						for (int j = 0; j < b2s; j++)
+						{
+							int iterator1 = b.gpcons(box1, i);
+							int iterator2 = b.gpcons(box2, j);
+
+							bool cond = geo.distance_less_than(*dat, iterator1, iterator2, cut_off);
+
+							if (cond)
+							{
+								//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
+								//int q = ints.get_potential_number(iterator1,iterator2,l);
+								index1_private.push_back(iterator1);
+								index2_private.push_back(iterator2);
+								//index3_private.push_back(0);
+								//	}
+							}
+							// for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
+							// 	int q = ints.get_potential_number(iterator1,iterator2,l);
+
+							// 	if(int_dl[q]) {
+							// 		bool cond =  distance_less_than(iterator1,iterator2,int_dis[q]);
+
+							// 		if(cond) {
+							// 			index1_private.push_back(iterator1);
+							// 			index2_private.push_back(iterator2);
+							// 			index3_private.push_back(l);
+							// 		}
+
+							// 	}
+							// 	else {
+							// 		index1_private.push_back(iterator1);
+							// 		index2_private.push_back(iterator2);
+							// 		index3_private.push_back(l);
+							// 	}
+							// }
+						}
+					}
+				}
+				else
+				{
+				}
+			}
+#pragma omp for schedule(static) ordered
+		for (int i = 0; i < omp_get_num_threads(); i++)
+		{
+#pragma omp ordered
+			index1.insert(index1.end(), index1_private.begin(), index1_private.end());
+		}
+#pragma omp for schedule(static) ordered
+		for (int i = 0; i < omp_get_num_threads(); i++)
+		{
+#pragma omp ordered
+			index2.insert(index2.end(), index2_private.begin(), index2_private.end());
+		}
+	}
+	matrix<int> a; //(index1.size(),2);
+	a.resize_parallel(index1.size(), 2);
+//s_matrix<int> pairs(index1.size(),3);
+	#pragma omp parallel for
+	for (int i = 0; i < (a).getNsafe(); i++)
+	{
+		(a)(i, 0) = index1[i];
+		(a)(i, 1) = index2[i];
+	}
+
+	return a;
+}
+
 
 matrix<int>* MD::calculatepairs(matrix<int> &boxlist, double cut_off) {
 	// vector<int> index1;
@@ -698,10 +854,11 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, double cut_off) {
 
 	for(int i = 0 ; i < this->getN() ; i++) {
 
-		int c = geo->assign_box((*dat),i,dim,cubes_per_length);
+		int c = geo.assign_box((*dat),i,dim,cubes_per_length);
 
 		b[c].push_back(i);
 	}
+
 
 
 
@@ -711,6 +868,77 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, double cut_off) {
 	return a;
 
 
+}
+
+matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, double cut_off)
+{
+	// vector<int> index1;
+	// vector<int> index2;
+	//#pragma omp parallel for
+	// int Ns = (*dat).getNsafe();
+	// int np = ints.number_of_potentials();
+	// //vector1<double> int_dis(np);
+	// vector1<double> int_dis(np);
+	// vector1<bool> int_dl(np);
+
+	// for(int i = 0 ; i < np ; i++) {
+	// 	int_dis[i] = 1.4*(ints.access_potential(i).interaction_distance);
+	// }
+
+	// for(int i = 0 ; i < np ; i++) {
+	// 	int_dl[i] = (ints.access_potential(i).dl);
+	// }
+
+	int total_cubes = boxlist.getNsafe();
+
+	double dims = (double)this->getdimension();
+
+	int cubes_per_length = (int)round(exp(log(total_cubes) / dims));
+
+	//vector<vector<int>> b;
+	int ressize = pow((int)ceil(cut_off), dimension);
+	// b.reserve(total_cubes);
+	// for (int j = 0; j < total_cubes; j++)
+	// {
+	// 	vector<int> temp;
+	// 	temp.reserve(ressize);
+	// 	b.push_back(temp);
+	// }
+	// //int dimension = this->getdimension();
+	// cout << ressize << endl;
+	// cout << total_cubes << endl;
+	// pausel();
+
+	vector1<int> ccs(total_cubes);
+	
+	matrix<int> b;
+
+	vector1<int> dim(dimension);
+	for (int i = 0; i < dimension; i++)
+	{
+		int ij = 1;
+		for (int j = 0; j < i; j++)
+		{
+			ij *= cubes_per_length;
+		}
+		dim[i] = ij;
+	}
+
+	int partn = this->getN();
+	vector1<int> indexes(partn);
+	#pragma omp parallel for
+	for (int i = 0; i < partn; i++)
+	{
+		int c = geo.assign_box((*dat), i, dim, cubes_per_length);
+		indexes[i] = c;
+	}
+
+	SingleHistogramParallel(indexes,ccs,b);
+
+	int ss = boxlist.getncols();
+	matrix<int> *a = new matrix<int>();
+	*a = precalculatepairs(b,ccs, boxlist, cut_off);
+	return a;
 }
 
 matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, double cut_off) { //p1 is a subset, which interacts with itself
@@ -762,7 +990,7 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, double c
 
 	for(int i = 0 ; i < p1.getsize() ; i++) {
 
-		int c = geo->assign_box((*dat),p1[i],dim,cubes_per_length);
+		int c = geo.assign_box((*dat),p1[i],dim,cubes_per_length);
 
 		b[c].push_back(p1[i]);
 	}
@@ -829,13 +1057,13 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, vector1<
 
 	for(int i = 0 ; i < p1.getsize() ; i++) {
 
-		int c = geo->assign_box((*dat),p1[i],dim,cubes_per_length);
+		int c = geo.assign_box((*dat),p1[i],dim,cubes_per_length);
 
 		b1[c].push_back(p1[i]);
 	}
 	for(int i = 0 ; i < p2.getsize() ; i++) {
 
-		int c = geo->assign_box((*dat),p2[i],dim,cubes_per_length);
+		int c = geo.assign_box((*dat),p2[i],dim,cubes_per_length);
 
 		b2[c].push_back(p2[i]);
 	}
@@ -863,7 +1091,7 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, vector1<
 						//int q = ints.get_potential_number(iterator1,iterator2,l);
 
 						//if(int_dl[q]) {
-					bool cond = geo->distance_less_than(*dat,iterator1,iterator2,cut_off);
+					bool cond = geo.distance_less_than(*dat,iterator1,iterator2,cut_off);
 					//bool cond =  distance_less_than(iterator1,iterator2,cut_off);
 	
 					if(cond) {
@@ -951,7 +1179,7 @@ matrix<int>* MD::calculatepairs_sorted(matrix<int> &boxlist, double cut_off) {
 
 	for(int i = 0 ; i < this->getN() ; i++) {
 
-		int c = geo->assign_box((*dat),i,dim,cubes_per_length);
+		int c = geo.assign_box((*dat),i,dim,cubes_per_length);
 
 		b[c].push_back(i);
 	}
@@ -981,7 +1209,7 @@ matrix<int>* MD::calculatepairs_sorted(matrix<int> &boxlist, double cut_off) {
 							//int q = ints.get_potential_number(iterator1,iterator2,l);
 
 							//if(int_dl[q]) {
-						bool cond = geo->distance_less_than(*dat,iterator1,iterator2,cut_off);
+						bool cond = geo.distance_less_than(*dat,iterator1,iterator2,cut_off);
 						//bool cond =  distance_less_than(iterator1,iterator2,cut_off);
 		
 						if(cond) {
@@ -1001,7 +1229,7 @@ matrix<int>* MD::calculatepairs_sorted(matrix<int> &boxlist, double cut_off) {
 						int iterator1 = (b[box1])[i];
 						int iterator2 = (b[box2])[j];
 
-						bool cond = geo->distance_less_than(*dat,iterator1,iterator2,cut_off);
+						bool cond = geo.distance_less_than(*dat,iterator1,iterator2,cut_off);
 		
 						if(cond) {
 							//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
@@ -1080,7 +1308,7 @@ matrix<double> MD::calculateforces(matrix<int> &pairs) {
 		double dis;
 		//vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
 		vector1<double> un(dimension);
-		geo->distance_vector(*dat,p1,p2,un,dis);
+		geo.distance_vector(*dat,p1,p2,un,dis);
 		double f1  = (*ints).force(sqrt(dis));
 
 		for(int j = 0 ; j < dimension ; j++) {
@@ -1112,7 +1340,7 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 		double dis;
 		//vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
 		vector1<double> un(dimension);
-		geo->distance_vector(*dat,p1,p2,un,dis);
+		geo.distance_vector(*dat,p1,p2,un,dis);
 
 		//un = i-j
 
@@ -1120,7 +1348,7 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 		double f1  = iny.force(sqrt(dis));
 
 
-		
+	/* 	
 		if(abs(f1) > 1.E4) {
 			cout << p1 << " " << p2 << endl;
 			cout << f1 << " " << dis << endl;
@@ -1157,7 +1385,7 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 			cout << scalar(dim,pri2) << endl;
 			
 			pausel();
-		}
+		} */
 		
 
 		for(int j = 0 ; j < dimension ; ++j) {
@@ -1191,7 +1419,7 @@ matrix<double> MD::calculateforces_sp(matrix<int> &pairs, potential &iny, matrix
 		double dis;
 		//vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
 		vector1<double> un(dimension);
-		geo->distance_vector(*dat, p1, p2, un, dis);
+		geo.distance_vector(*dat, p1, p2, un, dis);
 
 		//un = i-j
 		iny.setparameters(sp(p1,p2));
@@ -1226,7 +1454,7 @@ matrix<double> MD::calculateforceslist(matrix<int> &pairs,potential &iny) {
 		double dis;
 		//vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
 		vector1<double> un(dimension);
-		geo->distance_vector(*dat,p1,p2,un,dis);
+		geo.distance_vector(*dat,p1,p2,un,dis);
 
 		//un = i-j
 
@@ -1267,8 +1495,8 @@ matrix<double> MD::calculateforces_threebody(matrix<int> &triplets,potential3 &i
 		double dis1,dis2;
 		//vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
 		vector1<double> un1(dimension),un2(dimension);
-		geo->distance_vector(*dat,p2,p1,un1,dis1);
-		geo->distance_vector(*dat,p3,p2,un2,dis2);
+		geo.distance_vector(*dat,p2,p1,un1,dis1);
+		geo.distance_vector(*dat,p3,p2,un2,dis2);
 
 		vector1<double> f1(dimension);
 		vector1<double> f2(dimension);
@@ -1323,12 +1551,12 @@ matrix<double> MD::calculateforces_fast3D(matrix<int> &pairs) {
 		vector1<double> un(dimension);
 		//int p1 = pairs.mat[i*2+0];
 		//int p2 = pairs.mat[i*2+1];
-		//geo->distance_vector(*dat,p1,p2,un,dis);
+		//geo.distance_vector(*dat,p1,p2,un,dis);
 
 		int p1= pairs.mat[i*2+0]*dimension;
 		int p2 =pairs.mat[i*2+1]*dimension;
 
-		geo->distance3v((*dat).mat[p1+0],(*dat).mat[p2+0],(*dat).mat[p1+1],(*dat).mat[p2+1],(*dat).mat[p1+2],(*dat).mat[p2+2],un,dis);
+		geo.distance3v((*dat).mat[p1+0],(*dat).mat[p2+0],(*dat).mat[p1+1],(*dat).mat[p2+1],(*dat).mat[p1+2],(*dat).mat[p2+2],un,dis);
 
 		double f1  = (*ints).force2mdx(dis);
 
@@ -1362,12 +1590,12 @@ matrix<double> MD::calculatestress(matrix<int> &pairs) {
 		vector1<double> un(dimension);
 		//int p1 = pairs.mat[i*2+0];
 		//int p2 = pairs.mat[i*2+1];
-		//geo->distance_vector(*dat,p1,p2,un,dis);
+		//geo.distance_vector(*dat,p1,p2,un,dis);
 
 		int p1= pairs.mat[i*2+0]*dimension;
 		int p2 =pairs.mat[i*2+1]*dimension;
 
-		geo->distance3v((*dat).mat[p1+0],(*dat).mat[p2+0],(*dat).mat[p1+1],(*dat).mat[p2+1],(*dat).mat[p1+2],(*dat).mat[p2+2],un,dis);
+		geo.distance3v((*dat).mat[p1+0],(*dat).mat[p2+0],(*dat).mat[p1+1],(*dat).mat[p2+1],(*dat).mat[p1+2],(*dat).mat[p2+2],un,dis);
 
 		double f1  = (*ints).force2mdx(dis);
 
@@ -1406,12 +1634,12 @@ matrix<double> MD::calculateforces_truncated(matrix<int> &pairs, double above) {
 		vector1<double> un(dimension);
 		//int p1 = pairs.mat[i*2+0];
 		//int p2 = pairs.mat[i*2+1];
-		//geo->distance_vector(*dat,p1,p2,un,dis);
+		//geo.distance_vector(*dat,p1,p2,un,dis);
 
 		int p1= pairs.mat[i*2+0]*dimension;
 		int p2 =pairs.mat[i*2+1]*dimension;
 
-		geo->distance3v((*dat).mat[p1+0],(*dat).mat[p2+0],(*dat).mat[p1+1],(*dat).mat[p2+1],(*dat).mat[p1+2],(*dat).mat[p2+2],un,dis);
+		geo.distance3v((*dat).mat[p1+0],(*dat).mat[p2+0],(*dat).mat[p1+1],(*dat).mat[p2+1],(*dat).mat[p1+2],(*dat).mat[p2+2],un,dis);
 
 		double f1  = (*ints).force2mdx(dis);
 		if(dis < above) f1 = 0;
@@ -1503,7 +1731,7 @@ matrix<double> MD::calculateforces_external(Q &func)
 		vector1<double> un = (*dat).getrowvector(i);
 		//int p1 = pairs.mat[i*2+0];
 		//int p2 = pairs.mat[i*2+1];
-		//geo->distance_vector(*dat,p1,p2,un,dis);
+		//geo.distance_vector(*dat,p1,p2,un,dis);
 
 		// int p1 = pairs.mat[i * 2 + 0] * dimension;
 		// int p2 = pairs.mat[i * 2 + 1] * dimension;
@@ -1512,7 +1740,7 @@ matrix<double> MD::calculateforces_external(Q &func)
 		vector1<double> f =  func(un);
 		// cout << f << endl;
 		// pausel();
-		// geo->distance3v((*dat).mat[p1 + 0], (*dat).mat[p2 + 0], (*dat).mat[p1 + 1], (*dat).mat[p2 + 1], (*dat).mat[p1 + 2], (*dat).mat[p2 + 2], un, dis);
+		// geo.distance3v((*dat).mat[p1 + 0], (*dat).mat[p2 + 0], (*dat).mat[p1 + 1], (*dat).mat[p2 + 1], (*dat).mat[p1 + 2], (*dat).mat[p2 + 2], un, dis);
 
 		//double f1 = (*ints).force2mdx(dis);
 

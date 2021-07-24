@@ -26,7 +26,7 @@ LangevinNVT::LangevinNVT() {
 	c5 = (1 - (d));
 }
 
-LangevinNVT::LangevinNVT(geometry &a)  {
+LangevinNVT::LangevinNVT(cube &a)  {
 	//cout << "geo NVT constructor called" << endl;
 	gamma = 1.0;
 	dt = 1.0;
@@ -144,9 +144,10 @@ vector1<double> LangevinNVT::avmom() {
 
 void LangevinNVT::advance_pos() { 
 	int ds = this->getdimension();
+	int N = (*dat).getNsafe();
 	//int locald = this->getdimension();
 	#pragma omp parallel for schedule(dynamic)
-	for(int i = 0 ; i < (*dat).getNsafe() ;  i++ ) {
+	for(int i = 0 ; i < N ;  i++ ) {
 	for(int i1 = 0 ; i1 < ds ; i1++ ) {
 	(*dat)(i,i1) = (*dat)(i,i1)+ c1*(*mom)(i,i1);
 	//temp1->operator[](i1) = temp1->operator[](i1) + c1*(temp2->operator[](i1));
@@ -154,7 +155,7 @@ void LangevinNVT::advance_pos() {
 	
 	
 	}
-	(*this->geo).correct_position_and_momentum(*dat,*mom);
+	geo.correct_position_and_momentum(*dat,*mom);
 
 }
 
@@ -266,7 +267,7 @@ void LangevinNVT::initialize(matrix<int> &pairs) {
 	}
 	
 	}
-	(*this->geo).correct_position_and_momentum((*dat),(*mom));	
+	geo.correct_position_and_momentum((*dat),(*mom));	
 }
 
 bool fileExists(const std::string& filename)

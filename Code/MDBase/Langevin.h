@@ -22,7 +22,7 @@ protected:
 	double c5;// = (1-(d));	
 public:
 	LangevinNVT();
-	LangevinNVT(geometry &a); //define a Langevin system with a given geometry
+	LangevinNVT(cube &a); //define a Langevin system with a given geometry
 	virtual void setgamma(double); //set the damping factor
 	virtual void setdt(double); //set the timestep
 	virtual void setkT(double); //set the temperature

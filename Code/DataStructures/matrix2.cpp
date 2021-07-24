@@ -137,8 +137,29 @@ void matrix<T>::resize(int i, int j) {
 }
 
 template <class T>
+void matrix<T>::resize_parallel(int i, int j)
+{
+    delete[] mat;
+    nrows = i;
+    ncols = j;
+    datapoints = nrows * ncols;
+    mat = new T[datapoints];
+    #pragma omp parallel for
+    for (int i = 0; i < datapoints; i++)
+        mat[i] = T(0);
+}
+
+template <class T>
 void matrix<T>::reset(T a)
 {
+    for (int i = 0; i < datapoints; i++)
+        mat[i] = a;
+}
+
+template <class T>
+void matrix<T>::reset_parallel(T a)
+{
+    #pragma omp parallel for
     for (int i = 0; i < datapoints; i++)
         mat[i] = a;
 }
@@ -448,6 +469,44 @@ void matrix<T>::maxima(T &a) {
                 a = mat[i];
                 }
     }
+}
+
+
+
+template <class T>
+void matrix<T>::maxima_parallel(T &a)
+{
+
+
+    int num_threads = omp_get_max_threads();
+    vector1<T> my_mins(num_threads);
+
+    #pragma omp parallel
+    {
+        int id;
+        int i, n, start, stop;
+        T my_min =  mat[0];
+        id = omp_get_thread_num();
+
+        #pragma omp for 
+        for (i = 0; i < datapoints; i++)
+        {
+
+            if (mat[i] > my_min)
+                my_min = mat[i];
+        }
+
+        my_mins[id] = my_min; // Store result in min[id]
+    }
+
+    T f_my_min;
+    f_my_min = my_mins[0];
+
+    for (int i = 1; i < num_threads; i++)
+        if (my_mins[i] > f_my_min)
+            f_my_min = my_mins[i];
+
+    a = f_my_min;
 }
 
 template <class T>
@@ -1607,11 +1666,14 @@ void generate_uniform_random_matrix(matrix<double> &ra) {
     //gemerate a uniform random matrix of mean 0 and variance 1,
     int nr = ra.nrows;
     int nc = ra.ncols;
-
-    for(int i = 0 ; i < nr ; i++) {
-        for(int j = 0 ; j < nc ; j++) {
-            ra.mat[i*nc+j] = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        }
+    int dp = nr * nc;
+    // for(int i = 0 ; i < nr ; i++) {
+    //     for(int j = 0 ; j < nc ; j++) {
+    //         ra.mat[i*nc+j] = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+    //     }
+    // }
+    for(int i = 0 ; i < dp ; i++ ) {
+        ra.mat[i] = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
     }
 }
 

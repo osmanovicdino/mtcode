@@ -21,7 +21,7 @@ LangevinNVTR::LangevinNVTR() : LangevinNVT(), im(vector1<double>(1))
     *orient = res;
 }
 
-LangevinNVTR::LangevinNVTR(geometry &a) : LangevinNVT(a), im(vector1<double>(a.dimension*a.dimension))
+LangevinNVTR::LangevinNVTR(cube &a) : LangevinNVT(a), im(vector1<double>(a.dimension*a.dimension))
 {
     //cout << "geo NVTR constructor called" << endl;
     //gammar = 1.0;
@@ -467,7 +467,7 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
 
 void LangevinNVTR::rotate() {
     // updates the matrices q and qt;
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for schedule(static)
     for(int i = 0  ; i < (angmom)->getNsafe() ; i++) {
         vector1<double> rr = genfullmat(i);
 
@@ -571,7 +571,7 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
         double dis;
         //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
         vector1<double> un(dimension);
-        geo->distance_vector(*dat, p1, p2, un, dis);
+        geo.distance_vector(*dat, p1, p2, un, dis);
 
         //un = i-j
         dis = sqrt(dis);
@@ -621,7 +621,7 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
             double dis;
             //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
             vector1<double> un(dimension);
-            geo->distance_vector(*dat, p1, p2, un, dis);
+            geo.distance_vector(*dat, p1, p2, un, dis);
 
             //un = i-j
             dis = sqrt(dis);
@@ -675,7 +675,7 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
             double dis;
             //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
             vector1<double> un(dimension);
-            geo->distance_vector(*dat, p1, p2, un, dis);
+            geo.distance_vector(*dat, p1, p2, un, dis);
 
             //un = i-j
             dis = sqrt(dis);
@@ -777,7 +777,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ve
             double dis;
             //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
             vector1<double> un(dimension);
-            geo->distance_vector(*dat, p1, p2, un, dis);
+            geo.distance_vector(*dat, p1, p2, un, dis);
 
             //un = i-j
             dis = sqrt(dis);
@@ -1037,7 +1037,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ve
                     double dis;
                     //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
                     vector1<double> un(dimension);
-                    geo->distance_vector(*dat, p1, p2, un, dis);
+                    geo.distance_vector(*dat, p1, p2, un, dis);
 
                     //un = i-j
 
@@ -1109,7 +1109,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ve
     //             double dis;
     //             //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
     //             vector1<double> un(dimension);
-    //             geo->distance_vector(*dat, p1, p2, un, dis);
+    //             geo.distance_vector(*dat, p1, p2, un, dis);
 
     //             //un = i-j
 
@@ -1167,7 +1167,7 @@ vector<thetapair> LangevinNVTR::check_arg_thetas_per_pair(matrix<int> &pairs, Co
             double dis;
             //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
             vector1<double> un(dimension);
-            geo->distance_vector(*dat, p1, p2, un, dis);
+            geo.distance_vector(*dat, p1, p2, un, dis);
 
             //un = i-j
 
@@ -1303,7 +1303,7 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
             double dis;
             //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
             vector1<double> un(dimension);
-            geo->distance_vector(*dat, p1, p2, un, dis);
+            geo.distance_vector(*dat, p1, p2, un, dis);
 
             //un = i-j
             
@@ -1413,6 +1413,7 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
             edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
         }
     }
+
 
 
 

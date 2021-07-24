@@ -14,13 +14,14 @@
 #include "geometry.h"
 #include "./Potentials/potential.h"
 #include "./Potentials/potential3.h"
+#include "./Bindings/GraphAlgorithms.h"
 
 //#include "vec_vec.h"
 
 class MD { //virtual base class of all calculations 3 D
 protected:
 
-geometry *geo; //specify the geometry of the system
+cube geo; //specify the geometry of the system
 
 matrix<double> *dat; //specifies the positions of all the particles this is the baseline of all molecular dynamics
 
@@ -38,14 +39,14 @@ MD(const MD&);
 void setdat(matrix<double>&);
 
 void setinteractions(potential&);
-void setgeometry(geometry&);
+void setgeometry(cube&);
 
 double getcoordinate(int,int);
 
 int getN(); // get the number of particles
 int getdimension();
 matrix<double>& getdat();
-geometry& getgeo();
+cube& getgeo();
 potential& getints();
 void disvec(int &p1,int&p2,vector1<double>&uv,double&);
 
@@ -64,9 +65,13 @@ double distance(const int&,const int&); //the distance between particles i and j
 // double distance(int&, int&); //the distance between particles i and j; 
 // bool distance_less_than(const int&,const int&, double);
 matrix<int> precalculatepairs(vector<vector<int> > &, matrix<int>&, double);
+
+matrix<int> precalculatepairs(const matrix<int>&, const vector1<int>&, matrix<int> &, double);
 //matrix<int> GPUprecalculatepairs(vector<vector<int> > &, matrix<int>&, double)
 
 matrix<int>* calculatepairs(matrix<int>&,double); //calculate the pairs over which forces exist
+
+matrix<int> *calculatepairs_parallel(matrix<int> &, double); //calculate the pairs over which forces exist
 
 matrix<int>* calculatepairs(matrix<int>&,vector1<int>&,double); //calculate the pairs over which forces exist, int are the indices of the partial lists 
 

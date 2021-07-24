@@ -40,7 +40,9 @@ struct geometry {
 	virtual geometry* clone() const = 0;
 };
 
-struct cube : geometry {
+struct cube  {
+	int dimension;
+	
 	double l;
 
 	vector1<bool> pb;
@@ -54,6 +56,34 @@ struct cube : geometry {
 		l2s = SQR(ll/2.);
 		if(pbb.getsize() != dim) error("warning: specification of boundary conditions must be the same dimension as the system");
 	
+	}
+
+	cube() : pb(vector1<bool>(1,true)) {
+		dimension = 1;
+		l = 1.;
+		periodic = true;
+		l2s =  1.;
+	}
+
+	cube(const cube &c) : pb(c.pb) {
+		dimension = c.dimension;
+		periodic = c.periodic;
+		l2s = c.l2s;
+		l = c.l;
+	}
+
+	cube& operator=(const cube &c) {
+		pb = c.pb;
+		dimension = c.dimension;
+		periodic = c.periodic;
+		l2s = c.l2s;
+		l = c.l;
+
+		return *this;
+	}
+
+	~cube() {
+		//everything is dellocated automatically
 	}
 
 	double distance(const vector1<double> &x1,const vector1<double> &x2) {
@@ -244,11 +274,12 @@ struct cube : geometry {
 		//return dx;	
 	}	
 
-	void distance_vector(matrix<double> &r, int &i, int &j, vector1<double> &uv, double &d) { //returns the square distance to d and the distance between to uv
+	void distance_vector(const matrix<double> &r, const int &i, const int &j, vector1<double> &uv, double &d) { //returns the square distance to d and the distance between to uv
 		//vector1<double> dx(dimension);
 		double temp = 0.0;
 		for(int i1  = 0; i1 < dimension ; i1++ ) {
-			double as = r.mat[i*dimension+i1]-r.mat[j*dimension+i1];
+			//double as = r.mat[i*dimension+i1]-r.mat[j*dimension+i1];
+			double as = r.gpcons(i,i1) - r.gpcons(j,i1);
 			if(periodic) { if(SQR(as) > l2s ) 
 				as = as - SIGN(l,as); }
 			temp += SQR(as);
@@ -260,7 +291,31 @@ struct cube : geometry {
 		// 	dx[i1]=d2*dx[i1];
 		// }
 		//return dx;	
-	}	
+	}
+
+	void distance_vector(matrix<double> *r, const int &i, const int &j, vector1<double> &uv, double &d)
+	{ //returns the square distance to d and the distance between to uv
+		//vector1<double> dx(dimension);
+		double temp = 0.0;
+		for (int i1 = 0; i1 < dimension; i1++)
+		{
+			//double as = r.mat[i*dimension+i1]-r.mat[j*dimension+i1];
+			double as = r->gpcons(i, i1) - r->gpcons(j, i1);
+			if (periodic)
+			{
+				if (SQR(as) > l2s)
+					as = as - SIGN(l, as);
+			}
+			temp += SQR(as);
+			uv[i1] = as;
+		}
+		d = temp;
+		//uv*=(1./d);
+		// for(int i1 = 0 ; i1 < dimension ; i1++) {
+		// 	dx[i1]=d2*dx[i1];
+		// }
+		//return dx;
+	}
 
 	void distance_vector(vector1<double> &r1, vector1<double> &r2, vector1<double> &uv, double &d) { //returns the square distance to d and the distance between to uv
 		//vector1<double> dx(dimension);

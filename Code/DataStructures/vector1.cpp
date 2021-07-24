@@ -255,6 +255,28 @@ void vector1<T>::resize(int n) { /*resize vector whilst destroying all data*/
 }
 
 template <class T>
+void vector1<T>::resize_parallel(int n)
+{                    /*resize vector whilst destroying all data*/
+    size = n;        //set new size
+    delete[] data;   // delete data
+    data = new T[n]; // initialize new data
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++)
+        data[i] = 0.0; //data is destroyed
+}
+
+template <class T>
+void vector1<T>::resize_parallel_ascending(int n)
+{                    /*resize vector whilst destroying all data*/
+    size = n;        //set new size
+    delete[] data;   // delete data
+    data = new T[n]; // initialize new data
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++)
+        data[i] = T(i); //data is destroyed
+}
+
+template <class T>
 vector1<T> operator-(const vector1<T> &v){ //unaray minus operator
 int n = v.size;
 vector1<T> u(n);
@@ -400,6 +422,42 @@ T maxval(const vector1<T> &a) {
         }
     }
     return max;
+}
+
+template <class T>
+T maxval_parallel(const vector1<T> &a)
+{
+
+    int num_threads = omp_get_max_threads();
+    vector1<T> my_mins(num_threads);
+    T b;
+    #pragma omp parallel
+    {
+        int id;
+        int i, n, start, stop;
+        T my_min = a.data[0];
+        id = omp_get_thread_num();
+
+        #pragma omp for
+        for (i = 0; i < a.size; i++)
+        {
+
+            if (a.data[i] > my_min)
+                my_min = a.data[i];
+        }
+
+        my_mins[id] = my_min; // Store result in min[id]
+    }
+
+    T f_my_min;
+    f_my_min = my_mins[0];
+
+    for (int i = 1; i < num_threads; i++)
+        if (my_mins[i] > f_my_min)
+            f_my_min = my_mins[i];
+
+    b = f_my_min;
+    return b;
 }
 
 template <class T>

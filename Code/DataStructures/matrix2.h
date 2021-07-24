@@ -52,9 +52,9 @@ public:
         inline T& operator()(int) const;
 	inline vector1<T> operator()(int,char); //return the int row (char = 'r' ) or column (char = 'c')
 	inline T& operator()(int,int); // return the int,int element
-    inline T& gpcons(int,int) const;
-    inline vector1<T> getrowvector(const int&);
-    inline T& periodicselect(int,int); //periodic select along one axis
+        inline T& gpcons(int,int) const;
+        inline vector1<T> getrowvector(const int&);
+        inline T& periodicselect(int,int); //periodic select along one axis
         
         matrix& operator+() { return *this; } //unary plus
 
@@ -79,8 +79,10 @@ int getNsafe() {return nrows; }
 int getncols() { return ncols; }
 int getncols() const { return ncols; }
 void resize(int,int); //resize matrix to int,int
+void resize_parallel(int,int);
 
 void reset(T);
+void reset_parallel(T);
 
    // void removeoverlaps(int attempts) //remove overlaps greater than size d in the data
     
@@ -104,7 +106,8 @@ void reset(T);
         T rtrap(T dr, T dz);
         void minima(T&);
         void maxima(T&);
-	void minima(int&,int&);        
+        void maxima_parallel(T &);
+        void minima(int&,int&);        
 	void maxima(int&,int&);
         void trisolscol(vector1<T>&,vector1<T>&,vector1<T>,vector1<T>&,int);
         void trisolsrow(vector1<T>&,vector1<T>&,vector1<T>,vector1<T>&,int);

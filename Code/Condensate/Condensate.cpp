@@ -251,7 +251,7 @@ void Condensate::run(int runtime, int every, string strbase = "")
 
         F = obj->calculateforces(*pairs, wsa);
         
-        T.reset(0.0);
+        T.reset_parallel(0.0);
 
         obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
 
@@ -350,10 +350,10 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
 
 
-    matrix<int> *pairs = obj->calculatepairs(boxes, 3.*size_mol);
+    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 3.*size_mol);
 
+   // matrix<int> *pairs2 = obj->calculatepairs_parallel(boxes, 3. * size_mol);
 
-    
 
 
     WCAPotential wsa(3.0, size_mol, 0.0);
@@ -403,7 +403,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
         {
            // cout << "pairs recalculated" << endl;
             delete pairs;
-            pairs = obj->calculatepairs(boxes, 3.5);
+            pairs = obj->calculatepairs_parallel(boxes, 3.5);
         }
         if(i > 0 && i %10 ==0 ){
             opairs = obj->calculate_patch_list(*pairs, *pots);
@@ -422,7 +422,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
         F = obj->calculateforces(*pairs, wsa);
 
-        T.reset(0.0);
+        T.reset_parallel(0.0);
 
         obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs, *bm, F, T);
 
@@ -579,7 +579,7 @@ void Condensate::run_singlebond_eq(int runtime, int every, string strbase = "")
 
         F = obj->calculateforces(*pairs, wsa);
 
-        T.reset(0.0);
+        T.reset_parallel(0.0);
 
         obj->calculate_forces_and_torques3D_onlyone_nonlets_eq(opairs, runs_diff, *pots, bbs, *bm, F, T);
 
@@ -808,7 +808,7 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
         F += obj->calculateforces(*pairsp2, wsa3);
         F += obj->calculateforces(*pairsp1p2, wsa2);
 
-        T.reset(0.0);
+        T.reset_parallel(0.0);
 
         obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff,  *pots, bbs, *bm, F, T);
         generate_uniform_random_matrix(RT);
@@ -1049,7 +1049,7 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
         F += obj->calculateforces(*pairsp2, wsa3);
         F += obj->calculateforces(*pairsp1p2, wsa2);
 
-        T.reset(0.0);
+        T.reset_parallel(0.0);
 
         obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs, *bm, F, T);
         generate_uniform_random_matrix(RT);
@@ -1291,7 +1291,7 @@ void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, 
         F += obj->calculateforces(*pairsp2, wsa3);
         F += obj->calculateforces(*pairsp1p2, wsa2);
 
-        T.reset(0.0);
+        T.reset_parallel(0.0);
         
         obj->calculate_forces_and_torques3D_onlyone_nonlets(pairs, *pots, bbs, *bm, F, T);
         //obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs,runs_diff, *pots, bbs3, *bm, F, T);

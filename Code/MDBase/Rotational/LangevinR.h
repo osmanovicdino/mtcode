@@ -82,7 +82,7 @@ protected:
 	// double c5;// = (1-(d));	
 public:
 	LangevinNVTR();
-	LangevinNVTR(geometry &a); //define a Langevin system with a given geometry
+	LangevinNVTR(cube &a); //define a Langevin system with a given geometry
 
 	void initialize(matrix<double> &);
 	void initialize(matrix<double> &, matrix<double> &, matrix<double> &, matrix<double> & );
@@ -122,9 +122,9 @@ public:
 		matrix<double> *res = ort.clone();
 		orient = res;
 		int jdimension = orient->getncols();
-		if (jdimension != 3*(*(this->geo)).dimension)
+		if (jdimension != 3*(geo.dimension) )
 		{
-			cout << dimension << " " << (*(this->geo)).dimension << endl;
+			cout << dimension << " " << geo.dimension << endl;
 			error("set orient dimensions must match in MD");
 		}
 	}
