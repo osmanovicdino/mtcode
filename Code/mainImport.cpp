@@ -64,7 +64,9 @@ int main(int argc, char** argv) {
     int m6;
     int runtime;
     double energy_barrier;
-    if (argc == 10)
+    double anti_en;
+    double inv_en;
+    if (argc == 12)
     {
         runtime = atof(argv[1]);
         packing_fraction = atof(argv[2]);
@@ -75,19 +77,23 @@ int main(int argc, char** argv) {
         m5 = atof(argv[7]);
         m6 = atof(argv[8]);
         energy_barrier = atof(argv[9]);
+        anti_en = atof(argv[10]);
+        inv_en = atof(argv[11]);
     }
     else
     {
         //error("incorrect arg number");
-        runtime = 1000001;
-        packing_fraction = 0.0075;
+        runtime = 10001;
+        packing_fraction = 0.005;
         int1 = 12.0;
         int2 = 12.0;
-        int3 = 12.0;
+        int3 = 4.0;
         int4 = 60.0;
-        m5 = 1000;
-        m6 = 1000;
-        energy_barrier = 0.99;
+        m5 = 16000;
+        m6 = 16000;
+        energy_barrier = 0.001;
+        anti_en = -20.;
+        inv_en = 2.0;
     }
 
     //cout << packing_fraction << " " << int1 << " " << int2 << "  " << int3 << endl;
@@ -127,8 +133,8 @@ int main(int argc, char** argv) {
     // 0.0,
     // 0.0);
 
-    double unbinding_rebar = -20.0;
-    double unbinding_rebar2 = 2.0;
+    double unbinding_rebar = anti_en;
+    double unbinding_rebar2 = inv_en;
 
     b.setup_energy_barrier(0.99999, 0.99999, energy_barrier, 0.99999, energy_barrier, 0.99999,
                            0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
@@ -407,8 +413,9 @@ int main(int argc, char** argv) {
 
     Condensate A(l, n);
 
-    //A.setup_tight_packing(1.8 * size);
+    //A.setup_tight_packing(1.8*size);
 
+    //outfunc(A.obj->getdat(),"dat");
     A.setBindingModel(b);
 
     //cout << "set up 1" << endl;
@@ -428,7 +435,7 @@ int main(int argc, char** argv) {
     // cout << endl;
     // }
 
-    A.setviscosity(0.1);
+    A.setviscosity(1.0);
 
     double beta = 1.0;
 
@@ -474,6 +481,16 @@ int main(int argc, char** argv) {
     stringstream ss5;
     ss5 << m6;
     base += ss5.str();
+
+    base += "_ae=";
+    stringstream ss6;
+    ss6 << anti_en;
+    base += ss6.str();
+
+    base += "_ie=";
+    stringstream ss7;
+    ss7 << inv_en;
+    base += ss7.str();
 
     // cout << "done" << endl;
     //Do processing to make sure everything is fine here
