@@ -43,7 +43,7 @@ else
    echo "did not read file correctly"
    exit 1
 fi
-dirwemake=strdir
+dirwemake=$strdir
 cp ~/Chemistry/Code/mainanalyze.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 # g++ ~/Chemistry/Code/mainanalyze.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron_analyze
 cp ~/Chemistry/Code/angron_analyze /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron_analyze
