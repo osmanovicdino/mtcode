@@ -276,7 +276,8 @@ stringstream ii4;
 ii4 << num_arms;
 base += ii4.str();
 
-string mydir = "/u/scratch/d/dinoo/GrowthRun2/";
+string mydir = "/u/scratch/d/dinoo/GrowthRun1/";
+//string mydir = "/home/dino/External/GrowthRun1/";
 //mydir += base;//den=0.001_d=1._e=12._a=0.9272952180016123_arms=3";
 //cout << "all good" << endl;
 
@@ -286,6 +287,7 @@ string mydir2 = string(argv[6]);
 
 mydir += mydir2;
 matrix<int> growcurve= getgrowthcurve(mydir, c4, 5);
+
 
 
 string gc = "/growth";

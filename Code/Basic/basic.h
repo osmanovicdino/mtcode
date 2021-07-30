@@ -708,6 +708,8 @@ else
     return EXIT_FAILURE;
 }
 
+sort(files.begin(), files.end());
+
 return 0;
 
 }
@@ -735,6 +737,8 @@ int return_csv_in_dir(string directory, string match, vector<string> &files)
         perror("opendir");
         return EXIT_FAILURE;
     }
+
+    sort(files.begin(),files.end());
 
     return 0;
 }

@@ -22,7 +22,7 @@ matrix<int> getgrowthcurve(string dir, ComboPatch &iny, int N_Largest)
 
     //for each file analyze the structure
     for(int filen = 0 ; filen < n ; filen++) {
-        cout << filen << endl;
+       
         int TT;
         bool vv3;
         matrix<int> bindtemp = importcsv(dir + "/" + bindfiles[filen], TT, vv3); //import my file
@@ -64,7 +64,9 @@ matrix<int> getgrowthcurve(string dir, ComboPatch &iny, int N_Largest)
         }
 
         string sg = "a";
-        
+        cout << bindfiles[filen] << endl;
+        cout << filen << " " << edgelist.size() << endl;
+        cout << endl;
         //std::vector<mdpair> jhg(total_number_of_patches);
 
         
