@@ -435,7 +435,7 @@ int main(int argc, char** argv) {
     // cout << endl;
     // }
 
-    A.setviscosity(1.0);
+    A.setviscosity(0.1);
 
     double beta = 1.0;
 
