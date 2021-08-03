@@ -30,9 +30,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     {
     vector<mdpair> edgelist_private;
     edgelist_private.reserve(total_number_of_patches);
-
+    int tp = pairs.getNsafe();
     #pragma omp for nowait schedule(static)
-    for (i = 0; i < pairs.getNsafe(); ++i)
+    for (i = 0; i < tp; ++i)
     {
         int p1 = pairs(i, 0);
         int p2 = pairs(i, 1);
@@ -1244,6 +1244,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
        // int total_checks =0;        
 
         unsigned int i;
+        int tp = pairs.getNsafe();
 
         double mk = SQR(iny.max_check);
         #pragma omp parallel
@@ -1252,7 +1253,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             edgelist_private.reserve(total_number_of_patches);
 
             #pragma omp for nowait schedule(static)
-            for (i = 0; i < pairs.getNsafe(); ++i)
+            for (i = 0; i < tp; ++i)
             {
                 int p1 = pairs(i, 0);
                 int p2 = pairs(i, 1);
@@ -2749,9 +2750,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //         cout << tb2 << endl;
         //         cout << tb << endl;
         //         pausel(); */
-
+                int myn  = mypairs.size();
                 #pragma omp parallel for
-                for (int i = 0; i < mypairs.size(); i++)
+                for (int i = 0; i < myn; i++)
                 {
                     int p1;
                     int p2;
@@ -5096,8 +5097,9 @@ for (int i = 0; i < total_number_of_patches; ++i)
             }
 
 
+            int myn  = mypairs.size();
             #pragma omp parallel for
-            for (int i = 0; i < mypairs.size(); i++)
+            for (int i = 0; i < myn; i++)
             {
                 int p1;
                 int p2;

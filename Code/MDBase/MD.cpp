@@ -547,7 +547,7 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 
 	//cout << "reserved: " << totn << endl;
 
-
+	int totb = boxlist.getNsafe();
 	#pragma omp parallel
 	{
 	vector<int> index1_private;
@@ -557,7 +557,7 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 	index2_private.reserve(totn);
 	//vector<int> index3_private;
 	#pragma omp for nowait schedule(static)
-	for(int c1 = 0 ; c1 < boxlist.getNsafe() ; c1++)
+	for(int c1 = 0 ; c1 < totb ; c1++)
 		for(int c2 = 0 ; c2 < ss ; c2++) {
 			int box1 = c1;
 			int box2 = boxlist(c1,c2);
@@ -644,8 +644,9 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 	matrix<int> a;//(index1.size(),2);
 	a.resize_parallel(index1.size(),2);
 	//s_matrix<int> pairs(index1.size(),3);
+	int NN = (a).getNsafe();
 	#pragma omp parallel for
-	for(int i = 0 ; i < (a).getNsafe() ; i++) {
+	for(int i = 0 ; i < NN ; i++) {
 		(a)(i,0) = index1[i];
 		(a)(i,1) = index2[i];
 	}
@@ -685,7 +686,7 @@ matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& size
 
 	index1.reserve(totn);
 	index2.reserve(totn);
-
+	int totb = boxlist.getNsafe();
 	//cout << "reserved: " << totn << endl;
 
 #pragma omp parallel
@@ -697,7 +698,7 @@ matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& size
 		index2_private.reserve(totn);
 //vector<int> index3_private;
 #pragma omp for nowait schedule(static)
-		for (int c1 = 0; c1 < boxlist.getNsafe(); c1++)
+		for (int c1 = 0; c1 < totb; c1++)
 			for (int c2 = 0; c2 < ss; c2++)
 			{
 				int box1 = c1;
@@ -794,8 +795,9 @@ matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& size
 	matrix<int> a; //(index1.size(),2);
 	a.resize_parallel(index1.size(), 2);
 //s_matrix<int> pairs(index1.size(),3);
+	int NN = a.getNsafe();
 	#pragma omp parallel for
-	for (int i = 0; i < (a).getNsafe(); i++)
+	for (int i = 0; i < NN; i++)
 	{
 		(a)(i, 0) = index1[i];
 		(a)(i, 1) = index2[i];
@@ -1068,7 +1070,7 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, vector1<
 		b2[c].push_back(p2[i]);
 	}
 
-
+	int tb = boxlist.getNsafe();
 	int ss = boxlist.getncols();
 
 	#pragma omp parallel
@@ -1077,7 +1079,7 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, vector1<
 	vector<int> index2_private;
 	//vector<int> index3_private;
 	#pragma omp for nowait schedule(static)
-	for(int c1 = 0 ; c1 < boxlist.getNsafe() ; c1++) //loop over boxes
+	for(int c1 = 0 ; c1 < tb ; c1++) //loop over boxes
 		for(int c2 = 0 ; c2 < ss ; c2++) {
 			int box1 = c1;
 			int box2 = boxlist(c1,c2);
@@ -1185,7 +1187,7 @@ matrix<int>* MD::calculatepairs_sorted(matrix<int> &boxlist, double cut_off) {
 	}
 
 
-
+	int tb =boxlist.getNsafe();
 	int ss = boxlist.getncols();
 
 
@@ -1195,7 +1197,7 @@ matrix<int>* MD::calculatepairs_sorted(matrix<int> &boxlist, double cut_off) {
 	//vector<int> index2_private;
 	//vector<int> index3_private;
 	#pragma omp for nowait schedule(static)
-	for(int c1 = 0 ; c1 < boxlist.getNsafe() ; c1++)
+	for(int c1 = 0 ; c1 < tb ; c1++)
 		for(int c2 = 0 ; c2 < ss ; c2++) {
 			int box1 = c1;
 			int box2 = boxlist(c1,c2);
@@ -1298,9 +1300,9 @@ matrix<double> MD::calculateforces(matrix<int> &pairs) {
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
-
+	int totp = pairs.getNsafe();
 	#pragma omp parallel for
-	for(int i = 0 ; i < pairs.getNsafe() ; i++ ) {
+	for(int i = 0 ; i < totp ; i++ ) {
 		int p1 = pairs.mat[i*2+0];
 		int p2 = pairs.mat[i*2+1];
 		//int i1 = pairs(i,2);
@@ -1331,9 +1333,9 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
-
+	int totp = pairs.getNsafe();
 	#pragma omp parallel for
-	for(int i = 0 ; i < pairs.getNsafe() ; ++i ) {
+	for(int i = 0 ; i < totp ; ++i ) {
 		int p1 = pairs.mat[i*2+0];
 		int p2 = pairs.mat[i*2+1];
 		//int i1 = pairs(i,2);
@@ -1409,9 +1411,9 @@ matrix<double> MD::calculateforces_sp(matrix<int> &pairs, potential &iny, matrix
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
-
+	int totp = pairs.getNsafe();
 #pragma omp parallel for
-	for (int i = 0; i < pairs.getNsafe(); ++i)
+	for (int i = 0; i < totp; ++i)
 	{
 		int p1 = pairs.mat[i * 2 + 0];
 		int p2 = pairs.mat[i * 2 + 1];
@@ -1445,9 +1447,9 @@ matrix<double> MD::calculateforceslist(matrix<int> &pairs,potential &iny) {
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
-
+	int totp = pairs.getNsafe();
 	#pragma omp parallel for
-	for(int i = 0 ; i < pairs.getNsafe() ; ++i ) {
+	for(int i = 0 ; i < totp ; ++i ) {
 		int p1 = pairs.mat[i*2+0];
 		int p2 = pairs.mat[i*2+1];
 		//int i1 = pairs(i,2);
@@ -1485,9 +1487,9 @@ matrix<double> MD::calculateforces_threebody(matrix<int> &triplets,potential3 &i
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
-
+	int totp = triplets.getNsafe();
 	#pragma omp parallel for
-	for(int i = 0 ; i < triplets.getNsafe() ; ++i ) {
+	for(int i = 0 ; i < totp ; ++i ) {
 		int p1 = triplets.mat[i*3+0];
 		int p2 = triplets.mat[i*3+1];
 		int p3 = triplets.mat[i*3+2];
@@ -1541,9 +1543,9 @@ matrix<double> MD::calculateforces_fast3D(matrix<int> &pairs) {
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
-
+	int totp = pairs.getNsafe();
 	#pragma omp parallel for
-	for(int i = 0 ; i < pairs.getNsafe() ; i++ ) {
+	for(int i = 0 ; i < totp ; i++ ) {
 
 
 		double dis;
@@ -1581,8 +1583,9 @@ matrix<double> MD::calculatestress(matrix<int> &pairs) {
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
 	matrix<double> stress(dimension,dimension);
+	int totp = pairs.getNsafe();
 	#pragma omp parallel for
-	for(int i = 0 ; i < pairs.getNsafe() ; i++ ) {
+	for(int i = 0 ; i < totp ; i++ ) {
 
 
 		double dis;
@@ -1624,9 +1627,9 @@ matrix<double> MD::calculateforces_truncated(matrix<int> &pairs, double above) {
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
-
+	int totp = pairs.getNsafe();
 	#pragma omp parallel for
-	for(int i = 0 ; i < pairs.getNsafe() ; i++ ) {
+	for(int i = 0 ; i < totp ; i++ ) {
 
 
 		double dis;
@@ -1721,9 +1724,9 @@ matrix<double> MD::calculateforces_external(Q &func)
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
-
+	int totp = (*dat).getNsafe();
 	#pragma omp parallel for
-	for (int i = 0; i < (*dat).getNsafe(); i++)
+	for (int i = 0; i < totp; i++)
 	{
 
 		double dis;

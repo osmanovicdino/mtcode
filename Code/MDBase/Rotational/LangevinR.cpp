@@ -466,9 +466,10 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
 }
 
 void LangevinNVTR::rotate() {
+    int angn = (angmom)->getNsafe();
     // updates the matrices q and qt;
     #pragma omp parallel for schedule(static)
-    for(int i = 0  ; i < (angmom)->getNsafe() ; i++) {
+    for(int i = 0  ; i < angn ; i++) {
         vector1<double> rr = genfullmat(i);
 
         // cout << rr << endl;
@@ -561,9 +562,9 @@ void LangevinNVTR::rotate() {
 
 void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialtheta3D &iny, matrix<double> &forces, matrix<double> &torques)
 {
-
+    int totp = pairs.getNsafe();
     #pragma omp parallel for
-    for (int i = 0; i < pairs.getNsafe(); ++i)
+    for (int i = 0; i < totp; ++i)
     {
         int p1 = pairs(i, 0);
         int p2 = pairs(i, 1);
@@ -612,8 +613,9 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
 
     void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, vector1<potentialtheta3D*> &iny, matrix<double> &forces, matrix<double> &torques)
     {
+        int totp = pairs.getNsafe();
         #pragma omp parallel for
-        for (int i = 0; i < pairs.getNsafe(); ++i)
+        for (int i = 0; i < totp; ++i)
         {
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);
@@ -664,10 +666,10 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
 
     void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, ComboPatch &iny, matrix<double> &forces, matrix<double> &torques)
     {
-
+        int totp = pairs.getNsafe();
 
         #pragma omp parallel for
-        for (int i = 0; i < pairs.getNsafe(); ++i)
+        for (int i = 0; i < totp; ++i)
         {
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);
@@ -767,9 +769,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ve
         }
 
         //vector1<int> nump(this->getN(),0); //this is the number of bound particles per particle
-
+        int totp = pairs.getNsafe();
         #pragma omp parallel for
-        for (int i = 0; i < pairs.getNsafe(); ++i)
+        for (int i = 0; i < totp; ++i)
         {
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);
@@ -1147,6 +1149,7 @@ vector<thetapair> LangevinNVTR::check_arg_thetas_per_pair(matrix<int> &pairs, Co
     edgelist.reserve(pairs.getnrows());
 
     unsigned int i;
+    int tp = pairs.getNsafe();
 
 #pragma omp parallel
     {
@@ -1154,7 +1157,7 @@ vector<thetapair> LangevinNVTR::check_arg_thetas_per_pair(matrix<int> &pairs, Co
         edgelist_private.reserve(pairs.getnrows());
 
     #pragma omp for nowait schedule(static)
-        for (i = 0; i < pairs.getNsafe(); ++i)
+        for (i = 0; i < tp; ++i)
         {
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);
@@ -1282,7 +1285,7 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
     unsigned int i;
     double max_angle = iny.max_ang;
     double max_dis = iny.max_check + 1.;
-
+    int tp = pairs.getNsafe();
 
     #pragma omp parallel
     {
@@ -1290,7 +1293,7 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
         edgelist_private.reserve(10*pairs.getnrows());
 
         #pragma omp for nowait schedule(static)
-        for (i = 0; i < pairs.getNsafe(); ++i)
+        for (i = 0; i < tp; ++i)
         {
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);

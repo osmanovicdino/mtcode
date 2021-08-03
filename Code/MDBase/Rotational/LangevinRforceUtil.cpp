@@ -5,13 +5,13 @@ matrix<int> LangevinNVTR::CreateEdgeList(matrix<int> &adj, vector1<int> &len)
 {
     vector<mdpair> temp;
     temp.reserve(adj.getNsafe() * adj.getncols());
-
-#pragma omp parallel
+    int tota = adj.getNsafe();
+    #pragma omp parallel
     {
         vector<mdpair> tempprivate;
         tempprivate.reserve(adj.getNsafe() * adj.getncols());
-#pragma omp for nowait schedule(static)
-        for (int i = 0; i < adj.getNsafe(); i++)
+        #pragma omp for nowait schedule(static)
+        for (int i = 0; i < tota; i++)
         {
             for (int j = 0; j < len[i]; j++)
             {
@@ -32,10 +32,11 @@ matrix<int> LangevinNVTR::CreateEdgeList(matrix<int> &adj, vector1<int> &len)
             temp.insert(temp.end(), tempprivate.begin(), tempprivate.end());
         }
     }
-    matrix<int> a(temp.size() * 2, 2);
+    int tempn = temp.size();
+    matrix<int> a(tempn * 2, 2);
 //s_matrix<int> pairs(index1.size(),3);
 #pragma omp parallel for schedule(static)
-    for (int i = 0; i < temp.size(); i++)
+    for (int i = 0; i < tempn; i++)
     {
         (a)(2 * i, 0) = temp[i].b;
         (a)(2 * i, 1) = temp[i].a;

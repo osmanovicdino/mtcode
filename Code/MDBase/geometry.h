@@ -402,11 +402,11 @@ struct cube  {
 
 	void correct_position_and_momentum(matrix<double> &r, matrix<double> &p) {
 		//for(int j = 0 ; j < r.getNsafe() ; j++) {
-			
+			int totv =r.getNsafe();
 			for(int i = 0 ; i < dimension ; i++) {
 				if(pb[i]) {
 					#pragma omp parallel for schedule(static)
-					for(int j = 0 ; j < r.getNsafe() ; j++) {
+					for(int j = 0 ; j < totv ; j++) {
 						double temp = r(j,i);
 						if(temp < 0) {	
 							while(temp < 0) {
@@ -427,7 +427,7 @@ struct cube  {
 				}
 				else {
 					#pragma omp parallel for schedule(static)
-					for(int j = 0 ; j < r.getNsafe() ; j++) {
+					for(int j = 0 ; j < totv ; j++) {
 						if(r(j,i)<0) {
 							r(j,i) = -r(j,i);
 							p(j,i) = -p(j,i);
