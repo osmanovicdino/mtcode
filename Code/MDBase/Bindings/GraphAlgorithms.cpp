@@ -500,12 +500,13 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
  
 
     int nr = adj.nrows;
+    int ss =  indexes.size;
 
     for(;;) {
         bool equiv;
 
         #pragma omp parallel for schedule(static)
-        for(int i= 0 ; i < indexes.size ; i++) {
+        for(int i= 0 ; i < ss ; i++) {
             ftemp.data[i] = indexes.data[i];
         }
         //#pragma omp parallel 
@@ -530,11 +531,11 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
         //cout << "loop done" << endl;
 
         #pragma omp parallel for schedule(static)
-        for (int i = 0; i < indexes.size; i++)
+        for (int i = 0; i < ss; i++)
             indexes.data[i] = fnext.data[i];         
 
         #pragma omp parallel for schedule(static)
-        for (int i = 0; i < indexes.size; i++)
+        for (int i = 0; i < ss; i++)
         {
             int u = i;
             int fu = indexes.data[u];
@@ -547,7 +548,7 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
 
         equiv = true;
         #pragma omp parallel for schedule(static)
-        for (int i = 0; i < indexes.size; i++)
+        for (int i = 0; i < ss; i++)
         {
             if (indexes.data[i] != fnext.data[i])
             {
@@ -590,20 +591,26 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
  
 
     int nr = adj.size();
+    int ss = indexes.size;
 
+    
+    #pragma omp parallel
+    {
+    
+    static bool equiv; //shared between all threads
 
     for(;;) {
         //cout << "iterate" << endl;
-        bool equiv;
+        
 
-        #pragma omp parallel for schedule(static)
-        for(int i= 0 ; i < indexes.size ; i++) {
+        #pragma omp for schedule(static)
+        for(int i= 0 ; i < ss ; i++) {
             ftemp.data[i] = indexes.data[i];
         }
         //#pragma omp parallel 
         
            // cout << omp_get_num_threads() << endl;
-        #pragma omp parallel for schedule(static)
+        #pragma omp for schedule(static)
         for(int i = 0  ; i < 2*nr ; i++) {
             int u,v;
             if(i%2==0) {
@@ -640,12 +647,12 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
 
         //cout << "loop done" << endl;
 
-        #pragma omp parallel for schedule(static)
-        for (int i = 0; i < indexes.size; i++)
+        #pragma omp for schedule(static)
+        for (int i = 0; i < ss; i++)
             indexes.data[i] = fnext.data[i];         
 
-        #pragma omp parallel for schedule(static)
-        for (int i = 0; i < indexes.size; i++)
+        #pragma omp for schedule(static)
+        for (int i = 0; i < ss; i++)
         {
             int u = i;
             int fu = indexes.data[u];
@@ -657,8 +664,9 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
         }
 
         equiv = true;
-        #pragma omp parallel for schedule(static)
-        for (int i = 0; i < indexes.size; i++)
+
+        #pragma omp for schedule(static)
+        for (int i = 0; i < ss; i++)
         {
             if (indexes.data[i] != fnext.data[i])
             {
@@ -673,6 +681,7 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
         //cout << "done 3" << endl;    
         //bool equiv = true;
        if(equiv) break;
+    }
 
 
     }

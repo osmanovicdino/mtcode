@@ -1014,9 +1014,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
 
 
-
+        int tot = mypairs.size();
         #pragma omp parallel for
-        for(int i = 0  ; i < mypairs.size() ; i++) {
+        for(int i = 0  ; i < tot ; i++) {
             int p1;
             int p2;
             int wp1 = mypairs[i].a;
@@ -3945,9 +3945,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     output_ss_to_file("res3.csv", ss3);
 
     pausel(); */
-
+        int tot =  mypairs.size();
         #pragma omp parallel for
-        for (int i = 0; i < mypairs.size(); i++)
+        for (int i = 0; i < tot; i++)
         {
             int p1;
             int p2;
@@ -3967,15 +3967,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
             int potn = iny.which_potential(p1, p2, wp1, wp2);
 
-            
-            // if(potn != iny.which_potential(p1, p2,wp2,wp1)) {
-            //     cout << p1 <<  " " << p2 << " " << wp1 << " " << wp2 << endl;
-            //     cout << potn << endl;
-            //     cout << iny.which_potential(p1, p2,wp2,wp1) << endl;
-            //     //and it should be
-            //    cout << fv(wp1) << " " <<  fv(wp2) << endl;
-            //     error("why is the potential not fine if patches are reversed?");
-            // }
+
             dis = sqrt(dis);
 
             un /= dis;
@@ -4415,6 +4407,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
             vector1<int> indexes2(total_number_of_patches, sg);
             //std::vector<mdpair> jhg(total_number_of_patches);
 
+            
             ConnectedComponentsParallel(edgelist, indexes2);
 
             //compare the triplets in ConnectedComponentsParallel and the normal connected components
@@ -5103,7 +5096,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
             }
 
 
-#pragma omp parallel for
+            #pragma omp parallel for
             for (int i = 0; i < mypairs.size(); i++)
             {
                 int p1;
