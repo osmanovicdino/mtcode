@@ -1661,7 +1661,26 @@ vector1<T> meanmat_end(matrix<T> &a, int s) {
     return res/T(a.getnrows()-s);
 }
 
-void generate_uniform_random_matrix(matrix<double> &ra) {
+void generate_random_matrix(matrix<double> &ra)
+{ 
+    //generate random numbers between 0 and 1
+
+   
+    int nr = ra.nrows;
+    int nc = ra.ncols;
+    int dp = nr * nc;
+    // for(int i = 0 ; i < nr ; i++) {
+    //     for(int j = 0 ; j < nc ; j++) {
+    //         ra.mat[i*nc+j] = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+    //     }
+    // }
+    for (int i = 0; i < dp; i++)
+    {
+        ra.mat[i] = (((double)rand() / (RAND_MAX)));
+    }
+}
+
+void generate_uniform_random_matrix(matrix<double> &ra) { //gen random value with variance 1 mean 0
 
     //gemerate a uniform random matrix of mean 0 and variance 1,
     int nr = ra.nrows;

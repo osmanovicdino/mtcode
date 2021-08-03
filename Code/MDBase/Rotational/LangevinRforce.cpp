@@ -31,7 +31,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     vector<mdpair> edgelist_private;
     edgelist_private.reserve(total_number_of_patches);
 
-    #pragma omp for nowait schedule(dynamic)
+    #pragma omp for nowait schedule(static)
     for (i = 0; i < pairs.getNsafe(); ++i)
     {
         int p1 = pairs(i, 0);
@@ -412,6 +412,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
     SingleHistogram(indexes2,boindices2,ccs);
 
+    vector1<double> rands(total_number_of_patches);
+    Generate_Random_Numbers_Needed(rands,ccs);
+
     //boindices2 contains the size of each cluster
 
     // cout << boindices << endl;
@@ -477,7 +480,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             vector<mdpair> mypairs_private;
             mypairs_private.reserve(number_to_reserve);
 
-            #pragma omp for nowait schedule(dynamic) 
+            #pragma omp for nowait schedule(static) 
             for (int i = 0; i < total_number_of_patches; i++)
             {
                 int size_of_cluster = ccs[i];
@@ -520,7 +523,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                     bool aft;
 
-                    bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+                    bm.doublet(alreadybound_to_eachother, i1, i2, aft, rands[i]);
 
                     if (aft)
                     {
@@ -686,7 +689,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     // bool cond2 = i1 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
                     // bool cond3 = i2 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
 
-                    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+                    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, rands[i]);
 
                     if (a12)
                     {
@@ -1248,7 +1251,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             vector<mdpairwd> edgelist_private;
             edgelist_private.reserve(total_number_of_patches);
 
-            #pragma omp for nowait schedule(dynamic)
+            #pragma omp for nowait schedule(static)
             for (i = 0; i < pairs.getNsafe(); ++i)
             {
                 int p1 = pairs(i, 0);
@@ -1666,9 +1669,14 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
         vector1<int> ccs(total_number_of_patches);
 
+
         //SingleHistogram(indexes2, boindices2, ccs);
 
         matrix<int> boindices2 = SingleHistogram(indexes2, ccs);
+
+
+        vector1<double> rands(total_number_of_patches);
+        Generate_Random_Numbers_Needed(rands,ccs);
         // cout << "size: " <<  boindices2.getncols() << endl;
         // if(boindices2.getncols() > 10 ) {
         //     pausel();
@@ -1760,7 +1768,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             mypairs_private.reserve(number_to_reserve);
             large_clusters_private.reserve(number_to_reserve);
 
-            #pragma omp for nowait schedule(dynamic)
+            #pragma omp for nowait schedule(static)
             for (int i = 0; i < total_number_of_patches; i++)
             {
                 int size_of_cluster = ccs[i];
@@ -1801,7 +1809,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                     bool aft;
 
-                    bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+                    bm.doublet(alreadybound_to_eachother, i1, i2, aft, rands[i]);
 
                     if (aft)
                     {
@@ -1987,7 +1995,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     // // to integer
                     // int str = stoi(s);
 
-                    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+                    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, rands[i]);
 
                     if (a12)
                     {
@@ -2189,6 +2197,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
         int number_of_large_clusters =  large_clusters.size();
 
+        int largest_component = boindices2.getncols();
+
+        int num_rans_needed = (largest_component/2)+1;//add one for safety
+
+        matrix<double> rands_large_cluster(number_of_large_clusters, num_rans_needed);
+
+        generate_random_matrix(rands_large_cluster);
+
+
+
         #pragma omp parallel
         {
             vector<mdpair> mypairs_private;
@@ -2196,7 +2214,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             mypairs_private.reserve(number_to_reserve/2);
             
 
-            #pragma omp for nowait schedule(dynamic)
+            #pragma omp for nowait schedule(dynamic) //dynamic schedule as cutting down cc could take a long time for every different cc
             for (int allc = 0; allc < number_of_large_clusters; allc++)
             {
                 int i = large_clusters[allc];
@@ -2244,6 +2262,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     dem = ConnectedComponents(newedges, ind);
                     
                 }
+                //this has demarkated it
+
+
                // cout << "all cc done" << endl;
                 vector1<int> lensx(size_of_cluster);
 
@@ -2252,6 +2273,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                 PairHistogram(newedges, boindicesx, lensx);
 
                 //cout << "sorted correctly" << endl;
+                
 
                 //if two things are no longer in the same cluster, unbind them
                 for (int k1 = 0; k1 < size_of_cluster; k1++)
@@ -2283,6 +2305,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     }
                 }
 
+                int ran__iter = 0; //we iterate over the random number generated before
+
                 for (int j = 0; j < dem.getsize() - 1; j++)
                 {
                     int size_of_sub_cluster = dem[j + 1] - dem[j];
@@ -2312,8 +2336,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                         bool aft;
 
-                        bm.doublet(alreadybound_to_eachother, i1, i2, aft);
-
+                        bm.doublet(alreadybound_to_eachother, i1, i2, aft, rands_large_cluster(allc,ran__iter));
+                        ran__iter++;
                         if (aft)
                         {
                             bo.boundto[i1] = i2;
@@ -2440,27 +2464,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bool a12;
                         bool a23;
                         bool a13;
-                        //cout << "triplet called: " << i1 << " " << i2 << " " << i3 << endl;
-                        // //pausel();
-                        // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
-                        // bool cond2 = i1 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
-                        // bool cond3 = i2 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
-                        // int v1 = tempor(i1);
-                        // int v2 = tempor(i2);
-                        // int v3 = tempor(i3);
-                        // int sv1, sv2, sv3;
-                        // sort_triplet(v1, v2, v3, sv1, sv2, sv3);
-                        // string s1 = to_string(v1);
-                        // string s2 = to_string(v2);
-                        // string s3 = to_string(v3);
 
-                        // // Concatenate both strings
-                        // string s = s1 + s2 + s3;
+                        bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, rands_large_cluster(allc, ran__iter));
 
-                        // // Convert the concatenated string
-                        // // to integer
-                        // int str = stoi(s);
-
+                        ran__iter++;
 
                         if (a12)
                         {
@@ -2978,7 +2985,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             vector<mdpairwd> edgelist_private;
             edgelist_private.reserve(total_number_of_patches);
 
-            #pragma omp for nowait schedule(dynamic)
+            #pragma omp for nowait schedule(static)
             for (int ik = 0; ik < t_u_pairs+1; ++ik)
             {
                 int i,fi; //the start and end indices
@@ -3240,7 +3247,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
         //int wid =  boindices2.getncols();
 
         //outfunc(indexes2,"hola");
-        
+
+        vector1<double> rands;
+        rands.resize_parallel(total_number_of_patches);
+
+        Generate_Random_Numbers_Needed(rands, ccs);
         // matrix<int> boindices3;
         // SingleHistogramParallel(indexes2,ccs2,boindices3);
 
@@ -3276,7 +3287,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
             mypairs_private.reserve(number_to_reserve);
             large_clusters_private.reserve(number_to_reserve);
 
-            #pragma omp for nowait schedule(dynamic)
+            #pragma omp for nowait schedule(static)
             for (int i = 0; i < total_number_of_patches; i++)
             {
                 int size_of_cluster = ccs[i];
@@ -3315,7 +3326,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                     bool aft;
 
-                    bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+                    bm.doublet(alreadybound_to_eachother, i1, i2, aft, rands[i]);
 
                     if (aft)
                     {
@@ -3480,7 +3491,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     bool a13;
 
 
-                    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+                    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, rands[i]);
 
                     if (a12)
                     {
@@ -3570,9 +3581,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
         int number_of_large_clusters = large_clusters.size();
 
-        
-        
+        int largest_component = boindices2.getncols();
 
+        int num_rans_needed = (largest_component / 2) + 1; //add one for safety
+
+        matrix<double> rands_large_cluster(number_of_large_clusters, num_rans_needed);
+
+        generate_random_matrix(rands_large_cluster);
 
         if(need_large_c) {
         #pragma omp parallel
@@ -3675,6 +3690,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                     }
                 }
 
+                int ran__iter = 0; //our random iterator
+
                 for (int j = 0; j < dem.getsize() - 1; j++)
                 {
                     int size_of_sub_cluster = dem[j + 1] - dem[j];
@@ -3704,8 +3721,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
 
                         bool aft;
 
-                        bm.doublet(alreadybound_to_eachother, i1, i2, aft);
-
+                        bm.doublet(alreadybound_to_eachother, i1, i2, aft, rands_large_cluster(allc, ran__iter));
+                        ran__iter++;
                         if (aft)
                         {
                             bo.boundto[i1] = i2;
@@ -3833,8 +3850,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                         bool a23;
                         bool a13;
 
-                        bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
-                        
+                        bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, rands_large_cluster(allc, ran__iter));
+                        ran__iter++;
+
                         if (a12)
                         {
                             bo.boundto[i1] = i2;
@@ -3890,10 +3908,10 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
                             bo.isbound[i2] = false;
                             bo.isbound[i3] = false;
                         }
-}
+                    }
                     else
                     {
-                        //error("no this should not be possible, somehow our n cluster hasn't been broken up");
+                        error("no this should not be possible, somehow our n cluster hasn't been broken up");
                     }
                 }
             }
@@ -4168,7 +4186,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
                 vector<mdpairwd> edgelist_private;
                 edgelist_private.reserve(total_number_of_patches);
 
-                #pragma omp for nowait schedule(dynamic)
+                #pragma omp for nowait schedule(static)
                 for (int ik = 0; ik < t_u_pairs + 1; ++ik)
                 {
                     int i, fi; //the start and end indices
@@ -4408,6 +4426,8 @@ for (int i = 0; i < total_number_of_patches; ++i)
             //SingleHistogram(indexes2, boindices2, ccs);
 
             matrix<int> boindices2 = SingleHistogram(indexes2, ccs);
+            vector1<double> rands(total_number_of_patches);
+            Generate_Random_Numbers_Needed(rands, ccs);
 
             int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
             //        // cout << number_to_reserve << endl;
@@ -4429,7 +4449,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
                 mypairs_private.reserve(number_to_reserve);
                 large_clusters_private.reserve(number_to_reserve);
 
-                #pragma omp for nowait schedule(dynamic)
+                #pragma omp for nowait schedule(static)
                 for (int i = 0; i < total_number_of_patches; i++)
                 {
                     int size_of_cluster = ccs[i];
@@ -4472,7 +4492,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
 
                         double energy_before = boenergies(i1,0); //as there is only a single bound particle, we can know the energy in this way
 
-                        bm.doublet_eq(alreadybound_to_eachother, i1, i2, aft, energy_before);
+                        bm.doublet_eq(alreadybound_to_eachother, i1, i2, aft, energy_before, rands[i]);
 
                         if (aft)
                         {
@@ -4645,7 +4665,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
 
 
 
-                        bm.triplet_eq(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, e12, e23, e13);
+                        bm.triplet_eq(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, e12, e23, e13, rands[i]);
 
                         if (a12)
                         {
@@ -4732,6 +4752,14 @@ for (int i = 0; i < total_number_of_patches; ++i)
             //pausel();
 
             int number_of_large_clusters = large_clusters.size();
+            
+            int largest_component = boindices2.getncols();
+
+            int num_rans_needed = (largest_component / 2) + 1; //add one for safety
+
+            matrix<double> rands_large_cluster(number_of_large_clusters, num_rans_needed);
+
+            generate_random_matrix(rands_large_cluster);
 
             if (need_large_c)
             {
@@ -4833,6 +4861,7 @@ for (int i = 0; i < total_number_of_patches; ++i)
                                 }
                             }
                         }
+                        int ran__iter = 0;
 
                         for (int j = 0; j < dem.getsize() - 1; j++)
                         {
@@ -4864,8 +4893,8 @@ for (int i = 0; i < total_number_of_patches; ++i)
                                 bool aft;
 
                                 double energ = boenergies(i1,0);
-                                bm.doublet_eq(alreadybound_to_eachother, i1, i2, aft, energ);
-
+                                bm.doublet_eq(alreadybound_to_eachother, i1, i2, aft, energ, rands_large_cluster(allc, ran__iter));
+                                ran__iter++;
                                 if (aft)
                                 {
                                     bo.boundto[i1] = i2;
@@ -4998,7 +5027,8 @@ for (int i = 0; i < total_number_of_patches; ++i)
 
                                 get_energies(i1, i2, i3, nb1, nb2, nb3, boindices, boenergies, e12, e23, e13);
 
-                                bm.triplet_eq(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13,e12,e23,e13);
+                                bm.triplet_eq(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, e12, e23, e13, rands_large_cluster(allc, ran__iter));
+                                ran__iter++;
 
                                 if (a12)
                                 {

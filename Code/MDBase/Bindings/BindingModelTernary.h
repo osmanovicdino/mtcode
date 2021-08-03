@@ -79,11 +79,11 @@ struct BindingModelTernary : AbstractBindingModel
     vector1<double>& get_drate(int, int);
     vector1<double>& get_trate(int, int, int);
 
-    void doublet(bool before, int index1, int index2, bool &after);
+    void doublet(bool before, int index1, int index2, bool &after, double &ran);
 
     double calculate_score(int index1, int index2, bool are_b);
 
-    void triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &after1, bool &after2, bool &after3);
+    void triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &after1, bool &after2, bool &after3, double &ran);
 
     void nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters);
 

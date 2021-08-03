@@ -2,13 +2,13 @@ BindingModelSingle::BindingModelSingle(double onn, double offf) : on_rate(onn), 
     tr = off_rate + on_rate;
 }
 
-void BindingModelSingle::doublet(bool before, int index1, int index2, bool &after)
+void BindingModelSingle::doublet(bool before, int index1, int index2, bool &after, double &ran)
 {
 
 
     double totalr = tr;
 
-    double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+    double rr = totalr * ran;
 
     if (rr < off_rate)
     {
@@ -37,7 +37,7 @@ double BindingModelSingle::calculate_score(int index1, int index2, bool are_b)
     }
 }
 
-void BindingModelSingle::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13)
+void BindingModelSingle::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13, double &ran)
 {
 
     double r1;
@@ -85,7 +85,7 @@ void BindingModelSingle::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
 
     double totalr = r1 + r2 + r3 + r4;
 
-    double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+    double rr = totalr * ran;
 
     if (rr < r1)
     {

@@ -54,33 +54,12 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 
 using namespace std;
 
-void done() {
-    cout << "done" << endl;
-}
 
-void do_func(const matrix<double> &a) {
-
-    for(int i = 0 ; i < a.getnrows() ; i++) {
-        for(int j = 0  ; j < a.getncols() ; j++ ) {
-            double d=  a.gpcons(i,j)*a.gpcons(i,j);
-        }
-    }
-}
 
 int main(int argc, char **argv)
 {
-    matrix<double> *a;
-    a = new matrix<double>(100,100);
 
-    int count = 1000000;
-    for (size_t i = 0; i < count; i++)
-    {
-        cout << i << endl;
-        do_func(*a);
-    }
-    
 
-    srand(time(NULL));
 
     // fftw_complex *in;
     // fftw_complex *out;
@@ -316,45 +295,11 @@ int main(int argc, char **argv)
 
 
     // a.gamma_white = 2.;
-    // a.gamma_black = 1.;
-
-    // cout << a.data << endl;
-
-    // for(int i = 0 ; i < 20 ; i++) {
-    //     for(int j = 0 ; j < 20 ; j++) {
-    //         cout << a(double(i),double(j)) << ", ";
-    //     }
-    //     cout << endl;
-    // }
-
-   // a(10,10);
-
-
-
-    // cout << a.data.size() << endl;
-
-    // matrix<int> b(a.bmp_info_header.width,a.bmp_info_header.height);
-
-    // int iter = 0;
-    // for(int i = 0  ; i < a.bmp_info_header.height ; i++) {
-    //     for(int j = 0  ; j < a.bmp_info_header.width ; j++) {
-    //         b(i,j) = a.data[iter];
-    //         iter++;
-    //     }
-    // }
 
 
 
 
 
 
-
-    // for(int i = 0 ; i < 28000 ; i++) {
-    //     asd[i] = rand() % 28000;
-    // }
-
-    // for(int j = 0 ; j < 1000 ; j++) {
-    //     sort(asd.begin(),asd.end());
-    // }
 
 }

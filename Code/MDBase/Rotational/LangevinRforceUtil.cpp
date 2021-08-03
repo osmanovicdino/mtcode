@@ -227,8 +227,9 @@ void Process_Doublet(int ti1, int ti2, BinaryBindStore &bo, AbstractBindingModel
     bool alreadybound_to_eachother = bo.boundto[i1] == i2 && bo.boundto[i2] == i1 && bo.isbound[i1] && bo.isbound[i2];
 
     bool aft;
+    double r = (double)rand()/(double)RAND_MAX; //NEED TO FIX BEFORE USE
 
-    bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+    bm.doublet(alreadybound_to_eachother, i1, i2, aft,r);
 
     if (aft)
     {
@@ -348,8 +349,9 @@ void Process_Triplet(int ti1, int ti2, int ti3, BinaryBindStore &bo, AbstractBin
     // bool cond1 = i1 < 12000 && i2 > 12000 + 4 * 15000 && (i2 - 12000 - 15000 * 4) % 3 == 2;
     // bool cond2 = i1 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
     // bool cond3 = i2 < 12000 && i3 > 12000 + 4 * 15000 && (i3 - 12000 - 15000 * 4) % 3 == 2;
+    double r = (double)rand()/(double)(RAND_MAX); //NEED TO FIX THIS IF I EVER USE THIS FUNCTION
 
-    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13);
+    bm.triplet(b12, b23, b13, c12, c23, c13, i1, i2, i3, a12, a23, a13, r);
 
     if (a12)
     {

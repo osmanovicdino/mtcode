@@ -333,6 +333,27 @@ void PairHistogramExtendedParallel(vector<mdpairwd> &edgelist, matrix<int> &boin
     }
 }
 
+void Generate_Random_Numbers_Needed(vector1<double> &rands, const vector1<int> &ccs) {
+    int N = ccs.getsize();
+    for(int i = 0  ; i < N ; i++) {
+        if(ccs.gpcons(i) > 1) {
+            rands[i] = (double)(rand())/((double)(RAND_MAX));
+        }
+    }
+}
+
+void Generate_Random_Numbers_Needed_Large_C(vector1<double> &rands, const vector1<int> &ccs)
+{
+    int N = ccs.getsize();
+    for (int i = 0; i < N; i++)
+    {
+        if (ccs.gpcons(i) > 1)
+        {
+            rands[i] = (double)(rand()) / ((double)(RAND_MAX));
+        }
+    }
+}
+
 void DFUtil(int i, vector1<bool> &visited, matrix<int> &adj, vector1<int> &lens)
 {
     visited[i] = true;

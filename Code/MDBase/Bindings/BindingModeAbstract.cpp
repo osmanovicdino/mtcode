@@ -1,11 +1,12 @@
 #ifndef BINDINGMODEABSTRACT_CPP
 #define BINDINGMODEABSTRACT_CPP
 
-void  AbstractBindingModel::doublet_eq(bool before, int index1, int index2, bool &after, double energ) {
-
+void  AbstractBindingModel::doublet_eq(bool before, int index1, int index2, bool &after, double energ, double &r) {
+    //r is a random number which is between 0 and 1
+    
     double bef =  ( (int)(before) ) * energ;
 
-    double r =  (double)rand()/(double)(RAND_MAX);
+//double r =  (double)rand()/(double)(RAND_MAX);
 
     double aft =  ( (int)(!before) ) * energ;
 
@@ -74,7 +75,7 @@ void set_from(bool &a12, bool &a23, bool &a13, int cho)
     }
 }
 
-void AbstractBindingModel::triplet_eq(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &after1, bool &after2, bool &after3, double e12, double e23, double e13)
+void AbstractBindingModel::triplet_eq(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &after1, bool &after2, bool &after3, double e12, double e23, double e13, double &r)
 {
 
     double energy_before = ((int)b12) * e12 + ((int)b23) * e23 + ((int)b13) * e13;
@@ -121,7 +122,7 @@ void AbstractBindingModel::triplet_eq(bool b12, bool b23, bool b13, bool c12, bo
     }
 
     double de = energy_after - energy_before;
-    double r = (double)rand()/(double)(RAND_MAX);
+    //double r = (double)rand()/(double)(RAND_MAX);
 
     if(de<0) {
         set_from(after1, after2, after3, got);

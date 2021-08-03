@@ -902,8 +902,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ve
                     bool alreadybound_to_eachother = bo.boundto[i1]==i2 && bo.isbound[i1] && bo.isbound[i2];
 
                     bool aft;
-
-                    bm.doublet(alreadybound_to_eachother, i1, i2, aft);
+                    double r = (double)(rand())/(double)(RAND_MAX);
+                    bm.doublet(alreadybound_to_eachother, i1, i2, aft, r);
 
                     if(aft) {
                         bo.boundto[i1] = i2;
@@ -989,7 +989,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ve
                     bool a12;
                     bool a23;
                     bool a13;
-                    bm.triplet(b12,b23,b13,c12,c23,c13,i1,i2,i3,a12,a23,a13);
+                    double r = (double)(rand()) / (double)(RAND_MAX);
+                    bm.triplet(b12,b23,b13,c12,c23,c13,i1,i2,i3,a12,a23,a13,r);
 
                     if(a12) {
                         bo.boundto[i1] = i2;
@@ -1152,7 +1153,7 @@ vector<thetapair> LangevinNVTR::check_arg_thetas_per_pair(matrix<int> &pairs, Co
         vector<thetapair> edgelist_private;
         edgelist_private.reserve(pairs.getnrows());
 
-    #pragma omp for nowait schedule(dynamic)
+    #pragma omp for nowait schedule(static)
         for (i = 0; i < pairs.getNsafe(); ++i)
         {
             int p1 = pairs(i, 0);
@@ -1288,7 +1289,7 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
         vector<patchint> edgelist_private;
         edgelist_private.reserve(10*pairs.getnrows());
 
-        #pragma omp for nowait schedule(dynamic)
+        #pragma omp for nowait schedule(static)
         for (i = 0; i < pairs.getNsafe(); ++i)
         {
             int p1 = pairs(i, 0);
@@ -1437,7 +1438,7 @@ vector<int> adjacency(const vector<patchint> &c1) {
     {
     vector<int> indexes_private;
     indexes_private.reserve(n/3);
-    #pragma omp for nowait schedule(dynamic)
+    #pragma omp for nowait schedule(static)
     for(int i = 0  ; i < n ; i++) {
         if(c2[i]) {
             indexes_private.push_back(i);

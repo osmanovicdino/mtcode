@@ -107,7 +107,7 @@ void BindingModelBinary::setup_equilibrium() {
     tripr222 = t222;
 }
 
-void BindingModelBinary::doublet(bool before, int index1, int index2, bool &after)
+void BindingModelBinary::doublet(bool before, int index1, int index2, bool &after, double &ran)
 {
 
     if(index1 < div && index2 < div) {
@@ -125,7 +125,7 @@ void BindingModelBinary::doublet(bool before, int index1, int index2, bool &afte
 
         double totalr = r1 + r2;
 
-        double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+        double rr = totalr * ran;
 
         if (rr < r1)
         {
@@ -151,7 +151,7 @@ void BindingModelBinary::doublet(bool before, int index1, int index2, bool &afte
 
         double totalr = r1 + r2;
 
-        double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+        double rr = totalr * ran;
 
         if (rr < r1)
         {
@@ -177,7 +177,7 @@ void BindingModelBinary::doublet(bool before, int index1, int index2, bool &afte
 
         double totalr = r1 + r2;
 
-        double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+        double rr = totalr * ran;
 
         if (rr < r1)
         {
@@ -233,7 +233,8 @@ double BindingModelBinary::calculate_score(int index1, int index2, bool before) 
     }
 }
 
-void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13) {
+void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13, double &ran)
+{
 
     if(index1 < div && index2 < div && index3 < div) {
         int i1;
@@ -263,7 +264,7 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
 
         double totalr = r1 + r2 + r3 + r4;
 
-        double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+        double rr = totalr * ran;
 
         if (rr < r1)
         {
@@ -333,7 +334,7 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
         // cout << r1 << " " << r2 << " " << r3 << " " << r4 << endl;
 
 
-        double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+        double rr = totalr * ran;
 
         if (rr < r1)
         {
@@ -391,7 +392,7 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
 
         double totalr = r1 + r2 + r3 + r4;
 
-        double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+        double rr = totalr * ran;
 
         if (rr < r1)
         {
@@ -444,7 +445,7 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
 
         double totalr = r1 + r2 + r3 + r4;
 
-        double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+        double rr = totalr * ran;
 
         if (rr < r1)
         {
@@ -471,8 +472,6 @@ void BindingModelBinary::triplet(bool b12, bool b23, bool b13, bool c12, bool c2
             a13 = false;
         }
     }
-
-
 }
 
 void BindingModelBinary::nlet(const vector1<bool> &befores, const vector<mdpair> &indices, const vector<vector1<bool> > &possibles, vector1<bool> &afters)

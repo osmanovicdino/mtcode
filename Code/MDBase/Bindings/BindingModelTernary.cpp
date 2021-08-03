@@ -503,7 +503,7 @@ inline vector1<double>& BindingModelTernary<Q>::get_drate(int i, int j)
 
 
 template <typename Q>
-void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &after)
+void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &after, double &ran)
 {
 
 
@@ -555,7 +555,7 @@ void BindingModelTernary<Q>::doublet(bool before, int index1, int index2, bool &
 
        
 
-        double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+        double rr = totalr * ran;
 
         if (rr < r1)
         {
@@ -771,7 +771,7 @@ void append_ss_to_file(string file1, stringstream &ss)
 }
 
 template <typename Q>
-void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13)
+void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, bool c23, bool c13, int index1, int index2, int index3, bool &a12, bool &a23, bool &a13, double &ran)
 {
 
     vector1<double> rtemp;
@@ -836,7 +836,7 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
 
     double totalr = r1 + r2 + r3 + r4;
 
-    double rr = totalr * ((double)rand() / (double)(RAND_MAX));
+    double rr = totalr * ran;
     
 
     bool ta12,ta23,ta13;
