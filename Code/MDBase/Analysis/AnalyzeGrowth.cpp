@@ -187,6 +187,8 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
             }
         }
     }
+
+    return RES;
 }
 
 #endif /* ANALYZEGROWTH_CPP */
