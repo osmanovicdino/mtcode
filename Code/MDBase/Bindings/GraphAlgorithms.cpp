@@ -26,7 +26,7 @@ void SingleHistogram(vector1<int> &indexes2, matrix<int> &boindices2, vector1<in
     }
 }
 
-void SingleHistogramParallel(vector1<int> indexes2, vector1<int> &ccs, matrix<int> &boiindices2) {
+void SingleHistogramParallel(vector1<int> &indexes2, vector1<int> &ccs, matrix<int> &boiindices2) {
     int n = indexes2.getsize();
     // when the index of the group has been assigned, this function bins them
 
@@ -72,6 +72,50 @@ void SingleHistogramParallel(vector1<int> indexes2, vector1<int> &ccs, matrix<in
         }
 
     
+}
+
+void LargestComponents(vector<int> &indexes2, vector1<int> &largest)
+{
+    int n = indexes2.size();
+    // when the index of the group has been assigned, this function bins them
+
+    //matrix<int> boindices2(n,wid);
+
+    // if (((boiindices2.getnrows() != ccs.getsize())))
+    //     error("initial arrays must be same size in Single Histogram Parallel");
+    vector<int> ccs(n);
+    #pragma omp parallel for
+    for(int i = 0  ; i < n ; i++) {
+        ccs[i] = 0;
+    }
+
+    #pragma omp parallel for
+    for (int i = 0; i < n; ++i)
+    {
+        int wp1 = indexes2[i];
+//mtx.lock();
+//const std::lock_guard<std::mutex> lock(mtx);
+//int iterator1 = ccs[wp1];
+//boindices2(wp1, iterator1) = i;
+        #pragma omp atomic update
+        ccs[wp1]++;
+
+        // mtx.unlock();
+        //mtx.unlock();
+    }
+    #if defined(_OPENMP)
+        __gnu_parallel::sort(ccs.begin(), ccs.end(), greater<int>());
+    #else
+        std::sort(ccs.begin(), ccs.end(), greater<int>());
+    #endif
+
+
+    for(int i = 0 ; i < largest.getsize() ; i++) {
+        largest[i] = ccs[i];
+    }
+
+
+
 }
 
 matrix<int> SingleHistogramParallel(vector1<int> indexes2, vector1<int> &ccs) {

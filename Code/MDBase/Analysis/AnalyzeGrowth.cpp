@@ -121,6 +121,8 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     vector1<bool> pb(3, true);
     cube geo(l, pb, 3);
 
+
+
     LangevinNVT *A;
     A = new LangevinNVT(geo);
 
@@ -137,11 +139,13 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     //for each file analyze the structure
     for (int filen = 0; filen < n; filen++)
     {
-        cout << filen << endl;
-        int TT;
+        
+        double TT;
         bool vv3;
         matrix<double> postemp = importcsv(dir + "/" + posfiles[filen], TT, vv3); //import my file
 
+
+        
         A->setdat(postemp);
 
         
@@ -151,8 +155,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
 
         int Np = pairs->getNsafe();
         vector<mdpair> edgelist;
-
-        //we want to get an edgelist of all the particles
+        edgelist.reserve(Np);
 
 
             //bool is_bound = bool(bbs2.isbound[b_index]);
@@ -164,17 +167,25 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
             {
                 mdpair test(p1, p2);
                 edgelist.push_back(test);
-                }
+            }
                 
             
         }
+
+        
+        
         
     int N =  postemp.getNsafe();
+    // cout << filen << " " << N << " " << Np << endl;
     vector<int> indexes2 = ConnectedComponentsParallel(edgelist, N);
+
+
 
     unordered_map<int, size_t> count; // holds count of each encountered number
     for (int i = 0; i < N; i++)
         count[indexes2[i]]++;
+
+    
 
     std::vector<int> vals;
     vals.reserve(count.size());
@@ -189,6 +200,11 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     #else
         std::sort(vals.begin(), vals.end(), greater<int>());
     #endif
+
+    // cout << filen << " " << N << " " << Np <<  " ";
+    // for(int jk = 0 ; jk < N_Largest ; jk++)
+    // cout << vals[jk] << ",";
+    // cout << endl;
 
     //now we have the edgelist
 
