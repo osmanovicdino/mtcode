@@ -40,9 +40,9 @@ fi
 dirwemake=$strdir
 # cp ~/Chemistry/Code/mainanalyzedist.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 # g++ ~/Chemistry/Code/mainanalyze.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron_analyze
-cp ~/Chemistry/Code/studygrowth /u/scratch/d/dinoo/${basedir}/studygrowth
+cp ~/Chemistry/Code/studygrowth /u/scratch/d/dinoo/${basedir}/studygrowth${SGE_TASK_ID
 cd /u/scratch/d/dinoo/${basedir}/
-./studygrowth $strdir $l $d >log
+./studygrowth $strdir $l $d >log${SGE_TASK_ID
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
