@@ -128,7 +128,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     //for each file analyze the structure
     for (int filen = 0; filen < n; filen++)
     {
-
+        cout << filen << endl;
         int TT;
         bool vv3;
         matrix<double> postemp = importcsv(dir + "/" + posfiles[filen], TT, vv3); //import my file
