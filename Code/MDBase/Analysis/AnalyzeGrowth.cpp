@@ -110,6 +110,85 @@ matrix<int> getgrowthcurve(string dir, ComboPatch &iny, int N_Largest)
 
     // bindfiles is our vector with all the strings of the files
 }
+
+matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance, int N_Largest) {
+    vector<string> posfiles;
+    cout << dir << endl;
+    return_csv_in_dir(dir, "pos", posfiles);
+
+    int n = posfiles.size();
+
+    vector1<bool> pb(3, true);
+    cube geo(l, pb, 3);
+
+    vector<mdpair> edgelist;
+
+    matrix<int> RES(n, N_Largest);
+    
+    //for each file analyze the structure
+    for (int filen = 0; filen < n; filen++)
+    {
+
+        int TT;
+        bool vv3;
+        matrix<double> postemp = importcsv(dir + "/" + posfiles[filen], TT, vv3); //import my file
+        int N = postemp.getNsafe();
+
+        vector<mdpair> edgelist;
+
+        //we want to get an edgelist of all the particles
+
+
+            //bool is_bound = bool(bbs2.isbound[b_index]);
+
+        for(int i = 0  ; i < N ; i++) {
+            for(int j = i+1 ; j < N ; j++) {
+                if(geo.distance_less_than(postemp,i,j,binding_distance)) 
+                {
+                    mdpair test(i, j);
+                    edgelist.push_back(test);
+                }
+                
+            }
+        }
+        
+    
+    vector<int> indexes2 = ConnectedComponentsParallel(edgelist, N);
+
+    unordered_map<int, size_t> count; // holds count of each encountered number
+    for (int i = 0; i < N; i++)
+        count[indexes2[i]]++;
+
+    std::vector<int> vals;
+    vals.reserve(count.size());
+    //connected components are now saved to indexes2;
+    for (auto kv : count)
+    {
+        vals.push_back(kv.second);
+    }
+
+    #if defined(_OPENMP)
+        __gnu_parallel::sort(vals.begin(), vals.end(), greater<int>());
+    #else
+        std::sort(vals.begin(), vals.end(), greater<int>());
+    #endif
+
+    //now we have the edgelist
+
+        for (int j = 0; j < N_Largest; j++)
+        {
+            if (j > vals.size())
+            {
+                RES(filen, j) = 0;
+            }
+            else
+            {
+                RES(filen, j) = vals[j];
+            }
+        }
+    }
+}
+
 #endif /* ANALYZEGROWTH_CPP */
 
 

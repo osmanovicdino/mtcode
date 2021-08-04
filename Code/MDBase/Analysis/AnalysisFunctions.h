@@ -24,6 +24,8 @@ matrix<int> calcg1(matrix<double> &data, vector1<double> &orient, cube &geo, dou
 //get the growth curve of files in a directory dir
 matrix<int> getgrowthcurve(string dir, ComboPatch &iny, int N_Largest);
 
+matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance);
+
 #include "PairCorrelation.cpp"
 #include "AnalyzeGrowth.cpp"
 
