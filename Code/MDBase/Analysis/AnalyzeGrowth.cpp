@@ -149,7 +149,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
         matrix<int> * pairs = A->calculatepairs_parallel(boxes, dis);
 
 
-        int N = pairs->getNsafe();
+        int Np = pairs->getNsafe();
         vector<mdpair> edgelist;
 
         //we want to get an edgelist of all the particles
@@ -157,7 +157,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
 
             //bool is_bound = bool(bbs2.isbound[b_index]);
 
-        for(int i = 0  ; i < N ; i++) {
+        for(int i = 0  ; i < Np ; i++) {
             int p1 = (*pairs)(i, 0);
             int p2 = (*pairs)(i, 1);
             if (geo.distance_less_than(postemp, p1, p2, binding_distance))
@@ -169,7 +169,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
             
         }
         
-    
+    int N =  postemp.getNsafe();
     vector<int> indexes2 = ConnectedComponentsParallel(edgelist, N);
 
     unordered_map<int, size_t> count; // holds count of each encountered number
