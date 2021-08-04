@@ -121,6 +121,15 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     vector1<bool> pb(3, true);
     cube geo(l, pb, 3);
 
+    LangevinNVT *A;
+    A = new LangevinNVT(geo);
+
+    
+    double dis = 3.5;
+    int num = floor(l / dis);
+    int ccc;
+    matrix<int> boxes = A->getgeo().generate_boxes_relationships(num, ccc);
+
     vector<mdpair> edgelist;
 
     matrix<int> RES(n, N_Largest);
@@ -132,8 +141,15 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
         int TT;
         bool vv3;
         matrix<double> postemp = importcsv(dir + "/" + posfiles[filen], TT, vv3); //import my file
-        int N = postemp.getNsafe();
 
+        A->setdat(postemp);
+
+        
+
+        matrix<int> * pairs = A->calculatepairs_parallel(boxes, dis);
+
+
+        int N = pairs->getNsafe();
         vector<mdpair> edgelist;
 
         //we want to get an edgelist of all the particles
@@ -142,14 +158,15 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
             //bool is_bound = bool(bbs2.isbound[b_index]);
 
         for(int i = 0  ; i < N ; i++) {
-            for(int j = i+1 ; j < N ; j++) {
-                if(geo.distance_less_than(postemp,i,j,binding_distance)) 
-                {
-                    mdpair test(i, j);
-                    edgelist.push_back(test);
+            int p1 = (*pairs)(i, 0);
+            int p2 = (*pairs)(i, 1);
+            if (geo.distance_less_than(postemp, p1, p2, binding_distance))
+            {
+                mdpair test(p1, p2);
+                edgelist.push_back(test);
                 }
                 
-            }
+            
         }
         
     
@@ -186,6 +203,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
                 RES(filen, j) = vals[j];
             }
         }
+        delete pairs;
     }
 
     return RES;
