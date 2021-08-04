@@ -21,6 +21,10 @@
 #include <algorithm>
 #include <parallel/algorithm>
 #include <string.h>
+
+#include <unistd.h>
+#include <execinfo.h>
+#include <signal.h>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
