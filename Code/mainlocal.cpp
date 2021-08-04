@@ -22,6 +22,12 @@
 #include <parallel/algorithm>
 #include <chrono>
 
+//includes needed for backtracing
+
+#include <unistd.h>
+#include <execinfo.h>
+#include <signal.h>
+
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -55,7 +61,7 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
-    //signal(SIGSEGV, handler);
+    signal(SIGSEGV, handler);
 
 
 

@@ -743,19 +743,19 @@ int return_csv_in_dir(string directory, string match, vector<string> &files)
     return 0;
 }
 
-// void handler(int sig)
-// {
-//     void *array[10];
-//     size_t size;
+void handler(int sig)
+{
+    void *array[10];
+    size_t size;
 
-//     // get void*'s for all entries on the stack
-//     size = backtrace(array, 10);
+    // get void*'s for all entries on the stack
+    size = backtrace(array, 10);
 
-//     // print out all the frames to stderr
-//     fprintf(stderr, "Error: signal %d:\n", sig);
-//     backtrace_symbols_fd(array, size, STDERR_FILENO);
-//     exit(1);
-// }
+    // print out all the frames to stderr
+    fprintf(stderr, "Error: signal %d:\n", sig);
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
+    exit(1);
+}
 
 
 #endif	/* BASIC_H */
