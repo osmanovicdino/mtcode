@@ -38,10 +38,10 @@ else
    exit 1
 fi
 dirwemake=$strdir
-cp ~/Chemistry/Code/mainanalyzedist.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
+# cp ~/Chemistry/Code/mainanalyzedist.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 # g++ ~/Chemistry/Code/mainanalyze.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron_analyze
-cp ~/Chemistry/Code/studygrowth /u/scratch/d/dinoo/${basedir}/${dirwemake}/studygrowth
-cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
+cp ~/Chemistry/Code/studygrowth /u/scratch/d/dinoo/${basedir}/studygrowth
+cd /u/scratch/d/dinoo/${basedir}/
 ./studygrowth $strdir $l $d >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
