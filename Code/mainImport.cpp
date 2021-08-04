@@ -20,6 +20,10 @@
 #include <random>
 #include <algorithm>
 #include <parallel/algorithm>
+
+#include <unistd.h>
+#include <execinfo.h>
+#include <signal.h>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -53,7 +57,7 @@ using namespace std;
 int main(int argc, char** argv) {
 
     srand(time(NULL));
-    //signal(SIGSEGV, handler);
+    signal(SIGSEGV, handler);
 
     double packing_fraction;
     double int1;
