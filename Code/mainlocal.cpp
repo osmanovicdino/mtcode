@@ -105,7 +105,7 @@ int main(int argc, char **argv)
         int2 = 12.0;
         int3 = 4.0;
         int4 = 60.0;
-        m5 = 16000;
+        m5 = 4000;
         m6 = 16000;
         energy_barrier = 0.001;
         anti_en = -20.;
@@ -441,8 +441,10 @@ int main(int argc, char **argv)
     Condensate A(l, n);
 
 
+    A.setup_large_droplet(m1,m5,m6,0.640658,  l);
 
-
+    
+    cout << "droplet setup" << endl;
     //A.setup_tight_packing(1.8*size);
 
     
@@ -536,6 +538,9 @@ int main(int argc, char **argv)
     //cout << "bout to run" << endl;
 
     auto start = high_resolution_clock::now();
+
+
+    cout << "start" << endl;
 
     A.run_singlebond(runtime, every, base);
 

@@ -223,6 +223,21 @@ inline T& matrix<T>::operator()(int i, int j) {
             cout << "index out of range in matrix operator(int,int)" << endl;
             cout << "(i,j) = (" << i << "," << j <<")" << endl;
             cout << "maxvalues: " << nrows-1 << "," << ncols-1 << endl;
+            int nr = nrows;
+            int nc = ncols;
+            cout << "{";
+            for (int i = 0; i < nr; ++i)
+            {
+                cout << "{";
+                for (int j = 0; j < nc; ++j)
+                {
+                    j == nc - 1 ? cout << mat[i * nc + j] : cout << mat[i * nc + j] << ",";
+                }
+                i != nr - 1 ? cout << "}\n," : cout << "}";
+            }
+            cout << "};" << endl;
+
+            
             error(""); }
 	
 	return mat[i*ncols+j];

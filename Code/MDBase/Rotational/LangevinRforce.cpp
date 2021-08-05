@@ -2869,6 +2869,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(matrix<int> &p
     //now we have only the real forces, we no longer need to calculate the forces for the non-bound particles:
 }
 
+
+
 void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
 {
 
@@ -3076,6 +3078,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
         }
     }
 
+   // cout << edgelist.size() << endl;
+
+
+
+
     PairHistogramExtendedParallel(edgelist, boindices, boscores, tempbound);
 
     // matrix<int> boindicesx;   //(total_number_of_patches, depth_of_matrix);
@@ -3096,7 +3103,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
     // vector1<int> countubtc(3);
     //cout << " largest cluster: " << maxval(tempbound) << endl;
 
-#pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < total_number_of_patches; i++)
     { //check bindings, if distance metric is wrong, break bindings
         if (bo.isbound[i])
@@ -3125,6 +3132,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
         }
     }
 
+
     //save connectivity
     // for(int i = 0  ; i < edgelist.size() ; i++) {
     //     int wp1 = edgelist[i].a;
@@ -3145,6 +3153,16 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
     ConnectedComponentsParallel(edgelist, indexes2);
 
+    // vector1<int> indexes3;
+    // indexes3.resize_parallel_ascending(total_number_of_patches);
+
+    // ConnectedComponentsParallel_Old(edgelist, indexes2);
+
+    // cout << (indexes2 == indexes3) << endl;
+    // outfunc(indexes2,"sg1");
+    // outfunc(indexes3, "sg2");
+    // pausel();
+
     //compare the triplets in ConnectedComponentsParallel and the normal connected components
 
     //int depth_of_matrix2 = 15;
@@ -3155,10 +3173,13 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
     //SingleHistogram(indexes2, boindices2, ccs);
     matrix<int> boindices2;
+
     SingleHistogramParallel(indexes2, ccs, boindices2);
     //int wid =  boindices2.getncols();
 
     //outfunc(indexes2,"hola");
+
+
 
     vector1<double> rands;
     rands.resize_parallel(total_number_of_patches);
@@ -3324,7 +3345,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                         c23 = true;
                     }
                     else
-                        error("something weird");
+                        error("something weird orig");
 
                     //check the other
                 }
@@ -3389,7 +3410,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
                     cout << endl;
 
-                    error("error in clustering algorithm");
+                    error("error in clustering algorithm orig");
                 }
 
                 bool a12;
@@ -3725,7 +3746,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                                 c23 = true;
                             }
                             else
-                                error("something weird");
+                                error("something weird new");
 
                             //check the other
                         }

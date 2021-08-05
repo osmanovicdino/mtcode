@@ -390,4 +390,235 @@ void Process_Triplet(int ti1, int ti2, int ti3, BinaryBindStore &bo, AbstractBin
     }
 }
 
+void LangevinNVTR::setup_random_binding(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm)
+{
+    int total_number_of_patches = bo.boundto.getsize(); //iny.get_total_patches(this->getN());
+
+    vector1<int> tempbound;
+    tempbound.resize_parallel(total_number_of_patches); //no binding to begin wtih
+
+    int depth_of_matrix = 10; //Choose this value to be deep enough such that all values can be stored
+
+    matrix<int> boindices;   //(total_number_of_patches, depth_of_matrix);
+    matrix<double> boscores; //(total_number_of_patches, depth_of_matrix);
+
+    boindices.resize_parallel(total_number_of_patches, depth_of_matrix);
+    boscores.resize_parallel(total_number_of_patches, depth_of_matrix);
+
+    vector<mdpairwd> edgelist;
+    edgelist.reserve(total_number_of_patches);
+
+    //std::mutex mtx;
+
+    //int total_checks = 0;
+    int tn_pairs = pairs.size();
+    int t_u_pairs = divs.size();
+    double mk = iny.max_check;
+
+    if (tn_pairs > 0)
+    {
+#pragma omp parallel
+        {
+            vector<mdpairwd> edgelist_private;
+            edgelist_private.reserve(total_number_of_patches);
+
+#pragma omp for nowait schedule(dynamic)
+            for (int ik = 0; ik < t_u_pairs + 1; ++ik)
+            {
+                int i, fi; //the start and end indices
+                if (ik == 0)
+                {
+                    if (tn_pairs == 0)
+                    {
+                        i = 0;
+                        fi = 0;
+                        error("should get here");
+                    }
+                    else if (t_u_pairs == 0)
+                    {
+                        i = 0;
+                        fi = tn_pairs;
+                    }
+                    else
+                    {
+                        i = 0;
+                        fi = divs[ik];
+                    }
+                }
+                else if (ik == t_u_pairs)
+                {
+                    i = divs[ik - 1];
+                    fi = tn_pairs;
+                }
+                else
+                {
+                    i = divs[ik - 1];
+                    fi = divs[ik];
+                }
+
+                int p1, p2;
+                pairs[i].get_particle(p1, p2);
+                // patchint tempo = pairs[i];
+                // int p1 = tempo.particle_index1;
+                // int p2 = tempo.particle_index2;
+
+                //int i1 = pairs(i,2);
+                double dis;
+                //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+                vector1<double> un(dimension);
+                geo.distance_vector(*dat, p1, p2, un, dis);
+
+                //un = i-j
+
+                if (dis < SQR(mk))
+                {
+                    dis = sqrt(dis);
+                    un /= dis;
+                    double dx = un.gpcons(0);
+                    double dy = un.gpcons(1);
+                    double dz = un.gpcons(2);
+
+                    double qtemp0 = orient->gpcons(p1, 0);
+                    double qtemp1 = orient->gpcons(p1, 1);
+                    double qtemp2 = orient->gpcons(p1, 2);
+                    double qtemp3 = orient->gpcons(p1, 3);
+                    double qtemp4 = orient->gpcons(p1, 4);
+                    double qtemp5 = orient->gpcons(p1, 5);
+                    double qtemp6 = orient->gpcons(p1, 6);
+                    double qtemp7 = orient->gpcons(p1, 7);
+                    double qtemp8 = orient->gpcons(p1, 8);
+
+                    double gtemp0 = orient->gpcons(p2, 0);
+                    double gtemp1 = orient->gpcons(p2, 1);
+                    double gtemp2 = orient->gpcons(p2, 2);
+                    double gtemp3 = orient->gpcons(p2, 3);
+                    double gtemp4 = orient->gpcons(p2, 4);
+                    double gtemp5 = orient->gpcons(p2, 5);
+                    double gtemp6 = orient->gpcons(p2, 6);
+                    double gtemp7 = orient->gpcons(p2, 7);
+                    double gtemp8 = orient->gpcons(p2, 8);
+
+                    for (int j = i; j < fi; j++)
+                    {
+                        //pairschecked++;
+                        int potn, wp1, wp2;
+                        pairs[j].get_patch(potn, wp1, wp2);
+                        mypot *temppot = iny.potential_bundle[potn];
+
+                        double nxb1 = temppot->nxb1;
+                        double nxb2 = temppot->nxb2;
+                        double nyb1 = temppot->nyb1;
+                        double nyb2 = temppot->nyb2;
+                        double nzb1 = temppot->nzb1;
+                        double nzb2 = temppot->nzb2;
+                        double disp = temppot->interaction_distance;
+                        double thetam = temppot->thetam;
+                        double ctm = cos(thetam);
+                        double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+                        double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+                        double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+                        double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+                        double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+                        double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+                        double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
+                        double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
+
+                        // cout << p1 << " " << p2 << " " << wp1 << " " << wp2 << " " << disp << " " << thetam << endl;
+                        // pausel();
+                        //cout << disp << endl;
+                        //different conditions depending on whether there is binding or not.
+
+                        double disp2;
+                        bool cond1 = bo.boundto[wp1] == wp2 && bo.boundto[wp2] == wp1;
+                        bool b1, b2;
+
+                        b1 = bo.isbound[wp1];
+                        b2 = bo.isbound[wp2];
+
+                        if (b1 && b2 && cond1)
+                        { //both bound and to each other
+                            disp2 = disp;
+                        }
+                        else if (b1 && b2 && !cond1) //both bound and not to each other
+                        {
+                            disp2 = 0.5 * disp; //if both bound, make the conditions more onerous
+                        }
+                        else if (!b1 != !b2) //only one bound
+                        {
+                            disp2 = 0.7 * disp; //more onerous
+                        }
+                        else
+                        {
+                            //neither bound
+                            disp2 = disp;
+                        }
+
+                        if (argthetai > ctm && argthetaj > ctm && dis < disp2)
+                        {
+
+                            double scr1 = 1 - (argthetai - cos(thetam));
+                            double scr2 = 1 - (argthetaj - cos(thetam));
+
+                            double scr3 = 2 * (dis / disp2);
+
+                            double scr4 = -log(1E-10 + bm.calculate_score(wp1, wp2, b1 && b2 && cond1));
+
+                            double scr = scr1 + scr2 + scr3 + scr4;
+
+                            mdpairwd test(wp1, wp2, scr);
+                            edgelist_private.push_back(test);
+                        }
+                    }
+                }
+                // else {
+                //     pairschecked += fi-i;
+                // }
+                //pausel();
+            }
+
+            //     }
+            // }
+
+#pragma omp for schedule(static) ordered
+            for (int i = 0; i < omp_get_num_threads(); i++)
+            {
+#pragma omp ordered
+                edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
+            }
+        }
+    }
+
+    std::random_shuffle(edgelist.begin(), edgelist.end()); //every day I'm shuffling
+
+    // PairHistogramExtendedParallel(edgelist, boindices, boscores, tempbound);
+
+    int np = edgelist.size();
+    for(int i = 0  ; i < np ; i++) {
+        int wp1 =  edgelist[i].a;
+        int wp2 =  edgelist[i].b;
+
+        double scr =  edgelist[i].scr;
+        
+
+        bool bin1 = bo.isbound[wp1];
+        bool bin2 = bo.isbound[wp2];
+
+        if(!bin1 && !bin2 && scr < 4. ) {
+            bo.isbound[wp1] = true;
+            bo.isbound[wp2] = true;
+            bo.boundto[wp1] = wp2;
+            bo.boundto[wp2] = wp1;
+        }
+        else{
+
+        }
+    }
+
+
+
+   
+}
+
 #endif /* LANGEVINRFORCEUTIL_CPP */

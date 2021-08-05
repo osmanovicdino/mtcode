@@ -129,6 +129,9 @@ public:
 		}
 	}
 
+	void setup_random_binding(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm);
+
+
 	void setorientation(vector1<double> &a, vector1<double> &b, int i) {
 		//maps a to b
 		// (*orient)(i,0) = 1 - (SQR(a(1)*b(0) - a(0)*b(1) + SQR(a(2)*b(0) - a(0)*b(2))/(1 + a(0)*b(0) + a(1)*b(1) + a(2)*b(2));

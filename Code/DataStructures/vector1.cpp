@@ -103,21 +103,22 @@ if (size < 1 ) { error("cannot delete elements in a vector of size 1"); }
 
 }
 
-
+// #define watch(x) cout << (#x) << " is " << (x) << endl
 
 template <class T>
 inline T& vector1<T>::operator[](int i) { //safe method for accessing element
- if (i<0 || i > size-1) {
-     cout << "index out of range in vector1 operator[]" << endl;
-     cout << "current choice = " << i << endl;
-     cout << "maxvalue = " << size << endl;
-     cout << "following values: " << endl;
-     for (int i = 0; i < size; i++)
-     {
-         cout << data[i] << ",";
-     }
-     error("i not in range");
- }
+//  if (i<0 || i > size-1) {
+//      cout << "index out of range in vector1 operator[]" << endl;
+//      cout << "current choice = " << i << endl;
+//      cout << "maxvalue = " << size << endl;
+//      cout << "following values: " << endl;
+//      watch(*this);
+//      for (int i = 0; i < size; i++)
+//      {
+//          cout << data[i] << ",";
+//      }
+//      error("i not in range");
+//  }
  return data[i];
 }
 

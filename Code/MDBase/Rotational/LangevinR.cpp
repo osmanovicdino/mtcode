@@ -1151,7 +1151,7 @@ vector<thetapair> LangevinNVTR::check_arg_thetas_per_pair(matrix<int> &pairs, Co
     unsigned int i;
     int tp = pairs.getNsafe();
 
-#pragma omp parallel
+    #pragma omp parallel
     {
         vector<thetapair> edgelist_private;
         edgelist_private.reserve(pairs.getnrows());

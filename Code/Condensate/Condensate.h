@@ -26,6 +26,10 @@ void setBindingModel(AbstractBindingModel&);
 
 void setup_tight_packing(double size);
 
+void setup_large_droplet(int N1, int N2, int N3, double dens, double ll);
+
+
+
 void run(int,int, string strbase);
 
 void run_singlebond(int,int,string strbase);

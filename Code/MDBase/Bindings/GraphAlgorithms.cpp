@@ -51,6 +51,7 @@ void SingleHistogramParallel(vector1<int> &indexes2, vector1<int> &ccs, matrix<i
     }
 
     int sl = maxval_parallel(ccs);
+   
     boiindices2.resize_parallel(n,sl);
     vector1<int> count;//(n);
     count.resize_parallel(n);
@@ -616,7 +617,7 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
 
 
 //for all templates Y which have member functions a and b
-
+/* 
 template <typename Y>
 void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
     
@@ -637,16 +638,19 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
     int nr = adj.size();
     int ss = indexes.size;
 
-    
+
+    bool equiv;
     #pragma omp parallel
-    {
     
-    static bool equiv; //shared between all threads
+    {
 
-    for(;;) {
-        //cout << "iterate" << endl;
-        
-
+        //#pragma omp ordered
+        #pragma omp single
+        for (;;)
+        {
+            //cout << "iterate" << endl;
+            //shared between all threads    
+        bool equiv;
         #pragma omp for schedule(static)
         for(int i= 0 ; i < ss ; i++) {
             ftemp.data[i] = indexes.data[i];
@@ -706,8 +710,8 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
                 fnext.data[u] = indexes.data[fu];
             }
         }
-
         equiv = true;
+
 
         #pragma omp for schedule(static)
         for (int i = 0; i < ss; i++)
@@ -720,16 +724,130 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
                 equiv = false;
             }
         }
+
+
+        if(equiv)
+            break;
         
-
-        //cout << "done 3" << endl;    
-        //bool equiv = true;
-       if(equiv) break;
-    }
-
-
+        }
     }
    // pausel();
+} */
+
+template <typename Y>
+void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes)
+{
+
+    //WE duplicate the connectivity naturally here
+
+    //vector1<int> f(indexes);
+    vector1<int> fnext(indexes);
+    //if(res.size() != indexes.size) error("error in capacity of save function");
+    vector1<int> ftemp(indexes.getsize());
+
+    // #pragma omp parallel for schedule(static)
+    // for(int i = 0  ; i < indexes.getNsafe() ; i++) {
+    //     f[i] =  indexes[i];
+    //     gf[i] = indexes[i];
+    // }
+
+    int nr = adj.size();
+    int ss = indexes.size;
+
+
+        
+
+        for (;;)
+        {
+            bool equiv;
+            //cout << "iterate" << endl;
+
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < ss; i++)
+            {
+                ftemp.data[i] = indexes.data[i];
+            }
+            //#pragma omp parallel
+
+            // cout << omp_get_num_threads() << endl;
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < 2 * nr; i++)
+            {
+                int u, v;
+                if (i % 2 == 0)
+                {
+                    u = adj[i / 2].a;
+                    v = adj[i / 2].b;
+                }
+                else
+                {
+                    u = adj[i / 2].b;
+                    v = adj[i / 2].a;
+                }
+                // int u,v;
+                // sort_doublet(u1,v1,u,v);
+
+                int fu = indexes.data[u];
+                //cout << u << " " << v << " " << fu << " " << f.data[v] << endl;
+                if (fu == indexes.data[fu] && indexes.data[v] < fu)
+                {
+                    fnext.data[fu] = indexes.data[v];
+                }
+
+                // int u1 = v;
+                // int v1 = u;
+                // // int u,v;
+                // // sort_doublet(u1,v1,u,v);
+
+                // int fu1 = indexes.data[u1];
+                // //cout << u << " " << v << " " << fu << " " << f.data[v] << endl;
+                // if (fu1 == indexes.data[fu1] && indexes.data[v1] < fu1)
+                // {
+                //     fnext.data[fu1] = indexes.data[v1];
+                // }
+                //pausel();
+            }
+
+            //cout << "loop done" << endl;
+
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < ss; i++)
+                indexes.data[i] = fnext.data[i];
+
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < ss; i++)
+            {
+                int u = i;
+                int fu = indexes.data[u];
+
+                if (fu != indexes.data[fu])
+                {
+                    fnext.data[u] = indexes.data[fu];
+                }
+            }
+
+            equiv = true;
+
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < ss; i++)
+            {
+                if (indexes.data[i] != fnext.data[i])
+                {
+                    indexes.data[i] = fnext.data[i];
+                }
+                if (fnext.data[i] != ftemp.data[i])
+                {
+                    equiv = false;
+                }
+            }
+
+            //cout << "done 3" << endl;
+            //bool equiv = true;
+            if (equiv)
+                break;
+        }
+    
+    // pausel();
 }
 
 template <typename Y>

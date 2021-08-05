@@ -157,6 +157,98 @@ void Condensate::setup_tight_packing(double size) {
 
 }
 
+
+
+void Condensate::setup_large_droplet(int N1, int N2, int N3, double dens, double ll) {
+    //(4./3.)*pi*CUB(R) * dens == (N1+N2)
+    matrix<double> dat(N1+N2+N3, 3);
+    double radius_of_sphere_necessary = 6.0+cbrt(((double)(N1+N2) * 3.)/(pi*4.*dens));
+
+    if(radius_of_sphere_necessary > ll) error("too large a sphere for this to work");
+
+    vector<double> possible_pos_x_in_sphere;
+    vector<double> possible_pos_y_in_sphere;
+    vector<double> possible_pos_z_in_sphere;
+
+    vector<double> possible_pos_x_out_sphere;
+    vector<double> possible_pos_y_out_sphere;
+    vector<double> possible_pos_z_out_sphere;
+
+    double size =  cbrt((1./dens));
+
+    int pp = floor(ls / size);
+
+    for(int i = 0 ; i < pp ; i++) {
+        for(int j = 0  ; j < pp ; j++) {
+            for(int k = 0 ; k < pp ; k++) {
+                double x = 0.5 * size + i * size;
+                double y = 0.5 * size + j * size;
+                double z = 0.5 * size + k * size;
+
+                // bool cond1 = x < ll/2. - radius_of_sphere_necessary ||  x > ll/2. + radius_of_sphere_necessary;
+                // bool cond2 = y < ll / 2. - radius_of_sphere_necessary || y > ll / 2. + radius_of_sphere_necessary;
+                // bool cond3 = z < ll / 2. - radius_of_sphere_necessary || z > ll / 2. + radius_of_sphere_necessary;
+                bool cond1 = SQR(x-ll/2.)+SQR(y-ll/2.)+SQR(z-ll/2.) < SQR(radius_of_sphere_necessary);
+
+                if(cond1) {
+                    possible_pos_x_in_sphere.push_back(x);
+                    possible_pos_y_in_sphere.push_back(y);
+                    possible_pos_z_in_sphere.push_back(z);
+                }
+                else {
+                    possible_pos_x_out_sphere.push_back(x);
+                    possible_pos_y_out_sphere.push_back(y);
+                    possible_pos_z_out_sphere.push_back(z);
+                }
+            }
+        }
+    }
+
+
+
+
+    for(int i = 0  ; i < N1 ; i++) {
+        
+        int randint = rand() % (possible_pos_x_in_sphere.size());
+        dat(i, 0) = possible_pos_x_in_sphere[randint];
+        dat(i, 1) = possible_pos_y_in_sphere[randint];
+        dat(i, 2) = possible_pos_z_in_sphere[randint];
+
+        possible_pos_x_in_sphere.erase(possible_pos_x_in_sphere.begin() + randint);
+        possible_pos_y_in_sphere.erase(possible_pos_y_in_sphere.begin() + randint);
+        possible_pos_z_in_sphere.erase(possible_pos_z_in_sphere.begin() + randint);
+    }
+    for(int i = N1 ; i < N1 + N2 ; ++i) {
+
+        int randint = rand() % (possible_pos_x_out_sphere.size());
+        dat(i, 0) = possible_pos_x_out_sphere[randint];
+        dat(i, 1) = possible_pos_y_out_sphere[randint];
+        dat(i, 2) = possible_pos_z_out_sphere[randint];
+
+        possible_pos_x_out_sphere.erase(possible_pos_x_out_sphere.begin() + randint);
+        possible_pos_y_out_sphere.erase(possible_pos_y_out_sphere.begin() + randint);
+        possible_pos_z_out_sphere.erase(possible_pos_z_out_sphere.begin() + randint);
+    }
+    for (int i = N1 + N2; i < N1 + N2 + N3; ++i)
+    {
+
+        int randint = rand() % (possible_pos_x_in_sphere.size());
+        dat(i, 0) = possible_pos_x_in_sphere[randint];
+        dat(i, 1) = possible_pos_y_in_sphere[randint];
+        dat(i, 2) = possible_pos_z_in_sphere[randint];
+
+        possible_pos_x_in_sphere.erase(possible_pos_x_in_sphere.begin() + randint);
+        possible_pos_y_in_sphere.erase(possible_pos_y_in_sphere.begin() + randint);
+        possible_pos_z_in_sphere.erase(possible_pos_z_in_sphere.begin() + randint);
+    }
+
+
+
+    obj->setdat(dat);
+
+}
+
+
 void Condensate::setviscosity(double a)
 {
     double hdradius = 0.5;
@@ -380,10 +472,13 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
 
 
+    obj->setup_random_binding(opairs,runs_diff, *pots, bbs, *bm); //randomly arrange binding
     //cout << "fi" << endl;
-    //cout << "fi" << endl;
+
+
     obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs , *bm, F, T);
-    //cout << "fi2" << endl;
+
+
 
     generate_uniform_random_matrix(RT);
 

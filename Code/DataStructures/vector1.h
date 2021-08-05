@@ -283,6 +283,9 @@ public:
         template <typename Y>
         friend void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes);
 
+        template <typename Y>
+        friend void ConnectedComponentsParallel_Old(vector<Y> &adj, vector1<int> &indexes);
+
         friend int total_bool(const vector1<bool>&);
 };
 
