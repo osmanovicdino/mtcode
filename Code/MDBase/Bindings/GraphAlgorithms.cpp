@@ -617,9 +617,9 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
 
 
 //for all templates Y which have member functions a and b
-/* 
+
 template <typename Y>
-void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
+void ConnectedComponentsParallel_Old(vector<Y> &adj, vector1<int> &indexes) {
     
     //WE duplicate the connectivity naturally here
 
@@ -639,14 +639,15 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
     int ss = indexes.size;
 
 
-    bool equiv;
-    #pragma omp parallel
+    bool globe = false;
+    vector1<bool> local(omp_get_max_threads());
     
+    #pragma omp parallel
     {
 
         //#pragma omp ordered
-        #pragma omp single
-        for (;;)
+        
+        while (!globe)
         {
             //cout << "iterate" << endl;
             //shared between all threads    
@@ -655,6 +656,7 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
         for(int i= 0 ; i < ss ; i++) {
             ftemp.data[i] = indexes.data[i];
         }
+
         //#pragma omp parallel 
         
            // cout << omp_get_num_threads() << endl;
@@ -693,6 +695,7 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
             //pausel();
         }
 
+
         //cout << "loop done" << endl;
 
         #pragma omp for schedule(static)
@@ -710,6 +713,8 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
                 fnext.data[u] = indexes.data[fu];
             }
         }
+
+
         equiv = true;
 
 
@@ -725,14 +730,28 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes) {
             }
         }
 
+        
 
-        if(equiv)
-            break;
+        #pragma omp for schedule(static)
+        for(int i = 0 ; i < omp_get_max_threads() ; i++) {
+            local[omp_get_thread_num()] = equiv;
+        }
+
+        #pragma omp single
+        globe = local[0];
+
+        #pragma omp for reduction(&&: globe)
+        for (int i = 1; i < omp_get_max_threads(); i++)
+            globe = globe && local[i];
+
+
+        // if(globe)
+        //     break;
         
         }
     }
    // pausel();
-} */
+} 
 
 template <typename Y>
 void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes)
@@ -768,6 +787,7 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes)
                 ftemp.data[i] = indexes.data[i];
             }
             //#pragma omp parallel
+
 
             // cout << omp_get_num_threads() << endl;
             #pragma omp parallel for schedule(static)
@@ -808,6 +828,8 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes)
                 //pausel();
             }
 
+
+
             //cout << "loop done" << endl;
 
             #pragma omp parallel for schedule(static)
@@ -825,6 +847,8 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes)
                     fnext.data[u] = indexes.data[fu];
                 }
             }
+
+
 
             equiv = true;
 

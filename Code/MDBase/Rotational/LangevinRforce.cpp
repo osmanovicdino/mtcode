@@ -3146,22 +3146,17 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
     //matrix<int> edgelist = this->CreateEdgeList(boindices, tempbound);
 
-    //string sg = "a";
-    vector1<int> indexes2; //(total_number_of_patches, sg);
+    // vector1<int> indexes2; //(total_number_of_patches, sg);
+    // indexes2.resize_parallel_ascending(total_number_of_patches);
+    // //std::vector<mdpair> jhg(total_number_of_patches);
+
+    // ConnectedComponentsParallel(edgelist, indexes2);
+    
+
+    vector1<int> indexes2;
     indexes2.resize_parallel_ascending(total_number_of_patches);
-    //std::vector<mdpair> jhg(total_number_of_patches);
 
-    ConnectedComponentsParallel(edgelist, indexes2);
-
-    // vector1<int> indexes3;
-    // indexes3.resize_parallel_ascending(total_number_of_patches);
-
-    // ConnectedComponentsParallel_Old(edgelist, indexes2);
-
-    // cout << (indexes2 == indexes3) << endl;
-    // outfunc(indexes2,"sg1");
-    // outfunc(indexes3, "sg2");
-    // pausel();
+    ConnectedComponentsParallel_Old(edgelist, indexes2);
 
     //compare the triplets in ConnectedComponentsParallel and the normal connected components
 

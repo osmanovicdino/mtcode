@@ -162,7 +162,7 @@ void Condensate::setup_tight_packing(double size) {
 void Condensate::setup_large_droplet(int N1, int N2, int N3, double dens, double ll) {
     //(4./3.)*pi*CUB(R) * dens == (N1+N2)
     matrix<double> dat(N1+N2+N3, 3);
-    double radius_of_sphere_necessary = 6.0+cbrt(((double)(N1+N2) * 3.)/(pi*4.*dens));
+    double radius_of_sphere_necessary = 1.0+cbrt(((double)(N1+N3) * 3.)/(pi*4.*dens));
 
     if(radius_of_sphere_necessary > ll) error("too large a sphere for this to work");
 
@@ -202,6 +202,13 @@ void Condensate::setup_large_droplet(int N1, int N2, int N3, double dens, double
                 }
             }
         }
+    }
+
+
+    if(possible_pos_x_in_sphere.size() < N1+ N3) {
+        cout << possible_pos_x_in_sphere.size();
+        error("sphere not large enough");
+
     }
 
 

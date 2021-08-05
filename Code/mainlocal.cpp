@@ -39,6 +39,9 @@ inline omp_int_t omp_get_max_threads() { return 1; }
 inline omp_int_t omp_get_num_threads() { return 1; }
 #endif
 
+using namespace std;
+using namespace std::chrono;
+
 #include "Basic/basic.h"
 #include "DataStructures/vector1.h"
 #include "DataStructures/matrix2.h"
@@ -54,8 +57,7 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 
 //#include "MDGPU.cu"
 
-using namespace std;
-using namespace std::chrono;
+
 
 int main(int argc, char **argv)
 {
@@ -106,7 +108,7 @@ int main(int argc, char **argv)
         int3 = 4.0;
         int4 = 60.0;
         m5 = 4000;
-        m6 = 16000;
+        m6 = 20000;
         energy_barrier = 0.001;
         anti_en = -20.;
         inv_en = 2.0;
