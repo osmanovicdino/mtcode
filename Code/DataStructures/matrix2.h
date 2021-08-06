@@ -13,6 +13,7 @@
 #define	MATRIX_H
 
 #include "vector1.h"
+#include "mdpair.h"
 #include "vector1.cpp"
 
 //we'd like these classes below to have access to the matrix class
@@ -42,6 +43,7 @@ public:
         matrix(int,int,const matrix&,T); //imbed small matrix in large one, with rest of values T 
         template <class Y>
         matrix(const matrix<Y>&);
+        matrix(const vector<mdpair>&);
 
         matrix(int,int,int, T[]);
         matrix(int, int, vector1<T>&);

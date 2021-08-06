@@ -72,6 +72,20 @@ matrix<T>::matrix(const matrix<T> &m) {
 	mat = new T [datapoints];
 	for ( int i = 0 ; i < datapoints ; i++ ) mat[i] = m.mat[i];
 }
+
+template <class T>
+matrix<T>::matrix(const vector<mdpair> &m)
+{
+    nrows = m.size();
+    ncols = 2;
+    datapoints = nrows * ncols;
+    mat = new T[datapoints];
+    for (int i = 0; i < nrows; i++) {
+        mat[2*i] = m[i].a;
+        mat[2*i+1] =  m[i].b;
+    }
+}
+
 template <class T>
 matrix<T>::matrix(int n, int m , const matrix<T> &a) {
     nrows = n;

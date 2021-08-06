@@ -155,6 +155,8 @@ void LangevinNVT::advance_pos() {
 	
 	
 	}
+
+
 	geo.correct_position_and_momentum(*dat,*mom);
 
 }

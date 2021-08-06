@@ -662,23 +662,27 @@ matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& size
 	//estimate the total number
 
 	int ss = boxlist.getncols();
-	int totn = 0;
-	for (int c1 = 0; c1 < boxlist.getNsafe(); c1++)
-	{
-		for (int c2 = 0; c2 < ss; c2++)
-		{
-			int box1 = c1;
-			int box2 = boxlist(c1, c2);
-			if (box1 == box2)
-			{
-				totn += ((sizes.gpcons(box1)) * (sizes.gpcons(box1) - 1)) / 2;
-			}
-			else
-			{
-				totn += (sizes.gpcons(box1)) * (sizes.gpcons(box2));
-			}
-		}
-	}
+	// int totn = 0;
+	// for (int c1 = 0; c1 < boxlist.getNsafe(); c1++)
+	// {
+	// 	for (int c2 = 0; c2 < ss; c2++)
+	// 	{
+	// 		int box1 = c1;
+	// 		int box2 = boxlist(c1, c2);
+	// 		if (box1 == box2)
+	// 		{
+	// 			totn += ((sizes.gpcons(box1)) * (sizes.gpcons(box1) - 1)) / 2;
+	// 		}
+	// 		else
+	// 		{
+	// 			totn += (sizes.gpcons(box1)) * (sizes.gpcons(box2));
+	// 		}
+	// 	}
+	// }
+	int N = this->getN();
+
+	int totn = 20*N;
+
 
 	//estimate the total number
 	vector<int> index1;
@@ -697,7 +701,7 @@ matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& size
 		index1_private.reserve(totn);
 		index2_private.reserve(totn);
 //vector<int> index3_private;
-#pragma omp for nowait schedule(static)
+		#pragma omp for nowait schedule(dynamic)
 		for (int c1 = 0; c1 < totb; c1++)
 			for (int c2 = 0; c2 < ss; c2++)
 			{
@@ -796,7 +800,9 @@ matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& size
 	a.resize_parallel(index1.size(), 2);
 //s_matrix<int> pairs(index1.size(),3);
 	int NN = a.getNsafe();
-	#pragma omp parallel for
+
+
+#pragma omp parallel for
 	for (int i = 0; i < NN; i++)
 	{
 		(a)(i, 0) = index1[i];
@@ -806,6 +812,137 @@ matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& size
 	return a;
 }
 
+vector<mdpair> MD::precalculatepairs_md(const matrix<int> &b, const vector1<int> &sizes, matrix<int> &boxlist, double cut_off)
+{
+
+	//estimate the total number
+
+	int ss = boxlist.getncols();
+	int totn = 0;
+	for (int c1 = 0; c1 < boxlist.getNsafe(); c1++)
+	{
+		for (int c2 = 0; c2 < ss; c2++)
+		{
+			int box1 = c1;
+			int box2 = boxlist(c1, c2);
+			if (box1 == box2)
+			{
+				totn += ((sizes.gpcons(box1)) * (sizes.gpcons(box1) - 1)) / 2;
+			}
+			else
+			{
+				totn += (sizes.gpcons(box1)) * (sizes.gpcons(box2));
+			}
+		}
+	}
+
+	//estimate the total number
+	vector<mdpair> index1;
+
+
+	index1.reserve(totn);
+	
+	int totb = boxlist.getNsafe();
+	//cout << "reserved: " << totn << endl;
+
+#pragma omp parallel
+	{
+		vector<mdpair> index1_private;
+		index1_private.reserve(totn);
+
+//vector<int> index3_private;
+		#pragma omp for nowait schedule(static)
+		for (int c1 = 0; c1 < totb; c1++)
+			for (int c2 = 0; c2 < ss; c2++)
+			{
+				int box1 = c1;
+				int box2 = boxlist(c1, c2);
+				int b1s = sizes.gpcons(box1); //[box1];
+				int b2s = sizes.gpcons(box2);
+
+				if (box1 == box2)
+				{
+					for (int i = 0; i < b1s; i++)
+					{
+						for (int j = i + 1; j < b2s; j++)
+						{
+							int iterator1 = b.gpcons(box1, i);
+							int iterator2 = b.gpcons(box2, j);
+							//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
+							//int q = ints.get_potential_number(iterator1,iterator2,l);
+
+							//if(int_dl[q]) {
+							bool cond = geo.distance_less_than(*dat, iterator1, iterator2, cut_off);
+							//bool cond =  distance_less_than(iterator1,iterator2,cut_off);
+
+							if (cond)
+							{
+								//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
+								//int q = ints.get_potential_number(iterator1,iterator2,l);
+								index1_private.push_back(mdpair(iterator1,iterator2));
+								//index2_private.push_back(iterator2);
+								//index3_private.push_back(0);
+								//}
+							}
+						}
+					}
+				}
+				else if (box2 > box1)
+				{
+					for (int i = 0; i < b1s; i++)
+					{
+						for (int j = 0; j < b2s; j++)
+						{
+							int iterator1 = b.gpcons(box1, i);
+							int iterator2 = b.gpcons(box2, j);
+
+							bool cond = geo.distance_less_than(*dat, iterator1, iterator2, cut_off);
+
+							if (cond)
+							{
+								//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
+								//int q = ints.get_potential_number(iterator1,iterator2,l);
+								index1_private.push_back(mdpair(iterator1, iterator2)); 
+								//index2_private.push_back(iterator2);
+								//index3_private.push_back(0);
+								//	}
+							}
+							// for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
+							// 	int q = ints.get_potential_number(iterator1,iterator2,l);
+
+							// 	if(int_dl[q]) {
+							// 		bool cond =  distance_less_than(iterator1,iterator2,int_dis[q]);
+
+							// 		if(cond) {
+							// 			index1_private.push_back(iterator1);
+							// 			index2_private.push_back(iterator2);
+							// 			index3_private.push_back(l);
+							// 		}
+
+							// 	}
+							// 	else {
+							// 		index1_private.push_back(iterator1);
+							// 		index2_private.push_back(iterator2);
+							// 		index3_private.push_back(l);
+							// 	}
+							// }
+						}
+					}
+				}
+				else
+				{
+				}
+			}
+#pragma omp for schedule(static) ordered
+		for (int i = 0; i < omp_get_num_threads(); i++)
+		{
+#pragma omp ordered
+			index1.insert(index1.end(), index1_private.begin(), index1_private.end());
+		}
+
+	}
+	return index1;
+}
 
 matrix<int>* MD::calculatepairs(matrix<int> &boxlist, double cut_off) {
 	// vector<int> index1;

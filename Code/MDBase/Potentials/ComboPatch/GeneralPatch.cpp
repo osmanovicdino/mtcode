@@ -107,6 +107,13 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
 
 
     Nt = num_per_type[no_types - 1];
+
+
+    int ny = num_per_type[no_types-1];
+    typef = new int[ny];
+    for(int i = 0  ; i < ny ; i++) {
+        typef[i] = return_type(i);
+    }
     //*whpa = preallocate_which_patch();
 
     //whpa = new matrix<mdpair>(preallocate_which_patch());
@@ -211,6 +218,12 @@ GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnro
         }
     }
 
+    int ny = num_per_type[no_types - 1];
+    typef = new int[ny];
+    for (int i = 0; i < ny; i++)
+    {
+        typef[i] = a.typef[i];
+    }
     //whpa = new matrix<mdpair>(*(a.whpa));
 }
 
@@ -240,9 +253,9 @@ inline int GeneralPatch::return_type_patch(int i)
 
 int GeneralPatch::num_patches(const int &i)
 {
-    int k1 = return_type(i);
-
-    return no_patches_per_type[k1];
+    // int k1 = return_type(i);
+    
+    return no_patches_per_type[ typef[i] ];
 }
 
 // inline int GeneralPatch::mapping_funcion_particles(int i, int j) {
@@ -251,18 +264,18 @@ int GeneralPatch::num_patches(const int &i)
 
 void GeneralPatch::UpdateIterator(const int &i, const int &j) {
 
-int k1 = return_type(i);
-int k2 = return_type(j);
+    int k1 = typef[i];
+    int k2 = typef[j];
 
-// no_types*k1 - (k1*(1 + k1))/2. + k2
+    // no_types*k1 - (k1*(1 + k1))/2. + k2
 
-p = &(i1[ no_types*k1 - (k1*(1 + k1))/2 + k2 ]);
+    p = &(i1[no_types * k1 - (k1 * (1 + k1)) / 2 + k2]);
 }
 
 
 void GeneralPatch::UpdateIteratorSafe(const int &i, const int &j, int **q) {
-    int k1 = return_type(i);
-    int k2 = return_type(j);
+    int k1 = typef[i];
+    int k2 = typef[j];
 
     *q = (i1[no_types * k1 - (k1 * (1 + k1)) / 2 + k2]);
 }
@@ -280,30 +293,28 @@ int GeneralPatch::get_total_patches(const int &N) {
  }
 
  void GeneralPatch::which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
- { // what this function does is take 
-     int k1 = return_type(i);
-     int k2 = return_type(j);
+ { // what this function does is take
+     int k1 = typef[i];
+     int k2 = typef[j];
 
-    int potstart = potn - pot_starters(k1,k2);
+     int potstart = potn - pot_starters(k1, k2);
 
-    int ori = no_patches_per_type[k2];
+     int ori = no_patches_per_type[k2];
 
-    int k3 = potstart / ori;
-    int k4 = potstart % ori;
+     int k3 = potstart / ori;
+     int k4 = potstart % ori;
 
-    int starti = k1 == 0 ? 0 : total_patches_per_type[k1 - 1];
-    int startj = k2 == 0 ? 0 : total_patches_per_type[k2 - 1];
+     int starti = k1 == 0 ? 0 : total_patches_per_type[k1 - 1];
+     int startj = k2 == 0 ? 0 : total_patches_per_type[k2 - 1];
 
-    int startpi = k1 == 0 ? 0 : num_per_type[k1 - 1];
-    int startpj = k2 == 0 ? 0 : num_per_type[k2 - 1];
+     int startpi = k1 == 0 ? 0 : num_per_type[k1 - 1];
+     int startpj = k2 == 0 ? 0 : num_per_type[k2 - 1];
 
+     wpi = starti + (i - startpi) * no_patches_per_type[k1] + k3;
+     wpj = startj + (j - startpj) * no_patches_per_type[k2] + k4;
 
-
-    wpi = starti + (i-startpi) * no_patches_per_type[k1] + k3;
-    wpj = startj + (j-startpj) * no_patches_per_type[k2] + k4;
-
-    //  wpi = i;
-    //  wpj = j;
+     //  wpi = i;
+     //  wpj = j;
  }
 
  void GeneralPatch::pre_which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
@@ -436,9 +447,10 @@ int GeneralPatch::get_total_patches(const int &N) {
 
  int GeneralPatch::which_potential(const int &i, const int &j, const int &wpi, const int &wpj)
  {
-     int k1 = return_type(i);
-     int k2 = return_type(j);
-
+    //  int k1 = return_type(i);
+    //  int k2 = return_type(j);
+     int k1 = typef[i];
+     int k2 = typef[j];
      int potstart = pot_starters(k1, k2);
 
      int starti = k1 == 0 ? 0 : total_patches_per_type[k1 - 1];
@@ -454,9 +466,11 @@ int GeneralPatch::get_total_patches(const int &N) {
      d12 = potential_bundle[potn]->interaction_distance;
      ang12 = params(potn, 2);
 
-     int k1 = return_type(i);
-     int k2 = return_type(j);
-
+    //  int k1 = return_type(i);
+    //  int k2 = return_type(j);
+     int k1 = typef[i];
+     int k2 = typef[j];
+     
      int potstart = potn - pot_starters(k1, k2);
 
      int ori = no_patches_per_type[k2];

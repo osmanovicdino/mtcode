@@ -444,16 +444,9 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     bbs.isbound = isbound;
     bbs.boundto =  boundto;
 
-    num = floor(ls / (3.5 * size_mol));
+    num = floor(ls / (3. * size_mol));
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
-
-
-
-    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 3.*size_mol);
-
-   // matrix<int> *pairs2 = obj->calculatepairs_parallel(boxes, 3. * size_mol);
-
-
+    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
 
     WCAPotential wsa(3.0, size_mol, 0.0);
 
@@ -463,7 +456,6 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     matrix<double> T(NN, 3);
     matrix<double> RT(NN, 6);
     matrix<double> zeromatrix(NN, 3);
-
 
 
     F = obj->calculateforces(*pairs, wsa);
@@ -479,6 +471,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
 
 
+
     obj->setup_random_binding(opairs,runs_diff, *pots, bbs, *bm); //randomly arrange binding
     //cout << "fi" << endl;
 
@@ -488,7 +481,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
 
     generate_uniform_random_matrix(RT);
-
+    matrix<double> tempdat = obj->getdat();
 
     obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
@@ -503,9 +496,10 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
         // cout << tottemp / (double)(i + 1) << endl;
         if (i > 0 && i % 20 == 0)
         {
-           // cout << "pairs recalculated" << endl;
+  
             delete pairs;
-            pairs = obj->calculatepairs_parallel(boxes, 3.5);
+            pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
+            
         }
         if(i > 0 && i %10 ==0 ){
             opairs = obj->calculate_patch_list(*pairs, *pots);
@@ -615,10 +609,10 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
 
 
-    num = floor(ls / (3.5 * size_mol));
+    num = floor(ls / (3. * size_mol));
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
-    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 3. * size_mol);
+    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
 
     // matrix<int> *pairs2 = obj->calculatepairs_parallel(boxes, 3. * size_mol);
 
@@ -660,7 +654,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
         {
             // cout << "pairs recalculated" << endl;
             delete pairs;
-            pairs = obj->calculatepairs_parallel(boxes, 3.5);
+            pairs = obj->calculatepairs_parallel(boxes, 2.5*size_mol);
         }
         if (i > 0 && i % 10 == 0)
         {
@@ -769,10 +763,10 @@ void Condensate::run_singlebond_eq(int runtime, int every, string strbase = "")
     bbs.isbound = isbound;
     bbs.boundto = boundto;
 
-    num = floor(ls / (2. * size_mol));
+    num = floor(ls / (3. * size_mol));
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
-    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 3.5 * size_mol);
+    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
 
     WCAPotential wsa(3.0, size_mol, 0.0);
 
@@ -812,7 +806,7 @@ void Condensate::run_singlebond_eq(int runtime, int every, string strbase = "")
         {
             // cout << "pairs recalculated" << endl;
             delete pairs;
-            pairs = obj->calculatepairs_parallel(boxes, 3.5);
+            pairs = obj->calculatepairs_parallel(boxes, 2.5*size_mol);
         }
         if (i > 0 && i % 10 == 0)
         {

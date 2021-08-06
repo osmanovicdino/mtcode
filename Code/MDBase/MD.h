@@ -67,6 +67,8 @@ double distance(const int&,const int&); //the distance between particles i and j
 matrix<int> precalculatepairs(vector<vector<int> > &, matrix<int>&, double);
 
 matrix<int> precalculatepairs(const matrix<int>&, const vector1<int>&, matrix<int> &, double);
+
+vector<mdpair> precalculatepairs_md(const matrix<int> &, const vector1<int> &, matrix<int> &, double);
 //matrix<int> GPUprecalculatepairs(vector<vector<int> > &, matrix<int>&, double)
 
 matrix<int>* calculatepairs(matrix<int>&,double); //calculate the pairs over which forces exist

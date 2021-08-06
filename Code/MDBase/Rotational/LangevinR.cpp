@@ -1292,7 +1292,7 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
         vector<patchint> edgelist_private;
         edgelist_private.reserve(10*pairs.getnrows());
 
-        #pragma omp for nowait schedule(static)
+        #pragma omp for nowait schedule(dynamic,100)
         for (i = 0; i < tp; ++i)
         {
             int p1 = pairs(i, 0);
@@ -1341,6 +1341,9 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
                 double gtemp7 = orient->gpcons(p2, 7);
                 double gtemp8 = orient->gpcons(p2, 8);
 
+                // vector1<double> qtemp = orient->getrowvector(p1);
+                // vector1<double> gtemp = orient->getrowvector(p2);
+
                 // for (int j = 0; j < iny.num_patches(p1) ; j++)
                 // {
                 //     for (int k = 0; k < iny.num_patches(p2); k++)
@@ -1383,6 +1386,8 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
                     double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
                     double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
                     double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+
 
                     double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
                     double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);

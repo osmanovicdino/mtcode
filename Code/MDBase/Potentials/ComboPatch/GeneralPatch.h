@@ -12,6 +12,8 @@ struct GeneralPatch : ComboPatch {
     matrix<double> params;
     matrix<double> orient;
     matrix<int> pot_starters;
+
+    int *typef;
     //matrix<mdpair> *whpa;
     int Nt;
 
@@ -25,6 +27,10 @@ struct GeneralPatch : ComboPatch {
             delete i1[i];
         }
         delete [] i1;
+        delete no_patches_per_type;
+        delete num_per_type;
+        delete total_patches_per_type;
+        delete typef;
     }
     
     int num_patches(const int &);
