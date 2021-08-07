@@ -142,7 +142,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     for (int filen = 0; filen < n; filen++)
     {
         cout << filen << endl;
-        vector<mdpair> edgelist;
+        
         double TT;
         bool vv3;
 
