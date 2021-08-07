@@ -443,7 +443,7 @@ int main(int argc, char **argv)
     Condensate A(l, n);
 
 
-    //A.setup_large_droplet(m1,m5,m6,0.640658,  l);
+    A.setup_large_droplet(m1,m5,m6,0.640658,  l);
 
     
     cout << "droplet setup" << endl;

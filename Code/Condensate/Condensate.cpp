@@ -434,7 +434,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     
     int nh  = (*pots).get_total_patches(NN);
 
-
+    index_test * g = new index_test;
  
 
     vector1<bool>isbound(nh);
@@ -551,19 +551,25 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
             string bins =  "bindings";
             bins =  bins + strbase;
 
+            string cc =  "connectedcomponents";
+            cc = cc + strbase;
+
             poss += "_i=";
             oris += "_i=";
             bins += "_i=";
+            cc += "_i=";
 
             string extension = ".csv";
 
             poss += ss.str();
             oris += ss.str();
             bins += ss.str();
+            cc += ss.str();
 
             poss += extension;
             oris += extension;
             bins += extension;
+            cc += extension;
 
             ofstream myfile;
             myfile.open(poss.c_str());
@@ -573,17 +579,22 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
             ofstream myfile3;
             myfile3.open(bins.c_str());
+            
+            ofstream myfile4;
+            myfile4.open(cc.c_str());
 
             myfile <<= pos;
             myfile2 << setprecision(10) <<= orient;
             myfile3 <<= bbs.isbound;
             myfile3 << "\n";
             myfile3 <<= bbs.boundto;
+            myfile4 <<= distance_graph(pos,boxes,obj->getgeo(),1.4,g);
 
 
             myfile.close();
             myfile2.close();
             myfile3.close();
+            myfile4.close();
         }
     }
 }
@@ -614,7 +625,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
 
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
-
+    index_test *g = new index_test;
 
     // matrix<int> *pairs2 = obj->calculatepairs_parallel(boxes, 3. * size_mol);
 
@@ -695,7 +706,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
             stringstream ss;
 
-            ss << setw(number_of_digits) << setfill('0') << startval + (i / every);
+            ss << setw(number_of_digits) << setfill('0') << (i / every);
 
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();
@@ -707,19 +718,25 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
             string bins = "bindings";
             bins = bins + strbase;
 
+            string cc = "connectedcomponents";
+            cc = cc + strbase;
+
             poss += "_i=";
             oris += "_i=";
             bins += "_i=";
+            cc += "_i=";
 
             string extension = ".csv";
 
             poss += ss.str();
             oris += ss.str();
             bins += ss.str();
+            cc += ss.str();
 
             poss += extension;
             oris += extension;
             bins += extension;
+            cc += extension;
 
             ofstream myfile;
             myfile.open(poss.c_str());
@@ -730,15 +747,21 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
             ofstream myfile3;
             myfile3.open(bins.c_str());
 
+            ofstream myfile4;
+            myfile4.open(cc.c_str());
+
             myfile <<= pos;
             myfile2 << setprecision(10) <<= orient;
             myfile3 <<= bbs.isbound;
             myfile3 << "\n";
             myfile3 <<= bbs.boundto;
+            myfile4 <<= distance_graph(pos, boxes, obj->getgeo(), 1.4, g);
 
             myfile.close();
             myfile2.close();
             myfile3.close();
+            myfile4.close();
+
         }
     }
 }

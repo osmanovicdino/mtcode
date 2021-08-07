@@ -125,8 +125,8 @@ else{
 
     // string mydir2 = "den=0.001_d=1._e=12._a=1.1592794807274085_arms=3";
 
-    
-    matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, l, bin, 5);
+    index_test *g = new index_test;
+    matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, l, bin, 5, g);
 
     string gc = "/growth";
 
@@ -134,4 +134,6 @@ else{
     cout << "output" << endl;
 
     outfunc(growcurve, mydir + gc);
+
+
 }

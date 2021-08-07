@@ -2,6 +2,7 @@
 #define CONDENSATE_H
 
 #include "../MDBase/Rotational/LangevinR.h"
+#include "../MDBase/Analysis/AnalysisFunctions.h"
 
 struct Condensate {
 

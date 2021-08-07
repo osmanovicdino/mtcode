@@ -111,9 +111,72 @@ matrix<int> getgrowthcurve(string dir, ComboPatch &iny, int N_Largest)
     // bindfiles is our vector with all the strings of the files
 }
 
+struct index_test {
+
+    bool operator()(int a, int b) {
+        return true;
+    }
+
+};
+
+struct excludea : public index_test
+{
+    int N1,N2;
+    excludea(int N11, int N22) : N1(N11), N2(N22) {}
+    bool operator()(int a, int b)
+    {
+        bool cond1  = a < N1 || a > N2;
+        bool cond2 = b < N1 || b > N2;
+
+        if(cond1 && cond2) return true;
+        else return false;
+    }
+};
+
+vector1<int> distance_graph(matrix<double> &pos, matrix<int> &boxes, cube &geo, double binding_distance, index_test *i1)
+{
+    LangevinNVT *A;
+    A = new LangevinNVT(geo);
 
 
-matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance, int N_Largest) {
+
+    
+
+    A->setdat(pos);
+
+    matrix<int> *pairs = A->calculatepairs_parallel(boxes, binding_distance);
+
+    int Np = pairs->getNsafe();
+    vector<mdpair> edgelist;
+    edgelist.reserve(Np);
+
+    //bool is_bound = bool(bbs2.isbound[b_index]);
+
+    for (int i = 0; i < Np; i++)
+    {
+        int p1 = (*pairs)(i, 0);
+        int p2 = (*pairs)(i, 1);
+        if ((*i1)(p1,p2))
+        {
+            mdpair test(p1, p2);
+            edgelist.push_back(test);
+        }
+    }
+
+
+    int N = pos.getNsafe();
+    // cout << filen << " " << N << " " << Np << endl;
+    string sg = "a";
+    vector1<int> indexes2(N, sg);
+    ConnectedComponentsParallel_Old(edgelist, indexes2);
+
+    delete A;
+    delete pairs;
+
+    return indexes2;
+};
+
+matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance, int N_Largest, index_test *i1) {
     vector<string> posfiles;
     cout << dir << endl;
     return_csv_in_dir(dir, "pos", posfiles);
@@ -125,14 +188,14 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
 
 
 
-    LangevinNVT *A;
-    A = new LangevinNVT(geo);
+    // LangevinNVT *A;
+    // A = new LangevinNVT(geo);
 
     
     double dis = 3.5;
     int num = floor(l / dis);
     int ccc;
-    matrix<int> boxes = A->getgeo().generate_boxes_relationships(num, ccc);
+    matrix<int> boxes = geo.generate_boxes_relationships(num, ccc);
 
     
 
@@ -147,8 +210,12 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
         bool vv3;
 
         matrix<double> postemp = importcsv(dir + "/" + posfiles[filen], TT, vv3); //import my file
+        int N = postemp.getNsafe();
 
+        vector1<int> indexes2 =  distance_graph(postemp,boxes,geo,binding_distance,i1);
 
+        
+/* 
         A->setdat(postemp);
 
 
@@ -180,7 +247,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
         
     int N =  postemp.getNsafe();
     // cout << filen << " " << N << " " << Np << endl;
-    vector<int> indexes2 = ConnectedComponentsParallel(edgelist, N);
+    vector<int> indexes2 = ConnectedComponentsParallel(edgelist, N); */
 
 
 
@@ -222,12 +289,13 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
                 RES(filen, j) = vals[j];
             }
         }
-        delete pairs;
     }
 
     return RES;
 }
 
+
+/* 
 matrix<int> getgrowthcurve_distance_periodic_subset(string dir, double l, double binding_distance, int N_Largest, int N1, int N2)
 {
     vector<string> posfiles;
@@ -328,7 +396,7 @@ matrix<int> getgrowthcurve_distance_periodic_subset(string dir, double l, double
     }
 
     return RES;
-}
+} */
 
 #endif /* ANALYZEGROWTH_CPP */
 

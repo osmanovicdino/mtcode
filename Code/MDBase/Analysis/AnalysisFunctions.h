@@ -20,11 +20,13 @@ double angd(vector1<double> &angs, int iterator1, int iterator2, double lim); //
 //calculate g1 taking into account the angles
 matrix<int> calcg1(matrix<double> &data, vector1<double> &orient, cube &geo, double max, double dx, double dthe);
 
-
+struct index_test;
+vector1<int> distance_graph(matrix<double> &pos, matrix<int> &boxes, cube &geo, double binding_distance, index_test *i1);
 //get the growth curve of files in a directory dir
 matrix<int> getgrowthcurve(string dir, ComboPatch &iny, int N_Largest);
 
-matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance);
+matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance, int N_Largest, index_test *i1);
+
 
 #include "PairCorrelation.cpp"
 #include "AnalyzeGrowth.cpp"

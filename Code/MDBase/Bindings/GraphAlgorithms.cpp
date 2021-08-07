@@ -650,6 +650,8 @@ void ConnectedComponentsParallel_Old(vector<Y> &adj, vector1<int> &indexes) {
         
         while (!globe)
         {
+        
+        
             //cout << "iterate" << endl;
             //shared between all threads    
         bool equiv;
