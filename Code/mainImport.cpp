@@ -414,7 +414,7 @@ int main(int argc, char** argv) {
     double l = cbrt(pi * CUB(size) * (double)m1 / (6. * packing_fraction));
 
     //l = 20.34;
-
+    cout << n << endl;
     Condensate A(l, n);
 
     //A.setup_tight_packing(1.8*size);
@@ -533,9 +533,12 @@ int main(int argc, char** argv) {
     matrix<int> bindtemp = importcsv(bindfiles[bindfiles.size() - 1], TT, vv3);
 
 
+
     A.obj->setdat(postemp);
 
     A.obj->setorientation(orienttemp);
+
+
 
     BinaryBindStore bbs2;
     vector1<bool> iss(bindtemp.getncols());

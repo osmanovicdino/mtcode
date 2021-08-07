@@ -611,11 +611,10 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
     num = floor(ls / (3. * size_mol));
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
-    cout << "boxes calculated" << endl;
+
 
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
 
-    cout << "pairs calculated" << endl;
 
     // matrix<int> *pairs2 = obj->calculatepairs_parallel(boxes, 3. * size_mol);
 
@@ -628,7 +627,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
     F = obj->calculateforces(*pairs, wsa);
 
-    cout << "forces calculated" << endl;
+
 
     vector<patchint> opairs;
     opairs.reserve(NN * 10 * 10);
@@ -637,14 +636,13 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
     opairs = obj->calculate_patch_list(*pairs, *pots);
     runs_diff = adjacency(opairs);
 
-    cout << "theta pairs calculated" << endl;
-    //cout << "fi" << endl;
+
     //cout << "fi" << endl;
     obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs, *bm, F, T);
-    //cout << "fi2" << endl;
-    cout << "forces and torques calculated" << endl;
+
 
     generate_uniform_random_matrix(RT);
+
 
     obj->create_forces_and_torques_sphere(F, T, RT);
     //vector1<double> tottemp(6);
@@ -672,6 +670,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
         //obj->measured_temperature();
 
         obj->advancemom_halfstep(F, T);
+
 
         obj->advance_pos();
 

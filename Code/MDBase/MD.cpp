@@ -1062,21 +1062,27 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, double cut_off)
 		}
 		dim[i] = ij;
 	}
+	
 
 	int partn = this->getN();
 	vector1<int> indexes(partn);
 	#pragma omp parallel for
 	for (int i = 0; i < partn; i++)
 	{
+		
 		int c = geo.assign_box((*dat), i, dim, cubes_per_length);
 		indexes[i] = c;
 	}
 
+
+
 	SingleHistogramParallel(indexes,ccs,b);
+
 
 	int ss = boxlist.getncols();
 	matrix<int> *a = new matrix<int>();
 	*a = precalculatepairs(b,ccs, boxlist, cut_off);
+
 	return a;
 }
 

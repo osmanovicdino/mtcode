@@ -119,8 +119,12 @@ public:
 	// genmaty(const vector1<double> &arg);
 	// genmatz(const vector1<double> &arg);
 	void setorientation(matrix<double> &ort)  {
-		matrix<double> *res = ort.clone();
-		orient = res;
+		// cout << ort.getNsafe() << endl;
+		// matrix<double> *res = ort.clone();
+		delete orient;
+		orient = ort.clone();
+		//orient = res;
+
 		int jdimension = orient->getncols();
 		if (jdimension != 3*(geo.dimension) )
 		{

@@ -29,7 +29,7 @@ void SingleHistogram(vector1<int> &indexes2, matrix<int> &boindices2, vector1<in
 void SingleHistogramParallel(vector1<int> &indexes2, vector1<int> &ccs, matrix<int> &boiindices2) {
     int n = indexes2.getsize();
     // when the index of the group has been assigned, this function bins them
-
+    int np = ccs.getsize();
     //matrix<int> boindices2(n,wid);
 
     // if (((boiindices2.getnrows() != ccs.getsize())))
@@ -51,10 +51,11 @@ void SingleHistogramParallel(vector1<int> &indexes2, vector1<int> &ccs, matrix<i
     }
 
     int sl = maxval_parallel(ccs);
+
    
-    boiindices2.resize_parallel(n,sl);
+    boiindices2.resize_parallel(np,sl);
     vector1<int> count;//(n);
-    count.resize_parallel(n);
+    count.resize_parallel(np);
 
     #pragma omp parallel for schedule(static)
         for (int i = 0; i < n; ++i)

@@ -382,6 +382,8 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
     //calculate forces and torques in lab frame:
 
     int Ns = angmom->getNsafe();
+    int No = orient->getNsafe();
+
 
     #pragma omp parallel for schedule(static)
     for (int i = 0; i < Ns; i++)
