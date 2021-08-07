@@ -104,6 +104,7 @@ int main(int argc, char **argv)
 {
 
 srand(time(NULL));
+signal(SIGSEGV, handler);
 string mydir;
 double l;
 double bin;
@@ -125,9 +126,9 @@ else{
     // string mydir2 = "den=0.001_d=1._e=12._a=1.1592794807274085_arms=3";
 
     
-    matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, l, bin, 5);
+    matrix<int> growcurve = getgrowthcurve_distance_periodic_subset(mydir, l, bin, 5, 4000, 16000);
 
-    string gc = "/growth";
+    string gc = "/growthwa";
 
     cout << mydir + gc << endl;
     cout << "output" << endl;

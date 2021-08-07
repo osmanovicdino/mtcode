@@ -111,6 +111,8 @@ matrix<int> getgrowthcurve(string dir, ComboPatch &iny, int N_Largest)
     // bindfiles is our vector with all the strings of the files
 }
 
+
+
 matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance, int N_Largest) {
     vector<string> posfiles;
     cout << dir << endl;
@@ -132,7 +134,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     int ccc;
     matrix<int> boxes = A->getgeo().generate_boxes_relationships(num, ccc);
 
-    vector<mdpair> edgelist;
+    
 
     matrix<int> RES(n, N_Largest);
     
@@ -140,16 +142,16 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     for (int filen = 0; filen < n; filen++)
     {
         cout << filen << endl;
-        
+        vector<mdpair> edgelist;
         double TT;
         bool vv3;
+
         matrix<double> postemp = importcsv(dir + "/" + posfiles[filen], TT, vv3); //import my file
 
 
-        
         A->setdat(postemp);
 
-        
+
 
         matrix<int> * pairs = A->calculatepairs_parallel(boxes, dis);
 
@@ -208,6 +210,108 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double bindin
     // cout << endl;
 
     //now we have the edgelist
+
+        for (int j = 0; j < N_Largest; j++)
+        {
+            if (j > vals.size())
+            {
+                RES(filen, j) = 0;
+            }
+            else
+            {
+                RES(filen, j) = vals[j];
+            }
+        }
+        delete pairs;
+    }
+
+    return RES;
+}
+
+matrix<int> getgrowthcurve_distance_periodic_subset(string dir, double l, double binding_distance, int N_Largest, int N1, int N2)
+{
+    vector<string> posfiles;
+    cout << dir << endl;
+    return_csv_in_dir(dir, "pos", posfiles);
+
+    int n = posfiles.size();
+
+    vector1<bool> pb(3, true);
+    cube geo(l, pb, 3);
+
+    LangevinNVT *A;
+    A = new LangevinNVT(geo);
+
+    double dis = 3.5;
+    int num = floor(l / dis);
+    int ccc;
+    matrix<int> boxes = A->getgeo().generate_boxes_relationships(num, ccc);
+
+    
+
+    matrix<int> RES(n, N_Largest);
+
+    //for each file analyze the structure
+    for (int filen = 0; filen < n; filen++)
+    {
+        cout << filen << endl;
+
+        double TT;
+        bool vv3;
+
+        matrix<double> postemp = importcsv(dir + "/" + posfiles[filen], TT, vv3); //import my file
+
+        A->setdat(postemp);
+
+        matrix<int> *pairs = A->calculatepairs_parallel(boxes, dis);
+
+        int Np = pairs->getNsafe();
+        vector<mdpair> edgelist;
+        edgelist.reserve(Np);
+
+        //bool is_bound = bool(bbs2.isbound[b_index]);
+
+        for (int i = 0; i < Np; i++)
+        {
+            int p1 = (*pairs)(i, 0);
+            int p2 = (*pairs)(i, 1);
+            bool cond1 = p1 < N1 || p1 > N2;
+            bool cond2 = p2 < N1 || p2 > N2;
+            if (geo.distance_less_than(postemp, p1, p2, binding_distance) && (cond1 && cond2) )
+            {
+                mdpair test(p1, p2);
+                edgelist.push_back(test);
+            }
+        }
+
+        int N = postemp.getNsafe();
+        // cout << filen << " " << N << " " << Np << endl;
+        vector<int> indexes2 = ConnectedComponentsParallel(edgelist, N);
+
+        unordered_map<int, size_t> count; // holds count of each encountered number
+        for (int i = 0; i < N; i++)
+            count[indexes2[i]]++;
+
+        std::vector<int> vals;
+        vals.reserve(count.size());
+        //connected components are now saved to indexes2;
+        for (auto kv : count)
+        {
+            vals.push_back(kv.second);
+        }
+
+#if defined(_OPENMP)
+        __gnu_parallel::sort(vals.begin(), vals.end(), greater<int>());
+#else
+        std::sort(vals.begin(), vals.end(), greater<int>());
+#endif
+
+        // cout << filen << " " << N << " " << Np <<  " ";
+        // for(int jk = 0 ; jk < N_Largest ; jk++)
+        // cout << vals[jk] << ",";
+        // cout << endl;
+
+        //now we have the edgelist
 
         for (int j = 0; j < N_Largest; j++)
         {
