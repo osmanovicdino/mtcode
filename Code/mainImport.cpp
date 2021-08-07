@@ -531,12 +531,12 @@ int main(int argc, char** argv) {
     matrix<double> postemp = importcsv(posfiles[posfiles.size() - 1], T, vv1);
     matrix<double> orienttemp = importcsv(orientfiles[orientfiles.size() - 1], T, vv2);
     matrix<int> bindtemp = importcsv(bindfiles[bindfiles.size() - 1], TT, vv3);
-    cout << "all files importing" << endl;
+
 
     A.obj->setdat(postemp);
-    cout << "dat set" << endl;
+
     A.obj->setorientation(orienttemp);
-    cout << "orientation set" << endl;
+
     BinaryBindStore bbs2;
     vector1<bool> iss(bindtemp.getncols());
     vector1<int> ist(bindtemp.getncols());
@@ -547,7 +547,7 @@ int main(int argc, char** argv) {
     bbs2.isbound =  iss;
     bbs2.boundto = ist;
     //Do processing to make sure everything is fine here
-    cout << "bindings imported" << endl;
+
 
     A.run_singlebond_continue(runtime, every, posfiles.size(), bbs2, base);
 
