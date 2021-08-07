@@ -128,7 +128,7 @@ else{
     
     matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, l, bin, 5);
 
-    string gc = "/growthwa";
+    string gc = "/growth";
 
     cout << mydir + gc << endl;
     cout << "output" << endl;
