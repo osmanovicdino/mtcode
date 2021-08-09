@@ -706,7 +706,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
             stringstream ss;
 
-            ss << setw(number_of_digits) << setfill('0') << (i / every);
+            ss << setw(number_of_digits) << setfill('0') << startval +  ((i) / every);
 
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();
