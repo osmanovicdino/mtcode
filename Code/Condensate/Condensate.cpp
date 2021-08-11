@@ -298,7 +298,7 @@ void Condensate::run(int runtime, int every, string strbase = "")
 
     matrix<int> *pairs = obj->calculatepairs(boxes, 3.5);
 
-    WCAPotential wsa(3.0,1.0,0.0);
+    HSPotential wsa(3.0,1.0);
 
     int NN = obj->getN();
 
@@ -448,7 +448,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
 
-    WCAPotential wsa(3.0, size_mol, 0.0);
+    HSPotential wsa(3.0, size_mol);
 
 
 
@@ -629,7 +629,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
     // matrix<int> *pairs2 = obj->calculatepairs_parallel(boxes, 3. * size_mol);
 
-    WCAPotential wsa(3.0, size_mol, 0.0);
+    HSPotential wsa(3.0, size_mol);
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
@@ -797,7 +797,7 @@ void Condensate::run_singlebond_eq(int runtime, int every, string strbase = "")
 
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
 
-    WCAPotential wsa(3.0, size_mol, 0.0);
+    HSPotential wsa(3.0, size_mol);
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
@@ -964,9 +964,9 @@ void Condensate::run_singlebond_different_sizes(int runtime, int every, int div,
 
     matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.*(size1+size2)/2.);
 
-    WCAPotential wsa1(3.0, size1, 0.0);
-    WCAPotential wsa2(3.0, (size1+size2)/2., 0.0);
-    WCAPotential wsa3(3.0, size2, 0.0);
+    HSPotential wsa1(3.0, size1);
+    HSPotential wsa2(3.0, (size1+size2)/2.);
+    HSPotential wsa3(3.0, size2);
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
@@ -1197,9 +1197,9 @@ void Condensate::run_singlebond_different_sizes_continue(int runtime, int every,
     matrix<int> *pairsp2 = obj->calculatepairs(boxes, p2, 3.5 * size2);
     matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5 * (size1 + size2) / 2.);
 
-    WCAPotential wsa1(3.0, size1, 0.0);
-    WCAPotential wsa2(3.0, (size1+size2)/2., 0.0);
-    WCAPotential wsa3(3.0, size2, 0.0);
+    HSPotential wsa1(3.0, size1);
+    HSPotential wsa2(3.0, (size1 + size2) / 2.);
+    HSPotential wsa3(3.0, size2);
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);
@@ -1441,9 +1441,9 @@ void Condensate::run_singlebond_different_sizes_continue_thetalist(int runtime, 
 
     matrix<int> *pairsp1p2 = obj->calculatepairs(boxes, p1, p2, 3.5 * (size1 + size2) / 2.);
 
-    WCAPotential wsa1(3.0, size1, 0.0);
-    WCAPotential wsa2(3.0, (size1 + size2) / 2., 0.0);
-    WCAPotential wsa3(3.0, size2, 0.0);
+    HSPotential wsa1(3.0, size1);
+    HSPotential wsa2(3.0, (size1 + size2) / 2.);
+    HSPotential wsa3(3.0, size2);
 
     matrix<double> F(NN, 3);
     matrix<double> T(NN, 3);

@@ -136,35 +136,38 @@ struct KernFrenkelOnePatch : potentialtheta3D {
 
 
             if(argthetai >cos(thetam) && argthetaj > cos(thetam)) {
+                if (argthetai > 1.)
+                    argthetai = 0.999999;
 
-            double thetai = acos(argthetai);
+                if (argthetaj > 1.)
+                    argthetaj = 0.999999;
+                double thetai = acos(argthetai);
 
-            double thetaj = acos(argthetaj);
+                double thetaj = acos(argthetaj);
 
-            f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
+                f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
 
-            double fac = (dis/(rij));
-            double fac2 = SQR(fac);
-            double fac6 = CUB(fac2);
-            double fac12 = SQR(fac6);
+                double fac = (dis / (rij));
+                double fac2 = SQR(fac);
+                double fac6 = CUB(fac2);
 
-           // double potf = ((24*att)/dis)*(2*fac*fac12-fac*fac6);
+                // double potf = ((24*att)/dis)*(2*fac*fac12-fac*fac6);
 
-            //double pot =  4*att*((fac12)-(fac6));
+                //double pot =  4*att*((fac12)-(fac6));
 
-            double potf = ((24 * att) / dis) * (- fac * fac6);
-            double pot =  4*att*(-fac6);
+                double potf = ((24 * att) / dis) * (-fac * fac6);
+                double pot = 4 * att * (-fac6);
 
+                fx = f * potf * un.gpcons(0);
+                fy = f * potf * un.gpcons(1);
+                fz = f * potf * un.gpcons(2);
 
-            fx =  f * potf * un.gpcons(0);
-            fy =  f * potf * un.gpcons(1);
-            fz =  f * potf * un.gpcons(2);
+                //cout << fx << " " << fy << " " << fz << endl;
 
-            //cout << fx << " " << fy << " " << fz << endl;
-
-            double d1;
-            if(abs(SQR(argthetai)-1)<1E-5) {
-                d1 = 0.0;
+                double d1;
+                if (abs(SQR(argthetai) - 1) < 1E-5)
+                {
+                    d1 = 0.0;
             }
             else{
                 d1 = -1. / sqrt(1 - SQR(argthetai));

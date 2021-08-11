@@ -202,7 +202,7 @@ int main(int argc, char **argv)
         for (int j = 0; j < 4; j++)
         {
             params(iter, 0) = int1;
-            params(iter, 1) = 1.4 * size;
+            params(iter, 1) = 1.2 * size;
             params(iter, 2) = 0.927;
             iter++;
         }
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
         {
 
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1.4 * size;
+            params(iter, 1) = 1.2 * size;
             params(iter, 2) = 0.927;
 
             iter++;
@@ -228,14 +228,14 @@ int main(int argc, char **argv)
             if (j == 3) //top one
             {
                 params(iter, 0) = int4;
-                params(iter, 1) = 1.4 * size;
+                params(iter, 1) = 1.2 * size;
                 params(iter, 2) = 0.927; //slightly smaller aperture
             }
 
             else
             {
                 params(iter, 0) = int2;
-                params(iter, 1) = 1.4 * size;
+                params(iter, 1) = 1.2 * size;
                 params(iter, 2) = 0.927; //slightly smaller aperture
             }
             iter++;
@@ -249,13 +249,13 @@ int main(int argc, char **argv)
             if (i == 0 && j == 0)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4 * size;
+                params(iter, 1) = 1.2 * size;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4 * size;
+                params(iter, 1) = 1.2 * size;
                 params(iter, 2) = 0.927;
             }
 
@@ -271,7 +271,7 @@ int main(int argc, char **argv)
             if (j == 3)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 2. * size; //destroy the gas phase
+                params(iter, 1) = 1.7 * size; //destroy the gas phase
                 params(iter, 2) = 0.927;
                 iter++;
             }
@@ -279,7 +279,7 @@ int main(int argc, char **argv)
             {
 
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4 * size;
+                params(iter, 1) = 1.2 * size;
                 params(iter, 2) = 0.927;
                 iter++;
             }
@@ -293,13 +293,13 @@ int main(int argc, char **argv)
             if (i == 3 || j == 3)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.4 * size;
+                params(iter, 1) = 1.2 * size;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = int3;
-                params(iter, 1) = 1.4 * size;
+                params(iter, 1) = 1.2 * size;
                 params(iter, 2) = 0.927;
             }
             iter++;
