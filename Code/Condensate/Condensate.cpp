@@ -588,7 +588,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
             myfile3 <<= bbs.isbound;
             myfile3 << "\n";
             myfile3 <<= bbs.boundto;
-            myfile4 <<= distance_graph(pos,boxes,obj->getgeo(),1.4,g);
+            myfile4 <<= distance_graph(pos,boxes,obj->getgeo(),1.25,g);
 
 
             myfile.close();
@@ -755,7 +755,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
             myfile3 <<= bbs.isbound;
             myfile3 << "\n";
             myfile3 <<= bbs.boundto;
-            myfile4 <<= distance_graph(pos, boxes, obj->getgeo(), 1.4, g);
+            myfile4 <<= distance_graph(pos, boxes, obj->getgeo(), 1.25, g);
 
             myfile.close();
             myfile2.close();
