@@ -436,7 +436,7 @@ int main(int argc, char **argv)
 
 
 
-    double l = cbrt(pi * CUB(size) * (double)m1 / (6. * packing_fraction));
+    double l = cbrt(pi * CUB(size) * (double)(m1+m6) / (6. * packing_fraction));
 
     //l = 20.34;
 
