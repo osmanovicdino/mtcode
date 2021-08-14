@@ -29,7 +29,7 @@ module load gcc/9.3.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/params19.dat
+filename=~/Chemistry/Code/Basic/Scripts/params18.dat
 direcres="PhaseDiagramDesign13"
 
 if [ -e ${filename}   ]; then
