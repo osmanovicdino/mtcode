@@ -126,7 +126,6 @@ int main(int argc, char **argv)
     int n = m2 + m6;
 
 
-
     // int m1  = 2;
     // int m2 = 6;
     // int n = 10;
@@ -196,13 +195,15 @@ int main(int argc, char **argv)
     int tot = 4 * 4 + 4 * 4 + 4 * 4 + 4 * 4 + 4 * 4 + 4 * 4;
     matrix<double> params(tot, 3);
 
+    double range  = 1.2;
+
     int iter = 0;
     for (int i = 0; i < 4; i++) //nanostar/nanostar interaction
     {
         for (int j = 0; j < 4; j++)
         {
             params(iter, 0) = int1;
-            params(iter, 1) = 1.2 * size;
+            params(iter, 1) = range * size;
             params(iter, 2) = 0.927;
             iter++;
         }
@@ -214,7 +215,7 @@ int main(int argc, char **argv)
         {
 
             params(iter, 0) = 0.0;
-            params(iter, 1) = 1.2 * size;
+            params(iter, 1) = range * size;
             params(iter, 2) = 0.927;
 
             iter++;
@@ -228,14 +229,14 @@ int main(int argc, char **argv)
             if (j == 3) //top one
             {
                 params(iter, 0) = int4;
-                params(iter, 1) = 1.2 * size;
+                params(iter, 1) = range * size;
                 params(iter, 2) = 0.927; //slightly smaller aperture
             }
 
             else
             {
                 params(iter, 0) = int2;
-                params(iter, 1) = 1.2 * size;
+                params(iter, 1) = range * size;
                 params(iter, 2) = 0.927; //slightly smaller aperture
             }
             iter++;
@@ -249,13 +250,13 @@ int main(int argc, char **argv)
             if (i == 0 && j == 0)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.2 * size;
+                params(iter, 1) = range * size;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.2 * size;
+                params(iter, 1) = range * size;
                 params(iter, 2) = 0.927;
             }
 
@@ -271,7 +272,7 @@ int main(int argc, char **argv)
             if (j == 3)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.7 * size; //destroy the gas phase
+                params(iter, 1) = 1.4* range * size; //destroy the gas phase
                 params(iter, 2) = 0.927;
                 iter++;
             }
@@ -279,7 +280,7 @@ int main(int argc, char **argv)
             {
 
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.2 * size;
+                params(iter, 1) = range * size;
                 params(iter, 2) = 0.927;
                 iter++;
             }
@@ -293,13 +294,13 @@ int main(int argc, char **argv)
             if (i == 3 || j == 3)
             {
                 params(iter, 0) = 0.0;
-                params(iter, 1) = 1.2 * size;
+                params(iter, 1) = range * size;
                 params(iter, 2) = 0.927;
             }
             else
             {
                 params(iter, 0) = int3;
-                params(iter, 1) = 1.2 * size;
+                params(iter, 1) = range * size;
                 params(iter, 2) = 0.927;
             }
             iter++;
@@ -436,7 +437,7 @@ int main(int argc, char **argv)
 
 
 
-    double l = cbrt(pi * CUB(size) * (double)(m1+m6) / (6. * packing_fraction));
+    double l = cbrt(pi * CUB(size) * (double)(m1) / (6. * packing_fraction));
 
     //l = 20.34;
 
@@ -446,7 +447,6 @@ int main(int argc, char **argv)
     A.setup_large_droplet(m1,m5,m6,0.640658,  l);
 
     
-    cout << "droplet setup" << endl;
     //A.setup_tight_packing(1.8*size);
 
     
@@ -542,7 +542,6 @@ int main(int argc, char **argv)
     auto start = high_resolution_clock::now();
 
 
-    cout << "start" << endl;
 
     A.run_singlebond(runtime, every, base);
 

@@ -27,8 +27,13 @@ matrix<int> getgrowthcurve(string dir, ComboPatch &iny, int N_Largest);
 
 matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance, int N_Largest, index_test *i1);
 
+matrix<double> CreateRandomSample(matrix<double> &pos, int n, double l, int boxes);
+//for an initial system with particles at position pos, add n particles at random positions to the sample. l
+//is the size of the sample and and boxes is how the initial state should be subdivided for placing particles. 
+
 
 #include "PairCorrelation.cpp"
 #include "AnalyzeGrowth.cpp"
+#include "AddParticles.cpp"
 
 #endif /* ANALYSISFUNCTIONS_H */

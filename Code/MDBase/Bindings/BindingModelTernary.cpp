@@ -783,7 +783,6 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
 
 
 
-
     int indt1,indt2,indt3;
     unsigned char o1,o2,o3;
     sort_triplet_and_save_permutation(ind1,ind2,ind3,indt1,indt2,indt3,o1,o2,o3);
@@ -867,11 +866,49 @@ void BindingModelTernary<Q>::triplet(bool b12, bool b23, bool b13, bool c12, boo
         ta13 = false;
     }
 
+
     //unsigned char w1,w2,w3;
     //what_order(o1,o2,o3,w1,w2,w3);
 
     inverse_save_to_type(ta12, ta23, ta13, o1, o2, o3, a12, a23, a13);
 
+    // if (ind1 == 3 || ind2 == 3 || ind3 == 3)
+    // {
+    //     cout << rtemp << endl;
+    //     cout << "ind1: " << ind1 << " " << ind2 << " " << ind3 << endl;
+    //     cout << "b12: " << b12 << " " << b23 << " " << b13 << endl;
+    //     cout << "c12: " << c12 << " " << c23 << " " << c13 << endl;
+    //     cout << "a12: " << a12 << " " << a23 << " " << a13 << endl;
+
+    //     cout << "tind1: " << indt1 << " " << indt2 << " " << indt3 << endl;
+    //     cout << "tb12: " << tb12 << " " << tb23 << " " << tb13 << endl;
+    //     cout << "tc12: " << tc12 << " " << tc23 << " " << tc13 << endl;
+    //     cout << "ta12: " << ta12 << " " << ta23 << " " << ta13 << endl;
+
+    //     cout << "ran: " << ran << endl;
+    //     cout << "weig: " << r1 << " " << r2 << " " << r3 << " " << r4 << endl;
+
+    //     if (a12 && ((ind1 == 1 && ind2 == 3) || (ind1 == 3 && ind2 == 1)))
+    //     {
+    //         cout << ind1 << " " << ind2 << endl;
+    //         pausel();
+    //     }
+
+    //     else if (a23 && ((ind2 == 1 && ind3 == 3) || (ind3 == 3 && ind2 == 1)))
+    //     {
+    //         cout << ind2 << " " << ind3 << endl;
+    //         pausel();
+    //     }
+    //     else if (a13 && ((ind1 == 1 && ind3 == 3) || (ind1 == 3 && ind3 == 1)))
+    //     {
+    //         cout << ind1 << " " << ind3 << endl;
+    //         pausel();
+    //     }
+    //     else {
+
+    //     }
+        
+    // }
 }
 
 template <typename Q>

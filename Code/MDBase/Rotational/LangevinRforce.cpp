@@ -2874,6 +2874,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(matrix<int> &p
 void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
 {
 
+    
+
     //for all the pairs, for all bindings
     // #pragma omp declare reduction (mergeint : std::vector<int> : omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
     // #pragma omp declare reduction (mergemd : std::vector<mdpairwd> : omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
@@ -3199,7 +3201,20 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
     bool need_large_c = true;
 
-#pragma omp parallel
+    // int m1 = 500;
+    // int m2 = 500 + 2000;
+    // SortingFunctionNonUniform my_sorter;
+    // my_sorter.div1 = (m1 * 4);
+    // my_sorter.div2 = (m1 * 4 + 4 * (m2 - m1));
+    // my_sorter.np = 4;
+
+    // int possible_doublets = 0;
+    // int doubles_formed = 0;
+    // int triplets_lost = 0;
+
+
+
+    #pragma omp parallel
     {
         //int ag2 = int(rand()) ^ omp_get_thread_num();
         //cout << ag2 << endl;
@@ -3217,8 +3232,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
             if (size_of_cluster == 0)
             {
-            }
 
+            }
             else if (size_of_cluster == 1)
             {
 
@@ -3266,6 +3281,12 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     bo.isbound[i1] = false;
                     bo.isbound[i2] = false;
                 }
+
+                // if(aft && !alreadybound_to_eachother &&   ( (my_sorter(ti1)==1 && my_sorter(ti2)==3) || (my_sorter(ti1)==3 && my_sorter(ti2)==1) )    ) {
+
+                //     #pragma omp atomic update 
+                //         doubles_formed++;
+                // }
 
                 // stringstream ss2;
 
@@ -3472,6 +3493,18 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     bo.isbound[i2] = false;
                     bo.isbound[i3] = false;
                 }
+
+                // bool cond1 = is_there_a_13(b12, b23, b13, i1, i2, i3, my_sorter);
+
+                // bool cond2 = is_there_a_13(a12, a23, a13, i1, i2, i3, my_sorter);
+
+                // bool cond3 = is_123(i1,i2,i3,my_sorter);
+
+                // if(cond1 && !cond2 && cond3) {
+                //     #pragma omp atomic update
+                //     triplets_lost++;
+                // }
+            
             }
 
             else
@@ -3496,7 +3529,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
         // }
     }
 
-    //pausel();
+    // //pausel();
+    // cout << doubles_formed << "," << triplets_lost << endl;
 
     int number_of_large_clusters = large_clusters.size();
 
@@ -3510,7 +3544,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
     if (need_large_c)
     {
-#pragma omp parallel
+        #pragma omp parallel
         {
             //srand(int(time(NULL)) ^ omp_get_thread_num());
             vector<mdpair> mypairs_private;

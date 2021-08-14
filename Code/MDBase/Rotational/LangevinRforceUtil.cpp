@@ -47,6 +47,113 @@ matrix<int> LangevinNVTR::CreateEdgeList(matrix<int> &adj, vector1<int> &len)
     return a;
 }
 
+template <class Q>
+vector1<int> Bond_Count(BinaryBindStore &bbs, Q &sorter, int no_types) {
+    int N = bbs.boundto.getsize();
+    
+    vector1<int> counts((no_types)*(no_types-1)/2);
+
+    for(int i = 0 ; i < N ; i++) {
+        if(bbs.isbound[i]) {
+            int p1 =  sorter(i);
+            int p2 =  sorter(bbs.boundto[i]);
+
+            counts[p1*no_types+p2]++;
+        }
+    }
+
+    return counts;
+}
+
+template <class Q>
+matrix<int> Bond_Change(BinaryBindStore &bbs1, BinaryBindStore &bbs2, Q &sorter, int no_types) {
+    int N = bbs1.boundto.getsize();
+    //what bonds are changing, where bbs2 is the later time point
+    matrix<int> counts( (2*no_types) , (no_types));
+    //int neg = ((no_types) * (no_types + 1))/2;
+    int neg = no_types;
+    for (int i = 0; i < N; i++)
+    {
+        int i1;
+        if( bbs1.isbound[i] == false && bbs2.isbound[i] == true ) {
+            int p1 = sorter(i)-1;
+            int p2 = sorter(bbs2.boundto[i])-1;
+
+            counts(p1 , p2)++; //p1,p2 bond formed
+
+        }
+        else if (bbs1.isbound[i] == true && bbs2.isbound[i] == false )
+        {
+            int p1 = sorter(i)-1;
+            int p2 = sorter(bbs1.boundto[i])-1;
+
+            counts(neg + p1 , p2)++; //p1,p2 bond lost
+        }
+        else if (bbs1.isbound[i] == true && bbs2.isbound[i] == true && (bbs1.boundto[i] != bbs2.boundto[i]) )
+        {
+            int p1 = sorter(i)-1;
+            int p2 = sorter(bbs1.boundto[i])-1;
+
+            int p3 = sorter(i)-1;
+            int p4 = sorter(bbs2.boundto[i])-1;
+
+            counts(neg + p1 , p2)++; //p1,p2 bond lost
+            counts(p3 , p4)++; //p3,p4 bond formed
+            
+        }
+        else{
+            //do nothing
+        }
+
+
+        // 0 - > 1
+        // 1 -> 0
+        // 1 -> 1 but i->j
+
+        //what are the case for difference
+        
+
+    }
+
+    return counts;
+}
+
+template <class Q>
+bool is_there_a_13(bool b12, bool b23, bool b13, int i1, int i2 , int i3, Q &sorter) {
+     
+    if(b12 && (( (sorter(i1)==1 && sorter(i2)==3) || (sorter(i1)==3 && sorter(i2)==1) )) ) {
+        return true;
+    }
+    else if(b23 && ( (sorter(i3)==1 && sorter(i2)==3) || (sorter(i2)==3 && sorter(i3)==1) )) {
+        return true;
+    }
+    else if(b13 && ( (sorter(i3)==1 && sorter(i1)==3) || (sorter(i1)==3 && sorter(i3)==1) ) ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+template <class Q>
+bool is_123(int i1, int i2, int i3, Q &sorter)
+{
+
+    int ti1 = sorter(i1);
+    int ti2 = sorter(i2);
+    int ti3 = sorter(i3);
+
+    int k1,k2,k3;
+    sort_triplet(ti1,ti2,ti3,k1,k2,k3);
+
+    if(k1 == 1 && k2 == 2 && k3 ==3 ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 void get_energies(int i1, int i2, int i3, int nb1, int nb2, int nb3, const matrix<int> &boindices, const matrix<double> &boenergies, double &e12, double &e23, double &e13) {
 
     for(int i = 0 ; i < nb1 ; i++) {
