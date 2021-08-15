@@ -631,7 +631,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
 
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
-    index_test *g = new index_test;
+    //index_test *g = new index_test;
 
     // matrix<int> *pairs2 = obj->calculatepairs_parallel(boxes, 3. * size_mol);
 

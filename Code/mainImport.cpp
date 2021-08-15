@@ -553,6 +553,7 @@ int main(int argc, char** argv) {
     bbs2.boundto = ist;
     //Do processing to make sure everything is fine here
 
+    cout << "beginning run" << endl;
 
    A.run_singlebond_continue(runtime, every, posfiles.size(), bbs2, base);
     // A.run_singlebond_continue(runtime, every, 475, bbs2, base);
