@@ -525,6 +525,8 @@ int main(int argc, char** argv) {
         error("different sizes of import");
     }
 
+    cout << "beginning import" << endl;
+
     double T;
     int TT;
     bool vv1,vv2,vv3;
