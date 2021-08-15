@@ -489,7 +489,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     for (int i = 0; i < runtime; i++)
     {
 
-        //cout << i << endl;
+        cout << i << endl;
         // vector1<double> meas(6);
         // obj->measured_temperature(meas);
         // tottemp += meas;

@@ -417,6 +417,8 @@ int main(int argc, char** argv) {
     cout << n << endl;
     Condensate A(l, n);
 
+
+
     //A.setup_tight_packing(1.8*size);
 
     //outfunc(A.obj->getdat(),"dat");
@@ -496,7 +498,7 @@ int main(int argc, char** argv) {
     ss7 << inv_en;
     base += ss7.str();
 
-    // cout << "done" << endl;
+    cout << "done" << endl;
     //Do processing to make sure everything is fine here
 
     //pausel();
@@ -504,7 +506,7 @@ int main(int argc, char** argv) {
     A.obj->setdt(0.005);
     int every = 1000;
 
-    A.run_singlebond(runtime, 1000, base);
+    // A.run_singlebond(runtime, 1000, base);
     vector<string> orientfiles;
     vector<string> posfiles;
     vector<string> bindfiles;
