@@ -8,12 +8,12 @@
 #$ -l h_rt=12:00:00,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 12
+#$ -pe shared 16
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-6:1
+#$ -t 1-3:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -29,8 +29,8 @@ module load gcc/9.3.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/params18.dat
-direcres="PhaseDiagramDesign13"
+filename=~/Chemistry/Code/Basic/Scripts/params19.dat
+direcres="PhaseDiagramDesign14"
 
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
@@ -61,7 +61,7 @@ mkdir /u/scratch/d/dinoo/${direcres}/${dirwemake}
 cp ~/Chemistry/Code/mainImport.cpp /u/scratch/d/dinoo/${direcres}/${dirwemake}
 g++ -fopenmp ~/Chemistry/Code/mainImport.cpp -o /u/scratch/d/dinoo/${direcres}/${dirwemake}/angron2
 cd /u/scratch/d/dinoo/${direcres}/${dirwemake}
-export OMP_NUM_THREADS=12
+export OMP_NUM_THREADS=16
 ./angron2 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 $rate $ae $ie >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`

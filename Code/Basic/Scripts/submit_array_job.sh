@@ -8,12 +8,12 @@
 #$ -l h_rt=12:00:00,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 12
+#$ -pe shared 16
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-6:1
+#$ -t 1-3:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -62,7 +62,7 @@ mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainlocal.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp ~/Chemistry/Code/mainlocal.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
-export OMP_NUM_THREADS=12
+export OMP_NUM_THREADS=16
 ./angron 10000000 $den $i1 $i2 $i3 $i4 $m1 $m2 $rate $ae $ie >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
