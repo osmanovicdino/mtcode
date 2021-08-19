@@ -30,8 +30,8 @@
 #include <omp.h>
 #else
 typedef int omp_int_t;
-inline omp_int_t omp_get_thread_num() { return 0;}
-inline omp_int_t omp_get_max_threads() { return 1;}
+inline omp_int_t omp_get_thread_num() { return 0; }
+inline omp_int_t omp_get_max_threads() { return 1; }
 inline omp_int_t omp_get_num_threads() { return 1; }
 #endif
 
@@ -48,13 +48,12 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 // #include "NCGasR.h"
 // #include "Microtubule.h"
 
-
-
 //#include "MDGPU.cu"
 
 using namespace std;
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
 
     srand(time(NULL));
     signal(SIGSEGV, handler);
@@ -107,7 +106,7 @@ int main(int argc, char** argv) {
     //     params(i, 1) =  1.4; //distance
     //     params(i, 2) = 0.927;
     // }
-    int m1 = 500;
+    int m1 = 4000;
     int m2 = m1 + m5;
     int n = m2 + m6;
 
@@ -496,7 +495,7 @@ int main(int argc, char** argv) {
     ss7 << inv_en;
     base += ss7.str();
 
-    // cout << "done" << endl;
+    cout << "done" << endl;
     //Do processing to make sure everything is fine here
 
     //pausel();
@@ -504,7 +503,7 @@ int main(int argc, char** argv) {
     A.obj->setdt(0.005);
     int every = 1000;
 
-    //A.run_singlebond(runtime, 1000, base);
+    // A.run_singlebond(runtime, 1000, base);
     // vector<string> orientfiles;
     // vector<string> posfiles;
     // vector<string> bindfiles;
@@ -517,122 +516,49 @@ int main(int argc, char** argv) {
     // int s2 = posfiles.size();
     // int s3 = bindfiles.size();
 
-    // if ((s1 == 0) || (s2 == 0) || (s3 == 0)) {
+    // if ((s1 == 0) || (s2 == 0) || (s3 == 0))
+    // {
     //     error("no files found to import");
     // }
 
-    // if( (s1 != s2 ) || (s2 != s3 ) || (s1 != s3 ) ) {
+    // if ((s1 != s2) || (s2 != s3) || (s1 != s3))
+    // {
     //     error("different sizes of import");
     // }
 
+    // cout << "beginning import" << endl;
+
     double T;
     int TT;
-    bool vv1,vv2,vv3;
+    bool vv1, vv2, vv3;
     // matrix<double> postemp = importcsv(posfiles[posfiles.size() - 1], T, vv1);
     // matrix<double> orienttemp = importcsv(orientfiles[orientfiles.size() - 1], T, vv2);
     // matrix<int> bindtemp = importcsv(bindfiles[bindfiles.size() - 1], TT, vv3);
 
-    matrix<double> postemp = importcsv("/home/dino/Documents/Chemistry/SimulationResults/GoodSimulations/SphereDecay/posden=0.005_int1=14_int2=14_int3=6_int4=60_br=0.5num_anti=0num_inv=2000_ae=-20_ie=2_i=1474.csv", T, vv1);
-    matrix<double> orienttemp = importcsv("/home/dino/Documents/Chemistry/SimulationResults/GoodSimulations/SphereDecay/orientationden=0.005_int1=14_int2=14_int3=6_int4=60_br=0.5num_anti=0num_inv=2000_ae=-20_ie=2_i=1474.csv", T, vv2);
-    matrix<double> bindtemp = importcsv("/home/dino/Documents/Chemistry/SimulationResults/GoodSimulations/SphereDecay/bindingsden=0.005_int1=14_int2=14_int3=6_int4=60_br=0.5num_anti=0num_inv=2000_ae=-20_ie=2_i=1474.csv", T, vv3);
+    matrix<double> postemp = importcsv("/home/dino/External/PhaseDiagramDesign13/den=0.005_i1=14._i2=14._i3=6._i4=60._m1=16000_m2=16000_rate=0.01_ae=-20._ie=2./posden=0.005_int1=14_int2=14_int3=6_int4=60_br=0.01num_anti=16000num_inv=16000_ae=-20_ie=2_i=01307.csv", T, vv1);
+    matrix<double> orienttemp = importcsv("/home/dino/External/PhaseDiagramDesign13/den=0.005_i1=14._i2=14._i3=6._i4=60._m1=16000_m2=16000_rate=0.01_ae=-20._ie=2./orientationden=0.005_int1=14_int2=14_int3=6_int4=60_br=0.01num_anti=16000num_inv=16000_ae=-20_ie=2_i=01307.csv", T, vv2);
+    matrix<double> bindtemp = importcsv("/home/dino/External/PhaseDiagramDesign13/den=0.005_i1=14._i2=14._i3=6._i4=60._m1=16000_m2=16000_rate=0.01_ae=-20._ie=2./bindingsden=0.005_int1=14_int2=14_int3=6_int4=60_br=0.01num_anti=16000num_inv=16000_ae=-20_ie=2_i=01307.csv", T, vv3);
 
-    int num_anti = m5;
-    cout << l << endl;
-    matrix<double> InsertedAntiInvader = CreateRandomSample(postemp, num_anti, l, 20);
-    int nsni = 2500;
+    A.obj->setdat(postemp);
 
-    matrix<double> postemp2(nsni + num_anti, 3);
-    matrix<double> orienttemp2(nsni + num_anti, 9);
-    matrix<int> bindtemp2(2, nsni * 4 + 4 * num_anti);
+    A.obj->setorientation(orienttemp);
 
-    vector1<double> unc(9);
-    unc[0] = 1.;
-    unc[4] = 1.;
-    unc[8] = 1.;
-
-    for (int i = 0; i < nsni + num_anti; i++)
-    {
-        if (i < m1)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                postemp2(i, j) = postemp(i, j);
-            }
-            for (int j = 0; j < 9; j++)
-            {
-                orienttemp2(i, j) = orienttemp(i, j);
-            }
-        }
-        else if (i < m1 + num_anti)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                postemp2(i, j) = InsertedAntiInvader(i - (m1), j);
-            }
-            for (int j = 0; j < 9; j++)
-            {
-                orienttemp2(i, j) = unc[j];
-            }
-        }
-        else
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                postemp2(i, j) = postemp(i - num_anti, j);
-            }
-            for (int j = 0; j < 9; j++)
-            {
-                orienttemp2(i, j) = orienttemp(i - num_anti, j);
-            }
-        }
-    }
-
-    for (int i = 0; i < nsni * 4 + 4 * num_anti; i++)
-    {
-        if (i < m1 * 4)
-        {
-            int vv = bindtemp(1, i);
-            if (vv > m1 * 4)
-            {
-                vv += num_anti * 4;
-            }
-            bindtemp2(0, i) = bindtemp(0, i);
-            bindtemp2(1, i) = vv;
-        }
-        else if (i < m1 * 4 + num_anti * 4)
-        {
-            bindtemp2(0, i) = 0;
-            bindtemp2(1, i) = 0;
-        }
-        else
-        {
-            int vv = bindtemp(1, i - num_anti * 4);
-            if (vv > m1 * 4)
-            {
-                vv += num_anti * 4;
-            }
-            bindtemp2(0, i) = bindtemp(0, i - num_anti * 4);
-            bindtemp2(1, i) = vv;
-        }
-    }
-
-    A.obj->setdat(postemp2);
-    A.obj->setorientation(orienttemp2);
     BinaryBindStore bbs2;
-    vector1<bool> iss(bindtemp2.getncols());
-    vector1<int> ist(bindtemp2.getncols());
-    for (int i = 0; i < bindtemp2.getncols(); i++)
+    vector1<bool> iss(bindtemp.getncols());
+    vector1<int> ist(bindtemp.getncols());
+    for (int i = 0; i < bindtemp.getncols(); i++)
     {
-        iss[i] = (bool)bindtemp2(0, i);
-        ist[i] = bindtemp2(1, i);
+        iss[i] = (bool)bindtemp(0, i);
+        ist[i] = bindtemp(1, i);
     }
     bbs2.isbound = iss;
     bbs2.boundto = ist;
     //Do processing to make sure everything is fine here
 
+    cout << "beginning run" << endl;
 
-   // A.run_singlebond_continue(runtime, every, posfiles.size(), bbs2, base);
-    A.run_singlebond_continue(runtime, every, 0, bbs2, base);
+    A.run_singlebond_continue(runtime, every, 1307, bbs2, base);
+    // A.run_singlebond_continue(runtime, every, 475, bbs2, base);
 
     /*
 int NN = 10000;

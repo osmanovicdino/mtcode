@@ -78,13 +78,14 @@ int main(int argc, char **argv)
     double int2;
     double int3;
     double int4;
+    double int5;
     int m5;
     int m6;
     int runtime;
     double energy_barrier;
     double anti_en;
     double inv_en;
-    if (argc == 12)
+    if (argc == 13)
     {
         runtime = atof(argv[1]);
         packing_fraction = atof(argv[2]);
@@ -92,15 +93,17 @@ int main(int argc, char **argv)
         int2 = atof(argv[4]);
         int3 = atof(argv[5]);
         int4 = atof(argv[6]);
-        m5 = atof(argv[7]);
-        m6 = atof(argv[8]);
-        energy_barrier = atof(argv[9]);
-        anti_en = atof(argv[10]);
-        inv_en = atof(argv[11]);
+        int5 = atof(argv[7]);
+        m5 = atof(argv[8]);
+        m6 = atof(argv[9]);
+        energy_barrier = atof(argv[10]);
+        anti_en = atof(argv[11]);
+        inv_en = atof(argv[12]);
     }
     else
     {
         //error("incorrect arg number");
+        error("incorrect argument number");
         runtime = 10001;
         packing_fraction = 0.005;
         int1 = 12.0;
@@ -121,7 +124,7 @@ int main(int argc, char **argv)
     //     params(i, 1) =  1.4; //distance
     //     params(i, 2) = 0.927;
     // }
-    int m1 = 4000;
+    int m1 = 500;
     int m2 = m1 + m5;
     int n = m2 + m6;
 
@@ -279,7 +282,7 @@ int main(int argc, char **argv)
             else
             {
 
-                params(iter, 0) = 0.0;
+                params(iter, 0) = int5;
                 params(iter, 1) = range * size;
                 params(iter, 2) = 0.927;
                 iter++;
@@ -501,6 +504,11 @@ int main(int argc, char **argv)
     stringstream ii4;
     ii4 << int4;
     base += ii4.str();
+
+    base += "_int5=";
+    stringstream ii5;
+    ii5 << int5;
+    base += ii5.str();
 
     base += "_br=";
     stringstream ss3;
