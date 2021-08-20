@@ -411,8 +411,6 @@ void BindingModelTernary<Q>::setup_energy_barrier(
     set_stable_triple(tripr333, base_sub_33, base_sub_33, base_sub_33_off, base_sub_33, base_sub_33_off, base_sub_33_off, 0.0, 0.0, pos_33, 0.0, pos_33, pos_33);
 
 
-
-
     /*
 
     t111[0] = 0.998;  //fromi,jtpi,j
