@@ -424,6 +424,12 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
         tf /= 10;
     } while (tf);
 
+    int m1 = 500;
+    int m2 = 500;
+    SortingFunctionNonUniform my_sorter;
+    my_sorter.div1 = (m1 * 4);
+    my_sorter.div2 = (m1 * 4 + 4 * (m2 - m1));
+    my_sorter.np = 4;
 
 
     int NN = obj->getN();
@@ -478,7 +484,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
     obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs , *bm, F, T);
 
-   // BinaryBindStore tempbind = bbs;
+   BinaryBindStore tempbind = bbs;
 
     generate_uniform_random_matrix(RT);
     matrix<double> tempdat = obj->getdat();
@@ -489,7 +495,9 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     for (int i = 0; i < runtime; i++)
     {
 
-        cout << i << endl;
+
+        // cout <<= Bond_Count(bbs,my_sorter,3);
+        
         // vector1<double> meas(6);
         // obj->measured_temperature(meas);
         // tottemp += meas;
@@ -501,9 +509,10 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
             pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
 
             // matrix<int> counts = Bond_Change(tempbind, bbs, my_sorter, 3);
-            // //cout << counts << endl;
+            // // //cout << counts << endl;
             // cout << counts << endl;
-            // tempbind = bbs;
+            // pausel();
+            tempbind = bbs;
             // pausel();
             
         }
@@ -620,7 +629,8 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
 
     int NN = obj->getN();
     BinaryBindStore bbs = bbs2;
-    
+
+
 
     int nh = (*pots).get_total_patches(NN);
 
@@ -668,6 +678,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
     {
 
         cout << i << endl;
+        // cout <<= Bond_Count(bbs, my_sorter, 3);
         // vector1<double> meas(6);
         // obj->measured_temperature(meas);
         // tottemp += meas;

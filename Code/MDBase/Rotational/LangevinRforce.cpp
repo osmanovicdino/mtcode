@@ -2900,6 +2900,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
     //std::mutex mtx;
 
+    // BinaryBindStore bo_temp = bo;
+
     //int total_checks = 0;
     int tn_pairs = pairs.size();
     int t_u_pairs = divs.size();
@@ -3053,9 +3055,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
                             double scr3 = 2 * (dis / disp2);
 
-                            double scr4 = -log(1E-10 + bm.calculate_score(wp1, wp2, b1 && b2 && cond1));
+                            //double scr4 = -log(1E-10 + bm.calculate_score(wp1, wp2, b1 && b2 && cond1));
 
-                            double scr = scr1 + scr2 + scr3 + scr4;
+                            double scr = scr1 + scr2 + scr3;// + scr4;
 
                             mdpairwd test(wp1, wp2, scr);
                             edgelist_private.push_back(test);
@@ -3192,6 +3194,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
     // outfunc(boindices3, "bo3");
     // pausel();
 
+
+
     int number_to_reserve = MIN(2 * ((total_number_of_patches + 1) - total_number_of_patches), total_number_of_patches / 2);
     //        // cout << number_to_reserve << endl;
     vector<mdpair> mypairs; //(number_to_reserve);
@@ -3213,6 +3217,15 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
     // int triplets_lost = 0;
 
 
+
+    // stringstream alltriplets;
+
+    // int m1 = 500;
+    // int m2 = 500;
+    // SortingFunctionNonUniform my_sorter;
+    // my_sorter.div1 = (m1 * 4);
+    // my_sorter.div2 = (m1 * 4 + 4 * (m2 - m1));
+    // my_sorter.np = 4;
 
     #pragma omp parallel
     {
@@ -3494,7 +3507,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                     bo.isbound[i3] = false;
                 }
 
-                // bool cond1 = is_there_a_13(b12, b23, b13, i1, i2, i3, my_sorter);
+                //bool cond1 = is_there_a_13(i1, i2, i3, my_sorter);
 
                 // bool cond2 = is_there_a_13(a12, a23, a13, i1, i2, i3, my_sorter);
 
@@ -3503,6 +3516,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
                 // if(cond1 && !cond2 && cond3) {
                 //     #pragma omp atomic update
                 //     triplets_lost++;
+                // }
+                // if(cond1) {
+                // stringstream data;
+                // data << my_sorter(i1) <<"," << my_sorter(i2) <<"," << my_sorter(i3) <<"," << b12 << "," << b23 << "," << b13 << "," << c12 << "," << c23 << "," << c13 << "," << a12 << "," << a23 << "," << a13 <<"," << rands[i] << endl;
+                // cout << data.str();
                 // }
             
             }
@@ -3529,6 +3547,8 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
         // }
     }
 
+    // cout << alltriplets.str() << endl;
+    //cout << endl;
     // //pausel();
     // cout << doubles_formed << "," << triplets_lost << endl;
 
@@ -3877,6 +3897,17 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
             }
         }
     }
+
+
+    // int m1 = 500;
+    // int m2 = 500;
+    // SortingFunctionNonUniform my_sorter;
+    // my_sorter.div1 = (m1 * 4);
+    // my_sorter.div2 = (m1 * 4 + 4 * (m2 - m1));
+    // my_sorter.np = 4;
+    // Bond_Change_Type(bo_temp,bo,boindices2,ccs,my_sorter,3);
+    
+
     /* 
     stringstream ss1;
     stringstream ss2;

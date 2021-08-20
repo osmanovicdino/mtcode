@@ -104,16 +104,16 @@ int main(int argc, char **argv)
     {
         //error("incorrect arg number");
         //error("incorrect argument number");
-        runtime = 1000001;
+        runtime = 10001;
         packing_fraction = 0.005;
-        int1 = 13.0;
-        int2 = 13.0;
+        int1 = 14.0;
+        int2 = 14.0;
         int3 = 6.0;
         int4 = 60.0;
         int5 = 6.0;
-        m5 = -000;
+        m5 = 000;
         m6 = 2000;
-        energy_barrier = 0.001;
+        energy_barrier = 0.0001;
         anti_en = -20.;
         inv_en = 2.0;
     }
@@ -178,7 +178,42 @@ int main(int argc, char **argv)
     bool c1;
 
 
+
     b.print();
+
+    // bool c12 = true;
+    // bool c13 = true;
+    // bool c23 = true;
+
+    // bool b12 = false;
+    // bool b23 = true;
+    // bool b13 = false;
+
+    // int count1 = 0;
+    // int count2 = 0;
+    // int count3 = 0;
+
+    // for(int i = 0 ;  i < 100000 ; i++) {
+    //     bool a12,a23,a13;
+    //     double ran = (double)(rand())/((double)RAND_MAX);
+    //     b.triplet(b12,b23,b13,c12,c23,c13,0,1,2003,a12,a23,a13,ran);
+    //     if(a12) {
+    //         count1++;
+    //     }
+    //     if (a23)
+    //     {
+    //         count2++;
+    //     }
+    //     if (a13)
+    //     {
+    //         count3++;
+    //     }
+
+    // }
+
+    // cout << count1 << " " << count2 << " " << count3 << endl;
+    // pausel();
+
 
     // double sizemix = (size1+size2)/2.;
     // pausel();
@@ -550,9 +585,36 @@ int main(int argc, char **argv)
 
     auto start = high_resolution_clock::now();
 
+    double T;
+    int TT;
+    bool vv1, vv2, vv3;
+    // matrix<double> postemp = importcsv(posfiles[posfiles.size() - 1], T, vv1);
+    // matrix<double> orienttemp = importcsv(orientfiles[orientfiles.size() - 1], T, vv2);
+    // matrix<int> bindtemp = importcsv(bindfiles[bindfiles.size() - 1], TT, vv3);
 
+    matrix<double> postemp = importcsv("/home/dino/Documents/Chemistry/SimulationResults/GoodSimulations/SingleSphere3/posden=0.005_int1=14_int2=14_int3=6_int4=60_br=0num_anti=0num_inv=2000_ae=-20_ie=2_i=00475.csv", T, vv1);
+    matrix<double> orienttemp = importcsv("/home/dino/Documents/Chemistry/SimulationResults/GoodSimulations/SingleSphere3/orientationden=0.005_int1=14_int2=14_int3=6_int4=60_br=0num_anti=0num_inv=2000_ae=-20_ie=2_i=00475.csv", T, vv2);
+    matrix<double> bindtemp = importcsv("/home/dino/Documents/Chemistry/SimulationResults/GoodSimulations/SingleSphere3/bindingsden=0.005_int1=14_int2=14_int3=6_int4=60_br=0num_anti=0num_inv=2000_ae=-20_ie=2_i=00475.csv", T, vv3);
 
-    A.run_singlebond(runtime, every, base);
+    A.obj->setdat(postemp);
+
+    A.obj->setorientation(orienttemp);
+
+    BinaryBindStore bbs2;
+    vector1<bool> iss(bindtemp.getncols());
+    vector1<int> ist(bindtemp.getncols());
+    for (int i = 0; i < bindtemp.getncols(); i++)
+    {
+        iss[i] = (bool)bindtemp(0, i);
+        ist[i] = bindtemp(1, i);
+    }
+    bbs2.isbound = iss;
+    bbs2.boundto = ist;
+    //Do processing to make sure everything is fine here
+
+    //cout << "beginning run" << endl;
+
+    A.run_singlebond_continue(runtime, every, 0, bbs2, base);
 
     auto stop = high_resolution_clock::now();
 

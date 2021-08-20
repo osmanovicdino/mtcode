@@ -48,17 +48,19 @@ matrix<int> LangevinNVTR::CreateEdgeList(matrix<int> &adj, vector1<int> &len)
 }
 
 template <class Q>
-vector1<int> Bond_Count(BinaryBindStore &bbs, Q &sorter, int no_types) {
+matrix<int> Bond_Count(BinaryBindStore &bbs, Q &sorter, int no_types) {
     int N = bbs.boundto.getsize();
     
-    vector1<int> counts((no_types)*(no_types-1)/2);
+    // vector1<int> counts((no_types)*(no_types-1)/2);
+
+    matrix<int> counts(no_types,no_types);
 
     for(int i = 0 ; i < N ; i++) {
         if(bbs.isbound[i]) {
             int p1 =  sorter(i);
             int p2 =  sorter(bbs.boundto[i]);
 
-            counts[p1*no_types+p2]++;
+            counts(p1-1,p2-1)++;
         }
     }
 
@@ -119,7 +121,254 @@ matrix<int> Bond_Change(BinaryBindStore &bbs1, BinaryBindStore &bbs2, Q &sorter,
 }
 
 template <class Q>
-bool is_there_a_13(bool b12, bool b23, bool b13, int i1, int i2 , int i3, Q &sorter) {
+void  Bond_Change_Type(BinaryBindStore &bbs1, BinaryBindStore &bbs2, matrix<int> &boindices2, vector1<int> &ccs, Q &my_sorter, int no_types) {
+
+//go through the whole thing
+
+matrix<int> doublets_formed(no_types,no_types);
+
+matrix<int> doublets_lost(no_types, no_types);
+
+matrix<int> triplets_formed(no_types, no_types);
+
+matrix<int> triplets_lost(no_types, no_types);
+
+matrix<int> nlets_formed(no_types, no_types);
+
+matrix<int> nlets_lost(no_types, no_types);
+
+for(int i = 0  ; i < ccs.getsize() ; i++) {
+
+    if(ccs[i] == 2) {
+        //were they bound before?
+
+        int wp1 = boindices2(i,0);
+        int wp2 =  boindices2(i,1);
+
+        int t1 = my_sorter(wp1) - 1;
+        int t2 = my_sorter(wp2) - 1;
+
+        bool cond1 = bbs1.boundto[wp1] == wp2 && bbs1.boundto[wp2] == wp1;
+        bool b1, b2;
+
+        b1 = bbs1.isbound[wp1];
+        b2 = bbs1.isbound[wp2];
+
+        bool alreadybound =  b1 && b2 && cond1;
+
+        bool cond2 = bbs2.boundto[wp1] == wp2 && bbs2.boundto[wp2] == wp1;
+        bool b3, b4;
+
+        b3 = bbs2.isbound[wp1];
+        b4 = bbs2.isbound[wp2];
+
+        bool afterbound =  b3 && b4 && cond2;
+
+        if(alreadybound && afterbound) {
+
+        }
+        else if(alreadybound && !afterbound) {
+            doublets_lost(t1,t2)++;
+        }
+        else if(!alreadybound && afterbound){
+            doublets_formed(t1,t2)++;
+        }
+        else{
+
+        }
+
+
+    }
+
+    else if(ccs[i] == 3 ) {
+
+        int size_of_cluster = ccs[i];
+
+        vector<mdpair> matched;
+        matched.reserve(size_of_cluster * (size_of_cluster - 1) / 2);
+
+        for (int j = 0; j < size_of_cluster; j++)
+        {
+            int myindex = boindices2(i, j);
+            //for (int k = 0; k < tempbound[indexes[j]]; k++)
+            for (int k = j + 1; k < size_of_cluster; k++)
+            {
+                mdpair m1;
+                //int f1 = indexes[j];
+                //int f2 = boindices(indexes[j], k);
+
+                int f1 = myindex;
+                int f2 = boindices2(i, k);
+
+                if (f1 < f2)
+                {
+                    m1.a = f1;
+                    m1.b = f2;
+                }
+                else
+                {
+                    m1.a = f2;
+                    m1.b = f1;
+                }
+                matched.push_back(m1);
+            }
+        }
+
+
+        vector1<bool> bounded_before(matched.size());
+
+        for (int j = 0; j < matched.size(); j++)
+        {
+            int i1 = matched[j].a;
+            int i2 = matched[j].b;
+            bool b12 = bbs1.boundto[i1] == i2 && bbs1.boundto[i2] == i1 && bbs1.isbound[i1] && bbs1.isbound[i2];
+            bounded_before[j] = b12;
+        }
+
+        vector1<bool> bounded_after(matched.size());
+
+        for (int j = 0; j < matched.size(); j++)
+        {
+            int i1 = matched[j].a;
+            int i2 = matched[j].b;
+            bool b12 = bbs2.boundto[i1] == i2 && bbs2.boundto[i2] == i1 && bbs2.isbound[i1] && bbs2.isbound[i2];
+            bounded_after[j] = b12;
+        }
+
+        for (int j = 0; j < matched.size(); j++)
+        {
+            int typea = my_sorter(matched[j].a) - 1;
+            int typeb = my_sorter(matched[j].b) - 1;
+
+            if (bounded_after[j] && !bounded_before[j])
+            {
+                triplets_formed(typea, typeb)++;
+            }
+            else if (!bounded_after[j] && bounded_before[j])
+            {
+                triplets_lost(typea, typeb)++;
+            }
+            else
+            {
+            }
+        }
+
+    }
+    else if(ccs[i] > 3) {
+
+        int size_of_cluster = ccs[i];
+
+        vector<mdpair> matched;
+        matched.reserve(size_of_cluster * (size_of_cluster - 1) / 2);
+
+        for (int j = 0; j < size_of_cluster; j++)
+        {
+            int myindex = boindices2(i, j);
+            //for (int k = 0; k < tempbound[indexes[j]]; k++)
+            for (int k = j+1; k < size_of_cluster; k++)
+            {
+                mdpair m1;
+                //int f1 = indexes[j];
+                //int f2 = boindices(indexes[j], k);
+
+                int f1 = myindex;
+                int f2 = boindices2(i, k);
+
+                if (f1 < f2)
+                {
+                    m1.a = f1;
+                    m1.b = f2;
+                }
+                else
+                {
+                    m1.a = f2;
+                    m1.b = f1;
+                }
+                matched.push_back(m1);
+            }
+        }
+
+        vector1<bool> bounded_before(matched.size());
+
+        for (int j = 0; j < matched.size(); j++)
+        {
+            int i1 = matched[j].a;
+            int i2 = matched[j].b;
+            bool b12 = bbs1.boundto[i1] == i2 && bbs1.boundto[i2] == i1 && bbs1.isbound[i1] && bbs1.isbound[i2];
+            bounded_before[j] = b12;
+        }
+
+        vector1<bool> bounded_after(matched.size());
+
+        for (int j = 0; j < matched.size(); j++)
+        {
+            int i1 = matched[j].a;
+            int i2 = matched[j].b;
+            bool b12 = bbs2.boundto[i1] == i2 && bbs2.boundto[i2] == i1 && bbs2.isbound[i1] && bbs2.isbound[i2];
+            bounded_after[j] = b12;
+        }
+
+        for(int j = 0  ; j < matched.size() ; j++) {
+            int typea = my_sorter(matched[j].a)-1;
+            int typeb = my_sorter(matched[j].b)-1;
+
+            if(bounded_after[j] && !bounded_before[j]) {
+                nlets_formed(typea,typeb)++;
+            }
+            else if (!bounded_after[j] && bounded_before[j])
+            {
+                nlets_lost(typea , typeb )++;
+            }
+            else {
+
+            }
+
+        }
+
+
+    }
+    else{
+
+    }
+
+}
+
+cout <<= doublets_formed;
+cout <<= triplets_formed;
+cout <<= nlets_formed;
+
+cout <<= doublets_lost;
+cout <<= triplets_lost;
+cout <<= nlets_lost;
+
+
+}
+
+template <class Q>
+bool is_there_a_13( int i1, int i2, int i3, Q &sorter)
+{
+
+    if ( (((sorter(i1) == 1 && sorter(i2) == 3) || (sorter(i1) == 3 && sorter(i2) == 1))))
+    {
+        return true;
+    }
+    else if ( ((sorter(i3) == 1 && sorter(i2) == 3) || (sorter(i2) == 3 && sorter(i3) == 1)))
+    {
+        return true;
+    }
+    else if ( ((sorter(i3) == 1 && sorter(i1) == 3) || (sorter(i1) == 3 && sorter(i3) == 1)))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+template <class Q>
+bool is_there_a_13_bond(bool b12, bool b23, bool b13, int i1, int i2 , int i3, Q &sorter) {
      
     if(b12 && (( (sorter(i1)==1 && sorter(i2)==3) || (sorter(i1)==3 && sorter(i2)==1) )) ) {
         return true;

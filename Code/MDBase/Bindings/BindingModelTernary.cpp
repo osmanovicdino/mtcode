@@ -229,24 +229,34 @@ void BindingModelTernary<Q>::setup(double st11, double st22, double st33, double
     */
 }
 
+// double baserates2(double st11on, double st11off) {
+//     if(st11on < 1E-12) st11on = 1E-12;
+//     if(1-st11on < 1E-12 ) st11on =  1-1E-12;
+//     if(st11off < 1E-12) st11off = 1E-12;
+//     if(1-st11off < 1E-12 ) st11off =  1-1E-12;
+
+//     return 1. / sqrt(SQR(log(1 - st11on)) - 2 * st11off * SQR(log(1 - st11on)) +SQR(st11off) * SQR(log(1 - st11on)));
+// }
+
 double baserates2(double st11on, double st11off) {
     if(st11on < 1E-12) st11on = 1E-12;
-    if(1-st11on < 1E-12 ) st11on =  1-1E-12;
-    if(st11off < 1E-12) st11off = 1E-12;
-    if(1-st11off < 1E-12 ) st11off =  1-1E-12;
 
-    return 1. / sqrt(SQR(log(1 - st11on)) - 2 * st11off * SQR(log(1 - st11on)) +SQR(st11off) * SQR(log(1 - st11on)));
+
+    return sqrt((1-st11off)*(st11on)/(1-st11on));
 }
 
+// double myexp(double st11on, double st11off) {
+//     if(st11on < 1.E-12) st11on = 1.E-12;
+//     if(1.-st11on < 1.E-12 ) st11on =  1.-1.E-12;
+//     if(st11off < 1E-12) st11off = 1.E-12;
+//     if(1.-st11off < 1.E-12 ) st11off =  1.-1.E-12;
+
+
+
+//     return log(1.-st11off);
+// }
 double myexp(double st11on, double st11off) {
-    if(st11on < 1.E-12) st11on = 1.E-12;
-    if(1.-st11on < 1.E-12 ) st11on =  1.-1.E-12;
-    if(st11off < 1E-12) st11off = 1.E-12;
-    if(1.-st11off < 1.E-12 ) st11off =  1.-1.E-12;
-
-
-
-    return log(1.-st11off);
+    return 0.5*log((st11off-1)*(st11on-1)/st11on);
 }
 
 template <typename Q>
@@ -283,10 +293,10 @@ void BindingModelTernary<Q>::setup_energy_barrier(
     doubr33[2] = 1.0 - (double)st33_off;
     doubr33[3] = (double)st33_off;
 
-    doubr12[0] = 1.0 - (double)st33_on;
-    doubr12[1] = (double)st33_on;
-    doubr12[2] = 1.0 - (double)st33_off;
-    doubr12[3] = (double)st33_off;
+    doubr12[0] = 1.0 - (double)st12_on;
+    doubr12[1] = (double)st12_on;
+    doubr12[2] = 1.0 - (double)st12_off;
+    doubr12[3] = (double)st12_off;
 
     doubr13[0] = 1.0 - (double)st13_on;
     doubr13[1] = (double)st13_on;
@@ -375,15 +385,19 @@ void BindingModelTernary<Q>::setup_energy_barrier(
 
 
     //WAS PREVIOUSLY (1-STOFF)/(1-STON)
-    double base_sub_11_off = -baserates2(st11_on, st11_off) * (1 - st11_off) * log(1 - st11_on);
-    double base_sub_12_off = -baserates2(st12_on, st12_off) * (1 - st12_off) * log(1 - st12_on);
-    double base_sub_13_off = -baserates2(st13_on, st13_off) * (1 - st13_off) * log(1 - st13_on);
-    double base_sub_22_off = -baserates2(st22_on, st22_off) * (1 - st22_off) * log(1 - st22_on);
-    double base_sub_23_off = -baserates2(st23_on, st23_off) * (1 - st23_off) * log(1 - st23_on);
-    double base_sub_33_off = -baserates2(st33_on, st33_off) * (1 - st33_off) * log(1 - st33_on);
+    // double base_sub_11_off = -baserates2(st11_on, st11_off) * (1 - st11_off) * log(1 - st11_on);
+    // double base_sub_12_off = -baserates2(st12_on, st12_off) * (1 - st12_off) * log(1 - st12_on);
+    // double base_sub_13_off = -baserates2(st13_on, st13_off) * (1 - st13_off) * log(1 - st13_on);
+    // double base_sub_22_off = -baserates2(st22_on, st22_off) * (1 - st22_off) * log(1 - st22_on);
+    // double base_sub_23_off = -baserates2(st23_on, st23_off) * (1 - st23_off) * log(1 - st23_on);
+    // double base_sub_33_off = -baserates2(st33_on, st33_off) * (1 - st33_off) * log(1 - st33_on);
 
-  
-
+    double base_sub_11_off = baserates2(st11_on, st11_off);
+    double base_sub_12_off = baserates2(st12_on, st12_off);
+    double base_sub_13_off = baserates2(st13_on, st13_off);
+    double base_sub_22_off = baserates2(st22_on, st22_off);
+    double base_sub_23_off = baserates2(st23_on, st23_off);
+    double base_sub_33_off = baserates2(st33_on, st33_off);
 
     set_stable_triple(tripr111, base_sub_11, base_sub_11, base_sub_11_off, base_sub_11, base_sub_11_off, base_sub_11_off, 0.0, 0.0, pos_11, 0.0, pos_11, pos_11);
     set_stable_triple(tripr112, base_sub_12, base_sub_12, base_sub_11_off, base_sub_12, base_sub_12_off, base_sub_12_off, assym_11_12, assym_11_12, pos_11, 0.0 /*assym_12_12*/, pos_12, pos_12);
@@ -395,6 +409,9 @@ void BindingModelTernary<Q>::setup_energy_barrier(
     set_stable_triple(tripr223, base_sub_23, base_sub_23, base_sub_22_off, base_sub_23, base_sub_23_off, base_sub_22_off, assym_22_23, assym_22_23, pos_22, 0.0 /*assym_23_23*/, pos_23, pos_23);
     set_stable_triple(tripr233, base_sub_33, base_sub_23, base_sub_23_off, base_sub_23, base_sub_23_off, base_sub_23_off, assym_23_33, 0.0 /*assym_23_23*/, pos_23, -assym_23_33, pos_23, pos_23);
     set_stable_triple(tripr333, base_sub_33, base_sub_33, base_sub_33_off, base_sub_33, base_sub_33_off, base_sub_33_off, 0.0, 0.0, pos_33, 0.0, pos_33, pos_33);
+
+
+
 
     /*
 
