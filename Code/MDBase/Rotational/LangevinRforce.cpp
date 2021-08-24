@@ -4154,7 +4154,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets_eq(vector<patc
     int t_u_pairs = divs.size();
     double mk = iny.max_check;
 
-#pragma omp parallel
+    if (tn_pairs > 0)
+    {
+    #pragma omp parallel
     {
         vector<mdpairwd> edgelist_private;
         edgelist_private.reserve(total_number_of_patches);
@@ -4327,7 +4329,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets_eq(vector<patc
             edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
         }
     }
-
+    }
     PairHistogramExtended(edgelist, boindices, boenergies, tempbound);
 
     //cout << edgelist.size() << endl;
@@ -5125,5 +5127,5 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets_eq(vector<patc
         torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
         torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
     }
-}
+    }
 #endif /* LANGEVINRFORCE_CPP */
