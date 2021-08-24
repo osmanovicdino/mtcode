@@ -4339,7 +4339,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets_eq(vector<patc
     // vector1<int> countubtc(3);
     //cout << " largest cluster: " << maxval(tempbound) << endl;
 
-#pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < total_number_of_patches; i++)
     { //check bindings, if distance metric is wrong, break bindings
         if (bo.isbound[i])

@@ -22,6 +22,10 @@
 #include <parallel/algorithm>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
+#include <unistd.h>
+#include <execinfo.h>
+#include <signal.h>
+
 #if defined(_OPENMP)
 #include <omp.h>
 #else
@@ -250,7 +254,7 @@ int main(int argc, char **argv)
     A.setviscosity(0.1*size_of_part);
 
   
-    A.run_singlebond(runtime, 1000, base);
+    A.run_singlebond_eq(runtime, 1000, base);
     
     return 0;
 }
