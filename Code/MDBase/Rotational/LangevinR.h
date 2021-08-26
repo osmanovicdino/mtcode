@@ -83,9 +83,25 @@ protected:
 public:
 	LangevinNVTR();
 	LangevinNVTR(cube &a); //define a Langevin system with a given geometry
+	LangevinNVTR(const LangevinNVTR&);
+	LangevinNVTR& operator=(const LangevinNVTR&);
+	LangevinNVTR *clone() const { 
+		return new LangevinNVTR(*this); }
+	~LangevinNVTR();
 
 	void initialize(matrix<double> &);
 	void initialize(matrix<double> &, matrix<double> &, matrix<double> &, matrix<double> & );
+
+	void printall() {
+		cout << "printing all parameters" << endl;
+		cout << angmom->getNsafe() << endl;
+		cout << orient->getNsafe() << endl;
+		cout << mom->getNsafe() << endl;
+		cout << dat->getNsafe() << endl;
+		cout << "printed" << endl;
+		cout << endl;
+
+	}
 
 	void setIM(const vector1<double> &);
 	void setdt(double);
@@ -131,6 +147,15 @@ public:
 			cout << dimension << " " << geo.dimension << endl;
 			error("set orient dimensions must match in MD");
 		}
+	}
+
+	void setangularmomenta(matrix<double> &amom) {
+		//if(amom.getNsafe() != angmom->getNsafe() || amom.getncols() != angmom->getncols() ) error("not setting correct dimensions for setting angular momentum");
+		
+		delete angmom;
+		
+
+		angmom =  amom.clone();
 	}
 
 	void setup_random_binding(vector<patchint> &pairs, vector<int> &divs, ComboPatch &iny, BinaryBindStore &bo, AbstractBindingModel &bm);

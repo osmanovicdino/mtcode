@@ -1,4 +1,4 @@
-LangevinNVT::LangevinNVT() {
+LangevinNVT::LangevinNVT() : MD() {
 	//cout << "NVT constructor called" << endl;
 	gamma = 1.0;
 	dt = 1.0;
@@ -26,7 +26,7 @@ LangevinNVT::LangevinNVT() {
 	c5 = (1 - (d));
 }
 
-LangevinNVT::LangevinNVT(cube &a)  {
+LangevinNVT::LangevinNVT(cube &a) : MD()  {
 	//cout << "geo NVT constructor called" << endl;
 	gamma = 1.0;
 	dt = 1.0;
@@ -52,7 +52,69 @@ LangevinNVT::LangevinNVT(cube &a)  {
 	c5 = (1 - (d));
 }
 
+LangevinNVT::LangevinNVT(const LangevinNVT &a) : MD(a) {
 
+	
+	gamma = a.gamma;
+	dt = a.dt;
+	kT = a.kT;
+	m = a.m;
+	cube tempgeo = a.getgeo();
+	this->setgeometry(tempgeo);
+
+	matrix<double> temp = a.getdat() ;
+	this->setdat(temp);
+
+	mom = new matrix<double>;
+
+	matrix<double> tempmom = a.getmom();
+	mom = tempmom.clone();
+
+
+
+	d = (gamma * dt / 2.);
+	q = (dt) / 2.;
+	r = sqrt(0.5 * kT * (gamma) * (m) * (dt));
+
+	c1 = (dt / m);
+	c2 = (1.0 / (1.0 + (d)));
+	c3 = (1.0 / (1.0 + (d))) * q;
+	c4 = (1.0 / (1.0 + (d))) * r;
+	c5 = (1 - (d));
+}
+
+LangevinNVT::~LangevinNVT() {
+	delete mom;
+}
+
+LangevinNVT& LangevinNVT::operator=(const LangevinNVT &a)  {
+
+
+	delete mom;
+	MD::operator=(a);
+
+	gamma = a.gamma;
+	dt = a.dt;
+	kT = a.kT;
+	m = a.m;
+	cube tempgeo = a.getgeo();
+	this->setgeometry(tempgeo);
+	matrix<double> temp = a.getdat();
+	this->setdat(temp);
+	this->setmom(*(a.mom));
+
+	d = (gamma * dt / 2.);
+	q = (dt) / 2.;
+	r = sqrt(0.5 * kT * (gamma) * (m) * (dt));
+
+	c1 = (dt / m);
+	c2 = (1.0 / (1.0 + (d)));
+	c3 = (1.0 / (1.0 + (d))) * q;
+	c4 = (1.0 / (1.0 + (d))) * r;
+	c5 = (1 - (d));
+
+	return *this;
+}
 
 
 void LangevinNVT::setgamma(double g) {
@@ -110,7 +172,7 @@ void LangevinNVT::setm(double mm) {
 void LangevinNVT::setmom(matrix<double> &ps) {
 	delete mom;
 	if(ps.getNsafe() != this->getN() || ps.getncols() != this->getdimension() ) error("attempting to set momenta matrix which is not the same size as the system");
-	mom = new matrix<double>(ps);
+	mom = ps.clone();
 }
 
 void LangevinNVT::printparams() {
@@ -125,7 +187,7 @@ void LangevinNVT::printparams() {
 	cout << endl;
 }
 
-matrix<double>& LangevinNVT::getmom() {
+matrix<double> LangevinNVT::getmom() const {
 	return (*this->mom);
 }
 

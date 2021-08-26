@@ -239,9 +239,9 @@ void BindingModelTernary<Q>::setup(double st11, double st22, double st33, double
 // }
 
 double baserates2(double st11on, double st11off) {
-    if(st11on < 1E-12) st11on = 1E-12;
+    
 
-
+    
     return sqrt((1-st11off)*(st11on)/(1-st11on));
 }
 
@@ -256,6 +256,8 @@ double baserates2(double st11on, double st11off) {
 //     return log(1.-st11off);
 // }
 double myexp(double st11on, double st11off) {
+    if (st11on < 1E-12)
+        st11on = 1E-12;
     return 0.5*log((st11off-1)*(st11on-1)/st11on);
 }
 

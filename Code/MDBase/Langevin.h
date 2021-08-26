@@ -23,6 +23,12 @@ protected:
 public:
 	LangevinNVT();
 	LangevinNVT(cube &a); //define a Langevin system with a given geometry
+	LangevinNVT(const LangevinNVT&);
+	LangevinNVT& operator=(const LangevinNVT &);
+	LangevinNVT *clone() const { return new LangevinNVT(*this); }
+	~LangevinNVT();
+	
+
 	virtual void setgamma(double); //set the damping factor
 	virtual void setdt(double); //set the timestep
 	virtual void setkT(double); //set the temperature
@@ -42,7 +48,7 @@ public:
 	
 
 
-	matrix<double>& getmom(); //return a matrix of the particles momenta
+	matrix<double> getmom() const; //return a matrix of the particles momenta
 	vector1<double> avmom();
 	double getdt() { return dt;}
 	void printparams();

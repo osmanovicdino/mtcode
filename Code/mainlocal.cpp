@@ -106,14 +106,14 @@ int main(int argc, char **argv)
         //error("incorrect argument number");
         runtime = 1000001;
         packing_fraction = 0.005;
-        int1 = 13.0;
-        int2 = 13.0;
+        int1 = 15.0;
+        int2 = 15.0;
         int3 = 6.0;
         int4 = 60.0;
-        int5 = 6.0;
-        m5 = -000;
-        m6 = 2000;
-        energy_barrier = 0.001;
+        int5 = 0.0;
+        m5 = 1000;
+        m6 = 1000;
+        energy_barrier = 0.004;
         anti_en = -20.;
         inv_en = 2.0;
     }
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
     //     params(i, 1) =  1.4; //distance
     //     params(i, 2) = 0.927;
     // }
-    int m1 = 500;
+    int m1 = 4000;
     int m2 = m1 + m5;
     int n = m2 + m6;
 
@@ -179,6 +179,7 @@ int main(int argc, char **argv)
 
 
     b.print();
+
 
     // double sizemix = (size1+size2)/2.;
     // pausel();

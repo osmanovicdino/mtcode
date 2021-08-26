@@ -51,6 +51,60 @@ LangevinNVTR::LangevinNVTR(cube &a) : LangevinNVT(a), im(vector1<double>(a.dimen
     
 }
 
+LangevinNVTR::LangevinNVTR(const LangevinNVTR &a) : LangevinNVT(a), im(vector1<double>(a.dimension * a.dimension))
+{
+    //cout << "called copy constructor LangevinNVTR" << endl;
+    for(int i = 0  ; i < a.im.getsize() ; i++ ) {
+        im[i] = (a.im).gpcons(i);   
+    }
+
+    gammar = a.gammar;
+    Rt = a.Rt;
+    Rr = a.Rr;
+    dimension = a.dimension;
+
+    this->setdat(a.getdat());
+
+    angmom = new matrix<double>;
+    angmom = (*(a.angmom)).clone();
+
+    orient = new matrix<double>;
+    orient = (*(a.orient)).clone();
+}
+
+LangevinNVTR& LangevinNVTR::operator=(const LangevinNVTR &a) {
+    //cout << "called operator= LangevinNVTR" << endl;
+    
+    delete angmom;
+    delete orient;
+
+    LangevinNVT::operator=(a);
+    // for (int i = 0; i < a.im.getsize(); i++)
+    // {
+    //     im[i] = (a.im).gpcons(i);
+    // }
+    im = a.im;
+
+    gammar = a.gammar;
+    Rt = a.Rt;
+    Rr = a.Rr;
+    dimension = a.dimension;
+
+    this->setdat(a.getdat());
+
+    angmom = new matrix<double>;
+    angmom = (*(a.angmom)).clone();
+    orient = new matrix<double>;
+    orient = (*(a.orient)).clone();
+
+    return *this;
+}
+
+LangevinNVTR::~LangevinNVTR() {
+    delete angmom;
+    delete orient;
+}
+
 void LangevinNVTR::setIM(const vector1<double> &I) {
     if(I.getsize() != SQR(dimension)) error("error in forumulation of inertia matrix");
     
@@ -154,6 +208,7 @@ void LangevinNVTR::initialize(matrix<double> &positions)
     int NN = this->getN();
     int nc = positions.getncols();
 
+
     
 
     matrix<double> momenta(NN,nc);
@@ -225,11 +280,13 @@ void LangevinNVTR::initialize(matrix<double> &positions)
     //     error("incorrect initilization in orientations LangevinNVTR");
 
     matrix<double> angular_momenta(NN,3);
-    delete orient;
-    orient = new matrix<double>(orientations);
+    this->setorientation(orientations);
+    this->setangularmomenta(angular_momenta);
+    // delete orient;
+    // orient = new matrix<double>(orientations);
 
-    delete angmom;
-    angmom = new matrix<double>(angular_momenta);
+    // delete angmom;
+    // angmom = new matrix<double>(angular_momenta);
 }
 
 void LangevinNVTR::initialize(matrix<double> &positions, matrix<double> &momenta, matrix<double> &orientations, matrix<double> &angular_momenta) {
@@ -383,6 +440,8 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
 
     int Ns = angmom->getNsafe();
     int No = orient->getNsafe();
+
+
 
 
     #pragma omp parallel for schedule(static)

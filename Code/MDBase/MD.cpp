@@ -2,6 +2,9 @@ MD::MD() : geo(cube())
 {
 	//dat = new matrix<double>();
 	//cout << "abstract base class MD called" << endl;
+	HSPotential temppot(1.0,0.0);
+	ints = temppot.clone();
+
 }
 
 MD::MD(const MD &old) : geo(old.geo) {
@@ -27,9 +30,25 @@ MD::MD(const MD &old) : geo(old.geo) {
 	if (dimension != geo.dimension) error("copy constructor dimensions must match in MD");
 }
 
+MD& MD::operator=(const MD &old) {
+	//cout << "operator= MD called" << endl;
+
+	geo =  old.geo;
+
+	potential *potnew = (old.ints)->clone();
+	ints = potnew;
+
+	matrix<double> *groleo = (old.dat)->clone();
+	dat = groleo;
+
+	dimension = dat->getncols();
+
+	return *this;
+}
+
 
 MD::~MD() {
-	// delete dat;
+	delete dat;
 	// delete geo;
 }
 
@@ -40,7 +59,7 @@ void MD::setgeometry(cube &a) {
 
 }
 
-void MD::setdat(matrix<double> &a) {
+void MD::setdat(const matrix<double> &a) {
 	matrix<double> *res =  a.clone();
 	dat = res;
 	dimension = dat->getncols();
@@ -69,11 +88,11 @@ int MD::getN() {
 	return (*this->dat).getNsafe();
 }
 
-matrix<double>& MD::getdat() {
-	return *(this->dat);
+matrix<double> MD::getdat() const {
+	return (*(this->dat));
 }
 
-cube& MD::getgeo() {
+cube MD::getgeo() const {
 	return geo;
 }
 

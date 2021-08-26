@@ -34,9 +34,10 @@ public:
 
 MD();
 MD(const MD&);
+MD& operator=(const MD&);
 ~MD();
 
-void setdat(matrix<double>&);
+void setdat(const matrix<double>&);
 
 void setinteractions(potential&);
 void setgeometry(cube&);
@@ -45,8 +46,8 @@ double getcoordinate(int,int);
 
 int getN(); // get the number of particles
 int getdimension();
-matrix<double>& getdat();
-cube& getgeo();
+matrix<double> getdat() const;
+cube getgeo() const;
 potential& getints();
 void disvec(int &p1,int&p2,vector1<double>&uv,double&);
 

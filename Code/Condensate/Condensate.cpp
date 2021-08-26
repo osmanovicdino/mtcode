@@ -63,6 +63,7 @@ Condensate::Condensate(double ll, int N)  {
     b.initialize(dat);
 
 
+
     double kT = 1.0;
     double dt = 0.005;
     b.setdt(dt);
@@ -76,7 +77,8 @@ Condensate::Condensate(double ll, int N)  {
 
     b.setkT(kT);
 
-    *obj = b;
+    obj = b.clone();
+
 
 }
 
@@ -424,12 +426,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
         tf /= 10;
     } while (tf);
 
-    int m1 = 500;
-    int m2 = 500;
-    SortingFunctionNonUniform my_sorter;
-    my_sorter.div1 = (m1 * 4);
-    my_sorter.div2 = (m1 * 4 + 4 * (m2 - m1));
-    my_sorter.np = 4;
+
 
 
     int NN = obj->getN();
@@ -476,7 +473,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     runs_diff = adjacency(opairs);
 
 
-
+    cube concompc = obj->getgeo();
 
     obj->setup_random_binding(opairs,runs_diff, *pots, bbs, *bm); //randomly arrange binding
     //cout << "fi" << endl;
@@ -495,7 +492,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
     for (int i = 0; i < runtime; i++)
     {
 
-
+        cout << i << endl;
         // cout <<= Bond_Count(bbs,my_sorter,3);
         
         // vector1<double> meas(6);
@@ -603,8 +600,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
             myfile3 <<= bbs.isbound;
             myfile3 << "\n";
             myfile3 <<= bbs.boundto;
-            myfile4 <<= distance_graph(pos,boxes,obj->getgeo(),1.25,g);
-
+            myfile4 <<= distance_graph(pos, boxes, concompc, 1.25, g);
 
             myfile.close();
             myfile2.close();
@@ -640,6 +636,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
 
+
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 2.5 * size_mol);
     index_test *g = new index_test;
 
@@ -663,15 +660,18 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
     opairs = obj->calculate_patch_list(*pairs, *pots);
     runs_diff = adjacency(opairs);
 
-
+    cube concompc = obj->getgeo();
     //cout << "fi" << endl;
     obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs, *bm, F, T);
+
 
 
     generate_uniform_random_matrix(RT);
 
 
     obj->create_forces_and_torques_sphere(F, T, RT);
+
+
     //vector1<double> tottemp(6);
 
     for (int i = 0; i < runtime; i++)
@@ -772,7 +772,7 @@ void Condensate::run_singlebond_continue(int runtime, int every, int startval, B
             myfile3 <<= bbs.isbound;
             myfile3 << "\n";
             myfile3 <<= bbs.boundto;
-            myfile4 <<= distance_graph(pos, boxes, obj->getgeo(), 1.25, g);
+            myfile4 <<= distance_graph(pos, boxes, concompc , 1.25, g);
 
             myfile.close();
             myfile2.close();
