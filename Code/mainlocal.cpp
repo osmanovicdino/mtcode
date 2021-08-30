@@ -125,7 +125,7 @@ int main(int argc, char **argv)
     //     params(i, 1) =  1.4; //distance
     //     params(i, 2) = 0.927;
     // }
-    int m1 = 4000;
+    int m1 = 500;
     int m2 = m1 + m5;
     int n = m2 + m6;
 
