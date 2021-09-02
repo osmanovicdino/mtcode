@@ -5,11 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=12:00:00,h_data=128M
-# Email address to notify
-#$ -M $USER@mail
-# Notify when
-#$ -m bea
+#$ -l h_rt=4:00:00,h_data=128M
 #$ -t 1-200:1
 
 # echo job info on joblog:
