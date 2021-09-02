@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=4:00:00,h_data=128M
+#$ -l h_rt=4:00:00,h_data=512M
 #$ -t 1-200:1
 
 # echo job info on joblog:
