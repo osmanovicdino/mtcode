@@ -37,7 +37,6 @@ if [ -e ${filename}   ]; then
    rate=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $9}'`
    ae=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $10}'`
    ie=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $11}'`
-   wi = ${SGE_TASK_ID}
    echo "read file correctly" 
 else
    den=0.01
@@ -53,7 +52,7 @@ else
    wi=0
    echo "did not read file correctly"
 fi
-dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_i5=${i5}_m1=${m1}_m2=${m2}_rate=${rate}_ae=${ae}_ie=${ie}_num=${wi}"
+dirwemake="den=${den}_i1=${i1}_i2=${i2}_i3=${i3}_i4=${i4}_i5=${i5}_m1=${m1}_m2=${m2}_rate=${rate}_ae=${ae}_ie=${ie}_num=${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainlocalRandom.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ ~/Chemistry/Code/mainlocalRandom.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
