@@ -2,11 +2,18 @@
 void SingleHistogram(vector1<int> &indexes2, vector1<int> &ccs, matrix<int> &boindices2)
 {
 
-    // when the index of the group has been assigned, this function bins them
+    //when the index of the group has been assigned, this function bins them
+    // cout << ccs.getsize() << endl;
+    // cout << indexes2.getsize() << endl;
+    // cout << boindices2.getnrows() << endl;
+    
     // if ((indexes2.getsize() != boindices2.getnrows()) || ((indexes2.getsize() != ccs.getsize())))
     //     error("initial arrays must be same size in Single Histogram");
 
-    int sl = boindices2.getncols();
+    int sl = maxval_parallel(ccs);
+    int np = ccs.getsize();
+    boindices2.resize_parallel(np, sl);
+   // int sl = boindices2.getncols();
 
     for (int i = 0; i < indexes2.getsize(); ++i)
     {
