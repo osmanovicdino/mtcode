@@ -3082,6 +3082,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
         }
     }
 
+
    // cout << edgelist.size() << endl;
 
     #if defined(_OPENMP)
@@ -3155,6 +3156,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
     // //std::vector<mdpair> jhg(total_number_of_patches);
 
     // ConnectedComponentsParallel(edgelist, indexes2);
+
     
 
     vector1<int> indexes2;
@@ -3182,8 +3184,6 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
     //int wid =  boindices2.getncols();
 
     //outfunc(indexes2,"hola");
-
-
 
     vector1<double> rands;
     rands.resize_parallel(total_number_of_patches);
@@ -3935,6 +3935,9 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
     pausel(); */
     int tot = mypairs.size();
+
+
+
 #pragma omp parallel for
     for (int i = 0; i < tot; i++)
     {

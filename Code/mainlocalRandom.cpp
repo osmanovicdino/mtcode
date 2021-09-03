@@ -82,10 +82,9 @@ int main(int argc, char **argv)
     int m5;
     int m6;
     int runtime;
-    double energy_barrier;
     double anti_en;
     double inv_en;
-    if (argc == 13)
+    if (argc == 12)
     {
         runtime = atof(argv[1]);
         packing_fraction = atof(argv[2]);
@@ -96,9 +95,8 @@ int main(int argc, char **argv)
         int5 = atof(argv[7]);
         m5 = atof(argv[8]);
         m6 = atof(argv[9]);
-        energy_barrier = atof(argv[10]);
-        anti_en = atof(argv[11]);
-        inv_en = atof(argv[12]);
+        anti_en = atof(argv[10]);
+        inv_en = atof(argv[11]);
     }
     else
     {
@@ -111,9 +109,8 @@ int main(int argc, char **argv)
         int3 = 6.0;
         int4 = 60.0;
         int5 = 0.0;
-        m5 = 1000;
-        m6 = 1000;
-        energy_barrier = 0.004;
+        m5 = 0000;
+        m6 = 2000;
         anti_en = -20.;
         inv_en = 2.0;
     }
@@ -146,6 +143,7 @@ int main(int argc, char **argv)
 
 
     BindingModelTernary<SortingFunctionNonUniform> b(my_sorter);
+    BindingModelTernary<SortingFunctionNonUniform> b2(my_sorter);
     //BindingModelTernary b(my_sorter);
 
     // b.setup(0.99,0.01,0.01,0.01,0.0,0.0,
@@ -163,7 +161,22 @@ int main(int argc, char **argv)
     double unbinding_rebar = anti_en;
     double unbinding_rebar2 = inv_en;
 
-    b.setup_energy_barrier(0.99999, 0.99999, energy_barrier, 0.99999, energy_barrier, 0.99999,
+    double energy_barrier1 = 0.000;
+    double energy_barrier2 = 0.999;
+
+    b.setup_energy_barrier(0.99999, 0.99999, energy_barrier1, 0.99999, energy_barrier1, 0.99999,
+                           0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
+                           0.0,
+                           unbinding_rebar2,
+                           0.0,
+                           0.0,
+                           unbinding_rebar,
+                           unbinding_rebar,
+                           0.0,
+                           0.0,
+                           0.0);
+
+    b2.setup_energy_barrier(0.99999, 0.99999, energy_barrier2, 0.99999, energy_barrier2, 0.99999,
                            0.99999, 0.99999, 0.99999, 0.99999, 0.99999, 0.99999,
                            0.0,
                            unbinding_rebar2,
@@ -178,7 +191,6 @@ int main(int argc, char **argv)
     bool c1;
 
 
-    b.print();
 
 
     // double sizemix = (size1+size2)/2.;
@@ -505,19 +517,21 @@ int main(int argc, char **argv)
 
     Condensate A(l, n);
 
+    Condensate B(l, n);
 
     A.setup_large_droplet(m1,m5,m6,0.640658,  l);
+    B.setup_large_droplet(m1, m5, m6, 0.640658, l);
 
-    
     //A.setup_tight_packing(1.8*size);
 
     
     //outfunc(A.obj->getdat(),"dat");
     A.setBindingModel(b);
+    B.setBindingModel(b2);
 
     //cout << "set up 1" << endl;
     A.setpots(c);
-
+    B.setpots(c);
     //int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
     //int a = system("python3 /home/dino/Desktop/tylercollab/Repo/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
@@ -533,68 +547,96 @@ int main(int argc, char **argv)
     // }
 
     A.setviscosity(0.1);
+    B.setviscosity(0.1);
 
     double beta = 1.0;
 
     A.obj->setkT(1. / beta);
+    B.obj->setkT(1. / beta);
+
 
     string base = "den=";
+    string base2 = "den=";
     stringstream dd;
     dd << packing_fraction;
-    base+= dd.str();
-    
-    
+    base += dd.str();
+    base2 += dd.str();
+
     base += "_int1=";
+    base2 += "_int1=";
     stringstream ss;
     ss << int1;
     base += ss.str();
+    base2 += ss.str();
 
     stringstream ss1;
     ss1 << int2;
     base += "_int2=";
     base += ss1.str();
 
+    base2 += "_int2=";
+    base2 += ss1.str();
+
     base += "_int3=";
+    base2 += "_int3=";
     stringstream ss2;
     ss2 << int3;
     base += ss2.str();
+    base2 += ss2.str();
 
     base += "_int4=";
+    base2 += "_int4=";
+
     stringstream ii4;
     ii4 << int4;
     base += ii4.str();
+    base2 += ii4.str();
 
     base += "_int5=";
+    base2 += "_int5=";
     stringstream ii5;
     ii5 << int5;
     base += ii5.str();
+    base2 += ii5.str();
 
     base += "_br=";
+    base2 += "_br=";
     stringstream ss3;
-    ss3 << energy_barrier;
+    ss3 << energy_barrier1;
+
+    stringstream ss3_2;
+    ss3_2 << energy_barrier2;
     base += ss3.str();
+    base2 += ss3_2.str();
     // cout << "done" << endl;
     //Do processing to make sure everything is fine here
     base += "num_anti=";
+    base2 += "num_anti=";
     stringstream ss4;
     ss4 << m5;
     base += ss4.str();
+    base2 += ss4.str();
 
     base += "num_inv=";
+    base2 += "num_inv=";
     stringstream ss5;
     ss5 << m6;
     base += ss5.str();
-
+    base2 += ss5.str();
 
     base += "_ae=";
+    base2 += "_ae=";
     stringstream ss6;
     ss6 << anti_en;
     base += ss6.str();
+    base2 += ss6.str();
 
     base += "_ie=";
+    base2 += "_ie=";
     stringstream ss7;
     ss7 << inv_en;
     base += ss7.str();
+    base2 += ss7.str();
 
     // cout << "done" << endl;
     //Do processing to make sure everything is fine here
@@ -602,22 +644,17 @@ int main(int argc, char **argv)
     //pausel();
     //cout << m2 << endl;
     A.obj->setdt(0.005);
+    B.obj->setdt(0.005);
     int every = 1000;
 
     //cout << "bout to run" << endl;
 
-    auto start = high_resolution_clock::now();
 
 
 
     A.run_singlebond(runtime, every, base);
 
-    auto stop = high_resolution_clock::now();
-
-    auto duration = duration_cast<microseconds>(stop - start);
-
-    cout << "Time taken by function: "
-         << duration.count() << " microseconds" << endl;
+    B.run_singlebond(runtime, every, base2);
 
     // BinaryBindStore bbs2;
     // int vak =  n*4;

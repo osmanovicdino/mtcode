@@ -9,9 +9,24 @@ void SingleHistogram(vector1<int> &indexes2, vector1<int> &ccs, matrix<int> &boi
     
     // if ((indexes2.getsize() != boindices2.getnrows()) || ((indexes2.getsize() != ccs.getsize())))
     //     error("initial arrays must be same size in Single Histogram");
+    int n = indexes2.getsize();
+    for (int i = 0; i < n; ++i)
+    {
+        int wp1 = indexes2[i];
+        //mtx.lock();
+        //const std::lock_guard<std::mutex> lock(mtx);
+        //int iterator1 = ccs[wp1];
+        //boindices2(wp1, iterator1) = i;
 
-    int sl = maxval_parallel(ccs);
+        ccs[wp1]++;
+        
+        // mtx.unlock();
+        //mtx.unlock();
+    }
+    int sl = maxval(ccs);
     int np = ccs.getsize();
+
+    vector1<int> count(np); //(n);
     boindices2.resize_parallel(np, sl);
    // int sl = boindices2.getncols();
 
@@ -21,12 +36,12 @@ void SingleHistogram(vector1<int> &indexes2, vector1<int> &ccs, matrix<int> &boi
         //mtx.lock();
         //const std::lock_guard<std::mutex> lock(mtx);
 
-        int iterator1 = ccs[wp1];
+        int iterator1 = count[wp1];
         if (iterator1 < sl)
         {
 
             boindices2(wp1, iterator1) = i;
-            ccs[wp1]++;
+            count[wp1]++;
             // mtx.unlock();
         }
         //mtx.unlock();
