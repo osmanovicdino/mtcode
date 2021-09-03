@@ -3,8 +3,8 @@ void SingleHistogram(vector1<int> &indexes2, vector1<int> &ccs, matrix<int> &boi
 {
 
     // when the index of the group has been assigned, this function bins them
-    if ((indexes2.getsize() != boindices2.getnrows()) || ((indexes2.getsize() != ccs.getsize())))
-        error("initial arrays must be same size in Single Histogram");
+    // if ((indexes2.getsize() != boindices2.getnrows()) || ((indexes2.getsize() != ccs.getsize())))
+    //     error("initial arrays must be same size in Single Histogram");
 
     int sl = boindices2.getncols();
 
