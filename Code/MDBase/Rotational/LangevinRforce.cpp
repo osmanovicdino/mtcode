@@ -383,7 +383,7 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, Co
     matrix<int> boindices2(total_number_of_patches, depth_of_matrix);
     vector1<int> ccs(total_number_of_patches);
 
-    SingleHistogram(indexes2, boindices2, ccs);
+    SingleHistogram(indexes2, ccs, boindices2);
 
     vector1<double> rands(total_number_of_patches);
     Generate_Random_Numbers_Needed(rands, ccs);
@@ -3084,11 +3084,11 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
 
    // cout << edgelist.size() << endl;
 
-
-
-
+    #if defined(_OPENMP)
     PairHistogramExtendedParallel(edgelist, boindices, boscores, tempbound);
-
+    #else
+    PairHistogramExtended(edgelist,boindices,boscores,tempbound);
+    #endif
     // matrix<int> boindicesx;   //(total_number_of_patches, depth_of_matrix);
     // matrix<double> boscoresx; //(total_number_of_patches, depth_of_matrix);
 
@@ -3173,7 +3173,12 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone_nonlets(vector<patchin
     //SingleHistogram(indexes2, boindices2, ccs);
     matrix<int> boindices2;
 
+#if defined(_OPENMP)
     SingleHistogramParallel(indexes2, ccs, boindices2);
+#else
+    SingleHistogram(indexes2, ccs, boindices2);
+#endif
+    //
     //int wid =  boindices2.getncols();
 
     //outfunc(indexes2,"hola");

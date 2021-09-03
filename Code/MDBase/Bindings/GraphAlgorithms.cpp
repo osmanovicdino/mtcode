@@ -1,5 +1,5 @@
 
-void SingleHistogram(vector1<int> &indexes2, matrix<int> &boindices2, vector1<int> &ccs)
+void SingleHistogram(vector1<int> &indexes2, vector1<int> &ccs, matrix<int> &boindices2)
 {
 
     // when the index of the group has been assigned, this function bins them
