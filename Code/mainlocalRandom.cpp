@@ -61,10 +61,16 @@ using namespace std::chrono;
 
 int main(int argc, char **argv)
 {
-
-    srand(time(NULL));
+    auto start = high_resolution_clock::now();
+    auto nanos = duration_cast<nanoseconds>(start.time_since_epoch()).count();
+    int mym = nanos % 2147483647;
+    // cout << mym << endl;
+    // cout << nanos << endl;
+    // cout << time(NULL) << endl;
+    // pausel();
+    cout << mym << endl;
+    srand(mym);
     signal(SIGSEGV, handler);
-
 
 
     
@@ -100,8 +106,6 @@ int main(int argc, char **argv)
     }
     else
     {
-        //error("incorrect arg number");
-        //error("incorrect argument number");
         runtime = 1000001;
         packing_fraction = 0.005;
         int1 = 15.0;
