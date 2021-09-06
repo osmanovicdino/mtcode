@@ -264,9 +264,28 @@ void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<mdpairwd> &boindic
 void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<int> &boindices, matrix<double> &boscores, vector1<int> &tempbound)
 {
     int val = boindices.getncols();
+
     //bin an edgelist
     //Boindices must be wide enough to store the histogram, this is the responsibility of the programmer.
     int n = edgelist.size();
+    int tt =  boindices.getnrows();
+    // vector1<int> ccs(tempbound.getsize());
+    // for (int i = 0; i < n; ++i)
+    // {
+    //     int wp1, wp2;
+    //     double scr;
+
+    //     edgelist[i].gets(wp1, wp2, scr);
+    //     ccs[wp1]++;
+    //     ccs[wp2]++;
+    // }
+    // int sl = maxval(ccs);
+
+    // int np = boindices.getnrows();
+    // boindices.resize_parallel(np, sl);
+    // boscores.resize_parallel(np, sl);
+    // val=sl;
+
     for (int i = 0; i < n; i++)
     {
         int wp1,wp2;
@@ -282,38 +301,46 @@ void PairHistogramExtended(vector<mdpairwd> &edgelist, matrix<int> &boindices, m
         boscores(wp2, tempbound[wp2]) = scr;
         }  
         else{
-        //     error("overboard");
-        cout << wp1 << " " << wp2 << endl;
-        cout << maxval(tempbound) << endl;
-        
-        if(tempbound[wp1]==val) {
-            for(int j = 0 ; j < edgelist.size() ; j++) {
-                int wpt1, wpt2;
-                double scrt;
 
-                edgelist[j].gets(wpt1, wpt2, scrt);
+            val++;
+            boindices.resize_keep(tt, val);
+            boscores.resize_keep(tt, val);
+            boindices(wp1, tempbound[wp1]) = wp2;
+            boindices(wp2, tempbound[wp2]) = wp1;
+            boscores(wp1, tempbound[wp1]) = scr;
+            boscores(wp2, tempbound[wp2]) = scr;
+            //     error("overboard");
+            // cout << wp1 << " " << wp2 << endl;
+            // cout << maxval(tempbound) << endl;
 
-                if(wpt1 == wp1 || wpt2 == wp1) {
-                    cout << wpt1 << " " << wpt2 << " " << scrt << endl;
-                }
-            }
-        }
-        if (tempbound[wp2] == val)
-        {
-            for (int j = 0; j < edgelist.size(); j++)
-            {
-                int wpt1, wpt2;
-                double scrt;
+            // if(tempbound[wp1]==val) {
+            //     for(int j = 0 ; j < edgelist.size() ; j++) {
+            //         int wpt1, wpt2;
+            //         double scrt;
 
-                edgelist[j].gets(wpt1, wpt2, scrt);
+            //         edgelist[j].gets(wpt1, wpt2, scrt);
 
-                if (wpt1 == wp2 || wpt2 == wp2)
-                {
-                    cout << wpt1 << " " << wpt2 << " " << scrt << endl;
-                }
-            }
-        }
-        error("what happened");
+            //         if(wpt1 == wp1 || wpt2 == wp1) {
+            //             cout << wpt1 << " " << wpt2 << " " << scrt << endl;
+            //         }
+            //     }
+            // }
+            // if (tempbound[wp2] == val)
+            // {
+            //     for (int j = 0; j < edgelist.size(); j++)
+            //     {
+            //         int wpt1, wpt2;
+            //         double scrt;
+
+            //         edgelist[j].gets(wpt1, wpt2, scrt);
+
+            //         if (wpt1 == wp2 || wpt2 == wp2)
+            //         {
+            //             cout << wpt1 << " " << wpt2 << " " << scrt << endl;
+            //         }
+            //     }
+            // }
+            // error("what happened");
 
         } 
         tempbound[wp1]++;

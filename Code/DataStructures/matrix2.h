@@ -81,7 +81,9 @@ int getNsafe() {return nrows; }
 int getncols() { return ncols; }
 int getncols() const { return ncols; }
 void resize(int,int); //resize matrix to int,int
+void resize_keep(int,int);
 void resize_parallel(int,int);
+void resize_keep_parallel(int, int);
 
 void reset(T);
 void reset_parallel(T);

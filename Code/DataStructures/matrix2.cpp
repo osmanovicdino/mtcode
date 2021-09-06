@@ -151,6 +151,36 @@ void matrix<T>::resize(int i, int j) {
 }
 
 template <class T>
+void matrix<T>::resize_keep(int i, int j)
+{
+    if(i < nrows || j < ncols) error("cannot resize to smaller matrix");
+    matrix<T> a(*this);
+
+    delete[] mat;
+    nrows = i;
+    ncols = j;
+    datapoints = nrows * ncols;
+    mat = new T[datapoints];
+    for (int i = 0; i < a.nrows; i++)
+        for (int j = 0; j < a.ncols; j++)
+        {
+            mat[i * ncols + j] = a.mat[i * a.ncols + j];
+        }
+    for (int i = a.nrows; i < nrows; i++)
+        for (int j = 0; j < ncols; j++)
+        {
+            mat[i * ncols + j] = 0;
+        }
+    for (int j = a.ncols; j < ncols; j++)
+    {
+        for (int i = 0; i < nrows; i++)
+            mat[i * ncols + j] = 0;
+    }
+
+    //matrix kept
+}
+
+template <class T>
 void matrix<T>::resize_parallel(int i, int j)
 {
     delete[] mat;

@@ -477,7 +477,7 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
 
     obj->setup_random_binding(opairs,runs_diff, *pots, bbs, *bm); //randomly arrange binding
     //cout << "fi" << endl;
-
+    outfunc(obj->getdat(), "new");
 
     obj->calculate_forces_and_torques3D_onlyone_nonlets(opairs, runs_diff, *pots, bbs , *bm, F, T);
 
