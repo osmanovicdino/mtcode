@@ -73,11 +73,10 @@ LangevinNVTR::LangevinNVTR(const LangevinNVTR &a) : LangevinNVT(a), im(vector1<d
 }
 
 LangevinNVTR& LangevinNVTR::operator=(const LangevinNVTR &a) {
-    //cout << "called operator= LangevinNVTR" << endl;
+
     
     delete angmom;
     delete orient;
-
     LangevinNVT::operator=(a);
     // for (int i = 0; i < a.im.getsize(); i++)
     // {
@@ -313,7 +312,8 @@ void LangevinNVTR::advancemom_halfstep(matrix<double> &F, matrix<double> &T)  {
     //where F is in LAB FRAME
     //and T is in BODY FRAME
     int np = (*mom).getNsafe();
-    #pragma omp parallel for schedule(static)
+
+#pragma omp parallel for schedule(static)
     for (int i = 0; i < np; i++)
     {
 
@@ -429,25 +429,19 @@ vector1<double> LangevinNVTR::genfullmat(int i) {
 //     }
 // }
 
-
-
-void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &Randoms )
+void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &Randoms, int starti, int endi)
 { //adds friction and noise
     //int timeseed = int(time(NULL));
     //NO TRANSLATIONAL/ROTATIONAL COUPLING
 
     //calculate forces and torques in lab frame:
 
-    int Ns = angmom->getNsafe();
-    int No = orient->getNsafe();
-
-
-
-
+    // int Ns = angmom->getNsafe();
+    // int No = orient->getNsafe();
     #pragma omp parallel for schedule(static)
-    for (int i = 0; i < Ns; i++)
+    for (int i = starti; i < endi; i++)
     {
-       // srand(timeseed ^ omp_get_thread_num() );
+        // srand(timeseed ^ omp_get_thread_num() );
         double qtemp0 = orient->operator()(i, 0);
         double qtemp1 = orient->operator()(i, 1);
         double qtemp2 = orient->operator()(i, 2);
@@ -478,16 +472,18 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
         double tbrfy = (-gammar / im[4]) * lly;
         double tbrfz = (-gammar / im[8]) * llz;
 
-        double fbrrx = Rt * Randoms(i, 0);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double fbrry = Rt * Randoms(i, 1);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double fbrrz = Rt * Randoms(i, 2);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-        double tbrrx = Rr * Randoms(i, 3);// * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrrx = Rt * Randoms(i, 0); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrry = Rt * Randoms(i, 1); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double fbrrz = Rt * Randoms(i, 2); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        double tbrrx = Rr * Randoms(i, 3); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
         double tbrry = Rr * Randoms(i, 4); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
         double tbrrz = Rr * Randoms(i, 5); // * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+
 
         double fx = forcel(i, 0) + (fbrfx + fbrrx) * qtemp0 + (fbrfy + fbrry) * qtemp3 + (fbrfz + fbrrz) * qtemp6;
         double fy = forcel(i, 1) + (fbrfx + fbrrx) * qtemp1 + (fbrfy + fbrry) * qtemp4 + (fbrfz + fbrrz) * qtemp7;
         double fz = forcel(i, 2) + (fbrfx + fbrrx) * qtemp2 + (fbrfy + fbrry) * qtemp5 + (fbrfz + fbrrz) * qtemp8;
+
 
         //double tx = torquel(i, 0) + (tbrfx + tbrrx) * qtemp0 + (tbrfy + tbrry) * qtemp3 + (tbrfz + tbrrz) * qtemp6;
         //double ty = torquel(i, 1) + (tbrfx + tbrrx) * qtemp1 + (tbrfy + tbrry) * qtemp4 + (tbrfz + tbrrz) * qtemp7;
@@ -506,6 +502,7 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
         // cout << fy << " " << tby << endl;
         // cout << fz << " " << tbz << endl;
 
+
         // pausel();
 
         forcel(i, 0) = fx;
@@ -516,6 +513,9 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
         torquel(i, 1) = tby;
         torquel(i, 2) = tbz;
         // mom->operator()(i, 0) = mom->operator()(i, 0) + (dt / 2.) * fx;
+
+
+
         // mom->operator()(i, 1) = mom->operator()(i, 1) + (dt / 2.) * fy;
         // mom->operator()(i, 2) = mom->operator()(i, 2) + (dt / 2.) * fz;
 
@@ -523,6 +523,19 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
         // angmom->operator()(i, 1) = angmom->operator()(i, 1) + (dt / 2.) * tby;
         // angmom->operator()(i, 2) = angmom->operator()(i, 2) + (dt / 2.) * tbz;
     }
+    //in the following, we assume the centre of resistance is the same as the centre of mass
+}
+
+void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &Randoms )
+{ //adds friction and noise
+    //int timeseed = int(time(NULL));
+    //NO TRANSLATIONAL/ROTATIONAL COUPLING
+
+    //calculate forces and torques in lab frame:
+
+    int Ns = angmom->getNsafe();
+    this->create_forces_and_torques_sphere(forcel, torquel, Randoms, 0,Ns);
+
     //in the following, we assume the centre of resistance is the same as the centre of mass
 }
 
@@ -623,8 +636,9 @@ void LangevinNVTR::rotate() {
 
 void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialtheta3D &iny, matrix<double> &forces, matrix<double> &torques)
 {
-    int totp = pairs.getNsafe();
-    #pragma omp parallel for
+
+int totp =  pairs.getnrows();
+#pragma omp parallel for
     for (int i = 0; i < totp; ++i)
     {
         int p1 = pairs(i, 0);
@@ -674,6 +688,7 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
 
     void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, vector1<potentialtheta3D*> &iny, matrix<double> &forces, matrix<double> &torques)
     {
+
         int totp = pairs.getNsafe();
         #pragma omp parallel for
         for (int i = 0; i < totp; ++i)
@@ -723,11 +738,14 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
                 torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
             }
         }
+        cout << torques << endl;
+        pausel();
     }
 
     void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, ComboPatch &iny, matrix<double> &forces, matrix<double> &torques)
     {
         int totp = pairs.getNsafe();
+
 
         #pragma omp parallel for
         for (int i = 0; i < totp; ++i)
@@ -806,6 +824,9 @@ void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialt
 
             delete q;
         }
+
+
+
     }
 
 void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, vector1<potentialtheta3D *> &iny,  BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)

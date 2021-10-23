@@ -67,6 +67,7 @@ void MD::setdat(const matrix<double> &a) {
 		cout << dimension << " " << geo.dimension << endl;
 		error("set dat dimensions must match in MD");
 	}
+
 }
 
 void MD::setinteractions(potential &a) {
@@ -1168,6 +1169,92 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, double c
 
 }
 
+matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vector1<int> &p1, double cut_off)
+{ //p1 is a subset, which interacts with itself
+	//ASSUME THE SET OF INTERSECTIONS BETWEEN P1 and P2 is of size 0
+
+	// vector<int> index1;
+	// vector<int> index2;
+	//#pragma omp parallel for
+	// int Ns = (*dat).getNsafe();
+	// int np = ints.number_of_potentials();
+	// //vector1<double> int_dis(np);
+	// vector1<double> int_dis(np);
+	// vector1<bool> int_dl(np);
+
+	// for(int i = 0 ; i < np ; i++) {
+	// 	int_dis[i] = 1.4*(ints.access_potential(i).interaction_distance);
+	// }
+
+	// for(int i = 0 ; i < np ; i++) {
+	// 	int_dl[i] = (ints.access_potential(i).dl);
+	// }
+
+	int total_cubes = boxlist.getNsafe();
+
+	double dims = (double)this->getdimension();
+
+	int cubes_per_length = (int)round(exp(log(total_cubes) / dims));
+
+	int ressize = pow((int)ceil(cut_off), dimension);
+	// b.reserve(total_cubes);
+	// for (int j = 0; j < total_cubes; j++)
+	// {
+	// 	vector<int> temp;
+	// 	temp.reserve(ressize);
+	// 	b.push_back(temp);
+	// }
+	// //int dimension = this->getdimension();
+	// cout << ressize << endl;
+	// cout << total_cubes << endl;
+	// pausel();
+
+	vector1<int> ccs(total_cubes);
+
+	matrix<int> b;
+	//int dimension = this->getdimension();
+
+	vector1<int> dim(dimension);
+	for (int i = 0; i < dimension; i++)
+	{
+		int ij = 1;
+		for (int j = 0; j < i; j++)
+		{
+			ij *= cubes_per_length;
+		}
+		dim[i] = ij;
+	}
+
+	int partn =  p1.getsize();
+	vector1<int> indexes(partn);
+
+	#pragma omp parallel for
+	for (int i = 0; i < partn; i++)
+	{
+
+		int c = geo.assign_box((*dat), p1[i], dim, cubes_per_length);
+
+		//b[c].push_back(p1[i]);
+		indexes[i] = c;
+	}
+
+	//int ss = boxlist.getncols();
+	SingleHistogramParallel(indexes, ccs, b);
+
+	int ss = boxlist.getncols();
+	matrix<int> *a = new matrix<int>();
+	*a = precalculatepairs(b, ccs, boxlist, cut_off);
+
+
+	//shift it back to the identities of the particles as they were in the beginning
+	#pragma omp parallel for
+	for(int i = 0  ; i < a->getnrows() ; i++) {
+		(*a)(i, 0) = p1[(*a)(i, 0)];
+		(*a)(i, 1) = p1[(*a)(i, 1)];
+	}
+
+	return a;
+}
 
 matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, vector1<int> &p2, double cut_off) { //p1 and p2 interact with each other but not themselves
 	//ASSUME THE SET OF INTERSECTIONS BETWEEN P1 and P2 is of size 0

@@ -250,133 +250,135 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
         }
     }
 
-    outfunc(params,"lig");
+    outfunc(params,"ligand");
 
-    matrix<double> orient(nop, 3);
 
-    mypoin B;
-    // orient(0, 0) = 0.;
-    // orient(0, 1) = 0.;
-    // orient(0, 2) = 1.;
+    // matrix<double> orient(nop, 3);
 
-    // orient(1, 0) = 1;
-    // orient(1, 1) = 0.;
-    // orient(1, 2) = 0.;
+    // mypoin B;
+    // // orient(0, 0) = 0.;
+    // // orient(0, 1) = 0.;
+    // // orient(0, 2) = 1.;
 
-    // orient(2, 0) = -0.5;
-    // orient(2, 1) = sqrt(3)/2;
-    // orient(2, 2) = 0.;
+    // // orient(1, 0) = 1;
+    // // orient(1, 1) = 0.;
+    // // orient(1, 2) = 0.;
 
-    // orient(3, 0) = 0.;
-    // orient(3, 1) = 0.;
-    // orient(3, 2) = -1.;
+    // // orient(2, 0) = -0.5;
+    // // orient(2, 1) = sqrt(3)/2;
+    // // orient(2, 2) = 0.;
 
-    double dphi = 0.2;
-    double dtheta =0.1;
-    vector1<double> p1 = B(1, dtheta + pid / 2., -dphi);
-    vector1<double> p2 = B(1, pid / 2., -dphi);
-    vector1<double> p3 = B(1, -dtheta + pid / 2., -dphi);
+    // // orient(3, 0) = 0.;
+    // // orient(3, 1) = 0.;
+    // // orient(3, 2) = -1.;
 
-    vector1<double> p4 = B(1, dtheta + pid / 2.,(2.*pid/3.)  + dphi);
-    vector1<double> p5 = B(1, pid / 2., (2. * pid / 3.) + dphi );
-    vector1<double> p6 = B(1, -dtheta + pid / 2., (2. * pid / 3.) + dphi );
+    // double dphi = 0.2;
+    // double dtheta =0.1;
+    // vector1<double> p1 = B(1, dtheta + pid / 2., -dphi);
+    // vector1<double> p2 = B(1, pid / 2., -dphi);
+    // vector1<double> p3 = B(1, -dtheta + pid / 2., -dphi);
 
-    vector1<double> p7 = B(1, dtheta + pid / 2., dphi);
-    vector1<double> p8 = B(1, pid / 2., dphi);
-    vector1<double> p9 = B(1, -dtheta + pid / 2., dphi);
+    // vector1<double> p4 = B(1, dtheta + pid / 2.,(2.*pid/3.)  + dphi);
+    // vector1<double> p5 = B(1, pid / 2., (2. * pid / 3.) + dphi );
+    // vector1<double> p6 = B(1, -dtheta + pid / 2., (2. * pid / 3.) + dphi );
 
-    vector1<double> p10 = B(1, dtheta + pid / 2., (2. * pid / 3.) - dphi);
-    vector1<double> p11 = B(1, pid / 2., (2. * pid / 3.) - dphi);
-    vector1<double> p12 = B(1, -dtheta + pid / 2., (2. * pid / 3.) - dphi);
+    // vector1<double> p7 = B(1, dtheta + pid / 2., dphi);
+    // vector1<double> p8 = B(1, pid / 2., dphi);
+    // vector1<double> p9 = B(1, -dtheta + pid / 2., dphi);
 
-    // vector1<double> p13(3);
-    // vector1<double> p14(3);
+    // vector1<double> p10 = B(1, dtheta + pid / 2., (2. * pid / 3.) - dphi);
+    // vector1<double> p11 = B(1, pid / 2., (2. * pid / 3.) - dphi);
+    // vector1<double> p12 = B(1, -dtheta + pid / 2., (2. * pid / 3.) - dphi);
 
-    // double p1[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+    // // vector1<double> p13(3);
+    // // vector1<double> p14(3);
 
-    // double p2[3] = {cos(pid / 18.), -sin(pid / 18.), 0};
+    // // double p1[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
 
-    // double p3[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+    // // double p2[3] = {cos(pid / 18.), -sin(pid / 18.), 0};
 
-    // double p4[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+    // // double p3[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
 
-    // double p5[3] = {-sin((2 * pid) / 9.), cos((2 * pid) / 9.), 0};
+    // // double p4[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
 
-    // double p6[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+    // // double p5[3] = {-sin((2 * pid) / 9.), cos((2 * pid) / 9.), 0};
 
-    // double p7[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+    // // double p6[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
 
-    // double p8[3] = {cos(pid / 18.), sin(pid / 18.), 0};
+    // // double p7[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
 
-    // double p9[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+    // // double p8[3] = {cos(pid / 18.), sin(pid / 18.), 0};
 
-    // double p10[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
+    // // double p9[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
 
-    // double p11[3] = {-sin(pid / 9.), cos(pid / 9.), 0};
+    // // double p10[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
 
-    // double p12[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
+    // // double p11[3] = {-sin(pid / 9.), cos(pid / 9.), 0};
 
-    orient(0,0) = p1[0];
-    orient(0,1) = p1[1];
-    orient(0,2) = p1[2];
+    // // double p12[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
 
-    orient(1,0) = p2[0];
-    orient(1,1) = p2[1];
-    orient(1,2) = p2[2];
+    // orient(0,0) = p1[0];
+    // orient(0,1) = p1[1];
+    // orient(0,2) = p1[2];
 
-    orient(2,0) = p3[0];
-    orient(2,1) = p3[1];
-    orient(2,2) = p3[2];
+    // orient(1,0) = p2[0];
+    // orient(1,1) = p2[1];
+    // orient(1,2) = p2[2];
 
-    orient(3,0) = p4[0];
-    orient(3,1) = p4[1];
-    orient(3,2) = p4[2];
+    // orient(2,0) = p3[0];
+    // orient(2,1) = p3[1];
+    // orient(2,2) = p3[2];
 
-    orient(4,0) = p5[0];
-    orient(4,1) = p5[1];
-    orient(4,2) = p5[2];
+    // orient(3,0) = p4[0];
+    // orient(3,1) = p4[1];
+    // orient(3,2) = p4[2];
 
-    orient(5,0) = p6[0];
-    orient(5,1) = p6[1];
-    orient(5,2) = p6[2];
+    // orient(4,0) = p5[0];
+    // orient(4,1) = p5[1];
+    // orient(4,2) = p5[2];
 
-    orient(6,0) = p7[0];
-    orient(6,1) = p7[1];
-    orient(6,2) = p7[2];
+    // orient(5,0) = p6[0];
+    // orient(5,1) = p6[1];
+    // orient(5,2) = p6[2];
 
-    orient(7,0) = p8[0];
-    orient(7,1) = p8[1];
-    orient(7,2) = p8[2];
+    // orient(6,0) = p7[0];
+    // orient(6,1) = p7[1];
+    // orient(6,2) = p7[2];
 
-    orient(8,0) = p9[0];
-    orient(8,1) = p9[1];
-    orient(8,2) = p9[2];
+    // orient(7,0) = p8[0];
+    // orient(7,1) = p8[1];
+    // orient(7,2) = p8[2];
 
-    orient(9,0) = p10[0];
-    orient(9,1) = p10[1];
-    orient(9,2) = p10[2];
+    // orient(8,0) = p9[0];
+    // orient(8,1) = p9[1];
+    // orient(8,2) = p9[2];
 
-    orient(10,0) = p11[0];
-    orient(10,1) = p11[1];
-    orient(10,2) = p11[2];
+    // orient(9,0) = p10[0];
+    // orient(9,1) = p10[1];
+    // orient(9,2) = p10[2];
 
-    orient(11,0) = p12[0];
-    orient(11,1) = p12[1];
-    orient(11,2) = p12[2];
+    // orient(10,0) = p11[0];
+    // orient(10,1) = p11[1];
+    // orient(10,2) = p11[2];
 
-    // orient(12,0) = 0.;
-    // orient(12,1) = 0.;
-    // orient(12,2) = 1.0;
+    // orient(11,0) = p12[0];
+    // orient(11,1) = p12[1];
+    // orient(11,2) = p12[2];
 
-    // orient(13, 0) = 0.;
-    // orient(13, 1) = 0.;
-    // orient(13, 2) = -1.0;
+    // // orient(12,0) = 0.;
+    // // orient(12,1) = 0.;
+    // // orient(12,2) = 1.0;
 
-    GeneralPatch c(vec1, numb, params, orient, true);
+    // // orient(13, 0) = 0.;
+    // // orient(13, 1) = 0.;
+    // // orient(13, 2) = -1.0;
+
+    // GeneralPatch c(vec1, numb, params, orient, true);
 
 
     BivalentPatch c2(10.0, 1.4,0.5);
 
+    
     this->setpots(c2);
 
 
@@ -403,6 +405,8 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     vector<double> possible_pos_y;
     vector<double> possible_pos_z;
 
+    double myrmax = 0.7*rmax;
+
     for (int i = 0; i < pp; i++)
     {
         for (int j = 0; j < pp; j++)
@@ -412,7 +416,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
                 double x = 0.5 + i;
                 double y = 0.5 + j;
                 double z = 0.5 + k;
-                if (SQR(x - ll / 2.) + SQR(y - ll / 2.) + SQR(z - ll / 2.) < SQR(0.9 * rmax/2.) )
+                if (SQR(x - ll / 2.) + SQR(y - ll / 2.) + SQR(z - ll / 2.) < SQR(0.9 * myrmax/2.) )
                 {
                     possible_pos_x.push_back(x);
                     possible_pos_y.push_back(y);
@@ -421,6 +425,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
             }
         }
     }
+
 
 
     for (int i = 0; i < N; i++)
@@ -435,6 +440,8 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
         possible_pos_z.erase(possible_pos_z.begin() + randint);
     }
 
+
+
     LangevinNVTR b(geo);
 
     b.initialize(dat);
@@ -443,7 +450,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     double dt = 0.005;
     b.setdt(dt);
 
-    double viscosity = 1.;
+    double viscosity = 0.1;
     double hdradius = 0.5;
 
     b.setgamma(6. * pi * viscosity * hdradius);
@@ -452,7 +459,6 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     b.setkT(kT);
 
     *obj = b;
-
 
 }
 
@@ -576,6 +582,225 @@ void NanotubeAssembly::run(int runtime, int every, string strbase = "")
         // outfunc(F, "Fb_i=" + aa.str());
 
         obj->advancemom_halfstep(F, T);
+        if (i % every == 0)
+        {
+
+            cout << i << endl;
+
+            stringstream ss;
+
+            ss << setw(number_of_digits) << setfill('0') << (i / every);
+
+            matrix<double> orient = obj->getorientation();
+            matrix<double> pos = obj->getdat();
+
+            string poss = "pos";
+            poss = poss + strbase;
+            string oris = "orientation";
+            oris = oris + strbase;
+
+            poss += "_i=";
+            oris += "_i=";
+
+            string extension = ".csv";
+
+            poss += ss.str();
+            oris += ss.str();
+
+            poss += extension;
+            oris += extension;
+
+            ofstream myfile;
+            myfile.open(poss.c_str());
+
+            ofstream myfile2;
+            myfile2.open(oris.c_str());
+
+            myfile <<= pos;
+            myfile2 <<= orient;
+
+            myfile.close();
+            myfile2.close();
+
+            //pausel();
+        }
+    }
+}
+
+// struct ShellProperties {
+//     matrix<int> par;
+//     matrix<double> posi;
+//     double k;
+//     double rm;
+// };
+
+void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProperties &myshell, string strbase = "")
+{
+
+    //WARNING, WE ARE NOT CHECKING WHETHER THE SHELL WE ARE ADDING IS NOT OVERLAPPING WITH THE ORIGINAL SYSTEM,
+    //THE USER IS RESPONSIBLE FOR THIS
+    int ccc;
+
+    int tf = ceil((double)runtime / (double)every);
+    int number_of_digits = 0;
+    do
+    {
+        ++number_of_digits;
+        tf /= 10;
+    } while (tf);
+
+    matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+    matrix<int> bindingpairs =  myshell.par;
+
+    int totnp = myshell.posi.getnrows();
+
+
+    
+
+    //Hard Sphere Forces
+    WCAPotential wsa(3.0, 1.0, 0.0);
+    HarmonicPotential spr(myshell.k,myshell.rm);
+
+
+    //Combine Our Data Into One
+    int NN = obj->getN();
+    matrix<double> dat = obj->getdat();
+
+    cout << NN << endl;
+    double ll = obj->getgeo().l;
+    matrix<double> newdat(totnp+NN,3);
+    vector1<int> p1(NN);
+    for(int i  = 0  ; i < totnp + NN ; i++) {
+        if(i < totnp) {
+            for(int j = 0  ; j < 3 ; j++)
+                newdat(i,j) = myshell.posi(i, j)+ll/2.;  
+        }
+        else{
+            for (int j = 0; j < 3; j++)
+                newdat(i, j) = dat(i-totnp, j);
+                p1[i-totnp] =  i;
+        }
+    }
+    obj->initialize(newdat);
+
+
+    NN =  obj->getN(); //set new N
+    
+
+
+    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 3.5);
+    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, p1, 3.5);
+
+
+    matrix<double> F(NN, 3);
+    matrix<double> Fs(NN, 3);
+    matrix<double> T(NN, 3);
+    matrix<double> RT(NN, 6);
+    matrix<double> zeromatrix(NN, 3);
+
+    F = obj->calculateforces(*pairs, wsa);
+
+
+
+    F += obj->calculateforces(bindingpairs,spr);
+
+
+    //cout << "ok to here" << endl;
+
+    // F += obj->calculateforces_external(conf);
+
+    //cout << "trying to calculate this" << endl;
+
+    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T);
+
+    //double coru = 1.0;
+    // double nxtemp = 0.95;
+    // double nytemp = 0.31225;
+    // double nztemp = 0.0;
+    // KernFrenkelOnePatch2 testpot(nxtemp, nytemp, -nztemp, nxtemp, nytemp, nztemp, 100., 2., pi / 3., 0.75);
+    // obj->calculate_forces_and_torques3D(*pairs, testpot, F, T);
+
+    //obj->create_random_forces(RT, RR);
+    generate_uniform_random_matrix(RT);
+    matrix<double> F2= F;
+    obj->create_forces_and_torques_sphere(F, T, RT);
+
+
+    vector1<double> tottemp(6);
+
+
+
+
+    for (int i = 0; i < runtime; i++)
+    {
+        cout << i << endl;
+        vector1<double> meas(6);
+        // obj->measured_temperature(meas);
+        // tottemp += meas;
+        // cout << tottemp / (double)(i + 1) << endl;
+
+        // cout << i << endl;
+        if (i > 0 && i % 20 == 0)
+        {
+            // cout << "pairs recalculated" << endl;
+            delete pairs;
+            delete pairs_onlyb;
+            // pairs = obj->calculatepairs(boxes, 3.5);
+            pairs = obj->calculatepairs_parallel(boxes, 3.5);
+            pairs_onlyb = obj->calculatepairs_parallel(boxes, p1, 3.5);
+
+        }
+
+/*         matrix<double> R(NN, 3);
+        for (int i1 = 0; i1 < NN; i1++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                R(i1, j) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+            }
+        }
+        F = obj->calculateforces(*pairs, wsa);
+
+        (*obj).advance_mom(F, R);
+
+        (*obj).advance_pos(); */
+        
+        obj->advancemom_halfstep(F, T);
+
+        obj->advance_pos();
+        obj->rotate();
+
+        F = obj->calculateforces(*pairs, wsa);
+        F += obj->calculateforces(bindingpairs, spr);
+
+
+        // F += obj->calculateforces_external(conf);
+        //cout << obj->calculateforces_external(conf) << endl;
+        //pausel();
+        T.reset(0.0);
+
+        obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T);
+
+        // stringstream aa;
+        // aa << setw(number_of_digits+1) << setfill('0') << (i / 1);
+        // outfunc(T,"Tl_i="+aa.str());
+        // outfunc(F, "Fl_i=" + aa.str());
+        // obj->calculate_forces_and_torques3D(*pairs, *pots->potential_bundle[0], F, T);
+
+        // obj->create_random_forces(RT, RR);
+        generate_uniform_random_matrix(RT);
+        matrix<double> F2 =  F;
+
+        obj->create_forces_and_torques_sphere(F, T, RT);
+
+
+        // outfunc(T, "Tb_i=" + aa.str());
+        // outfunc(F, "Fb_i=" + aa.str());
+
+
+        obj->advancemom_halfstep(F, T);
+
         if (i % every == 0)
         {
 

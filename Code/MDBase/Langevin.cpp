@@ -89,8 +89,6 @@ LangevinNVT::~LangevinNVT() {
 
 LangevinNVT& LangevinNVT::operator=(const LangevinNVT &a)  {
 
-
-	delete mom;
 	MD::operator=(a);
 
 	gamma = a.gamma;
@@ -207,6 +205,7 @@ vector1<double> LangevinNVT::avmom() {
 void LangevinNVT::advance_pos() { 
 	int ds = this->getdimension();
 	int N = (*dat).getNsafe();
+
 	//int locald = this->getdimension();
 	#pragma omp parallel for schedule(static)
 	for(int i = 0 ; i < N ;  i++ ) {

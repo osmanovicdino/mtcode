@@ -231,6 +231,7 @@ public:
 
 	// void one_bond_per_patch_condition(matrix<int> &pairs, vector<potentialtheta3D*> &);
 	//void create_random_forces(matrix<double>&, matrix<double>&);
+	void create_forces_and_torques_sphere(matrix<double> &, matrix<double> &, matrix<double> &, int starti, int endi);
 	void create_forces_and_torques_sphere(matrix<double> &, matrix<double> &, matrix<double> &); //transform between body fixed frame and lab fixed frame
 	void calculate_forces_and_torques3D(matrix<int> &pairs, potentialtheta3D &, matrix<double> &F, matrix<double> &T); //calculation of force for a single angle dependent theta
 	void calculate_forces_and_torques3D(matrix<int> &pairs, vector1<potentialtheta3D*> &, matrix<double> &F, matrix<double> &T); //calculation of force for a potential bundle

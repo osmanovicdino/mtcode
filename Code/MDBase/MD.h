@@ -76,7 +76,9 @@ matrix<int>* calculatepairs(matrix<int>&,double); //calculate the pairs over whi
 
 matrix<int> *calculatepairs_parallel(matrix<int> &, double); //calculate the pairs over which forces exist
 
-matrix<int>* calculatepairs(matrix<int>&,vector1<int>&,double); //calculate the pairs over which forces exist, int are the indices of the partial lists 
+matrix<int>* calculatepairs(matrix<int>&,vector1<int>&,double); //calculate the pairs over which forces exist, int are the indices of the partial lists
+
+matrix<int> *calculatepairs_parallel(matrix<int> &, vector1<int> &, double); //calculate the pairs over which forces exist, int are the indices of the partial lists
 
 matrix<int>* calculatepairs(matrix<int>&,vector1<int>&,vector1<int>&,double); //calculate the pairs over which forces exist, int are the indices of the partial lists 
 
