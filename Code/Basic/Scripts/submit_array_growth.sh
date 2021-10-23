@@ -23,7 +23,7 @@ echo " "
 # load the job environment:
 . /u/local/Modules/default/init/modules.sh
 ## Edit the line below as needed:
-module load gcc/9.3.0
+module load gcc/10.2.0
 
 ## substitute the command to run your code
 ## in the two lines below:
