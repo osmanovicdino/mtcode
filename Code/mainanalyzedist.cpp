@@ -145,7 +145,7 @@ else{
 
     string grt = "pos";
     index_test *g = new index_test;
-    matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, grt,  l, bin, 100, g);
+    matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, grt,  l, bin, 1000, g);
 
     string gc = "/growth";
 
