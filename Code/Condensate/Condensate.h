@@ -33,6 +33,8 @@ void setup_large_droplet(int N1, int N2, int N3, double dens, double ll);
 
 void run(int,int, string strbase);
 
+void run_spherical(int, int, string strbase);
+
 void run_singlebond(int,int,string strbase);
 
 void run_singlebond_continue(int, int, int startval, BinaryBindStore &bbs2, string strbase);

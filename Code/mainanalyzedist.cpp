@@ -118,6 +118,7 @@ if (argc == 4)
 }
 else{
     error("incorrect number of arguments for this executable");
+    //cout << "on your own" << endl;
 }
     //mydir += base;//den=0.001_d=1._e=12._a=0.9272952180016123_arms=3";
     //cout << "all good" << endl;
@@ -125,8 +126,25 @@ else{
 
     // string mydir2 = "den=0.001_d=1._e=12._a=1.1592794807274085_arms=3";
 
+    // mydir = "/home/dino/Documents/Chemistry/ArmLength/GrowthData/Equi/";
+    // double ls[5] = {80.5996, 161.199, 241.799, 322.398, 402.998};
+    // string lens[5] = {"l=80.5996", "l=161.199", "l=241.799", "l=322.398", "l=402.998"};
+    // string grows[5] = {"growth1", "growth2", "growth3", "growth4", "growth5"};
+
+    // for(int i = 0  ; i < 5 ; i++) {
+    // index_test *g = new index_test;
+    // matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, lens[i], ls[i], (i+1.)*1.4, 100, g);
+
+    // string gc = grows[i];
+
+    // cout << mydir + gc << endl;
+    // cout << "output" << endl;
+
+    // outfunc(growcurve, mydir + gc);
+    // }
+
     index_test *g = new index_test;
-    matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, l, bin, 5, g);
+    matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, l, bin, 100, g);
 
     string gc = "/growth";
 
@@ -134,6 +152,4 @@ else{
     cout << "output" << endl;
 
     outfunc(growcurve, mydir + gc);
-
-
 }

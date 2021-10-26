@@ -152,14 +152,14 @@ void NCGas::forcecalc2(int i, int j, vector1<double> &force) {
 // }
 
 
-NCGas::NCGas(double ll, int totalN) {
+NCGas::NCGas(double ll, int totalN, double sigmaa, double etaa) {
 	obj = new LangevinNVT;
 
 	l = ll;
-	num = floor(ll/4.0);
+	num = floor(ll/(4.0*sigmaa));
 	double pi = 3.1415;
 	eps = 1.0;
-	eqeps = 1.0;
+	eqeps = 4.0;
 	lambda = 1.5;
 
 	chm = 0.5*l;
@@ -172,11 +172,46 @@ NCGas::NCGas(double ll, int totalN) {
 	
 	matrix<double> store(totalN,3);
 
+	matrix<double> dat(totalN, 3);
 
+	int pp = ceil(cbrt((double)totalN)) + 1;
+	double binsize = (ll) / (double)pp;
+
+	vector<double> possible_pos_x;
+	vector<double> possible_pos_y;
+	vector<double> possible_pos_z;
+
+	for (int i = 0; i < pp; i++)
+	{
+		for (int j = 0; j < pp; j++)
+		{
+			for (int k = 0; k < pp; k++)
+			{
+				double x = 0.5 * binsize + i * binsize;
+				double y = 0.5 * binsize + j * binsize;
+				double z = 0.5 * binsize + k * binsize;
+				possible_pos_x.push_back(x);
+				possible_pos_y.push_back(y);
+				possible_pos_z.push_back(z);
+			}
+		}
+	}
+
+	for (int i = 0; i < totalN; i++)
+	{
+		int randint = rand() % (possible_pos_x.size());
+		dat(i, 0) = possible_pos_x[randint];
+		dat(i, 1) = possible_pos_y[randint];
+		dat(i, 2) = possible_pos_z[randint];
+
+		possible_pos_x.erase(possible_pos_x.begin() + randint);
+		possible_pos_y.erase(possible_pos_y.begin() + randint);
+		possible_pos_z.erase(possible_pos_z.begin() + randint);
+	}
 
 //	intmatrix f(totalN);
-	double sigma  = 1.0;
-	WCAPotential nswca(1.0, sigma, eqeps);
+	sigma  = sigmaa;
+	WCAPotential nswca(eqeps, sigma, eqeps);
 
 	//double specific_volume  = sigma*sigma*sigma;
 	//double dls = sigma;
@@ -224,7 +259,7 @@ NCGas::NCGas(double ll, int totalN) {
 
 	double kT = 1.0;
 	double dt = 0.005;
-	double eta = 50.;
+	double eta = etaa;
 
 	// int sweeps = 5;
 	// double max_step = 0.2;
@@ -254,12 +289,12 @@ NCGas::NCGas(double ll, int totalN) {
 
 
 	// delete yolo;
-	cout << "STARTING IMPORT" << endl;
-	double T;
-	bool err1;
-	matrix<double> stat = importcsv("/home/dino/Documents/Demons/Data/exampledata.csv",T,err1);
-	cout << "imported" << endl;
-	if(err1) error("failed to impport");
+	// cout << "STARTING IMPORT" << endl;
+	// double T;
+	// bool err1;
+	// matrix<double> stat = importcsv("/home/dino/Documents/Demons/Data/exampledata.csv",T,err1);
+	// cout << "imported" << endl;
+	// if(err1) error("failed to impport");
 
 	// double alpha = 2*pi*rand();
 	// double beta = 2*pi*rand();
@@ -293,7 +328,7 @@ NCGas::NCGas(double ll, int totalN) {
 
 	//apply a random rotation
 
-	b.setdat(stat);
+	b.setdat(dat);
 	
 	//b.setdat(store);
 	b.setinteractions(nswca);
@@ -321,11 +356,11 @@ void NCGas::setkT(double kT) {
 	obj->setkT(kT);
 }
 
-void NCGas::seteqeps(double eqepss) {
+void NCGas::seteqeps(double eqepss, double sigmaa) {
 	int totalN = obj->getN();
 	eqeps = eqepss;
-	double sigma = 1.0;
-	WCAPotential nswca(1.0, sigma, eqeps);
+	sigma = sigmaa;
+	WCAPotential nswca(eqeps, sigma, eqeps);
 	obj->setinteractions(nswca);
 
 	// vector1<double> inta(3);
@@ -344,7 +379,7 @@ void NCGas::seteqeps(double eqepss) {
 void NCGas::setgeo(cube &bc) {
 	(*(this->obj)).setgeometry(bc);
 	l=bc.l;
-	num = floor(bc.l/4.0);
+	num = floor(bc.l/(4.0*sigma));
 	// vector1<double> inta(3);
 	// inta[0]=1.0;
 	// inta[1]=1.0;
@@ -526,7 +561,7 @@ void NCGas::run(int runtime)
 
 	//double ll = ((*obj).getgeo()).l;	
 	
-	matrix<int> *froyo = obj->calculatepairs(boxes,3.5);
+	matrix<int> *froyo = obj->calculatepairs_parallel(boxes,3.5*sigma);
 
 	//matrix<int> *froyo2 = obj->calculatepairs_sorted(boxes,3.5);
 	// cout << "pairs calculated" << endl;
@@ -549,12 +584,12 @@ void NCGas::run(int runtime)
 
 	for(i = 0 ; i < runtime ; i++) {
 		cout << i << endl;
-		cout << (*obj).avmom() << endl;
+		//cout << (*obj).avmom() << endl;
 	if(i%15==0) {
 		delete froyo;
 		// cout << "updated after: " << i << endl;
 		// state = obj->getdat();
-		froyo = (*obj).calculatepairs(boxes,3.5); 
+		froyo = (*obj).calculatepairs_parallel(boxes,3.5*sigma); 
 	}
 
 
@@ -590,29 +625,29 @@ void NCGas::run(int runtime)
 			
 		// 	//}
 		// }
-		matrix<double> F2(F.getNsafe(),3);
+		// matrix<double> F2(F.getNsafe(),3);
 
-		#pragma omp parallel for
-		for(int p = 0 ; p < (*froyo).getNsafe() ; p++) {
-					int i = froyo->operator()(p,0);
-					int j = froyo->operator()(p,1);
-			//for(int j = i+1 ; j < totalN ; j++) {
+		// #pragma omp parallel for
+		// for(int p = 0 ; p < (*froyo).getNsafe() ; p++) {
+		// 			int i = froyo->operator()(p,0);
+		// 			int j = froyo->operator()(p,1);
+		// 	//for(int j = i+1 ; j < totalN ; j++) {
 				
-					// //vector1<double> as = forcecalc1((*obj).getcoordinate(i,0), (*obj).getcoordinate(j,0), (*obj).getcoordinate(i,1), (*obj).getcoordinate(j,1), (*obj).getcoordinate(i,2), (*obj).getcoordinate(j,2));
-					// cout << "p1: " << (*obj).getcoordinate(i,0) << " " << (*obj).getcoordinate(i,1) << " " << (*obj).getcoordinate(i,2) << endl;
-					// cout << "p2: " << (*obj).getcoordinate(j,0) << " " << (*obj).getcoordinate(j,1) << " " << (*obj).getcoordinate(j,2) << endl;
-					vector1<double> as(3);
-					this->forcecalc2(i,j,as);
+		// 			// //vector1<double> as = forcecalc1((*obj).getcoordinate(i,0), (*obj).getcoordinate(j,0), (*obj).getcoordinate(i,1), (*obj).getcoordinate(j,1), (*obj).getcoordinate(i,2), (*obj).getcoordinate(j,2));
+		// 			// cout << "p1: " << (*obj).getcoordinate(i,0) << " " << (*obj).getcoordinate(i,1) << " " << (*obj).getcoordinate(i,2) << endl;
+		// 			// cout << "p2: " << (*obj).getcoordinate(j,0) << " " << (*obj).getcoordinate(j,1) << " " << (*obj).getcoordinate(j,2) << endl;
+		// 			vector1<double> as(3);
+		// 			this->forcecalc2(i,j,as);
 
-					F2(i,0)+=as.gpcons(0);
-					F2(i,1)+=as.gpcons(1);
-					F2(i,2)+=as.gpcons(2);
-					F2(j,0)+=-as.gpcons(0);
-					F2(j,1)+=-as.gpcons(1);
-					F2(j,2)+=-as.gpcons(2);
+		// 			F2(i,0)+=as.gpcons(0);
+		// 			F2(i,1)+=as.gpcons(1);
+		// 			F2(i,2)+=as.gpcons(2);
+		// 			F2(j,0)+=-as.gpcons(0);
+		// 			F2(j,1)+=-as.gpcons(1);
+		// 			F2(j,2)+=-as.gpcons(2);
 			
-			//}
-		}	
+		// 	//}
+		// }	
 
 	// matrix<double> F1((*obj).calculateforces_truncated((*froyo),1.12246));		
 	// double totv = 0.0;
@@ -632,7 +667,7 @@ void NCGas::run(int runtime)
 	// cout << totv2 << endl;
 	
 
-	F+=F2;
+	// F+=F2;
 
 	if(i>0&&i%every==0) { 
 // vector1<double> x(this->getN()),y(this->getN()),z(this->getN());
@@ -678,17 +713,17 @@ void NCGas::run(int runtime)
 		filename += ss.str();
 		filename += extension;
 
-		string momname = "F";
-		momname += ss.str();
-		momname += extension;
+		// string momname = "F";
+		// momname += ss.str();
+		// momname += extension;
 
-		string momname2 = "Fnc";
-		momname2 += ss.str();
-		momname2 += extension;
+		// string momname2 = "Fnc";
+		// momname2 += ss.str();
+		// momname2 += extension;
 
-		string pairname = "pairs";
-		pairname += ss.str();
-		pairname += extension;
+		// string pairname = "pairs";
+		// pairname += ss.str();
+		// pairname += extension;
 
 
 
@@ -697,17 +732,6 @@ void NCGas::run(int runtime)
 		myfile <<= (*obj).getdat();
 		myfile.close();
 
-		matrix<double> F1((*obj).calculateforces_truncated((*froyo),1.12246));
-
-		ofstream myfile2;
-		myfile2.open(momname.c_str());
-		myfile2 <<= F1;
-		myfile2.close();
-
-		ofstream myfile3;
-		myfile3.open(momname2.c_str());
-		myfile3 <<= F2;
-		myfile3.close();		
 		}	
 		// for(int i  = 0 ; i < obj->getN() ; i++ ) {
 		// 	double x1 = (*obj).getcoordinate(i,0);

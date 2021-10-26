@@ -176,12 +176,14 @@ vector1<int> distance_graph(matrix<double> &pos, matrix<int> &boxes, cube &geo, 
     return indexes2;
 };
 
-matrix<int> getgrowthcurve_distance_periodic(string dir, double l, double binding_distance, int N_Largest, index_test *i1) {
+matrix<int> getgrowthcurve_distance_periodic(string dir, string subd, double l, double binding_distance, int N_Largest, index_test *i1) {
     vector<string> posfiles;
     cout << dir << endl;
-    return_csv_in_dir(dir, "pos", posfiles);
-
+    return_csv_in_dir(dir, subd, posfiles);
+    cout << "csv returned" << endl;
     int n = posfiles.size();
+
+
 
     vector1<bool> pb(3, true);
     cube geo(l, pb, 3);

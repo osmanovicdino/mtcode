@@ -24,6 +24,8 @@
 #include <execinfo.h>
 #include <signal.h>
 #include <unistd.h>
+#include <algorithm>
+#include <parallel/algorithm>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -58,7 +60,7 @@ int main(int argc, char **argv)
     srand(time(NULL));
     //signal(SIGSEGV, handler);
     double radius = 25.;
-    double monomers = 1000;
+    double monomers = 100;
 
     //monomers/(4/3piradius3)
 

@@ -720,6 +720,8 @@ int return_csv_in_dir(string directory, string match, vector<string> &files)
     struct dirent *diread;
     //vector<string> files;
 
+    cout << "beginning directory read" << endl;
+
     if ((dir = opendir(directory.c_str())) != nullptr)
     {
         while ((diread = readdir(dir)) != nullptr)

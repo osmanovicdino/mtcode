@@ -11,7 +11,10 @@ double eqeps;
 double lambda;
 double l;
 
-NCGas(double, int);
+double sigma;
+double eta;
+
+NCGas(double, int, double, double );
 
 
 double chm;
@@ -20,7 +23,7 @@ double lam4;
 
 void seteps(double);
 void setkT(double);
-void seteqeps(double);
+void seteqeps(double, double);
 void setgeo(cube&);
 
 matrix<double> calculate_virial_with_matrices(matrix<double>&,matrix<double>&);
