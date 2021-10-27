@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=00:30:00,h_data=256M
+#$ -l h_rt=06:00:00,h_data=512M
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 8
@@ -19,7 +19,7 @@ echo " "
 # load the job environment:
 . /u/local/Modules/default/init/modules.sh
 ## Edit the line below as needed:
-module load gcc/9.3.0
+module load gcc/10.2.0
 
 ## substitute the command to run your code
 ## in the two lines below:
