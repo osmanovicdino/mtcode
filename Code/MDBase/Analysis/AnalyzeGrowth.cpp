@@ -282,7 +282,7 @@ matrix<int> getgrowthcurve_distance_periodic(string dir, string subd, double l, 
 
         for (int j = 0; j < N_Largest; j++)
         {
-            if (j > vals.size())
+            if (j >= vals.size())
             {
                 RES(filen, j) = 0;
             }
