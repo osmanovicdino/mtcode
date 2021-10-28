@@ -58,11 +58,14 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
+    int nt[2] = {1000, 125};
+    int i  = 0;
 
+    for(double sigma =  1. ; sigma < 2.1 ; sigma += 1.0 ) {
+    NCGas a(37.411*sigma, nt[i], sigma, 2.0*(sigma/2.));
 
-    for(double sigma =  3. ; sigma < 5.5 ; sigma += 1.0 ) {
-    NCGas a(80.5996*sigma, 10000, sigma, 2.0*(sigma/2.));
-    a.run(1000000);
+    a.run(10000000);
+    i++;
     }
 
 
