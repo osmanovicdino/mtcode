@@ -109,10 +109,16 @@ int main(int argc, char **argv)
 
     matrix<double> params2(tot*tot, 3);
 
+        //original run 
+       // double length_scale =  0.4+size_of_part;
+
+        //new run
+        double length_scale = 1.4*size_of_part;
+
     for (int i = 0; i < tot * tot; i++)
     {
         params2(i, 0) = energ;
-        params2(i, 1) = 0.4+size_of_part;
+        params2(i, 1) = length_scale;
         params2(i, 2) = angs;
     }
 
