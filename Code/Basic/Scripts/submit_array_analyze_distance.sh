@@ -25,7 +25,7 @@ module load gcc/10.2.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/paramsgrowth7analyze.dat
+filename=~/Chemistry/Code/Basic/Scripts/paramsgrowth8analyze.dat
 basedir="GrowthRun4"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
