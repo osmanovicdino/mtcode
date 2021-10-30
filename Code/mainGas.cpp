@@ -55,18 +55,19 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
+    double sigma;
+
+    if(argc == 2) {
+        sigma =  atof(argv[1]);
+    }
 
     srand(time(NULL));
 
-    int nt[2] = {1000, 125};
-    int i  = 0;
-
-    for(double sigma =  1. ; sigma < 1.5 ; sigma += 1.0 ) {
-    NCGas a(37.411, nt[i], sigma, 2.0*(sigma/2.));
+    NCGas a(80.6*sigma, 10000, sigma, 2.0*(sigma/2.));
 
     a.run(10000000);
     i++;
-    }
+    
 
 
     return 0;
