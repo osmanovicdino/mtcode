@@ -34,10 +34,6 @@ basedir="GrowthRun5"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    den=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
-   i1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $2}'` 
-   i2=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $3}'` 
-   i3=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $4}'`
-   i4=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $5}'`
    echo "read file correctly" 
 else
    den=0.01
@@ -47,7 +43,7 @@ else
    i4=4
    echo "did not read file correctly"
 fi
-dirwemake="den=${den}_d=${i1}_e=${i2}_a=${i3}_arms=${i4}"
+dirwemake="sigma=${den}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainGas.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp ~/Chemistry/Code/mainGas.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron

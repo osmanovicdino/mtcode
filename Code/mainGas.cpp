@@ -66,7 +66,7 @@ int main(int argc, char **argv)
     NCGas a(80.6*sigma, 10000, sigma, 2.0*(sigma/2.));
 
     a.run(10000000);
-    i++;
+
     
 
 
