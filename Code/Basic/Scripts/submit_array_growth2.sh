@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=12:00:00,h_data=128M
+#$ -l h_rt=12:00:00,h_data=256M
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 8
@@ -49,7 +49,7 @@ cp ~/Chemistry/Code/mainGas.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp ~/Chemistry/Code/mainGas.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 export OMP_NUM_THREADS=8
-./angron $sigma >log
+./angron $den >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
