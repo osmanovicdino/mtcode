@@ -60,6 +60,9 @@ int main(int argc, char **argv)
     if(argc == 2) {
         sigma =  atof(argv[1]);
     }
+    else {
+        error("what");
+    }
 
     srand(time(NULL));
 
