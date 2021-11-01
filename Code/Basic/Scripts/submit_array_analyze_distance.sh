@@ -9,7 +9,7 @@
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 8
-#$ -t 1-21:1
+#$ -t 1-5:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -25,8 +25,8 @@ module load gcc/10.2.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/paramsgrowth8analyze.dat
-basedir="GrowthRun4"
+filename=~/Chemistry/Code/Basic/Scripts/paramsgrowth9analyze.dat
+basedir="GrowthRun5"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    strdir=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`

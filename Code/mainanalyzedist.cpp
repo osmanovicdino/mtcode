@@ -143,7 +143,7 @@ else{
     // outfunc(growcurve, mydir + gc);
     // }
 
-    string grt = "pos";
+    string grt = "x";
     index_test *g = new index_test;
     matrix<int> growcurve = getgrowthcurve_distance_periodic(mydir, grt,  l, bin, 1000, g);
 
