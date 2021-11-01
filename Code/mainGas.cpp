@@ -56,9 +56,11 @@ using namespace std;
 int main(int argc, char **argv)
 {
     double sigma;
+    double eqeps;
 
     if(argc == 2) {
         sigma =  atof(argv[1]);
+        eqeps = atof(argv[2]);
     }
     else {
         error("what");
@@ -67,6 +69,7 @@ int main(int argc, char **argv)
     srand(time(NULL));
 
     NCGas a(37.411*sigma, 1000, sigma, 2.0*(sigma/2.));
+    a.seteqeps(eqeps,sigma)
 
     a.run(10000000);
 

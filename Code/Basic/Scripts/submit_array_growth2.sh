@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-5:1
+#$ -t 1-10:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -34,6 +34,7 @@ basedir="GrowthRun5"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    den=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
+   eps=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $2}'`
    echo "read file correctly" 
 else
    den=0.01
@@ -43,7 +44,7 @@ else
    i4=4
    echo "did not read file correctly"
 fi
-dirwemake="sigma=${den}"
+dirwemake="sigma=${den}_epsilon=${eps}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainGas.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp ~/Chemistry/Code/mainGas.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
