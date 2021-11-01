@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     double sigma;
     double eqeps;
 
-    if(argc == 2) {
+    if(argc == 3) {
         sigma =  atof(argv[1]);
         eqeps = atof(argv[2]);
     }
