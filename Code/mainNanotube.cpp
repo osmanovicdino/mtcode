@@ -58,9 +58,15 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
+    int NM;
+
+    if(argc == 2) {
+        NM = atof(argv[1]);
+    }
+
     //signal(SIGSEGV, handler);
     double radius = 25.;
-    double monomers = 100;
+    double monomers = NM;
 
     //monomers/(4/3piradius3)
 
@@ -90,8 +96,14 @@ int main(int argc, char **argv)
     B.par = pairs;
     B.posi = pos;
 
+    string stringbase = "Num_mon=";
+    stringstream ss;
+    ss << monomers;
+    string ss2 = ss.str();
 
-    A.run_with_real_surface(1000000,1000,B);
+    stringbase += ss2;
+
+    A.run_with_real_surface(1000000,1000,B,stringbase);
     // A.run(1000000, 1000);
 
     return 0;
