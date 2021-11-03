@@ -8,7 +8,7 @@
 #$ -l h_rt=12:00:00,h_data=256M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 4
+#$ -pe shared 8
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -49,7 +49,7 @@ mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainGas.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp ~/Chemistry/Code/mainGas.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=8
 ./angron $den $eps >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
