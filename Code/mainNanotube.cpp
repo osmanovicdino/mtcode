@@ -88,8 +88,8 @@ int main(int argc, char **argv)
     double T2;
     bool err2;
     matrix<double> pos = importcsv("/home/dino/Documents/tylercollab/Repo/Code/Basic/InitialConditions/IsocohedronP.csv", T2, err2);
-    double k = 10.0;
-    double rm = 1.25;
+    double k = 1.0;
+    double rm = 1.4;
 
     B.k = k;
     B.rm = rm;

@@ -667,7 +667,7 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
     int NN = obj->getN();
     matrix<double> dat = obj->getdat();
 
-    cout << NN << endl;
+
     double ll = obj->getgeo().l;
     matrix<double> newdat(totnp+NN,3);
     vector1<int> p1(NN);
@@ -693,6 +693,7 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
     matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, p1, 3.5);
 
 
+
     matrix<double> F(NN, 3);
     matrix<double> Fs(NN, 3);
     matrix<double> T(NN, 3);
@@ -701,10 +702,12 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
 
     F = obj->calculateforces(*pairs, wsa);
 
-
+    // double val;
+    // F.maxima(val);
+    // cout << val << endl;
+    // pausel();
 
     F += obj->calculateforces(bindingpairs,spr);
-
 
     //cout << "ok to here" << endl;
 
@@ -713,6 +716,7 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
     //cout << "trying to calculate this" << endl;
 
     obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T);
+    
 
     //double coru = 1.0;
     // double nxtemp = 0.95;

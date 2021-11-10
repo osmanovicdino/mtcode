@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
 
-    NCGas a(173.647, 10000, sigma, 2.0 * (sigma / 2.));
+    NCGas a(80.6*sigma, 10000, sigma, 2.0 * (sigma / 2.));
     a.seteqeps(eqeps,sigma);
 
     a.run(10000000);
