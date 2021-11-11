@@ -9,7 +9,7 @@
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 8
-#$ -t 1-5:1
+#$ -t 1-8:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -25,7 +25,7 @@ module load gcc/10.2.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/paramsgrowth11analyze.dat
+filename=~/Chemistry/Code/Basic/Scripts/paramsgrowth12analyze.dat
 basedir="GrowthRun6"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
