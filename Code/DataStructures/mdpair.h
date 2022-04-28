@@ -38,6 +38,14 @@ struct mdpair
             return false;
     }
 
+    bool either(const mdpair &rhs ) const 
+    {
+        if(a == rhs.a || b == rhs.b || a == rhs.b || b == rhs.a) {
+            return true;
+        }
+        else return false;
+    }
+
     friend ostream &operator<<(ostream &gt, const mdpair &lhs)
     {
         gt << lhs.a;

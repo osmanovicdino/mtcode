@@ -680,7 +680,11 @@ T matrix<T>::rtrap(T dr, T dz) {
 template <class T>
 void matrix<T>::setrow(vector1<T> &v, int i) {
         int n = v.size;
-        if ( n != ncols || i > nrows ) error("not same size in setting row vector, or vector range out of bounds");
+        if ( n != ncols || i > nrows ) {
+            cout << n << " " << i << endl;
+            cout << ncols << " " << nrows << endl;
+            error("not same size in setting row vector, or vector range out of bounds");
+        }
         for ( int k = 0 ; k < ncols ; k++ )
                 mat[ncols*i+k]=v.data[k];
 

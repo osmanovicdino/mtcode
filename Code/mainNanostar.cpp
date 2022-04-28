@@ -6,26 +6,25 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-#include <limits>
-#include <cmath>
-#include <complex>
+// #include <limits>
+// #include <cmath>
+// #include <complex>
 #include <sstream>
 #include <string>
 #include <iomanip>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <time.h>
-#include <sys/time.h>
+// #include <sys/ioctl.h>
+// #include <fcntl.h>
+// #include <time.h>
+// #include <sys/time.h>
 #include <sys/stat.h>
 #include <random>
-#include <mutex>
-#include <atomic>
-#include <dirent.h>
-#include <execinfo.h>
-#include <signal.h>
-#include <unistd.h>
 #include <algorithm>
 #include <parallel/algorithm>
+//#include <thrust/host_vector.h>
+//#include <thrust/device_vector.h>
+#include <unistd.h>
+#include <execinfo.h>
+#include <signal.h>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -46,7 +45,7 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 #include "MDBase/Langevin.h"
 //#include "MDBase/LangevinR.h"
 #include "Condensate/Condensate.h"
-
+#include "Condensate/Nanostar.h"
 // #include "NCGasR.h"
 // #include "Microtubule.h"
 
@@ -58,42 +57,37 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
-    int n = 400;
 
-    Condensate A(27.5, n);
+    int arm_length;
+    if(argc == 2) {
+        arm_length =  atof(argv[1]);
+    }
+    Nanostar A(1000,200.0,arm_length);
 
-    double angle = 0.5;
+
+    A.DoAnMC();
+
+
+    cout << "everything seems to work" << endl;
+
+    //A.Passa_set_nanostar();
+
+    A.run(1000000,1000);
+
     
-    int tot = 4 * 4 + 4 * 2 + 2 * 2;
-    matrix<double> params(tot, 3);
-    for (int i = 0; i < 16; i++)
-    {
-        params(i, 0) = 0.0;
-        params(i, 1) = 1.4;
-        params(i, 2) = angle;
-    }
-    for (int i = 16; i < 24; i++)
-    {
-        params(i, 0) = 100.0;
-        params(i, 1) = 1.4;
-        params(i, 2) = angle;
-    }
-    for (int i = 24; i < tot; i++)
-    {
-        params(i, 0) = 100.0;
-        params(i, 1) = 1.4;
-        params(i, 2) = angle;
-    }
 
-    TetrahedralWithBivalent c2(params, 50,n);
-    A.setpots(c2);
+    // string filename ="./";
 
-    int runtime = 1000000;
-    int every = 1000;
-    A.setviscosity(10.0);
-    // A.run_singlebond(runtime, every);
+    // int a = system("python3 /home/dino/Documents/Condensate/Code/Plotting/FigureMonitor.py ./ ./col.csv >filecreationlog &");
 
-    A.run(10000000, 1000);
+    // A.set_initial_state(filename);
 
+    // for(int i = 0  ; i < A.bindpairs.size() ; i++) {
+    // mdpair temp = A.bindpairs[i];
+    // cout << temp.a << " " << temp.b << endl;
+    // }
+
+    // A.run(10000,100);
     return 0;
+
 }

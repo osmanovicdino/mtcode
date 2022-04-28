@@ -752,16 +752,29 @@ int totp =  pairs.getnrows();
         {
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);
+
+            if (p2 < p1)
+            { //INDICES NEED TO BE SORTED FOR IT TO WORK
+                int tp1 = p1;
+                p1 = p2;
+                p2 = tp1;
+            }
             //int i1 = pairs(i,2);
             double dis;
             //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
             vector1<double> un(dimension);
             geo.distance_vector(*dat, p1, p2, un, dis);
 
+
+
             //un = i-j
             dis = sqrt(dis);
 
             un /= dis;
+
+  
+
+
             int **q = new int *;
             
             if (iny.safe)
@@ -773,6 +786,11 @@ int totp =  pairs.getnrows();
             {
                 iny.UpdateIteratorSafe(p1, p2, q);
             }
+
+            // cout << p1 << " " << p2 << endl;
+            // cout << (*q)[0] << endl;
+            // cout << (*q)[1] << endl;
+            // pausel();
             //iny.UpdateIterator(p1,p2); // this points the patch pointer to the correct particles
 
             //cout << (*q)[0] << endl;
@@ -791,19 +809,32 @@ int totp =  pairs.getnrows();
                 double tjx;
                 double tjy;
                 double tjz;
-                //cout << p1 << " " << p2 << " " << tp  << " " << potn << endl;
+
                 (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
 
+                // cout << p1 << " " << p2 << " " << tp << " " << potn << endl;
 
-                // cout << fx <<" " << fy << " " << fz << endl;
+                // cout << "forces: " << fx <<" " << fy << " " << fz << endl;
                 // cout << dis << endl;
                 // cout << un << endl;
                 // cout << iny.potential_bundle[potn]->getparameters() << endl;
-                // if(abs(fx)>1E-10 || abs(fy)>1E-10|| abs(fz)> 1E-10) {
-                //     int wp1,wp2;
-                //     iny.which_patch(p1,p2,potn,wp1,wp2);
-                //     cout << p1 <<" " << p2 << " " <<potn << " " << wp1 << " " << wp2 << endl;
+
+                // pausel();
+
+
+                // if((abs(fx)>1E-10 || abs(fy)>1E-10|| abs(fz)> 1E-10) /* &&(p1<2048+50 && p2 >= 2048+50) */ ) {
+                // int wp1,wp2;
+                // iny.which_patch(p1,p2,potn,wp1,wp2);
+                // cout << p1 <<" " << p2 << " " <<potn << " " << wp1 << " " << wp2 << endl;
+                // cout << un << endl;
+                // cout << dis << endl;
+                // cout << fx << " " << fy << " " << fz << endl;
+                
+                // pausel();
+                
                 // }
+                
+
                 forces(p1, 0) += fx;
                 forces(p1, 1) += fy;
                 forces(p1, 2) += fz;
@@ -832,10 +863,6 @@ int totp =  pairs.getnrows();
 void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, vector1<potentialtheta3D *> &iny,  BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
     {
 
-
-        //for all the pairs, for all bindings
-
-
         //for a given sphere geometry
 
         int np1 = sqrt(iny.getsize());
@@ -857,6 +884,12 @@ void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, ve
         {
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);
+
+            if(p2<p1) { //INDICES NEED TO BE SORTED FOR IT TO WORK
+                int tp1 = p1;
+                p1 = p2;
+                p2 = tp1;
+            }
             //int i1 = pairs(i,2);
             double dis;
             //vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);

@@ -4,6 +4,7 @@ MD::MD() : geo(cube())
 	//cout << "abstract base class MD called" << endl;
 	HSPotential temppot(1.0,0.0);
 	ints = temppot.clone();
+	dat = new matrix<double>(1,3);
 
 }
 
@@ -60,8 +61,12 @@ void MD::setgeometry(cube &a) {
 }
 
 void MD::setdat(const matrix<double> &a) {
-	matrix<double> *res =  a.clone();
-	dat = res;
+	// matrix<double> *res =  a.clone();
+	// dat = res;
+
+	delete dat;
+
+	dat = a.clone();
 	dimension = dat->getncols();
 	if (dimension != (geo.dimension) ) {
 		cout << dimension << " " << geo.dimension << endl;
@@ -1597,8 +1602,6 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 
 
 		double f1  = iny.force(sqrt(dis));
-
-
 	/* 	
 		if(abs(f1) > 1.E4) {
 			cout << p1 << " " << p2 << endl;

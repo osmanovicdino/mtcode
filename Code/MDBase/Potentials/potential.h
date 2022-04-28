@@ -83,6 +83,7 @@ struct HSPotential: potential {
 	double sigma6,sigma12;	
 	HSPotential(double a, double b) : epsilon(a), sigma(b) {paramlimit=1.12246*sigma; dl=true; interaction_distance=paramlimit+sigma; sigma6= SQR(CUB(sigma)); sigma12 = SQR(sigma6); }
 
+	/*
 	double energy(double x) {
       	if(x < paramlimit) {
         	double a;
@@ -94,6 +95,20 @@ struct HSPotential: potential {
         	return 0;
         }
 	}
+	*/
+	//define an MC-friendly energy potential
+	double energy(double x) {
+		if (x < sigma)
+		{
+			return 1.E10;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+
 	double force(double x) {
 		//where x is the distance, this is the magnitude of the force, it is multiplied by r/|r| to give vectorial
         if(x < paramlimit) {
@@ -289,7 +304,7 @@ struct FENEPotential : potential {
 
 	double energy(double x) { 
 		if(x<R_0) return -(kbond/2.)*SQR(R_0)*log(1.0-SQR(x)/SQR(R_0));
-		else return 1.E5*x;
+		else return 1.E10*SQR(x);
 	}
 
 	double force(double x) { return -kbond*x/(1-SQR(x)/SQR(R_0));}
@@ -313,6 +328,7 @@ struct FENEPotential : potential {
 	}
 
 };
+
 
 struct ColoumbPotential : potential {
 	double k;

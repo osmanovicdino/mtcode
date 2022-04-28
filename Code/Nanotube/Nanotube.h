@@ -11,6 +11,17 @@ struct ShellProperties
     matrix<double> posi;
     double k;
     double rm;
+
+    void DoAnMC(double, bool);
+};
+
+struct particle_adder {
+int No_types;
+vector1<int> nums;
+vector1<int> pats;
+
+
+
 };
 
 struct NanotubeAssembly {
@@ -19,9 +30,13 @@ int num;
 
 LangevinNVTR *obj;
 
-ComboPatch *pots;
+TetrahedralWithBivalent *pots;
 
 spherical_confinement_3D conf;
+
+double myrmax;
+
+double ll;
 
 // matrix<double> create_spherical_shell(int N, double R);
 
@@ -30,11 +45,16 @@ NanotubeAssembly(double, int); //argument one is radius, argument 2 is the amoun
 void setviscosity(double);
 void setkT(double);
 
-void setpots(ComboPatch &);
+void add_particle2();
+
+void add_particle42(int);
+
+void setpots(TetrahedralWithBivalent &);
 
 void run(int, int, string strbase);
 
-void run_with_real_surface(int,int,ShellProperties &, string strbase);
+void run_with_real_surface(int, int, ShellProperties &, string strbase);
+void run_with_real_surface_add_particles(int, int, ShellProperties &, double prod, string strbase);
 
 //AbstractBindingModel *bm;
 

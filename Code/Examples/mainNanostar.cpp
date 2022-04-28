@@ -53,11 +53,6 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-    matrix<double> K(3,3);
-
-    matrix<double> K2 = K*K;
-
-    cout << endl;
     // srand(time(NULL));
 
     // Nanostar A(2,11.0);
