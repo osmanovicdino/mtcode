@@ -49,7 +49,7 @@ struct Nanostar {
 
     void DoAnMC();
 
-    void run(int total, int every, string);
+    void run(int total, int every,int, string);
     
 };
 

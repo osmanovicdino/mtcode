@@ -821,7 +821,7 @@ void Nanostar::DoAnMC()
 
 }
 
-void Nanostar::run(int runtime, int every, string strbase = "")
+void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
 {
     int tf = ceil((double)runtime / (double)every);
     int number_of_digits = 0;
@@ -925,7 +925,7 @@ void Nanostar::run(int runtime, int every, string strbase = "")
 
              stringstream ss;
 
-             ss << setw(number_of_digits) << setfill('0') << (i / every);
+             ss << setw(number_of_digits) << setfill('0') << st+(i / every);
 
              matrix<double> pos = obj->getdat();
 
