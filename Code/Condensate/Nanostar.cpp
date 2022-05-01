@@ -35,7 +35,7 @@ Nanostar::Nanostar(int N, double ll, int length_of_branchh) :  bindpairs(vector<
 
     WCAPotential StickerPotential(10.0,sigma,att_epp);
 
-    WCAPotential HS(10.0, sigma, 0.0);
+    WCAPotential HS(20.0, sigma, 0.0);
 
     FENEPotential nrr(50,1.4);
 
@@ -897,7 +897,7 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
 
          matrix<double> F1((*obj).calculateforces(bp2, *bindp));
 
-         //matrix<double> F2((*obj).calculateforces_threebody(bep2, *bendp));
+         matrix<double> F2((*obj).calculateforces_threebody(bep2, *bendp));
 
 
          matrix<double> F3((*obj).calculateforces(possible_stickers, *faa));
@@ -907,7 +907,7 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
 
 
 
-        matrix<double> F = F1 /* + F2 */ + F3 + F4;
+        matrix<double> F = F1 + F2 + F3 + F4;
 
         matrix<double> R(totalN, dimension);
 
