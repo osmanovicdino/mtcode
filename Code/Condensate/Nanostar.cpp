@@ -897,7 +897,7 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
 
          matrix<double> F1((*obj).calculateforces(bp2, *bindp));
 
-         matrix<double> F2((*obj).calculateforces_threebody(bep2, *bendp));
+         //matrix<double> F2((*obj).calculateforces_threebody(bep2, *bendp));
 
 
          matrix<double> F3((*obj).calculateforces(possible_stickers, *faa));
@@ -907,7 +907,7 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
 
 
 
-        matrix<double> F = F1 + F2 + F3 + F4;
+        matrix<double> F = F1 /* + F2 + */+ F3 + F4;
 
         matrix<double> R(totalN, dimension);
 
