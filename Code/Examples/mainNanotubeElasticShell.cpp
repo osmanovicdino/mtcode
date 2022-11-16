@@ -26,7 +26,6 @@
 #include <unistd.h>
 #include <algorithm>
 #include <parallel/algorithm>
-#include <chrono>
 //#include <thrust/host_vector.h>
 //#include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -58,19 +57,69 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-    uint64_t microseconds_since_epoch = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    srand(time(NULL));
+    int NM;
 
-    // cout << microseconds_since_epoch << endl;
-    // cout << time(NULL) << endl;
-    int seed = microseconds_since_epoch % time(NULL);
-    srand(seed);
+    if (argc == 2)
+    {
+        NM = atof(argv[1]);
+    }
+    else
+    {
+        error("specify number of monomers");
+    }
 
     // signal(SIGSEGV, handler);
-    double radius = 40.;
-    double monomers = 1000;
+
+    ShellProperties B;
+    int Ns = 2048;
+    double targetdensity = 2.0;
+
+    stringstream sx1;
+    stringstream sx2;
+
+    sx1 << Ns;
+    sx2 << targetdensity;
+
+    // string basic ="./Plotting/GenerateSpherePoints.wls";
+
+    string basic = "/home/dino/Documents/tylercollab/Repo/Code/Plotting/GenerateSpherePoints.wls";
+    string gap = " ";
+
+    string command = basic + gap + sx1.str() + gap + sx2.str();
+
+    system(command.c_str());
+
+    int T;
+    bool err1;
+    matrix<int> pairs = importcsv("./IsocohedronI.csv", T, err1);
+    double T2;
+    bool err2;
+    matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
+    double k = 5.0;
+    double rm = 1.25;
+
+    system("rm Iso*.csv");
+    B.k = k;
+    B.rm = rm;
+    B.par = pairs;
+    B.posi = pos;
+
+    // B.DoAnMC(100.,false);
+
+    // outfunc(B.posi,"res");
+    // pausel();
+
+    // vector1<double> mean = meanmat_end(pos,0);
+
+    double approxradius = sqrt(SQR(pos(0, 0)) + SQR(pos(0, 1)) + SQR(pos(0, 2)));
+
+    double radius = (1. / 0.9) * 2 * approxradius;
+    double monomers = NM;
 
     // monomers/(4/3piradius3)
 
+    cout << "starting" << endl;
     NanotubeAssembly A(radius, monomers);
 
     double deltaG = 30.0;
@@ -129,27 +178,38 @@ int main(int argc, char **argv)
     }
     for (int i = 16; i < 24; i++)
     {
-        params(i, 0) = 0.0;
+        params(i, 0) = 100.0;
         params(i, 1) = 1.4;
         params(i, 2) = angle;
     }
     for (int i = 24; i < tot; i++)
     {
-        params(i, 0) = deltaG;
+        params(i, 0) = 100.0;
         params(i, 1) = 1.4;
         params(i, 2) = angle;
     }
 
-    TetrahedralWithBivalent c2(params,0, monomers);
-    //TetrahedralWithBivalent c2(deltaG, 1.4, angle);
+    TetrahedralWithBivalent c2(params, Ns + NM / 4, Ns + NM);
 
     A.setpots(c2);
+    A.setkT(1.0);
 
-    A.run(10000000, 1000);
+    cout << "done" << endl;
 
-    //A.run_anneal(10000000, 1000, 10000);
+    // outfunc(B.posi,"res");
+    // cout << "MC done" << endl;
 
-    return 0;
+    // pausel();
+
+    string stringbase = "Num_mon=";
+    stringstream ss;
+    ss << monomers;
+    string ss2 = ss.str();
+
+    stringbase += ss2;
+
+    A.run_with_real_surface_add_particles(10000000, 1000, B, 0.000, stringbase);
     // A.run(1000000, 1000);
 
+    return 0;
 }

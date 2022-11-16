@@ -1,7 +1,8 @@
 #ifndef NANOSTAR_CPP
 #define NANOSTAR_CPP
 
-Nanostar::Nanostar(int N, double ll, int length_of_branchh) :  bindpairs(vector<mdpair>()), bendpairs(vector<mdtriplet>()), stickerList(vector<int>()){
+Nanostar::Nanostar(int N, double ll, vector1<int> &length_of_branchh, matrix<double> &ori) : length_of_each_branch(length_of_branchh), accumulate(vector1<int>(length_of_each_branch.getsize())), bindpairs(vector<mdpair>()), bendpairs(vector<mdtriplet>()), stickerList(vector<int>())
+{
     obj = new LangevinNVT;
     dimension = 3;
     l = ll;
@@ -11,20 +12,48 @@ Nanostar::Nanostar(int N, double ll, int length_of_branchh) :  bindpairs(vector<
 
     total_particles = 0;
 
-    num_branches = 3;
+    num_branches = length_of_each_branch.getsize();
 
-    length_of_branch = length_of_branchh;
+    if(ori.getnrows() != num_branches) error("defined initial orientiations must agree with the number of branches");
 
-    total_parts_per_nanostar = num_branches*length_of_branch+1;
+    
+    for (int j = 0; j <= num_branches - 1; j++)
+    {
+        int iter = 0;
+        for (int k = 0; k < j; k++)
+        {
+            iter += length_of_each_branch[k];
+        }
+        accumulate[j] = iter;
+    }
+
+
+
+    //total_parts_per_nanostar = num_branches*length_of_branch+1;
+    total_parts_per_nanostar = 1;
+    for(int j = 0 ; j < num_branches ; j++) {
+        total_parts_per_nanostar += length_of_each_branch[j];
+    }
+
 
     total_particles = 0;
 
-    for (int i = 0; i < num_nanostars + 1; i++)
+    vector<int> relational_sticker_list;
+    int iter = length_of_each_branch[0];
+    relational_sticker_list.push_back(iter);
+    for(int j = 1 ; j < num_branches ; j++) {
+        iter += length_of_each_branch[j];
+        relational_sticker_list.push_back(iter);
+    }
+
+    for (int i = 0; i < num_nanostars ; i++)
     {
         for(int j = 0  ; j < num_branches ; j++) {
-        stickerList.push_back(i*total_parts_per_nanostar + length_of_branch * j);
+        stickerList.push_back(i*total_parts_per_nanostar + relational_sticker_list[j]);
         }
     }
+
+
 
     vector1<bool> is_periodic(dimension,true);
     cube bc(ll,is_periodic,dimension);
@@ -68,7 +97,7 @@ Nanostar::Nanostar(int N, double ll, int length_of_branchh) :  bindpairs(vector<
 
     *obj = b;
 
-    matrix<double> store = create_initial_state();
+    matrix<double> store = create_initial_state(ori);
 
 
     potential *q1 = StickerPotential.clone();
@@ -83,9 +112,6 @@ Nanostar::Nanostar(int N, double ll, int length_of_branchh) :  bindpairs(vector<
     matrix<double> moms(store.getnrows(), dimension);
     obj->setdat(store);
     obj->setmom(moms);
-
-    
-
 }
 
 matrix<double> rotationmatrix(double theta, double phi, double psi) {
@@ -105,29 +131,40 @@ return rot;
 
 }
 
-matrix<double> Nanostar::create_initial_state() {
+matrix<double> Nanostar::create_initial_state(matrix<double> &ori) {
 
     matrix<double> store(total_particles,3);
 
-    vector1<double> ori1(3);
-    vector1<double> ori2(3);
-    vector1<double> ori3(3);
+    // vector1<double> ori1(3);
+    // vector1<double> ori2(3);
+    // vector1<double> ori3(3);
 
-    double orig1[3] = {0.942809, 0, 0.};
-    double orig2[3] = {-0.471405, 0.816497, 0.};
-    double orig3[3] = {-0.471405, -0.816497, 0.};
+    // double orig1[3] = {0.942809, 0, 0.};
+    // double orig2[3] = {-0.471405, 0.816497, 0.};
+    // double orig3[3] = {-0.471405, -0.816497, 0.};
 
-    for (int j = 0; j < 3; j++)
-    {
-        ori1[j] = 1.1 * orig1[j];
-        ori2[j] = 1.1 * orig2[j];
-        ori3[j] = 1.1 * orig3[j];
-    }
+    // for (int j = 0; j < 3; j++)
+    // {
+    //     ori1[j] = 1.1 * orig1[j];
+    //     ori2[j] = 1.1 * orig2[j];
+    //     ori3[j] = 1.1 * orig3[j];
+    // }
 
+    // vector1<int> accumulate(num_branches);
+    // for(int j =0 ; j <= num_branches-1 ; j++) {
+    //     int iter = 0;
+    //     for(int k = 0 ; k < j ; k++) {
+    //         iter += length_of_each_branch[k];
+    //     }
+    //     accumulate[j] = length_of_each_branch[j]
+    // }
+
+    // cout << accumulate << endl;
+    // pausel();
 
 
     for(int i = 0  ; i < num_nanostars ; i++) {
-        //cout << i << endl;
+        cout << i << endl;
         double x = l * (double)rand()/(double)(RAND_MAX);
         double y = l * (double)rand() / (double)(RAND_MAX);
         double z = l * (double)rand() / (double)(RAND_MAX);
@@ -141,35 +178,68 @@ matrix<double> Nanostar::create_initial_state() {
         store(i * total_parts_per_nanostar, 1) = y;
         store(i * total_parts_per_nanostar, 2) = z;
 
+
+        // do a ranodom rotation on the nanostar
         double theta = 2 * pi * ((double)rand() / ((double)RAND_MAX));
         double phi = 2 * pi * ((double)rand() / ((double)RAND_MAX));
         double psi = 2 * pi * ((double)rand() / ((double)RAND_MAX));
 
         matrix<double> rot(rotationmatrix(theta,phi,psi));
-        //do a random rotation on the nanostar
-        vector1<double> nori1 = rot * ori1;
-        vector1<double> nori2 = rot * ori2;
-        vector1<double> nori3 = rot * ori3;
 
-        for (int j = 0; j < length_of_branch; j++)
-        {
-            vector1<double> pos1 = centre + (double)(j+1)*nori1;
-            vector1<double> pos2 = centre + (double)(j+1)*nori2;
-            vector1<double> pos3 = centre + (double)(j+1)*nori3;
-
-
-            obj->getgeo().correct_position(pos1);
-            obj->getgeo().correct_position(pos2);
-            obj->getgeo().correct_position(pos3);
-
-            for(int k = 0  ; k < dimension ; k++) {
-            store(i * total_parts_per_nanostar + 1+0 * (length_of_branch) + j, k) = pos1[k];
-            store(i * total_parts_per_nanostar + 1+1 * (length_of_branch) + j, k) = pos2[k];
-            store(i * total_parts_per_nanostar + 1+2 * (length_of_branch) + j, k) = pos3[k];
+        matrix<double> neworients(ori.getnrows(),3);
+        for(int j = 0 ; j < ori.getnrows() ; j++) {
+            vector1<double> ctemp = ori.getrowvector(j);
+            vector1<double> atemp = rot*ctemp;
+            for(int k = 0 ; k < 3 ; k++) {
+                neworients(j,k) = atemp[k];
             }
+
         }
+
+
+
+
+        for(int j = 0 ; j < num_branches ; j++) {
+            for(int k = 0  ; k < length_of_each_branch[j] ; k++) {
+                vector1<double> pos1 = centre + (double)(k + 1) * (neworients.getrowvector(j));
+
+
+                obj->getgeo().correct_position(pos1);
+
+                for (int k1 = 0; k1 < dimension; k1++)
+                {
+                    store(i * total_parts_per_nanostar + 1 + accumulate[j] + k, k1) = pos1[k1];
+                }
+            }
+        }  
+        //do a random rotation on the nanostar
+        // vector1<double> nori1 = rot * ori1;
+        // vector1<double> nori2 = rot * ori2;
+        // vector1<double> nori3 = rot * ori3;
+
+        // for (int j = 0; j < length_of_branch; j++)
+        // {
+        //     vector1<double> pos1 = centre + (double)(j+1)*nori1;
+        //     vector1<double> pos2 = centre + (double)(j+1)*nori2;
+        //     vector1<double> pos3 = centre + (double)(j+1)*nori3;
+
+
+        //     obj->getgeo().correct_position(pos1);
+        //     obj->getgeo().correct_position(pos2);
+        //     obj->getgeo().correct_position(pos3);
+
+        //     for(int k = 0  ; k < dimension ; k++) {
+        //     store(i * total_parts_per_nanostar + 1+0 * (length_of_branch) + j, k) = pos1[k];
+        //     store(i * total_parts_per_nanostar + 1+1 * (length_of_branch) + j, k) = pos2[k];
+        //     store(i * total_parts_per_nanostar + 1+2 * (length_of_branch) + j, k) = pos3[k];
+        //     }
+        // }
     }
+
+
     cout << "nanostars added" << endl;
+
+
 
     return store;
 
@@ -217,31 +287,36 @@ void Nanostar::create_nanostar() {
 
     int initial = total_particles;
 
-    for(int i = 0 ; i < num_branches ; i++) {
-        mdpair a(initial+0,initial+length_of_branch*i+1);
-        bindpairs.push_back(a);
+    for(int i = 0  ; i < num_branches ; i++) {
+            mdpair a(initial + 0, initial + accumulate[i] + 1);
+            bindpairs.push_back(a);
     }
+
+    
+    // for(int i = 0 ; i < num_branches ; i++) {
+    //     mdpair a(initial+0,initial+length_of_branch*i+1);
+    //     bindpairs.push_back(a);
+    // }
 
     for (int i = 0; i < num_branches; i++)
     {
-        mdtriplet a(initial+0, initial+length_of_branch * i + 1, initial+length_of_branch*1+2);
+        mdtriplet a(initial+0, initial+accumulate[i] + 1, initial+accumulate[i]+2);
         bendpairs.push_back(a);
     }
 
     for(int nb = 0 ; nb < num_branches ; nb++)
-        for(int i = 1 ; i < length_of_branch ; i++ ) {
-            mdpair a(initial + nb * length_of_branch + i, initial + nb * length_of_branch + i + 1);
+        for(int i = 1 ; i < length_of_each_branch[nb] ; i++ ) {
+            mdpair a(initial + accumulate[nb] + i, initial + accumulate[nb] + i + 1);
             bindpairs.push_back(a);
         }
 
     for (int nb = 0; nb < num_branches; nb++)
-        for (int i = 1; i < length_of_branch - 1; i++)
+        for (int i = 1; i < length_of_each_branch[nb] - 1; i++)
         {
-            mdtriplet a(initial + nb * length_of_branch + i, initial + nb * length_of_branch + i + 1, initial + nb * length_of_branch + i + 2);
+            mdtriplet a(initial + accumulate[nb] + i, initial + accumulate[nb] + i + 1, initial + accumulate[nb] + i + 2);
             bendpairs.push_back(a);
         }
-    total_particles +=num_branches*length_of_branch+1;
-
+    total_particles += total_parts_per_nanostar;
 }
 
 
@@ -831,6 +906,35 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
         tf /= 10;
     } while (tf);
 
+    if(true)
+    {
+
+        // cout << i << endl;
+
+        stringstream ss;
+
+        ss << setw(number_of_digits) << setfill('0') << st + (0 / every);
+
+        matrix<double> pos = obj->getdat();
+
+        string poss = "pos";
+        poss = poss + strbase;
+
+        poss += "_i=";
+
+        string extension = ".csv";
+
+        poss += ss.str();
+
+        poss += extension;
+
+        ofstream myfile;
+        myfile.open(poss.c_str());
+
+        myfile <<= pos;
+
+        myfile.close();
+    }
 
     matrix<int> bp2(bindpairs.size(),2);
 
@@ -856,6 +960,8 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
 
     int totalN = obj->getN();
 
+
+
     //int sibdiv = floor(ll/4.0);
     int ccc;
     int num = floor(l/4.);
@@ -863,6 +969,9 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
     matrix<int> boxes = (obj)->getgeo().generate_boxes_relationships(num, ccc);
 
     matrix<int> *froyo1 = obj->calculatepairs_parallel(boxes, 3.5);
+
+    // matrix<int> *froyo1 = obj->calculatepairs_parallel(boxes, 3.5);
+
 
     // *possible_stickers = new matrix<int>;
     matrix<int> possible_stickers;
@@ -872,7 +981,6 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
 
 
     this->gets(*froyo1,possible_stickers,hs_pairs);
-    
 
 
      //matrix<int> *hs_pairs = new matrix<int>;
@@ -918,7 +1026,7 @@ void Nanostar::run(int runtime, int every, int st = 0, string strbase = "")
                 R(i1, j) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
             }
          }
-         if (i % every == 0)
+         if (i % every == 0 && i > 0)
          {
 
              //cout << i << endl;

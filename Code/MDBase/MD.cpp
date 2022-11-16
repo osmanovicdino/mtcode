@@ -1104,6 +1104,7 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, double cut_off)
 	SingleHistogramParallel(indexes,ccs,b);
 
 
+
 	int ss = boxlist.getncols();
 	matrix<int> *a = new matrix<int>();
 	*a = precalculatepairs(b,ccs, boxlist, cut_off);
@@ -1650,6 +1651,80 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 	}
 
 
+
+	return forces;
+}
+
+matrix<double> MD::calculateforcesDV(matrix<int> &pairs, potential &iny, vector1<double> &mags)
+{
+
+	matrix<double> forces((*dat).getNsafe(), dimension);
+	// vec_vec<double> outputs(pairs.getn());
+	//  ofstream myfile;
+	//  myfile.open("forces.csv", ios::out | ios::app);
+	// cout << pairs.getNsafe() << endl;
+	// potential * pot = ints(0,1,0).clone();
+	int totp = pairs.getNsafe();
+#pragma omp parallel for
+	for (int i = 0; i < totp; ++i)
+	{
+		int p1 = pairs.mat[i * 2 + 0];
+		int p2 = pairs.mat[i * 2 + 1];
+		// int i1 = pairs(i,2);
+		double dis;
+		// vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+		vector1<double> un(dimension);
+		geo.distance_vector(*dat, p1, p2, un, dis);
+
+		// un = i-j
+
+		double f1 = mags[i]*iny.force(sqrt(dis));
+		/*
+			if(abs(f1) > 1.E4) {
+				cout << p1 << " " << p2 << endl;
+				cout << f1 << " " << dis << endl;
+				vector1<int> dim(3);
+				for (int i1 = 0; i1 < 3; i1++)
+				{
+					int ij = 1;
+					for (int j = 0; j < i1; j++)
+					{
+						ij *= 38;
+					}
+					dim[i] = ij;
+				}
+
+				vector1<double> pr1 = (*dat).getrowvector(p1);
+
+				vector1<double> pr2 = (*dat).getrowvector(p2);
+
+				vector1<int> pri1(3);
+				vector1<int> pri2(3);
+
+				for (size_t i2 = 0; i2 < 3; i2++)
+				{
+					pri1[i2] = floor(pr1[i2] / 3.05908);
+					pri2[i2] = floor(pr2[i2] / 3.05908);
+
+				}
+
+
+				cout << pr1 << endl;
+				cout << pr2 << endl;
+
+				cout << scalar(dim,pri1) << endl;
+				cout << scalar(dim,pri2) << endl;
+
+				pausel();
+			} */
+
+		for (int j = 0; j < dimension; ++j)
+		{
+			double fac = f1 * un[j] / sqrt(dis);
+			(forces).mat[p1 * dimension + j] += fac;
+			(forces).mat[p2 * dimension + j] += -fac;
+		}
+	}
 
 	return forces;
 }

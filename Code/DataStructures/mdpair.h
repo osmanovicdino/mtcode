@@ -91,6 +91,16 @@ struct mdtriplet {
 
     mdtriplet() : a(0), b(0), c(0) {}
     mdtriplet(const int &aa, const int &bb, const int &cc) : a(aa), b(bb), c(cc) {}
+
+    friend ostream &operator<<(ostream &gt, const mdtriplet &lhs)
+    {
+        gt << lhs.a;
+        gt << " ";
+        gt << lhs.b;
+        gt << " ";
+        gt << lhs.c;
+        return gt;
+    }
 };
 
 struct dispair

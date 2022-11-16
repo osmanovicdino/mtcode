@@ -98,6 +98,7 @@ matrix<int>* calculatepairs_sorted(matrix<int>&,double); //calculate the pairs o
 
 matrix<double> calculateforces(matrix<int>&); //calculate the forces using the pairs as an input
 matrix<double> calculateforces(matrix<int>&,potential&); //calculate the forces using the pairs as an input
+matrix<double> calculateforcesDV(matrix<int> &, potential &, vector1<double> &); // calculate the forces using the pairs as an input
 matrix<double> calculateforces_sp(matrix<int>&,potential&,matrix<vector1<double> >&);
 matrix<double> calculateforceslist(matrix<int>&,potential&); //calculate the forces using the pairs as an input
 matrix<double> calculateforces_threebody(matrix<int>&,potential3&);

@@ -38,6 +38,7 @@ struct TetrahedralWithBivalent : ComboPatch
 
     matrix<double> params2;
 
+    TetrahedralWithBivalent();
     TetrahedralWithBivalent(matrix<double> &,int,int);
 
     ~TetrahedralWithBivalent()
@@ -46,6 +47,8 @@ struct TetrahedralWithBivalent : ComboPatch
         delete i2;
         delete i3;
     }
+
+    void change_nt(const int &ntt) { nt = ntt;}
 
     int num_patches(const int &i);
     void UpdateIterator(const int &i, const int &j);

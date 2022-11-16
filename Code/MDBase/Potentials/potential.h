@@ -296,6 +296,52 @@ struct HarmonicPotential : potential {
 
 };
 
+struct QuarticPotential : potential
+{
+	double k;
+	double x0;
+
+	QuarticPotential(double a, double b) : k(a), x0(b)
+	{
+		dl = false;
+		interaction_distance = 0.0;
+	}
+
+	double energy(double x)
+	{
+		return 0.25 * k * SQR(SQR(x - x0));
+	}
+	double force(double x)
+	{
+		return -k * CUB((x - x0));
+	}
+	double force2mdx(double x2)
+	{
+		return -k;
+	}
+
+	void setparameters(const vector1<double> &x)
+	{
+		if (x.getsize() != 2)
+			error("parameters vector for HarmonicPotential not of the right size");
+		this->k = x.gpcons(0);
+		this->x0 = x.gpcons(1);
+	}
+	void printparameters()
+	{
+		cout << "harmonic spring constant: " << k << " minima: " << x0 << endl;
+	}
+	void printparameters(ofstream &s)
+	{
+		s << k << "," << x0;
+	}
+
+	QuarticPotential *clone() const
+	{
+		return new QuarticPotential(*this);
+	}
+};
+
 struct FENEPotential : potential {
 	double kbond;
 	double R_0;
