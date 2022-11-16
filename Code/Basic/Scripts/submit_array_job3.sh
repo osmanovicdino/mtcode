@@ -41,7 +41,7 @@ else
 fi
 dirwemake="m1=${m1}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
-cp ~/Chemistry/Code/mainlocal.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
+cp ~/Chemistry/Code/mainlocal2.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainlocal2.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 export OMP_NUM_THREADS=12
