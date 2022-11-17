@@ -174,7 +174,7 @@ int main(int argc, char **argv)
         {
             params(iter, 0) = int1;
             params(iter, 1) = range * size;
-            params(iter, 2) = 0.927;
+            params(iter, 2) = 0.727;
             iter++;
         }
     }
@@ -188,14 +188,14 @@ int main(int argc, char **argv)
             {
                 params(iter, 0) = 0.0;
                 params(iter, 1) = range * size;
-                params(iter, 2) = 0.927; // slightly smaller aperture
+                params(iter, 2) = 0.727; // slightly smaller aperture
             }
 
             else
             {
                 params(iter, 0) = int1;
                 params(iter, 1) = range * size;
-                params(iter, 2) = 0.927; // slightly smaller aperture
+                params(iter, 2) = 0.727; // slightly smaller aperture
             }
             iter++;
         }
