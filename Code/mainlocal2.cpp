@@ -166,7 +166,7 @@ int main(int argc, char **argv)
     matrix<double> params(tot, 3);
 
     double range  = 1.2;
-
+    double ang =  0.7;
     int iter = 0;
     for (int i = 0; i < 4; i++) //nanostar/nanostar interaction
     {
@@ -174,7 +174,7 @@ int main(int argc, char **argv)
         {
             params(iter, 0) = int1;
             params(iter, 1) = range * size;
-            params(iter, 2) = 0.727;
+            params(iter, 2) = ang;
             iter++;
         }
     }
@@ -188,14 +188,14 @@ int main(int argc, char **argv)
             {
                 params(iter, 0) = 0.0;
                 params(iter, 1) = range * size;
-                params(iter, 2) = 0.727; // slightly smaller aperture
+                params(iter, 2) = ang; // slightly smaller aperture
             }
 
             else
             {
                 params(iter, 0) = int1;
                 params(iter, 1) = range * size;
-                params(iter, 2) = 0.727; // slightly smaller aperture
+                params(iter, 2) = ang; // slightly smaller aperture
             }
             iter++;
         }
@@ -209,14 +209,14 @@ int main(int argc, char **argv)
             {
                 params(iter, 0) = 0.0;
                 params(iter, 1) = range * size;
-                params(iter, 2) = 0.927; //slightly smaller aperture
+                params(iter, 2) = ang; //slightly smaller aperture
             }
 
             else
             {
                 params(iter, 0) = int1;
                 params(iter, 1) = range * size;
-                params(iter, 2) = 0.927; //slightly smaller aperture
+                params(iter, 2) = ang; //slightly smaller aperture
             }
             iter++;
         }
