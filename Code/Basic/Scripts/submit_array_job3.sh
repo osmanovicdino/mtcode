@@ -43,7 +43,7 @@ else
    i1=12.;
    echo "did not read file correctly"
 fi
-dirwemake="m1=${m1}"
+dirwemake="m1=${m1}_m2={$m2}_i2={$i2}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainlocal2.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainlocal2.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
