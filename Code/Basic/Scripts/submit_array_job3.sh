@@ -49,7 +49,7 @@ cp ~/Chemistry/Code/mainlocal2.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainlocal2.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 export OMP_NUM_THREADS=12
-./angron 10000000 0.005 12. $i1 $m1 $m2 >log
+./angron 20000000 0.005 12. $i1 $m1 $m2 >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
