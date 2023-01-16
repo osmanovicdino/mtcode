@@ -80,17 +80,20 @@ int main(int argc, char **argv)
     double int4;
     double int5;
     int m3;
+    int m4;
 
     int runtime;
     double energy_barrier;
     double anti_en;
     double inv_en;
-    if (argc == 5)
+    if (argc == 7)
     {
         runtime = atof(argv[1]);
         packing_fraction = atof(argv[2]);
         int1 = atof(argv[3]);
-        m3 = atof(argv[4]);
+        int2 = atof(argv[4]);
+        m3 = atof(argv[5]);
+        m4 = atof(argv[6]);
     }
     else
     {
@@ -99,7 +102,9 @@ int main(int argc, char **argv)
         runtime = 1000001;
         packing_fraction = 0.005;
         int1 = 15.0;
+        int2 = 0.0;
         m3 = 500;
+        m4 = 500;
 
     }
 
@@ -111,7 +116,7 @@ int main(int argc, char **argv)
     //     params(i, 2) = 0.927;
     // }
     int m1 = m3;
-    int m2 = 1000;
+    int m2 = m3+m4;
 
 
     // int m1  = 2;
@@ -151,10 +156,11 @@ int main(int argc, char **argv)
     // pausel();
 
     double size = 1.0;
-
+    int p1 = 3;
+    int p2 = 3;
     vector1<int> vec1(2);
-    vec1[0] = 4;
-    vec1[1] = 4;
+    vec1[0] = p1;
+    vec1[1] = p2;
 
     vector1<int> numb(2);
 
@@ -162,15 +168,15 @@ int main(int argc, char **argv)
     numb[1] = m2;
 
 
-    int tot   = 4 * 4 + 4 * 4 + 4 * 4;
+    int tot   = p1 * p1 + p1 * p2 + p2 * p2;
     matrix<double> params(tot, 3);
 
-    double range  = 1.2;
-    double ang =  0.7;
+    double range  = 1.4;
+    double ang =  0.927;
     int iter = 0;
-    for (int i = 0; i < 4; i++) //nanostar/nanostar interaction
+    for (int i = 0; i < p1; i++) 
     {
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < p1; j++)
         {
             params(iter, 0) = int1;
             params(iter, 1) = range * size;
@@ -179,14 +185,14 @@ int main(int argc, char **argv)
         }
     }
 
-    for (int i = 0; i < 4; i++) //nanostar/anti-invader interaction
+    for (int i = 0; i < p1; i++) 
     {
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < p2; j++)
         {
 
-            if (j == 3) // top one
+            if (j == p2-1) // top one
             {
-                params(iter, 0) = 0.0;
+                params(iter, 0) = int2;
                 params(iter, 1) = range * size;
                 params(iter, 2) = ang; // slightly smaller aperture
             }
@@ -201,13 +207,13 @@ int main(int argc, char **argv)
         }
     }
 
-    for (int i = 0; i < 4; i++) //nanonstar/invader interaction
+    for (int i = 0; i < p2; i++) 
     {
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < p2; j++)
         {
-            if (j == 3) //top one
+            if (i==p1-1 || j == p2-1) //top one
             {
-                params(iter, 0) = 0.0;
+                params(iter, 0) = int2;
                 params(iter, 1) = range * size;
                 params(iter, 2) = ang; //slightly smaller aperture
             }
@@ -223,35 +229,33 @@ int main(int argc, char **argv)
     }
 
 
-    matrix<double> orient(8, 3);
+    matrix<double> orient(p1+p2, 3);
 
-    double nx1 = sqrt(8. / 9.);
+    // double nx1 = sqrt(8. / 9.);
+    // double ny1 = 0.;
+    // double nz1 = -1. / 3.;
+
+    // double nx2 = -sqrt(2. / 9.);
+    // double ny2 = sqrt(2. / 3.);
+    // double nz2 = -1. / 3.;
+
+    // double nx3 = -sqrt(2. / 9.);
+    // double ny3 = -sqrt(2. / 3.);
+    // double nz3 = -1. / 3.;
+
+
+
+    double nx1 = 1.;
     double ny1 = 0.;
-    double nz1 = -1. / 3.;
+    double nz1 = 0.;
 
-    double nx2 = -sqrt(2. / 9.);
-    double ny2 = sqrt(2. / 3.);
-    double nz2 = -1. / 3.;
+    double nx2 = -0.5;
+    double ny2 = 0.5*sqrt(3.);
+    double nz2 = 0.;
 
-    double nx3 = -sqrt(2. / 9.);
-    double ny3 = -sqrt(2. / 3.);
-    double nz3 = -1. / 3.;
-
-    double nx4 = 0;
-    double ny4 = 0;
-    double nz4 = 1.;
-
-    // double nx5 = 1.;
-    // double ny5 = 0.;
-    // double nz5 = 0.;
-
-    // double nx6 = -0.5;
-    // double ny6 = 0.5*sqrt(3.);
-    // double nz6 = 0.;
-
-    // double nx7 = -0.5 ;
-    // double ny7 = -0.5*sqrt(3.);
-    // double nz7 = 0.;
+    double nx3 = -0.5 ;
+    double ny3 = -0.5*sqrt(3.);
+    double nz3 = 0.;
 
     // double nx8 =  0.5;
     // double ny8 = 0.5*sqrt(3);
@@ -285,25 +289,19 @@ int main(int argc, char **argv)
     orient(2, 1) = ny3;
     orient(2, 2) = nz3;
 
-    orient(3, 0) = nx4;
-    orient(3, 1) = ny4;
-    orient(3, 2) = nz4;
+    orient(3, 0) = nx1;
+    orient(3, 1) = ny1;
+    orient(3, 2) = nz1;
 
-    orient(4, 0) = nx1;
-    orient(4, 1) = ny1;
-    orient(4, 2) = nz1;
+    orient(4, 0) = nx2;
+    orient(4, 1) = ny2;
+    orient(4, 2) = nz2;
 
-    orient(5, 0) = nx2;
-    orient(5, 1) = ny2;
-    orient(5, 2) = nz2;
+    orient(5, 0) = nx3;
+    orient(5, 1) = ny3;
+    orient(5, 2) = nz3;
 
-    orient(6, 0) = nx3;
-    orient(6, 1) = ny3;
-    orient(6, 2) = nz3;
 
-    orient(7, 0) = nx4;
-    orient(7, 1) = ny4;
-    orient(7, 2) = nz4;
 
     // orient(8, 0) = nx5;
     // orient(8, 1) = ny5;
@@ -351,16 +349,16 @@ int main(int argc, char **argv)
 
 
 
-    double l = cbrt(pi * CUB(size) * (double)(m2) / (6. * packing_fraction));
+    double l = cbrt(pi * CUB(size) * (double)(m1) / (6. * packing_fraction));
 
     //l = 20.34;
 
     Condensate A(l, m2 );
 
 
-    // A.setup_large_droplet(m1,m5,m6,0.640658,  l);
+    A.setup_large_droplet(m3,m4,0,0.640658,  l);
+    // outfunc(A.obj->getdat(),"res");
 
-    
     //A.setup_tight_packing(1.8*size);
 
     
@@ -401,13 +399,22 @@ int main(int argc, char **argv)
     ss << int1;
     base += ss.str();
 
+    base += "_int2=";
+    stringstream ss2;
+    ss2 << int2;
+    base += ss2.str();
+
     // cout << "done" << endl;
     //Do processing to make sure everything is fine here
-    base += "num_anti=";
+    base += "num_s1=";
     stringstream ss4;
     ss4 << m1;
     base += ss4.str();
 
+    base += "num_s2=";
+    stringstream ss5;
+    ss5 << m2;
+    base += ss5.str();
 
     // cout << "done" << endl;
     //Do processing to make sure everything is fine here

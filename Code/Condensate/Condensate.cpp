@@ -205,7 +205,7 @@ void Condensate::setup_large_droplet(int N1, int N2, int N3, double dens, double
             }
         }
     }
-
+    cout << "all possible sites detected" << endl;
 
     if(possible_pos_x_in_sphere.size() < N1+ N3) {
         cout << possible_pos_x_in_sphere.size();
@@ -227,6 +227,7 @@ void Condensate::setup_large_droplet(int N1, int N2, int N3, double dens, double
         possible_pos_y_in_sphere.erase(possible_pos_y_in_sphere.begin() + randint);
         possible_pos_z_in_sphere.erase(possible_pos_z_in_sphere.begin() + randint);
     }
+    cout << "sphere particles added" << endl;
     for(int i = N1 ; i < N1 + N2 ; ++i) {
 
         int randint = rand() % (possible_pos_x_out_sphere.size());
@@ -238,6 +239,7 @@ void Condensate::setup_large_droplet(int N1, int N2, int N3, double dens, double
         possible_pos_y_out_sphere.erase(possible_pos_y_out_sphere.begin() + randint);
         possible_pos_z_out_sphere.erase(possible_pos_z_out_sphere.begin() + randint);
     }
+    cout << "non_sphere particles added" << endl;
     for (int i = N1 + N2; i < N1 + N2 + N3; ++i)
     {
 
@@ -250,11 +252,11 @@ void Condensate::setup_large_droplet(int N1, int N2, int N3, double dens, double
         possible_pos_y_in_sphere.erase(possible_pos_y_in_sphere.begin() + randint);
         possible_pos_z_in_sphere.erase(possible_pos_z_in_sphere.begin() + randint);
     }
-
-
+    cout << "non_sphere particles added" << endl;
+    
 
     obj->setdat(dat);
-
+    cout << "done" << endl;
 }
 
 
