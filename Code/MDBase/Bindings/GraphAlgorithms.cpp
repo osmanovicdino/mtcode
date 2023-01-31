@@ -595,7 +595,7 @@ void ConnectedComponentsParallel(matrix<int> &adj, vector1<int> &indexes) {
  
 
     int nr = adj.nrows;
-    int ss =  indexes.size;
+    int ss =  indexes.Nsize;
 
     for(;;) {
         bool equiv;
@@ -686,7 +686,7 @@ void ConnectedComponentsParallel_Old(vector<Y> &adj, vector1<int> &indexes) {
  
 
     int nr = adj.size();
-    int ss = indexes.size;
+    int ss = indexes.Nsize;
 
 
     bool globe = false;
@@ -823,7 +823,7 @@ void ConnectedComponentsParallel(vector<Y> &adj, vector1<int> &indexes)
     // }
 
     int nr = adj.size();
-    int ss = indexes.size;
+    int ss = indexes.Nsize;
 
 
         

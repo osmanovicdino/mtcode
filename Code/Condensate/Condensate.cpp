@@ -589,8 +589,9 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
             ofstream myfile;
             myfile.open(poss.c_str());
 
-            ofstream myfile2;
-            myfile2.open(oris.c_str());
+            //UNCOMMENT TO OUTPUT ORIENTATIONS AS WELL ( A LOT OF DATA HERE)
+            // ofstream myfile2;
+            // myfile2.open(oris.c_str());
 
             ofstream myfile3;
             myfile3.open(bins.c_str());
@@ -599,14 +600,14 @@ void Condensate::run_singlebond(int runtime, int every, string strbase = "")
             myfile4.open(cc.c_str());
 
             myfile <<= pos;
-            myfile2 << setprecision(10) <<= orient;
+            // myfile2 << setprecision(10) <<= orient;
             myfile3 <<= bbs.isbound;
             myfile3 << "\n";
             myfile3 <<= bbs.boundto;
             myfile4 <<= distance_graph(pos, boxes, concompc, 1.25, g);
 
             myfile.close();
-            myfile2.close();
+            // myfile2.close();
             myfile3.close();
             myfile4.close();
         }

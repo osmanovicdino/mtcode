@@ -57,7 +57,7 @@ friend struct Bilinear2<T>;
 friend struct Bilinear3;
 
 private:
-	int size; //size of the vector
+	int Nsize; //size of the vector
 	T * data; //pointer to data members
 
 
@@ -123,7 +123,8 @@ public:
         template <class Y>
         friend bool operator>(const vector1<Y> &, const vector1<Y> &); //tests
 
-        inline int getsize() const { return size; }
+        inline int getsize() const { return Nsize; }
+        inline int size() const {return Nsize; } //allows for overloading with c++ vector
 	T* getdat() {return data; }
 	void setval(T a); //set all the values in the vector to a
 	void swap(int,int); // swap

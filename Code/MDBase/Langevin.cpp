@@ -222,6 +222,27 @@ void LangevinNVT::advance_pos() {
 
 }
 
+template <class vec>
+void LangevinNVT::advance_pos(vec &p1)
+{
+	int ds = this->getdimension();
+	int N = p1.size();
+
+// int locald = this->getdimension();
+#pragma omp parallel for schedule(static)
+	for (int j = 0; j < N; j++)
+	{
+	for (int i1 = 0; i1 < ds; i1++)
+	{
+		int i = p1[j];
+	(*dat)(i, i1) = (*dat)(i, i1) + c1 * (*mom)(i, i1);
+	// temp1->operator[](i1) = temp1->operator[](i1) + c1*(temp2->operator[](i1));
+	}
+	}
+
+	geo.correct_position_and_momentum(*dat, *mom);
+}
+
 // double c1 = (dt/m);
 // double c2 = (1.0/(1.0+(d)));
 // double c3 = (1.0/(1.0+(d)))*q;

@@ -41,6 +41,8 @@ void setdat(const matrix<double>&);
 
 void setinteractions(potential&);
 void setgeometry(cube&);
+void set_particle(const vector1<double>&,int);
+
 
 double getcoordinate(int,int);
 
@@ -76,11 +78,15 @@ matrix<int>* calculatepairs(matrix<int>&,double); //calculate the pairs over whi
 
 matrix<int> *calculatepairs_parallel(matrix<int> &, double); //calculate the pairs over which forces exist
 
-matrix<int>* calculatepairs(matrix<int>&,vector1<int>&,double); //calculate the pairs over which forces exist, int are the indices of the partial lists
+template <class vec>
+matrix<int>* calculatepairs(matrix<int>&,vec&,double); //calculate the pairs over which forces exist, int are the indices of the partial lists
 
-matrix<int> *calculatepairs_parallel(matrix<int> &, vector1<int> &, double); //calculate the pairs over which forces exist, int are the indices of the partial lists
+template <class vec>
+matrix<int> *calculatepairs_parallel(matrix<int> &, vec&, double); //calculate the pairs over which forces exist, int are the indices of the partial lists
 
-matrix<int>* calculatepairs(matrix<int>&,vector1<int>&,vector1<int>&,double); //calculate the pairs over which forces exist, int are the indices of the partial lists 
+
+template <class vec>
+matrix<int>* calculatepairs(matrix<int>&,vec&,vec&,double); //calculate the pairs over which forces exist, int are the indices of the partial lists 
 
 matrix<int>* calculatepairs_sorted(matrix<int>&,double); //calculate the pairs over which forces exist
 

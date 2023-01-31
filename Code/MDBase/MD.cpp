@@ -5,10 +5,12 @@ MD::MD() : geo(cube())
 	HSPotential temppot(1.0,0.0);
 	ints = temppot.clone();
 	dat = new matrix<double>(1,3);
+	
 
 }
 
-MD::MD(const MD &old) : geo(old.geo) {
+MD::MD(const MD &old) : geo(old.geo)
+{
 	// geometry *geotemp = (old.geo);
 	// //geo = &(old.geo);
 	//cout << "copy constructor MD called" << endl;
@@ -19,7 +21,6 @@ MD::MD(const MD &old) : geo(old.geo) {
 	//cout << "yo" << endl;
 	//geo = old.geo;
 	//dat = new matrix<double>;
-
 	potential *potnew =  (old.ints)->clone();
 	ints = potnew;
 
@@ -75,12 +76,21 @@ void MD::setdat(const matrix<double> &a) {
 
 }
 
+void MD::set_particle(const vector1<double> &a, int index)
+{
+	// matrix<double> *res =  a.clone();
+	// dat = res;
+	if(a.size() != dimension) error("incorrect dimension in set_particle");
+	
+	for(int i1 = 0 ; i1 < dimension ; i1++)
+		(*dat)(index,i1) = a.gpcons(i1);
+
+}
+
 void MD::setinteractions(potential &a) {
 	potential* q = a.clone();
 	ints = q;
 }
-
-
 
 double MD::getcoordinate(int i, int j) {
 	return (*dat).mat[i*dimension+j];
@@ -1112,7 +1122,9 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, double cut_off)
 	return a;
 }
 
-matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, double cut_off) { //p1 is a subset, which interacts with itself
+
+template <class vec>
+matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vec &p1, double cut_off) { //p1 is a subset, which interacts with itself
 	//ASSUME THE SET OF INTERSECTIONS BETWEEN P1 and P2 is of size 0
 
 	// vector<int> index1;
@@ -1159,7 +1171,7 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, double c
 
 
 
-	for(int i = 0 ; i < p1.getsize() ; i++) {
+	for(int i = 0 ; i < p1.size() ; i++) {
 
 		int c = geo.assign_box((*dat),p1[i],dim,cubes_per_length);
 
@@ -1175,7 +1187,8 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, double c
 
 }
 
-matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vector1<int> &p1, double cut_off)
+template <class vec>
+matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vec &p1, double cut_off)
 { //p1 is a subset, which interacts with itself
 	//ASSUME THE SET OF INTERSECTIONS BETWEEN P1 and P2 is of size 0
 
@@ -1231,7 +1244,7 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vector1<int> &p1,
 		dim[i] = ij;
 	}
 
-	int partn =  p1.getsize();
+	int partn =  p1.size();
 	vector1<int> indexes(partn);
 
 	#pragma omp parallel for
@@ -1262,7 +1275,8 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vector1<int> &p1,
 	return a;
 }
 
-matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, vector1<int> &p2, double cut_off) { //p1 and p2 interact with each other but not themselves
+template <class vec>
+matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vec &p1, vec &p2, double cut_off) { //p1 and p2 interact with each other but not themselves
 	//ASSUME THE SET OF INTERSECTIONS BETWEEN P1 and P2 is of size 0
 
 	vector<int> index1;
@@ -1312,13 +1326,13 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vector1<int> &p1, vector1<
 
 
 
-	for(int i = 0 ; i < p1.getsize() ; i++) {
+	for(int i = 0 ; i < p1.size() ; i++) {
 
 		int c = geo.assign_box((*dat),p1[i],dim,cubes_per_length);
 
 		b1[c].push_back(p1[i]);
 	}
-	for(int i = 0 ; i < p2.getsize() ; i++) {
+	for(int i = 0 ; i < p2.size() ; i++) {
 
 		int c = geo.assign_box((*dat),p2[i],dim,cubes_per_length);
 

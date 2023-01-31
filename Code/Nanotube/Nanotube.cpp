@@ -1614,11 +1614,9 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
     }
 }
 
-void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int every, ShellProperties &myshell, double prod, string strbase = "")
-{
 
-    //WARNING, WE ARE NOT CHECKING WHETHER THE SHELL WE ARE ADDING IS NOT OVERLAPPING WITH THE ORIGINAL SYSTEM,
-    //THE USER IS RESPONSIBLE FOR THIS
+void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int every, ShellProperties &myshell, double prod, string strbase = "") {
+
     int ccc;
 
     int tf = ceil((double)runtime / (double)every);
@@ -1631,23 +1629,26 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
-    matrix<int> bindingpairs = myshell.par;
+    matrix<int> bindingpairs = myshell.par; //we can get all the binding pairs of the elastic shell
 
-    int totnp = myshell.posi.getnrows();
+    int totnp = myshell.posi.getnrows(); // total particles that are not patchy
 
-    //Hard Sphere Forces
+    // Hard Sphere Forces
     HSPotential wsa(3.0, 1.0);
     HarmonicPotential spr(myshell.k, myshell.rm);
 
-    // DoAnMC(ShellProperties);
+    int Nx = obj->getN(); // this defines the NN total, 
+    //i.e. every particle that is going to be added to the simulation, 
+    //but which might not be included yet
+    int NN = Nx + totnp; //every particle
+    
+    matrix<double> dat = obj->getdat(); // get the data, remember that a lot of these values will be initialized
+    //to zero to begin with
 
-    //Combine Our Data Into One
-    int NN = obj->getN();
-    matrix<double> dat = obj->getdat();
 
     double ll = obj->getgeo().l;
-    matrix<double> newdat(totnp + NN, 3);
-    for (int i = 0; i < totnp + NN; i++)
+    matrix<double> newdat(NN, 3);
+    for (int i = 0; i < NN; i++)
     {
         if (i < totnp)
         {
@@ -1658,158 +1659,113 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
         {
             for (int j = 0; j < 3; j++)
                 newdat(i, j) = dat(i - totnp, j);
-           
         }
     }
+
     obj->initialize(newdat);
 
-    NN = obj->getN(); //set new N
-    vector1<int> p1(NN-totnp);
-    for(int ik = totnp ; ik < NN ; ik++) {
-        p1[ik-totnp] = ik;
-    }
-    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 3.5);
-    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, p1, 3.5);
 
+    //programmatic
+    vector<int> indices_everything; //these are the indices of all the particles on the shell
+    indices_everything.reserve(NN);
+    vector<int> indices_patchy; // the index of all the patchy particles
+    for(int i = 0  ; i < totnp ; i++) {
+        indices_everything.push_back(i);
+    }
+    indices_patchy.reserve(Nx);
+
+    vector<int> indices_to_add;
+    indices_to_add.reserve(Nx);
+    vector<double> indices_weights;
+    indices_weights.reserve(Nx);
+    for (int i = totnp; i < NN; i++)
+    {
+        indices_to_add.push_back(i);
+        indices_weights.push_back(1.);
+    }
+
+    particle_adder vv;
+    vv.set_indices(indices_to_add);
+    vv.set_weights(indices_weights);
+    sphere_vol vol;
+    vol.r = 20.;
+    vol.ll = ll;
+    vv.set_volume(vol);
+    vv.set_rate(prod);
+
+
+    matrix<int> *pairs = obj->calculatepairs_parallel(boxes,indices_everything, 3.5); //for the hard sphere repulsion
+    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); //for the patchy particle binding
+    //start with zero patchy particles in the simulation
+    //indices_patchy.push_back(0);
+
+    //define the full storage matrices of all the particles, despite the fact they won't all be utilized
     matrix<double> F(NN, 3);
     matrix<double> Fs(NN, 3);
     matrix<double> T(NN, 3);
     matrix<double> RT(NN, 6);
     matrix<double> zeromatrix(NN, 3);
 
-    F = obj->calculateforces(*pairs, wsa);
+    F = obj->calculateforces(*pairs, wsa); //calculate the forces due to hard sphere forces
 
-    // double val;
-    // F.maxima(val);
-    // cout << val << endl;
-    // pausel();
+    F += obj->calculateforces(bindingpairs, spr); //calculate the forces involved due to elastic shell
 
-    F += obj->calculateforces(bindingpairs, spr);
 
+    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); //calculate the forces involved due to patchy
+
+    generate_uniform_random_matrix(RT, indices_patchy); //only generate random torques for the patchy particles
+
+    obj->create_forces_and_torques_sphere(F, T, RT,indices_patchy,false); //only create torques and forces for patchy particles
     
-
-    //cout << "ok to here" << endl;
-
-    // F += obj->calculateforces_external(conf);
-
-    //cout << "trying to calculate this" << endl;
-
-    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T);
-
-    //double coru = 1.0;
-    // double nxtemp = 0.95;
-    // double nytemp = 0.31225;
-    // double nztemp = 0.0;
-    // KernFrenkelOnePatch2 testpot(nxtemp, nytemp, -nztemp, nxtemp, nytemp, nztemp, 100., 2., pi / 3., 0.75);
-    // obj->calculate_forces_and_torques3D(*pairs, testpot, F, T);
-
-    //obj->create_random_forces(RT, RR);
-    generate_uniform_random_matrix(RT);
-    matrix<double> F2 = F;
-    obj->create_forces_and_torques_sphere(F, T, RT);
-
-    vector1<double> tottemp(6);
-
+    
     for (int i = 0; i < runtime; i++)
     {
-        cout << i << endl;
-        vector1<double> meas(6);
-        // obj->measured_temperature(meas);
-        // tottemp += meas;
-        // cout << tottemp / (double)(i + 1) << endl;
-
-        // cout << i << endl;
-        if (i > 0 && i % 20 == 0)
-        {
+    
+    if (i > 0 && i % 20 == 0)
+    {
             // cout << "pairs recalculated" << endl;
             delete pairs;
             delete pairs_onlyb;
             // pairs = obj->calculatepairs(boxes, 3.5);
-            double r1 = (double)rand()/(double)RAND_MAX;
- 
-            if(r1<prod) {
-                int ad = rand() % 10 ;
-                int ad2;
-                if(ad < 9 ) ad2 = 1;
-                else ad2 = 0;
-                this->add_particle42(ad2);
-                int Ng = obj->getN();
-                F.resize(Ng, 3);
-                Fs.resize(Ng, 3);
-                T.resize(Ng, 3);
-                RT.resize(Ng, 6);
-                zeromatrix.resize(Ng, 3);
+            
+            //ADD THE PARTICLE ADDITION METHOD HERE
+            bool dd = false;
+            vector1<double> v1(3);
+            int fi;
+            cout << vv.weights.size() << endl;
+            vv.add_p(*obj,indices_everything,dd,v1,fi);
+
+            if(dd) {
+                indices_everything.push_back(fi);
+                obj->set_particle(v1,fi);
+
+
             }
 
-            NN = obj->getN(); //set new N
-            vector1<int> p2(NN - totnp);
-            for (int ik = totnp; ik < NN; ik++)
-            {
-                p2[ik - totnp] = ik;
-            }
+            pairs = obj->calculatepairs_parallel(boxes,indices_everything, 3.5);
+            pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5);
+    }
+
+    obj->advancemom_halfstep(F, T, indices_everything);
+    obj->advance_pos(indices_everything);
+    obj->rotate(indices_patchy); //only update the patchy particles with the rotate algorithm
+
+    F = obj->calculateforces(*pairs, wsa);        // calculate the forces due to hard sphere forces
+    F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
 
 
-            pairs = obj->calculatepairs_parallel(boxes, 3.5);
-            pairs_onlyb = obj->calculatepairs_parallel(boxes, p2, 3.5);
+    T.reset(0.0);
 
+    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
 
-        }
+    generate_uniform_random_matrix(RT, indices_patchy); // only generate random torques for the patchy particles
 
-        /*         matrix<double> R(NN, 3);
-        for (int i1 = 0; i1 < NN; i1++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                R(i1, j) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
-            }
-        }
-        F = obj->calculateforces(*pairs, wsa);
+    obj->create_forces_and_torques_sphere(F, T, RT, indices_patchy, false); // only create torques and forces for patchy particles
 
-        (*obj).advance_mom(F, R);
+    obj->advancemom_halfstep(F, T, indices_everything);
 
-        (*obj).advance_pos(); */
-
-        obj->advancemom_halfstep(F, T);
-
-
-        obj->advance_pos();
-
-
-        obj->rotate();
-
-
-        F = obj->calculateforces(*pairs, wsa);
-
-        F += obj->calculateforces(bindingpairs, spr);
-        // F += obj->calculateforces_external(conf);
-        //cout << obj->calculateforces_external(conf) << endl;
-        //pausel();
-        T.reset(0.0);
-
-        obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T);
-
-        // stringstream aa;
-        // aa << setw(number_of_digits+1) << setfill('0') << (i / 1);
-        // outfunc(T,"Tl_i="+aa.str());
-        // outfunc(F, "Fl_i=" + aa.str());
-        // obj->calculate_forces_and_torques3D(*pairs, *pots->potential_bundle[0], F, T);
-
-        // obj->create_random_forces(RT, RR);
-        generate_uniform_random_matrix(RT);
-
-        matrix<double> F2 = F;
-
-
-        obj->create_forces_and_torques_sphere(F, T, RT);
-
-        // outfunc(T, "Tb_i=" + aa.str());
-        // outfunc(F, "Fb_i=" + aa.str());
-
-        obj->advancemom_halfstep(F, T);
-
-
-        if (i % every == 0)
-        {
+    if (i % every == 0)
+    {
 
             cout << i << endl;
 
@@ -1843,14 +1799,20 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
             myfile2.open(oris.c_str());
 
             myfile <<= pos;
-            myfile2 << pots->nt;
+            for(int ik  = 0 ; ik < indices_everything.size() ; ik++)
+            myfile2 << indices_everything[ik] << endl;
 
             myfile.close();
             myfile2.close();
 
-            //pausel();
-        }
+            // pausel();
     }
+
+    }
+
 }
+
+
+
 
 #endif /* NANOTUBE_CPP */

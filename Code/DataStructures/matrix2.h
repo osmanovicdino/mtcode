@@ -301,6 +301,8 @@ void reset_parallel(T);
 
         friend void generate_random_matrix(matrix<double> &ra);
         friend void generate_uniform_random_matrix(matrix<double> &ra);
+        template <class vec>
+        friend void generate_uniform_random_matrix(matrix<double> &ra, vec&);
 };
 
 

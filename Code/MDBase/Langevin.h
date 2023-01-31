@@ -54,6 +54,9 @@ public:
 	void printparams();
 
 	void advance_pos(); //advance the position of the particles
+
+	template <class vec>
+	void advance_pos(vec&);										  // advance the position of the particles
 	virtual void advance_mom(matrix<double>&,matrix<double>&);//advance the momenta a full step with the arguments being the deterministic and random forces
 	
 	template<typename F>

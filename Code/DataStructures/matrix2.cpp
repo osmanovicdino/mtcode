@@ -596,9 +596,9 @@ void matrix<T>::minima(int &a, int &b) {
 template <class T>
 void matrix<T>::trisolscol(vector1<T> &a, vector1<T> &b, vector1<T> c, vector1<T> &d, int j) {
     if ( j > ncols || j < 0) error("tridiagonal solve assignment is out of row range");
-    if (d.size != nrows ) error("size of vector incompatible with matrix row size");
+    if (d.Nsize != nrows ) error("size of vector incompatible with matrix row size");
 
-    int n = a.size;
+    int n = a.Nsize;
 
     c.data[0] /= b.data[0];	/* Division by zero risk. */
     d.data[0] /= b.data[0];	/* Division by zero would imply a singular matrix. */
@@ -618,9 +618,9 @@ void matrix<T>::trisolscol(vector1<T> &a, vector1<T> &b, vector1<T> c, vector1<T
 template <class T>
 void matrix<T>::trisolsrow(vector1<T> &a, vector1<T> &b, vector1<T> c, vector1<T> &d, int j) {
     if ( j > nrows || j < 0) error("tridiagonal solve assignment is out of row range");
-    if (d.size != ncols ) error("size of vector incompatible with matrix col size");
+    if (d.Nsize != ncols ) error("size of vector incompatible with matrix col size");
 
-    int n = a.size;
+    int n = a.Nsize;
 
     c.data[0] /= b.data[0];	/* Division by zero risk. */
     d.data[0] /= b.data[0];	/* Division by zero would imply a singular matrix. */
@@ -679,7 +679,7 @@ T matrix<T>::rtrap(T dr, T dz) {
 
 template <class T>
 void matrix<T>::setrow(vector1<T> &v, int i) {
-        int n = v.size;
+        int n = v.Nsize;
         if ( n != ncols || i > nrows ) {
             cout << n << " " << i << endl;
             cout << ncols << " " << nrows << endl;
@@ -700,7 +700,7 @@ void matrix<T>::setrow(T &d, int i) {
 
 template <class T>
 void matrix<T>::setcol(vector1<T> &v, int i) {
-        int n = v.size;
+        int n = v.Nsize;
         if ( n != nrows || i > ncols ) error("not same size in setting row vector, or vector range out of bounds");
         for ( int k = 0 ; k < nrows ; k++ )
                 mat[ncols*k+i]=v.data[k];
@@ -1491,7 +1491,7 @@ void rotate(matrix<T> &r, matrix<T> &qt, const int i, const T a, const T b) {
 template <class T>
 void qrupdt(matrix<T> &r, matrix<T> &qt, vector1<T> &u, vector1<T> &v) {
 	int i,k;
-	int n = u.size;
+	int n = u.Nsize;
 	int m = r.ncols;
 	for ( k =n-1;k>=0;k--)
 		if ( u[k] != 0.0) break;
@@ -1745,6 +1745,16 @@ void generate_uniform_random_matrix(matrix<double> &ra) { //gen random value wit
     // }
     for(int i = 0 ; i < dp ; i++ ) {
         ra.mat[i] = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+    }
+}
+
+template <class vec>
+void generate_uniform_random_matrix(matrix<double> &ra, vec &subset) {
+
+    for (int i = 0; i < subset.size(); i++)
+    {   
+        int j =  subset[i];
+        ra.mat[j] = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
     }
 }
 

@@ -326,11 +326,31 @@ void LangevinNVTR::advancemom_halfstep(matrix<double> &F, matrix<double> &T)  {
         (*mom)(i, 2) += (dt / 2.) * F(i, 2);
         (*angmom)(i, 2) += (dt / 2.) * T(i, 2);
     }
-
-
     
+}
 
-    
+template <class vec>
+void LangevinNVTR::advancemom_halfstep(matrix<double> &F, matrix<double> &T, vec &p1)
+{
+
+    // where F is in LAB FRAME
+    // and T is in BODY FRAME
+    int np = p1.size();
+
+#pragma omp parallel for schedule(static)
+    for (int j = 0; j < np; j++)
+    {
+        int i =  p1[j];
+
+        // (mom)->operator()(i, i1) = ((mom)->operator()(i, i1)) + (dt/2.) * F(i, i1) ;
+        // (angmom)->operator()(i, i1) = (angmom)->operator()(i, i1) + (dt / 2.) * T(i, i1);
+        (*mom)(i, 0) += (dt / 2.) * F(i, 0);
+        (*angmom)(i, 0) += (dt / 2.) * T(i, 0);
+        (*mom)(i, 1) += (dt / 2.) * F(i, 1);
+        (*angmom)(i, 1) += (dt / 2.) * T(i, 1);
+        (*mom)(i, 2) += (dt / 2.) * F(i, 2);
+        (*angmom)(i, 2) += (dt / 2.) * T(i, 2);
+    }
 }
 
 // void LangevinNVTR::advance_pos() {
@@ -429,18 +449,27 @@ vector1<double> LangevinNVTR::genfullmat(int i) {
 //     }
 // }
 
-void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &Randoms, int starti, int endi)
+template <class vec>
+void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matrix<double> &torquel, matrix<double> &Randoms, vec &indexes, bool all)
 { //adds friction and noise
     //int timeseed = int(time(NULL));
     //NO TRANSLATIONAL/ROTATIONAL COUPLING
 
-    //calculate forces and torques in lab frame:
-
-    // int Ns = angmom->getNsafe();
+    //calculate forces and torques in lab frame:d
+    int NI;
+    if(all) {
+        NI = forcel.getNsafe();
+    }
+    else{
+        NI =  indexes.size();
+    }// int Ns = angmom->getNsafe();
     // int No = orient->getNsafe();
     #pragma omp parallel for schedule(static)
-    for (int i = starti; i < endi; i++)
+    for (int j = 0; j < NI; j++)
     {
+        int i;
+        if(!all) i = indexes[j];
+        else i = j;
         // srand(timeseed ^ omp_get_thread_num() );
         double qtemp0 = orient->operator()(i, 0);
         double qtemp1 = orient->operator()(i, 1);
@@ -534,16 +563,20 @@ void LangevinNVTR::create_forces_and_torques_sphere(matrix<double> &forcel, matr
     //calculate forces and torques in lab frame:
 
     int Ns = angmom->getNsafe();
-    this->create_forces_and_torques_sphere(forcel, torquel, Randoms, 0,Ns);
+    vector1<int> a;
+    this->create_forces_and_torques_sphere(forcel, torquel, Randoms, a, true);
 
     //in the following, we assume the centre of resistance is the same as the centre of mass
 }
 
-void LangevinNVTR::rotate() {
-    int angn = (angmom)->getNsafe();
-    // updates the matrices q and qt;
+template<class vec>
+void LangevinNVTR::rotate(vec &p1) {
+    int angn = p1.size();
+// updates the matrices q and qt;
     #pragma omp parallel for schedule(static)
-    for(int i = 0  ; i < angn ; i++) {
+    for (int j = 0; j < angn; j++)
+    {
+        int i =  p1[j];
         vector1<double> rr = genfullmat(i);
 
         // cout << rr << endl;
@@ -572,7 +605,6 @@ void LangevinNVTR::rotate() {
         // cout << "Ang after: " << endl;
         // cout << jtemp0 << " " << jtemp1 << " " << jtemp2 << endl;
         // cout << endl;
-        
 
         // double qtemp0 = orient->operator()(i, 0) * rr[0] + orient->operator()(i, 1) * rr[1] + orient->operator()(i, 2) * rr[2];
         // double qtemp1 = orient->operator()(i, 0) * rr[3] + orient->operator()(i, 1) * rr[4] + orient->operator()(i, 2) * rr[5];
@@ -584,7 +616,7 @@ void LangevinNVTR::rotate() {
         // double qtemp7 = orient->operator()(i, 6) * rr[3] + orient->operator()(i, 7) * rr[4] + orient->operator()(i, 8) * rr[5];
         // double qtemp8 = orient->operator()(i, 6) * rr[6] + orient->operator()(i, 7) * rr[7] + orient->operator()(i, 8) * rr[8];
 
-        double qtemp0 = orient->operator()(i,0)* rr[0]+orient->operator()(i,3)* rr[3]+orient->operator()(i,6)* rr[6];
+        double qtemp0 = orient->operator()(i, 0) * rr[0] + orient->operator()(i, 3) * rr[3] + orient->operator()(i, 6) * rr[6];
 
         double qtemp1 = orient->operator()(i, 1) * rr[0] + orient->operator()(i, 4) * rr[3] + orient->operator()(i, 7) * rr[6];
 
@@ -602,17 +634,17 @@ void LangevinNVTR::rotate() {
 
         double qtemp8 = orient->operator()(i, 2) * rr[2] + orient->operator()(i, 5) * rr[5] + orient->operator()(i, 8) * rr[8];
 
-// cout << "Q before: " << endl;
-// cout << orient->operator()(i, 0) << " " << orient->operator()(i, 1) << " " << orient->operator()(i, 2) << endl;
-// cout << orient->operator()(i, 3) << " " << orient->operator()(i, 4) << " " << orient->operator()(i, 5) << endl;
-// cout << orient->operator()(i, 6) << " " << orient->operator()(i, 7) << " " << orient->operator()(i, 8) << endl;
-// cout << endl;
-// cout << "Q after: " << endl;
-// cout << qtemp0 << " " << qtemp1 << " " << qtemp2 << endl;
-// cout << qtemp3 << " " << qtemp4 << " " << qtemp5 << endl;
-// cout << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
+        // cout << "Q before: " << endl;
+        // cout << orient->operator()(i, 0) << " " << orient->operator()(i, 1) << " " << orient->operator()(i, 2) << endl;
+        // cout << orient->operator()(i, 3) << " " << orient->operator()(i, 4) << " " << orient->operator()(i, 5) << endl;
+        // cout << orient->operator()(i, 6) << " " << orient->operator()(i, 7) << " " << orient->operator()(i, 8) << endl;
+        // cout << endl;
+        // cout << "Q after: " << endl;
+        // cout << qtemp0 << " " << qtemp1 << " " << qtemp2 << endl;
+        // cout << qtemp3 << " " << qtemp4 << " " << qtemp5 << endl;
+        // cout << qtemp6 << " " << qtemp7 << " " << qtemp8 << endl;
 
-// pausel();
+        // pausel();
 
         angmom->operator()(i, 0) = jtemp0;
         angmom->operator()(i, 1) = jtemp1;
@@ -628,6 +660,15 @@ void LangevinNVTR::rotate() {
         orient->operator()(i, 7) = qtemp7;
         orient->operator()(i, 8) = qtemp8;
     }
+}
+
+void LangevinNVTR::rotate() {
+    int angn = (angmom)->getNsafe();
+    vector1<int> p1(angn);
+    for(int i  = 0 ; i < angn ; i++)
+        p1[i]=i;
+    // updates the matrices q and qt;
+    rotate(p1);
 
 }
 

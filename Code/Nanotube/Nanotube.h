@@ -2,6 +2,7 @@
 #define NANOTUBE_H
 
 #include "../MDBase/Rotational/LangevinR.h"
+#include "ParticleAdder.h"
 
 //In order to generate the initial sphere conditions, go to "/home/dino/Documents/Nanotube/Sphere.nb"
 
@@ -15,14 +16,6 @@ struct ShellProperties
     void DoAnMC(double, bool);
 };
 
-struct particle_adder {
-int No_types;
-vector1<int> nums;
-vector1<int> pats;
-
-
-
-};
 
 struct NanotubeAssembly {
 
