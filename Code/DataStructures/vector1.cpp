@@ -28,7 +28,7 @@ vector1<T>::vector1(int n, T a) { //create a vector of n elements initialized to
 }
 template <class T>
 vector1<T>::vector1(int n, string a)
-{ //create a vector of n elements initialized to a.
+{ //create an ascending vector.
     Nsize = n;
     data = new T[Nsize];
     for (int i = 0; i < n; i++)

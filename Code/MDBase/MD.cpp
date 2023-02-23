@@ -676,6 +676,7 @@ matrix<int> MD::precalculatepairs(vector<vector<int> > &b, matrix<int> &boxlist,
 	}
 
 	}
+
 	matrix<int> a;//(index1.size(),2);
 	a.resize_parallel(index1.size(),2);
 	//s_matrix<int> pairs(index1.size(),3);
@@ -751,7 +752,7 @@ matrix<int> MD::precalculatepairs(const matrix<int> &b, const vector1<int>& size
 					{
 						for (int j = i + 1; j < b2s; j++)
 						{
-							int iterator1 = b.gpcons(box1,i);
+							int iterator1 = b.gpcons(box1, i);
 							int iterator2 = b.gpcons(box2, j);
 							//for(int l = 0 ; l < ints.getnints(iterator1,iterator2) ; l++) {
 							//int q = ints.get_potential_number(iterator1,iterator2,l);
@@ -1169,7 +1170,7 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vec &p1, double cut_off) {
 		dim[i] = ij;
 	}
 
-
+	// cout << "nonp: " << p1.size() << endl;
 
 	for(int i = 0 ; i < p1.size() ; i++) {
 
@@ -1178,10 +1179,16 @@ matrix<int>* MD::calculatepairs(matrix<int> &boxlist, vec &p1, double cut_off) {
 		b[c].push_back(p1[i]);
 	}
 
+	//EVEYRTHING BEYOND HERE IS THE PARALLEL ALGO
+	
+	//pausel();
+	//PARALLEL ALGO UP TO HERE
 
 	//int ss = boxlist.getncols();
 	matrix<int> *a = new matrix<int>();
 	*a = precalculatepairs(b,boxlist,cut_off);
+		
+	//cout << "nonp: " << a->getnrows() << endl;
 	return a;
 	
 
@@ -1257,20 +1264,46 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vec &p1, double c
 		indexes[i] = c;
 	}
 
+
+
+	//when they are added out of order, we do not correspond the entries properly?
+
 	//int ss = boxlist.getncols();
 	SingleHistogramParallel(indexes, ccs, b);
+
+	//remap onto the actual values of b
+	#pragma omp parallel for
+	for(int i = 0 ; i < b.getnrows() ; i++) {
+		for(int j = 0  ; j < ccs[i] ; j++) {
+			b(i,j) = p1[b(i,j)];
+		}
+	}
+
+
+	//find all the particles 
+
+	
+	// for (int j = 0; j < b.getnrows(); j++)
+	// {
+	// 	if (b(j,0) != 0)
+	// 	{
+	// 		cout << j << " " << endl;
+	// 		for (int k = 0; k < b.getncols(); k++)
+	// 			cout << b(j,k) << ",";
+	// 		cout << endl;
+	// 		cout << endl;
+	// 	}
+	// }
+
+	// pausel();
 
 	int ss = boxlist.getncols();
 	matrix<int> *a = new matrix<int>();
 	*a = precalculatepairs(b, ccs, boxlist, cut_off);
+	
 
 
-	//shift it back to the identities of the particles as they were in the beginning
-	#pragma omp parallel for
-	for(int i = 0  ; i < a->getnrows() ; i++) {
-		(*a)(i, 0) = p1[(*a)(i, 0)];
-		(*a)(i, 1) = p1[(*a)(i, 1)];
-	}
+	
 
 	return a;
 }

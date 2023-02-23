@@ -1396,9 +1396,9 @@ void NanotubeAssembly::add_particle42(int which)
 //     double rm;
 // };
 
-void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProperties &myshell, string strbase = "")
+void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProperties &myshell, matrix<double> &constantF, string strbase = "")
 {
-
+    //constant F is a constant force applied on the system
     //WARNING, WE ARE NOT CHECKING WHETHER THE SHELL WE ARE ADDING IS NOT OVERLAPPING WITH THE ORIGINAL SYSTEM,
     //THE USER IS RESPONSIBLE FOR THIS
     int ccc;
@@ -1473,6 +1473,8 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
 
     F += obj->calculateforces(bindingpairs,spr);
 
+    F += constantF;
+
     //cout << "ok to here" << endl;
 
     // F += obj->calculateforces_external(conf);
@@ -1541,7 +1543,7 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
 
         F = obj->calculateforces(*pairs, wsa);
         F += obj->calculateforces(bindingpairs, spr);
-
+        F += constantF;
 
         // F += obj->calculateforces_external(conf);
         //cout << obj->calculateforces_external(conf) << endl;
@@ -1647,6 +1649,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
 
     double ll = obj->getgeo().l;
+
     matrix<double> newdat(NN, 3);
     for (int i = 0; i < NN; i++)
     {
@@ -1667,10 +1670,12 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
     //programmatic
     vector<int> indices_everything; //these are the indices of all the particles on the shell
+    vector<int> indices_shell;
     indices_everything.reserve(NN);
     vector<int> indices_patchy; // the index of all the patchy particles
     for(int i = 0  ; i < totnp ; i++) {
         indices_everything.push_back(i);
+        indices_shell.push_back(i);
     }
     indices_patchy.reserve(Nx);
 
@@ -1688,14 +1693,21 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
     vv.set_indices(indices_to_add);
     vv.set_weights(indices_weights);
     sphere_vol vol;
-    vol.r = 20.;
+    vol.r = (1./10.)*ll;
     vol.ll = ll;
+    vol.c1 = ll/2.;
+    vol.c2 = ll/2.;
+    vol.c3 = ll/2.;
     vv.set_volume(vol);
     vv.set_rate(prod);
 
-
+    
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes,indices_everything, 3.5); //for the hard sphere repulsion
+
+
     matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); //for the patchy particle binding
+    
+    
     //start with zero patchy particles in the simulation
     //indices_patchy.push_back(0);
 
@@ -1715,9 +1727,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
     generate_uniform_random_matrix(RT, indices_patchy); //only generate random torques for the patchy particles
 
-    obj->create_forces_and_torques_sphere(F, T, RT,indices_patchy,false); //only create torques and forces for patchy particles
-    
-    
+    obj->create_forces_and_torques_sphere(F, T, RT,indices_patchy,false); //only create torques and forces for patchy particles  
+
     for (int i = 0; i < runtime; i++)
     {
     
@@ -1732,35 +1743,60 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
             bool dd = false;
             vector1<double> v1(3);
             int fi;
-            cout << vv.weights.size() << endl;
-            vv.add_p(*obj,indices_everything,dd,v1,fi);
 
-            if(dd) {
+
+           vector1<double> me1 = meanish(obj->getdat(),indices_shell);
+
+           sphere_vol vol2;
+           vol2.r = (1. / 10.) * ll;
+           vol2.ll = ll;
+           vol2.c1 = me1[0];
+           vol2.c2 = me1[1];
+           vol2.c3 = me1[2];
+           vv.set_volume(vol2);
+
+           vv.add_p(*obj, indices_everything, dd, v1, fi);
+
+           if (dd)
+           {
+                cout << "added: " << fi << endl;
                 indices_everything.push_back(fi);
+                indices_patchy.push_back(fi);
                 obj->set_particle(v1,fi);
 
 
             }
 
+            
             pairs = obj->calculatepairs_parallel(boxes,indices_everything, 3.5);
+
             pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5);
-    }
+
+
+
+        }
 
     obj->advancemom_halfstep(F, T, indices_everything);
     obj->advance_pos(indices_everything);
     obj->rotate(indices_patchy); //only update the patchy particles with the rotate algorithm
 
     F = obj->calculateforces(*pairs, wsa);        // calculate the forces due to hard sphere forces
+
+
     F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
+
 
 
     T.reset(0.0);
 
     obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
 
-    generate_uniform_random_matrix(RT, indices_patchy); // only generate random torques for the patchy particles
 
-    obj->create_forces_and_torques_sphere(F, T, RT, indices_patchy, false); // only create torques and forces for patchy particles
+
+    generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
+
+
+    obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
 
     obj->advancemom_halfstep(F, T, indices_everything);
 

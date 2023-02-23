@@ -717,6 +717,24 @@ matrix<T> matrix<T>::flipcols() {
 }
 
 template <class T>
+bool matrix<T>::check_matrix(T val)
+{
+    bool res= false;
+    
+    for (int i = 0; i < nrows; i++)
+        for (int j = 0; j <ncols; j++)
+        {
+            if(abs(mat[i * ncols + j])>val) {
+                cout << mat[i * ncols + j] << " " <<  i << " " << j << endl;
+                res=true;
+                }
+        }
+
+    return res;
+    
+}
+
+template <class T>
 matrix<T> operator*(const matrix<T> &m1,const matrix<T> &m2) {
 if (m1.nrows != m2.nrows || m1.ncols != m2.ncols) error("diff size matrics in * operator");
 int numrows = m1.nrows;
@@ -1756,6 +1774,28 @@ void generate_uniform_random_matrix(matrix<double> &ra, vec &subset) {
         int j =  subset[i];
         ra.mat[j] = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
     }
+}
+
+template <class vec>
+vector1<double> meanish(const matrix<double> &a, vec &subset) {
+    //WARNING, NO OUT OF BOUNDS CHECKING, PROGRAMMER IS RESPONSIBLE
+    vector1<double> res(a.ncols);
+    for(int i = 0  ; i < subset.size() ; i++) {
+        int i1 = subset[i];
+        for(int j = 0 ; j < a.ncols ; j++) {
+        res[j] += a.gpcons(i1,j);
+        }
+    }
+    res/=(double)subset.size();
+    return res;
+}
+
+vector1<double> meanish(matrix<double> &a)
+{
+    // WARNING, NO OUT OF BOUNDS CHECKING, PROGRAMMER IS RESPONSIBLE
+    string str = "asc";
+    vector1<int> ind(a.nrows,str);
+    return meanish(a,ind);
 }
 
 #endif

@@ -58,37 +58,43 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
-    int NM;
+    int NM2;
 
     if (argc == 2)
     {
-        NM = atof(argv[1]);
+        NM2 = atof(argv[1]);
     }
     else
     {
         error("specify number of monomers");
     }
+    int NM = 2000;
+    //nm2 is the total amount of added crosslinks
 
     // signal(SIGSEGV, handler);
 
     ShellProperties B;
-    int Ns = 2048;
+    int Ns = 4096;
     double targetdensity = 2.0;
 
-    stringstream sx1;
-    stringstream sx2;
+    // stringstream sx1;
+    // stringstream sx2;
 
-    sx1 << Ns;
-    sx2 << targetdensity;
+    // sx1 << Ns;
+    // sx2 << targetdensity;
 
+    // RUN THIS TO REGENERATE SPHERE POINTS
     // string basic ="./Plotting/GenerateSpherePoints.wls";
 
-    string basic = "/home/dino/Documents/tylercollab/Repo/Code/Plotting/GenerateSpherePoints.wls";
-    string gap = " ";
+    // string basic = "/home/dino/Documents/tylercollab/Repo/Code/Plotting/GenerateSpherePoints.wls";
+    // string gap = " ";
 
-    string command = basic + gap + sx1.str() + gap + sx2.str();
+    // string command = basic + gap + sx1.str() + gap + sx2.str();
 
-    system(command.c_str());
+    // system(command.c_str());
+
+    // pausel();
+
 
     int T;
     bool err1;
@@ -97,9 +103,9 @@ int main(int argc, char **argv)
     bool err2;
     matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
     double k = 5.0;
-    double rm = 1.25;
+    double rm = 0.;
 
-    system("rm Iso*.csv");
+    // system("rm Iso*.csv");
     B.k = k;
     B.rm = rm;
     B.par = pairs;
@@ -111,8 +117,9 @@ int main(int argc, char **argv)
     // pausel();
 
     // vector1<double> mean = meanmat_end(pos,0);
-
+    
     double approxradius = sqrt(SQR(pos(0, 0)) + SQR(pos(0, 1)) + SQR(pos(0, 2)));
+
 
     double radius = 1.1 * 2 * approxradius;
     double monomers = NM;
@@ -123,10 +130,11 @@ int main(int argc, char **argv)
     NanotubeAssembly A(radius, monomers);
 
     double deltaG = 30.0;
-    double angle = 0.9;
+    double angle = 0.6;
     // BivalentPatch c2(deltaG, 1.4, angle);
 
-    matrix<double> orient(6, 3);
+    matrix<double> orient(4, 3);
+    matrix<double> orient2(2, 3);
 
     double nx4 = 1.0;
     double ny4 = 0.0;
@@ -156,33 +164,46 @@ int main(int argc, char **argv)
     orient(0, 1) = ny6;
     orient(0, 2) = nz6;
 
-    orient(1, 0) = nx7;
-    orient(1, 1) = ny7;
-    orient(1, 2) = nz7;
+    orient(1, 0) = nx8;
+    orient(1, 1) = ny8;
+    orient(1, 2) = nz8;
 
-    orient(2, 0) = nx8;
-    orient(2, 1) = ny8;
-    orient(2, 2) = nz8;
+    orient(2, 0) = nx7;
+    orient(2, 1) = ny7;
+    orient(2, 2) = nz7;
 
-    orient(2, 0) = nx9;
-    orient(2, 1) = ny9;
-    orient(2, 2) = nz9;
+    orient(3, 0) = nx9;
+    orient(3, 1) = ny9;
+    orient(3, 2) = nz9;
 
-    orient(4, 0) = nx4;
-    orient(4, 1) = ny4;
-    orient(4, 2) = nz4;
+    orient2(0, 0) = nx4;
+    orient2(0, 1) = ny4;
+    orient2(0, 2) = nz4;
 
-    orient(5, 0) = nx5;
-    orient(5, 1) = ny5;
-    orient(5, 2) = nz5;
+    orient2(1, 0) = nx5;
+    orient2(1, 1) = ny5;
+    orient2(1, 2) = nz5;
 
     int tot = 4 * 4 + 4 * 2 + 2 * 2;
+    int iter = 0;
     matrix<double> params(tot, 3);
-    for (int i = 0; i < 4*4; i++)
+    for (int i = 0; i < 4; i++)
     {
-        params(i, 0) = 0.0;
-        params(i, 1) = 1.4;
-        params(i, 2) = angle;
+        for(int j = 0  ; j < 4 ; j++) {
+        if(i<=1 && j <=1) {
+        params(iter, 0) = 00.0;
+        }
+        else if (i >= 2 && j >= 2)
+        {
+        params(iter, 0) = 00.0;
+        }
+        else{
+        params(iter, 0) = 00.0;
+        }
+        params(iter, 1) = 1.4;
+        params(iter, 2) = angle;
+        iter++;
+        }
     }
     for (int i = 4 * 4; i < 4 * 4+4*2; i++)
     {
@@ -197,9 +218,14 @@ int main(int argc, char **argv)
         params(i, 2) = angle;
     }
 
+    cout << orient << endl;
+    cout << orient2 << endl;
 
+    TetrahedralWithBivalent c2(params, Ns+Nm2 , Ns + NM,orient,orient2); //set the difference to be  greater
 
-    TetrahedralWithBivalent c2(params, Ns + NM / 4, Ns + NM); //set the difference to be  greater
+    // c2.v = orient;
+    // c2.v2= orient2;
+
 
     A.setpots(c2);
     A.setkT(1.0);
@@ -217,9 +243,12 @@ int main(int argc, char **argv)
     string ss2 = ss.str();
 
     stringbase += ss2;
+    // matrix<double> constantF(Ns+NM,3);
+    // constantF(0,2) = -100.;
+    // constantF(4095,2) = 100.;
+    A.run_with_real_surface_add_particles(100000000, 10000, B, 0.001, stringbase);
+    // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
+        // A.run(1000000, 1000);
 
-    A.run_with_real_surface_add_particles(10000000, 1000, B, 0.100, stringbase);
-    // A.run(1000000, 1000);
-
-    return 0;
+        return 0;
 }

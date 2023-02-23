@@ -45,9 +45,10 @@ vector1<double> particle_adder::generate_point_in_volume() {
         myvec1[1] = r2;
         myvec1[2] = r3;
         iter++;
-        if(iter > 100) error("can't add new particle, the chosen volume is too small for this to be an efficient algorithm");
+        //if(iter > 100) error("can't add new particle, the chosen volume is too small for this to be an efficient algorithm");
         
     }
+
     return myvec1;
 }
 
@@ -105,6 +106,8 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
             mymin = minval(mydistances);
         }
 
+        // cout << mymin << endl;
+
         double result = std::reduce(weights.begin(), weights.end());
 
         double randv = result*((double)rand() / (double)(RAND_MAX));
@@ -118,11 +121,16 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
         }    
         }
 
+  
+
         ve = myvec1;
         fi = indices[index_which];
 
+
+
         remove_at(weights,index_which);
         remove_at(indices, index_which);
+
 
 
     }

@@ -122,6 +122,8 @@ void reset_parallel(T);
         void setrow(T&,int); // set the int row to a be a constant T
 	void setcol(vector1<T>&,int); // set the int column to be vector
         matrix<T> flipcols();
+
+        bool check_matrix(T val);
         
         template <class Y>
         friend Y scalar(matrix<Y>&, matrix<Y>&);
@@ -303,6 +305,11 @@ void reset_parallel(T);
         friend void generate_uniform_random_matrix(matrix<double> &ra);
         template <class vec>
         friend void generate_uniform_random_matrix(matrix<double> &ra, vec&);
+
+        friend vector1<double> meanish(matrix<double> &m); // find the mean of a subset
+
+        template <class vec>
+        friend vector1<double> meanish(const matrix<double> &m, vec&); //find the mean of a subset
 };
 
 

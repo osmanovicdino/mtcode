@@ -22,10 +22,17 @@ struct volume_vol {
 
 struct sphere_vol : public volume_vol  {
     double r = 5.; //default to 5,;
+    double c1 =10.;
+    double c2 = 10.;
+    double c3 = 10.;
+
     bool in_volume(vector1<double> &myvec) {
         double tot = 0.0;
-        for(int i  = 0 ; i < 3 ; i++)
-        tot += SQR(myvec[i]-ll/2.);
+
+        tot += SQR(myvec[0] - c1);
+        tot += SQR(myvec[1] - c2);
+        tot += SQR(myvec[2] - c3);
+
 
         if(tot>SQR(r)) return false;
         else return true;

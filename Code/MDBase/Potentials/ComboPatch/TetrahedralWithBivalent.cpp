@@ -1,7 +1,7 @@
 #ifndef TETRAHEDRALWITHBIVALENT_CPP
 #define TETRAHEDRALWITHBIVALENT_CPP
 
-TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt, int nbb) : ComboPatch(28), v(matrix<double>(4, 3)), v2(matrix<double>(2,3)),params2(params)
+TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt, int nbb, const matrix<double> &newv, const matrix<double> &newv2) : ComboPatch(28), v(newv), v2(newv2),params2(params)
 {
     if(params.getNsafe()!=28) error("param list for Tetrahedron with Bivalent not of correct dimension (should be 28)");
     nt = ntt;
@@ -23,35 +23,36 @@ TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt
 
     safe = false;
 
-    v(0, 0) = nx1;
-    v(0, 1) = ny1;
-    v(0, 2) = nz1;
 
-    //vector1<double> v2(3);
+    // v(0, 0) = nx1;
+    // v(0, 1) = ny1;
+    // v(0, 2) = nz1;
 
-    v(1, 0) = nx2;
-    v(1, 1) = ny2;
-    v(1, 2) = nz2;
+    // //vector1<double> v2(3);
 
-    //vector1<double> v3(3);
+    // v(1, 0) = nx2;
+    // v(1, 1) = ny2;
+    // v(1, 2) = nz2;
 
-    v(2, 0) = nx3;
-    v(2, 1) = ny3;
-    v(2, 2) = nz3;
+    // //vector1<double> v3(3);
 
-    //vector1<double> v4(3);
+    // v(2, 0) = nx3;
+    // v(2, 1) = ny3;
+    // v(2, 2) = nz3;
 
-    v(3, 0) = nx4;
-    v(3, 1) = ny4;
-    v(3, 2) = nz4;
+    // //vector1<double> v4(3);
 
-    v2(0, 0) = nx5;
-    v2(0, 1) = ny5;
-    v2(0, 2) = nz5;
+    // v(3, 0) = nx4;
+    // v(3, 1) = ny4;
+    // v(3, 2) = nz4;
 
-    v2(1, 0) = nx6;
-    v2(1, 1) = ny6;
-    v2(1, 2) = nz6;
+    // v2(0, 0) = nx5;
+    // v2(0, 1) = ny5;
+    // v2(0, 2) = nz5;
+
+    // v2(1, 0) = nx6;
+    // v2(1, 1) = ny6;
+    // v2(1, 2) = nz6;
 
     int iter = 0;
 
@@ -91,6 +92,11 @@ TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt
             iter++;
         }
     }
+}
+
+TetrahedralWithBivalent::TetrahedralWithBivalent(matrix<double> &params, int ntt, int nbb) : TetrahedralWithBivalent(params,ntt,nbb,defaultv(),defaultv2())
+{
+
 }
 
 int TetrahedralWithBivalent::num_patches(const int &i)

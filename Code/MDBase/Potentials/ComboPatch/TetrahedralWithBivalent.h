@@ -3,29 +3,29 @@
 
 struct TetrahedralWithBivalent : ComboPatch
 {
-    double nx1 = sqrt(8. / 9.);
-    double ny1 = 0.;
-    double nz1 = -1. / 3.;
+    // double nx1 = sqrt(8. / 9.);
+    // double ny1 = 0.;
+    // double nz1 = -1. / 3.;
 
-    double nx2 = -sqrt(2. / 9.);
-    double ny2 = sqrt(2. / 3.);
-    double nz2 = -1. / 3.;
+    // double nx2 = -sqrt(2. / 9.);
+    // double ny2 = sqrt(2. / 3.);
+    // double nz2 = -1. / 3.;
 
-    double nx3 = -sqrt(2. / 9.);
-    double ny3 = -sqrt(2. / 3.);
-    double nz3 = -1. / 3.;
+    // double nx3 = -sqrt(2. / 9.);
+    // double ny3 = -sqrt(2. / 3.);
+    // double nz3 = -1. / 3.;
 
-    double nx4 = 0;
-    double ny4 = 0;
-    double nz4 = 1.;
+    // double nx4 = 0;
+    // double ny4 = 0;
+    // double nz4 = 1.;
 
-    double nx5 = -1.0;
-    double ny5 = 0.0;
-    double nz5 = 0.0;
+    // double nx5 = -1.0;
+    // double ny5 = 0.0;
+    // double nz5 = 0.0;
 
-    double nx6 = 1.0;
-    double ny6 = 0.0;
-    double nz6 = 0.0;
+    // double nx6 = 1.0;
+    // double ny6 = 0.0;
+    // double nz6 = 0.0;
 
     int *i1; // t<-> t
     int *i2; //  t<-> s
@@ -38,8 +38,44 @@ struct TetrahedralWithBivalent : ComboPatch
 
     matrix<double> params2;
 
+    matrix<double> defaultv() const {
+        matrix<double> v(4,3);
+        v(0, 0) = sqrt(8. / 9.);
+        v(0, 1) = 0.;
+        v(0, 2) = -1. / 3.;
+
+        v(1, 0) = -sqrt(2. / 9.);
+        v(1, 1) = sqrt(2. / 3.);
+        v(1, 2) = -1. / 3.;
+
+        v(2, 0) = -sqrt(2. / 9.);
+        v(2, 1) = -sqrt(2. / 3.);
+        v(2, 2) = -1. / 3.;
+
+        v(3, 0) = 0;
+        v(3, 1) = 0;
+        v(3, 2) = 1.;
+
+        return v;
+    }
+
+    matrix<double> defaultv2() const
+    {
+        matrix<double> v2(2, 3);
+        v2(0, 0) = -1.;
+        v2(0, 1) = 0.;
+        v2(0, 2) = 0.;
+
+        v2(1, 0) = 1.;
+        v2(1, 1) = 0.;
+        v2(1, 2) = 0.;
+
+        return v2;
+    }
+
     TetrahedralWithBivalent();
     TetrahedralWithBivalent(matrix<double> &,int,int);
+    TetrahedralWithBivalent(matrix<double> &,int,int, const matrix<double>&,const matrix<double>&);
 
     ~TetrahedralWithBivalent()
     {
