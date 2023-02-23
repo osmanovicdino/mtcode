@@ -221,7 +221,7 @@ int main(int argc, char **argv)
     cout << orient << endl;
     cout << orient2 << endl;
 
-    TetrahedralWithBivalent c2(params, Ns+Nm2 , Ns + NM,orient,orient2); //set the difference to be  greater
+    TetrahedralWithBivalent c2(params, Ns+NM2 , Ns + NM,orient,orient2); //set the difference to be  greater
 
     // c2.v = orient;
     // c2.v2= orient2;
