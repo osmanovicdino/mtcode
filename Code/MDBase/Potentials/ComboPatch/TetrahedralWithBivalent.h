@@ -3,29 +3,29 @@
 
 struct TetrahedralWithBivalent : ComboPatch
 {
-    // double nx1 = sqrt(8. / 9.);
-    // double ny1 = 0.;
-    // double nz1 = -1. / 3.;
+    double nx1 = sqrt(8. / 9.);
+    double ny1 = 0.;
+    double nz1 = -1. / 3.;
 
-    // double nx2 = -sqrt(2. / 9.);
-    // double ny2 = sqrt(2. / 3.);
-    // double nz2 = -1. / 3.;
+    double nx2 = -sqrt(2. / 9.);
+    double ny2 = sqrt(2. / 3.);
+    double nz2 = -1. / 3.;
 
-    // double nx3 = -sqrt(2. / 9.);
-    // double ny3 = -sqrt(2. / 3.);
-    // double nz3 = -1. / 3.;
+    double nx3 = -sqrt(2. / 9.);
+    double ny3 = -sqrt(2. / 3.);
+    double nz3 = -1. / 3.;
 
-    // double nx4 = 0;
-    // double ny4 = 0;
-    // double nz4 = 1.;
+    double nx4 = 0;
+    double ny4 = 0;
+    double nz4 = 1.;
 
-    // double nx5 = -1.0;
-    // double ny5 = 0.0;
-    // double nz5 = 0.0;
+    double nx5 = -1.0;
+    double ny5 = 0.0;
+    double nz5 = 0.0;
 
-    // double nx6 = 1.0;
-    // double ny6 = 0.0;
-    // double nz6 = 0.0;
+    double nx6 = 1.0;
+    double ny6 = 0.0;
+    double nz6 = 0.0;
 
     int *i1; // t<-> t
     int *i2; //  t<-> s
