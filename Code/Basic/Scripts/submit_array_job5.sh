@@ -5,10 +5,10 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=47:59:59,h_data=128M
+#$ -l h_rt=24:00:00,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 10
+#$ -pe shared 12
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -46,7 +46,7 @@ cp ~/Chemistry/Code/IsocohedronI.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronP.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShell.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
-export OMP_NUM_THREADS=10
+export OMP_NUM_THREADS=12
 ./angron $m1 >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
