@@ -59,10 +59,12 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
     int NM2;
-
-    if (argc == 2)
+    double deltaG2,angle2;
+    if (argc == 4)
     {
         NM2 = atof(argv[1]);
+        deltaG2 = atof(argv[2]);
+        angle2 = atof(argv[3]);
     }
     else
     {
@@ -129,8 +131,8 @@ int main(int argc, char **argv)
     cout << "starting" << endl;
     NanotubeAssembly A(radius, monomers);
 
-    double deltaG = 30.0;
-    double angle = 0.6;
+    double deltaG = deltaG2;
+    double angle = angle2;
     // BivalentPatch c2(deltaG, 1.4, angle);
 
     matrix<double> orient(4, 3);
@@ -207,13 +209,13 @@ int main(int argc, char **argv)
     }
     for (int i = 4 * 4; i < 4 * 4+4*2; i++)
     {
-        params(i, 0) = 100.0;
+        params(i, 0) = deltaG;
         params(i, 1) = 1.4;
         params(i, 2) = angle;
     }
     for (int i = 4 * 4 + 4 * 2; i < tot; i++)
     {
-        params(i, 0) = 100.0;
+        params(i, 0) = deltaG;
         params(i, 1) = 1.4;
         params(i, 2) = angle;
     }

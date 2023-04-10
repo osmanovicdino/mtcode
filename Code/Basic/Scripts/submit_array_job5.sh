@@ -30,7 +30,7 @@ module load gcc/10.2.0
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
 filename=~/Chemistry/Code/Basic/Scripts/paramsSA1.dat
-basedir="SelfAssembly2"
+basedir="SelfAssembly3"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    m1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
