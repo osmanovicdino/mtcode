@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=24:00:00,h_data=128M
+#$ -l h_rt=23:59:59,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 12
@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-10:1
+#$ -t 1-15:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -29,17 +29,21 @@ module load gcc/10.2.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/paramsSA1.dat
+filename=~/Chemistry/Code/Basic/Scripts/paramsSA2.dat
 basedir="SelfAssembly3"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    m1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
+   i1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $2}'`
+   a1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $3}'`
    echo "read file correctly" 
 else
-   m1=200;
+   m1=200
+   i1=10.
+   a1=0.6
    echo "did not read file correctly"
 fi
-dirwemake="m1=${m1}"
+dirwemake="m1=${m1}_i=${i1}_a=${a1}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeElasticShell.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronI.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
@@ -47,7 +51,7 @@ cp ~/Chemistry/Code/IsocohedronP.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShell.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 export OMP_NUM_THREADS=12
-./angron $m1 >log
+./angron $m1 $i1 $a1 >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
