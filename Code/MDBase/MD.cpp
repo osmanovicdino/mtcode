@@ -1650,7 +1650,7 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 
 
 		double f1  = iny.force(sqrt(dis));
-	/* 	
+	
 		if(abs(f1) > 1.E4) {
 			cout << p1 << " " << p2 << endl;
 			cout << f1 << " " << dis << endl;
@@ -1687,7 +1687,7 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 			cout << scalar(dim,pri2) << endl;
 			
 			pausel();
-		} */
+		}  
 		
 
 		for(int j = 0 ; j < dimension ; ++j) {

@@ -861,38 +861,40 @@ int totp =  pairs.getnrows();
                 // cout << iny.potential_bundle[potn]->getparameters() << endl;
 
                 // pausel();
+                if (abs(fx) > 1.E4 || abs(fy) > 1.E4 || abs(fz) > 1.E4)
+                {
+                    cout << p1 << " " << p2 << endl;
+                    cout << fx << " " << fy << " " << fz << " " << dis << endl;
+                }
 
+                    // if((abs(fx)>1E-10 || abs(fy)>1E-10|| abs(fz)> 1E-10) /* &&(p1<2048+50 && p2 >= 2048+50) */ ) {
+                    // int wp1,wp2;
+                    // iny.which_patch(p1,p2,potn,wp1,wp2);
+                    // cout << p1 <<" " << p2 << " " <<potn << " " << wp1 << " " << wp2 << endl;
+                    // cout << un << endl;
+                    // cout << dis << endl;
+                    // cout << fx << " " << fy << " " << fz << endl;
 
-                // if((abs(fx)>1E-10 || abs(fy)>1E-10|| abs(fz)> 1E-10) /* &&(p1<2048+50 && p2 >= 2048+50) */ ) {
-                // int wp1,wp2;
-                // iny.which_patch(p1,p2,potn,wp1,wp2);
-                // cout << p1 <<" " << p2 << " " <<potn << " " << wp1 << " " << wp2 << endl;
-                // cout << un << endl;
-                // cout << dis << endl;
-                // cout << fx << " " << fy << " " << fz << endl;
-                
-                // pausel();
-                
-                // }
-                
+                    // pausel();
 
-                forces(p1, 0) += fx;
-                forces(p1, 1) += fy;
-                forces(p1, 2) += fz;
+                    // }
 
-                forces(p2, 0) += -fx;
-                forces(p2, 1) += -fy;
-                forces(p2, 2) += -fz;
+                    forces(p1, 0) += fx;
+                    forces(p1, 1) += fy;
+                    forces(p1, 2) += fz;
 
-                torques(p1, 0) += tix;
-                torques(p1, 1) += tiy;
-                torques(p1, 2) += tiz;
+                    forces(p2, 0) += -fx;
+                    forces(p2, 1) += -fy;
+                    forces(p2, 2) += -fz;
 
-                torques(p2, 0) += tjx; // - dis * (fz * un[1] - fy * un[2]);
-                torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
-                torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
-            }
+                    torques(p1, 0) += tix;
+                    torques(p1, 1) += tiy;
+                    torques(p1, 2) += tiz;
 
+                    torques(p2, 0) += tjx; // - dis * (fz * un[1] - fy * un[2]);
+                    torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
+                    torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
+                }
 
             delete q;
         }

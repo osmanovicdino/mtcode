@@ -68,6 +68,7 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
 
 
         vector1<double> mydistances(ind.size());
+
         for (int j = 0; j < ind.size(); j++)
         {
             int i  =  ind[j];
@@ -82,14 +83,20 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
             mydistances[j] = obj.getgeo().distance(myvec1, myvec2);
         }
 
-        double mymin = minval(mydistances);
-
+        double mymin;
+        if( ind.size() > 0) {
+            mymin = minval(mydistances);
+        }
+        else {
+            mymin=2.;
+        }
         int iter = 0;
-
+        
         while (mymin < 1.0)
         {
+            iter++;
             myvec1 = generate_point_in_volume();
-
+            
             for (int j = 0; j < ind.size(); j++)
             {
                 int i = ind[j];
@@ -104,6 +111,11 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
                 mydistances[j] = obj.getgeo().distance(myvec1, myvec2);
             }
             mymin = minval(mydistances);
+
+            if (iter > 1000) {
+                cout << "couldn't place" << endl;
+                pausel();
+            }
         }
 
         // cout << mymin << endl;

@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 
     // signal(SIGSEGV, handler);
 
-    ShellProperties B;
+    // ShellProperties B;
     int Ns = 4096;
     double targetdensity = 2.0;
 
@@ -98,20 +98,20 @@ int main(int argc, char **argv)
     // pausel();
 
 
-    int T;
-    bool err1;
-    matrix<int> pairs = importcsv("./IsocohedronI.csv", T, err1);
-    double T2;
-    bool err2;
-    matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
-    double k = 5.0;
-    double rm = 0.;
+    // int T;
+    // bool err1;
+    // matrix<int> pairs = importcsv("./IsocohedronI.csv", T, err1);
+    // double T2;
+    // bool err2;
+    // matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
+    // double k = 5.0;
+    // double rm = 0.;
 
     // system("rm Iso*.csv");
-    B.k = k;
-    B.rm = rm;
-    B.par = pairs;
-    B.posi = pos;
+    // B.k = k;
+    // B.rm = rm;
+    // B.par = pairs;
+    // B.posi = pos;
 
     // B.DoAnMC(100.,false);
 
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 
     // vector1<double> mean = meanmat_end(pos,0);
     
-    double approxradius = sqrt(SQR(pos(0, 0)) + SQR(pos(0, 1)) + SQR(pos(0, 2)));
+    double approxradius = 20.0;
 
 
     double radius = 1.1 * 2 * approxradius;
@@ -186,7 +186,6 @@ int main(int argc, char **argv)
     orient2(1, 1) = ny5;
     orient2(1, 2) = nz5;
 
-    double range = 1.4;
     int tot = 4 * 4 + 4 * 2 + 2 * 2;
     int iter = 0;
     matrix<double> params(tot, 3);
@@ -203,7 +202,7 @@ int main(int argc, char **argv)
         else{
         params(iter, 0) = 00.0;
         }
-        params(iter, 1) = range;
+        params(iter, 1) = 1.4;
         params(iter, 2) = angle;
         iter++;
         }
@@ -211,20 +210,17 @@ int main(int argc, char **argv)
     for (int i = 4 * 4; i < 4 * 4+4*2; i++)
     {
         params(i, 0) = deltaG;
-        params(i, 1) = range;
+        params(i, 1) = 1.4;
         params(i, 2) = angle;
     }
     for (int i = 4 * 4 + 4 * 2; i < tot; i++)
     {
         params(i, 0) = deltaG;
-        params(i, 1) = range;
+        params(i, 1) = 1.4;
         params(i, 2) = angle;
     }
 
-    cout << orient << endl;
-    cout << orient2 << endl;
-
-    TetrahedralWithBivalent c2(params, Ns+NM2 , Ns + NM,orient,orient2); //set the difference to be  greater
+    TetrahedralWithBivalent c2(params, NM2 , Ns + NM,orient,orient2); //set the difference to be  greater
 
     // c2.v = orient;
     // c2.v2= orient2;
@@ -249,7 +245,7 @@ int main(int argc, char **argv)
     // matrix<double> constantF(Ns+NM,3);
     // constantF(0,2) = -100.;
     // constantF(4095,2) = 100.;
-    A.run_with_real_surface_add_particles(10000000, 10000, B, 0.01, stringbase);
+    A.run_add_particles(100000000, 10000, 0.001, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 

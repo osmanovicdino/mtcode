@@ -186,7 +186,6 @@ int main(int argc, char **argv)
     orient2(1, 1) = ny5;
     orient2(1, 2) = nz5;
 
-    double range = 1.4;
     int tot = 4 * 4 + 4 * 2 + 2 * 2;
     int iter = 0;
     matrix<double> params(tot, 3);
@@ -203,7 +202,7 @@ int main(int argc, char **argv)
         else{
         params(iter, 0) = 00.0;
         }
-        params(iter, 1) = range;
+        params(iter, 1) = 1.4;
         params(iter, 2) = angle;
         iter++;
         }
@@ -211,13 +210,13 @@ int main(int argc, char **argv)
     for (int i = 4 * 4; i < 4 * 4+4*2; i++)
     {
         params(i, 0) = deltaG;
-        params(i, 1) = range;
+        params(i, 1) = 1.4;
         params(i, 2) = angle;
     }
     for (int i = 4 * 4 + 4 * 2; i < tot; i++)
     {
         params(i, 0) = deltaG;
-        params(i, 1) = range;
+        params(i, 1) = 1.4;
         params(i, 2) = angle;
     }
 
@@ -249,7 +248,7 @@ int main(int argc, char **argv)
     // matrix<double> constantF(Ns+NM,3);
     // constantF(0,2) = -100.;
     // constantF(4095,2) = 100.;
-    A.run_with_real_surface_add_particles(10000000, 10000, B, 0.01, stringbase);
+    A.run_with_real_surface_add_particles(100000000, 10000, B, 0.001, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 

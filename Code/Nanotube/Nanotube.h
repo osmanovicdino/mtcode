@@ -50,6 +50,7 @@ void run_anneal(int, int, int, string strbase);
 
 void run_with_real_surface(int, int, ShellProperties &, matrix<double> &constantF, string strbase);
 void run_with_real_surface_add_particles(int, int, ShellProperties &, double prod, string strbase);
+void run_add_particles(int, int, double prod, string strbase);
 
 //AbstractBindingModel *bm;
 
