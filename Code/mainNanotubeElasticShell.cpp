@@ -186,7 +186,7 @@ int main(int argc, char **argv)
     orient2(1, 1) = ny5;
     orient2(1, 2) = nz5;
 
-    double range = 1.4;
+    double range = 1.2;
     int tot = 4 * 4 + 4 * 2 + 2 * 2;
     int iter = 0;
     matrix<double> params(tot, 3);
