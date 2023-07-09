@@ -4,6 +4,11 @@
 #include "../MDBase/Rotational/LangevinR.h"
 #include "ParticleAdder.h"
 
+struct WeiM
+{
+    double weight;
+    int M;
+};
 //In order to generate the initial sphere conditions, go to "/home/dino/Documents/Nanotube/Sphere.nb"
 
 struct ShellProperties
@@ -49,7 +54,7 @@ void run(int, int, string strbase);
 void run_anneal(int, int, int, string strbase);
 
 void run_with_real_surface(int, int, ShellProperties &, matrix<double> &constantF, string strbase);
-void run_with_real_surface_add_particles(int, int, ShellProperties &, double prod, string strbase);
+void run_with_real_surface_add_particles(int, int, ShellProperties &, double prod, WeiM &c1, string strbase);
 void run_add_particles(int, int, double prod, string strbase);
 
 //AbstractBindingModel *bm;

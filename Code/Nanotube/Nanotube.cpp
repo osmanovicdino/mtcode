@@ -1773,7 +1773,8 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
 }
 
 
-void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int every, ShellProperties &myshell, double prod, string strbase = "") {
+void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int every, ShellProperties &myshell, double prod, WeiM &c1 , string strbase = "")
+{
 
     int ccc;
 
@@ -1842,7 +1843,11 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
     for (int i = totnp; i < NN; i++)
     {
         indices_to_add.push_back(i);
-        indices_weights.push_back(1.);
+        double ww=1.;
+        if(i<c1.M) {
+            ww = c1.weight;
+        }
+        indices_weights.push_back(ww);
     }
 
     particle_adder vv;
@@ -2001,7 +2006,6 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
     }
 
     }
-
 }
 
 void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, string strbase = "")
