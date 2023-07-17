@@ -252,7 +252,7 @@ int main(int argc, char **argv)
     WeiM c1;
     c1.M=0;
     c1.weight=1.;
-    A.run_with_real_surface_add_particles(10000000, 10000, B, 0.001, c1, stringbase);
+    A.run_with_real_surface_add_particles(100000000, 10000, B, 0.001, c1, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 
