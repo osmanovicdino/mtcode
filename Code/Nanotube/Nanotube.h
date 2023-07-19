@@ -49,6 +49,8 @@ void add_particle42(int);
 
 void setpots(TetrahedralWithBivalent &);
 
+matrix<double> calculate_covariance(int Ns);
+
 void run(int, int, string strbase);
 
 void run_anneal(int, int, int, string strbase);

@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-20:1
+#$ -t 1-40:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -43,7 +43,7 @@ else
    a1=0.6
    echo "did not read file correctly"
 fi
-dirwemake="m1=${m1}_i=${i1}_a=${a1}"
+dirwemake="m1=${m1}_i=${i1}_a=${a1}_try=${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeElasticShell.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronI.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}

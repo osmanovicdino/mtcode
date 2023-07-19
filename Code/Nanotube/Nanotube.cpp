@@ -1038,6 +1038,37 @@ void NanotubeAssembly::add_particle42(int which)
         //(*pots).CreateFiles();
     }
 
+    matrix<double> NanotubeAssembly::calculate_covariance(int Ns) {
+
+        matrix<double> m(3,3);
+
+        for(int i = 0 ; i < 3 ; i++) {
+            for(int j = i ; j < 3 ; j++) {
+                vector1<double> m1(Ns);
+                vector1<double> m2(Ns);
+
+                for(int k = 0 ; k < Ns ; k++) {
+                    m1[k] = obj->getcoordinate(k,i);
+
+                    m2[k] = obj->getcoordinate(k,j);
+                }
+
+                double mean1 = meanish(m1);
+                double mean2 = meanish(m2);
+                double tot = 0.0;
+                for(int k = 0 ; k < Ns ; k++) {
+                tot+=(m1[k] - mean1) * (m2[k] - mean2);
+                }
+                tot /= ((double)Ns-1);
+            
+                m(i,j) = tot;
+
+                if(i != j) m(j,i) = tot; 
+            }
+        }
+        return m;
+    }
+
     void NanotubeAssembly::run(int runtime, int every, string strbase = "")
     {
         
@@ -1978,16 +2009,22 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
             string oris = "div";
             oris = oris + strbase;
 
+            string elli = "eigs";
+            elli = elli + strbase;
+
             poss += "_i=";
             oris += "_i=";
+            //elli += "_i=";
 
             string extension = ".csv";
 
             poss += ss.str();
             oris += ss.str();
+            //elli += ss.str();
 
             poss += extension;
             oris += extension;
+            elli += extension;
 
             ofstream myfile;
             myfile.open(poss.c_str());
@@ -1995,12 +2032,22 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
             ofstream myfile2;
             myfile2.open(oris.c_str());
 
+            ofstream myfile3;
+            myfile3.open(elli.c_str(),  std::ios_base::app);
+
             myfile <<= pos;
             for(int ik  = 0 ; ik < indices_everything.size() ; ik++)
             myfile2 << indices_everything[ik] << endl;
 
+            
+
+            matrix<double> eig = calculate_covariance(totnp);
+
+            myfile3 <<= eig;
+
             myfile.close();
             myfile2.close();
+            myfile3.close();
 
             // pausel();
     }
