@@ -8,7 +8,7 @@
 #$ -l h_rt=23:59:59,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 12
+#$ -pe shared 6
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
