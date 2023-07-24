@@ -13,7 +13,7 @@
 #$ -M $USER@mail
 # Notify when
 #$ -m bea
-#$ -t 1-40:1
+#$ -t 1-32:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -29,8 +29,8 @@ module load gcc/10.2.0
 ## in the two lines below:
 ##echo '/usr/bin/time -v hostname'
 ##/usr/bin/time -v hostname
-filename=~/Chemistry/Code/Basic/Scripts/paramsSA5.dat
-basedir="SelfAssembly5"
+filename=~/Chemistry/Code/Basic/Scripts/paramsSA6.dat
+basedir="SelfAssembly6"
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    m1=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`

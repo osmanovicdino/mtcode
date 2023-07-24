@@ -258,6 +258,7 @@ public:
 	// void advancemom_fullstep();
 	vector<thetapair> check_arg_thetas_per_pair(matrix<int> &pairs, ComboPatch &iny);
 	vector<patchint> calculate_patch_list(matrix<int> &pairs, ComboPatch &iny);
+	vector<patchint> calculate_bound_pairs(matrix<int> &pairs, ComboPatch &iny);
 	virtual void adv(matrix<int>&);
 
 	//virtual void advm(matrix<int>&,vector1<int>&,vector1<bool>&,intmatrix&); //advance with forces that depend on the internal state of the particle

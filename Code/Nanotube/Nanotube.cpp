@@ -1180,6 +1180,8 @@ void NanotubeAssembly::add_particle42(int which)
                 string oris = "orientation";
                 oris = oris + strbase;
 
+                vector<patchint> pairsbound = obj->calculate_bound_pairs(*pairs,*pots);
+
                 poss += "_i=";
                 oris += "_i=";
 
@@ -1198,7 +1200,11 @@ void NanotubeAssembly::add_particle42(int which)
                 myfile2.open(oris.c_str());
 
                 myfile <<= pos;
-                myfile2 <<= orient;
+                //myfile2 <<= orient;
+                for(int j = 0 ; j < pairsbound.size() ; j++) {
+                myfile2 << pairsbound[j].particle_index1 << "," << pairsbound[j].particle_index2 << endl;
+                }
+
 
                 myfile.close();
                 myfile2.close();

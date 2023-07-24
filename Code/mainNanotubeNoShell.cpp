@@ -239,15 +239,28 @@ int main(int argc, char **argv)
     string stringbase = "Num_mon=";
     stringstream ss;
     ss << monomers;
-    string ss2 = ss.str();
+    string str = ss.str();
 
-    stringbase += ss2;
+    stringbase += str;
+
+    stringstream ss2;
+    ss2 << deltaG;
+
+    stringbase += string("dG=")+ss2.str();
+
+    stringstream ss3;
+    ss3 << angle;
+
+    stringbase += string("ang=")+ss3.str();
+
     // matrix<double> constantF(Ns+NM,3);
     // constantF(0,2) = -100.;
     // constantF(4095,2) = 100.;
-    A.run_add_particles(10000000, 10000, 0.001, stringbase);
-    // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
-        // A.run(1000000, 1000);
+    A.conf.setv(0.0);//no confinement
+    A.run(2000000, 10000, stringbase);
+        // A.run_add_particles(10000000, 10000, 0.001, stringbase);
+        //  A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
+        //  A.run(1000000, 1000);
 
         return 0;
 }

@@ -779,13 +779,13 @@ int totp =  pairs.getnrows();
                 torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
             }
         }
-        cout << torques << endl;
-        pausel();
+
     }
 
     void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, ComboPatch &iny, matrix<double> &forces, matrix<double> &torques)
     {
         int totp = pairs.getNsafe();
+
 
 
         #pragma omp parallel for
@@ -861,6 +861,12 @@ int totp =  pairs.getnrows();
                 // cout << iny.potential_bundle[potn]->getparameters() << endl;
 
                 // pausel();
+
+                if (abs(fx) > 1.E-3 || abs(fy) > 1.E-3 || abs(fz) > 1.E-3)
+                {
+
+                }
+
                 if (abs(fx) > 1.E4 || abs(fy) > 1.E4 || abs(fz) > 1.E4)
                 {
                     cout << p1 << " " << p2 << endl;
@@ -1584,6 +1590,152 @@ vector<patchint> LangevinNVTR::calculate_patch_list(matrix<int> &pairs, ComboPat
 
 
 
+
+    return edgelist;
+}
+
+vector<patchint> LangevinNVTR::calculate_bound_pairs(matrix<int> &pairs, ComboPatch &iny)
+{
+    vector<patchint> edgelist;
+    edgelist.reserve(10 * pairs.getnrows());
+    unsigned int i;
+    double max_angle = iny.max_ang;
+    double max_dis = iny.max_check;
+    int tp = pairs.getNsafe();
+
+#pragma omp parallel
+    {
+        vector<patchint> edgelist_private;
+        edgelist_private.reserve(10 * pairs.getnrows());
+
+#pragma omp for nowait schedule(dynamic, 100)
+        for (i = 0; i < tp; ++i)
+        {
+            int p1 = pairs(i, 0);
+            int p2 = pairs(i, 1);
+            if (p2 < p1)
+            { // INDICES NEED TO BE SORTED FOR IT TO WORK
+                int tp1 = p1;
+                p1 = p2;
+                p2 = tp1;
+            }
+            // int i1 = pairs(i,2);
+            double dis;
+            // vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+            vector1<double> un(dimension);
+            geo.distance_vector(*dat, p1, p2, un, dis);
+
+            // un = i-j
+
+            dis = sqrt(dis);
+            
+            if (dis < max_dis)
+            {
+                un /= dis;
+                double dx = un.gpcons(0);
+                double dy = un.gpcons(1);
+                double dz = un.gpcons(2);
+
+                double qtemp0 = orient->gpcons(p1, 0);
+                double qtemp1 = orient->gpcons(p1, 1);
+                double qtemp2 = orient->gpcons(p1, 2);
+                double qtemp3 = orient->gpcons(p1, 3);
+                double qtemp4 = orient->gpcons(p1, 4);
+                double qtemp5 = orient->gpcons(p1, 5);
+                double qtemp6 = orient->gpcons(p1, 6);
+                double qtemp7 = orient->gpcons(p1, 7);
+                double qtemp8 = orient->gpcons(p1, 8);
+
+                double gtemp0 = orient->gpcons(p2, 0);
+                double gtemp1 = orient->gpcons(p2, 1);
+                double gtemp2 = orient->gpcons(p2, 2);
+                double gtemp3 = orient->gpcons(p2, 3);
+                double gtemp4 = orient->gpcons(p2, 4);
+                double gtemp5 = orient->gpcons(p2, 5);
+                double gtemp6 = orient->gpcons(p2, 6);
+                double gtemp7 = orient->gpcons(p2, 7);
+                double gtemp8 = orient->gpcons(p2, 8);
+
+                // vector1<double> qtemp = orient->getrowvector(p1);
+                // vector1<double> gtemp = orient->getrowvector(p2);
+
+                // for (int j = 0; j < iny.num_patches(p1) ; j++)
+                // {
+                //     for (int k = 0; k < iny.num_patches(p2); k++)
+                //     {
+
+                // int potn = np1 * j + k;
+
+                int **q = new int *;
+                if (iny.safe)
+                {
+                    iny.UpdateIterator(p1, p2);
+                    *q = *iny.p;
+                }
+                else
+                {
+                    iny.UpdateIteratorSafe(p1, p2, q);
+                }
+
+                // int **q = iny.p;
+
+                for (int tp = 1; tp < (*q)[0] + 1; tp++)
+                {
+                    int potn = (*q)[tp];
+
+                    mypot *temppot = iny.potential_bundle[potn];
+
+                    double nxb1 = temppot->nxb1;
+                    double nxb2 = temppot->nxb2;
+                    double nyb1 = temppot->nyb1;
+                    double nyb2 = temppot->nyb2;
+                    double nzb1 = temppot->nzb1;
+                    double nzb2 = temppot->nzb2;
+                    double disp = temppot->interaction_distance;
+                    double thetam = temppot->thetam;
+
+                    double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+                    double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+                    double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+                    double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+                    double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+                    double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+                    double argthetai = -(nx1 * dx + ny1 * dy + nz1 * dz);
+                    double argthetaj = (nx2 * dx + ny2 * dy + nz2 * dz);
+
+                    if (argthetai > cos(thetam) && argthetaj > cos(thetam))
+                    {
+                        // this is an empirically established formula for how large the total difference betweenn the angles
+                        // from the time when they switch on has to be for no new bonds to form after 10 time
+                        int wp1, wp2;
+                        iny.which_patch(p1, p2, potn, wp1, wp2);
+
+                        patchint test;
+                        test.particle_index1 = p1;
+                        test.particle_index2 = p2;
+                        test.potn = potn;
+                        test.patch_index1 = wp1;
+                        test.patch_index2 = wp2;
+                        edgelist_private.push_back(test);
+                    }
+                    else
+                    {
+                        // don't add
+                    }
+                }
+                // pausel();
+                delete q;
+            }
+        }
+#pragma omp for schedule(static) ordered
+        for (int i = 0; i < omp_get_num_threads(); i++)
+        {
+#pragma omp ordered
+            edgelist.insert(edgelist.end(), edgelist_private.begin(), edgelist_private.end());
+        }
+    }
 
     return edgelist;
 }

@@ -2059,6 +2059,10 @@ class spherical_confinement_3D {
 		return *this ;
 	}
 
+	void setv(double vv) {
+		v=vv;
+	}
+
 	vector1<double> operator()(const vector1<double> &x) const {
 		
 		//for(int j = 0  ; j < 3 ; )
