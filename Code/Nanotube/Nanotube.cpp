@@ -2061,6 +2061,291 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
     }
 }
 
+template <typename T>
+std::vector<T> complement(const std::vector<T> &v1, const std::vector<T> &v2)
+{
+    std::vector<T> result;
+    std::set_difference(v1.begin(), v1.end(), v2.begin(), v2.end(), std::back_inserter(result));
+    return result;
+}
+
+void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime, int every, ShellProperties &myshell, double prod, WeiM &c1, matrix<double> &olddat, vector1<int> &oldint, string strbase = "")
+{
+
+    int ccc;
+
+    // int tf = ceil((double)runtime / (double)every);
+    // int number_of_digits = 0;
+    // do
+    // {
+    // ++number_of_digits;
+    // tf /= 10;
+    // } while (tf);
+
+    int number_of_digits = 5; // as the code continues to iterate, we shall set it 
+
+    matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+    matrix<int> bindingpairs = myshell.par; // we can get all the binding pairs of the elastic shell
+
+    int totnp = myshell.posi.getnrows(); // total particles that are not patchy
+
+    // Hard Sphere Forces
+    HSPotential wsa(3.0, 1.0);
+    HarmonicPotential spr(myshell.k, myshell.rm);
+
+    int Nx = obj->getN(); // this defines the NN total,
+    // i.e. every particle that is going to be added to the simulation,
+    // but which might not be included yet
+    int NN = Nx + totnp; // every particle
+
+    matrix<double> dat = olddat; // get the data, remember that a lot of these values will be initialized
+    // to zero to begin with
+
+    double ll = obj->getgeo().l;
+
+    matrix<double> newdat(NN, 3); 
+    for (int i = 0; i < NN; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        newdat(i, j) = dat(i, j);
+    }
+
+    obj->initialize(newdat);
+
+    // programmatic
+    vector<int> indices_everything; // these are the indices of all the particles on the shell
+    vector<int> indices_shell;
+    indices_everything.reserve(NN);
+    vector<int> indices_patchy; // the index of all the patchy particles
+    for (int i = 0; i < totnp; i++)
+    {
+    indices_everything.push_back(i);
+    indices_shell.push_back(i);
+    }
+    vector<int> already_added; // the particles that have already been added
+    for(int i = totnp ; i < oldint.getsize() ; i++) {
+        already_added.push_back(oldint[i]);
+        indices_everything.push_back(oldint[i]);
+    }
+    
+    indices_patchy.reserve(Nx);
+
+    vector<int> indices_to_add_temp;
+    indices_to_add_temp.reserve(Nx);
+    vector<double> indices_weights;
+    indices_weights.reserve(Nx);
+    for (int i = totnp; i < NN; i++)
+    {
+    indices_to_add_temp.push_back(i);
+
+
+
+    }
+
+
+    // for(int i  = 0 ; i < already_added.size() ; i++){
+    // int index_which = already_added[i];
+    // remove_at(indices_weights, index_which);
+    // remove_at(indices_to_add, index_which);
+    // }
+
+
+    std::sort(already_added.begin(),already_added.end());
+
+    vector<int> indices_to_add  = complement(indices_to_add_temp,already_added);
+
+
+
+   
+   
+    // set_difference(indices_to_add_temp.begin(),indices_to_add_temp.end(),already_added.begin(),already_added.end(),std::back_inserter(indices_to_add));
+
+    for (int i = 0; i < indices_to_add.size(); i++)
+    {
+    //indices_to_add_temp.push_back(i);
+    int index1 = indices_to_add[i];
+    double ww = 1.;
+    if (index1 < c1.M)
+    {
+        ww = c1.weight;
+    }
+    indices_weights.push_back(ww);
+    }
+
+    // for (size_t i = 0; i < already_added.size(); ++i)
+    // {
+    // std::cout << already_added[i] << ",";
+    // }
+    // cout << endl;
+    // cout << endl;
+
+    // for (size_t i = 0; i < indices_to_add.size(); ++i)
+    // {
+    // std::cout << indices_to_add[i] << ",";
+    // }
+    // cout << endl;
+
+    // cout << already_added.size() << endl;
+    // cout << indices_weights.size() << endl;
+    // cout << indices_to_add.size() << endl;
+    // pausel();
+
+    particle_adder vv;
+    vv.set_indices(indices_to_add);
+    vv.set_weights(indices_weights);
+    sphere_vol vol;
+    vol.r = (1. / 10.) * ll;
+    vol.ll = ll;
+    vol.c1 = ll / 2.;
+    vol.c2 = ll / 2.;
+    vol.c3 = ll / 2.;
+    vv.set_volume(vol);
+    vv.set_rate(prod);
+
+    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, indices_everything, 3.5); // for the hard sphere repulsion
+
+    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); // for the patchy particle binding
+
+    // start with zero patchy particles in the simulation
+    // indices_patchy.push_back(0);
+
+    // define the full storage matrices of all the particles, despite the fact they won't all be utilized
+    matrix<double> F(NN, 3);
+    matrix<double> Fs(NN, 3);
+    matrix<double> T(NN, 3);
+    matrix<double> RT(NN, 6);
+    matrix<double> zeromatrix(NN, 3);
+
+    F = obj->calculateforces(*pairs, wsa); // calculate the forces due to hard sphere forces
+
+    F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
+
+    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+
+    generate_uniform_random_matrix(RT, indices_patchy); // only generate random torques for the patchy particles
+
+    obj->create_forces_and_torques_sphere(F, T, RT, indices_patchy, false); // only create torques and forces for patchy particles
+
+    for (int i = 0; i < runtime; i++)
+    {
+    cout << i << endl;
+    if (i > 0 && i % 20 == 0)
+    {
+            // cout << "pairs recalculated" << endl;
+            delete pairs;
+            delete pairs_onlyb;
+            // pairs = obj->calculatepairs(boxes, 3.5);
+
+            // ADD THE PARTICLE ADDITION METHOD HERE
+            bool dd = false;
+            vector1<double> v1(3);
+            int fi;
+
+            vector1<double> me1 = meanish(obj->getdat(), indices_shell);
+
+            sphere_vol vol2;
+            vol2.r = (1. / 10.) * ll;
+            vol2.ll = ll;
+            vol2.c1 = me1[0];
+            vol2.c2 = me1[1];
+            vol2.c3 = me1[2];
+            vv.set_volume(vol2);
+
+            vv.add_p(*obj, indices_everything, dd, v1, fi);
+
+            if (dd)
+            {
+            cout << "added: " << fi << endl;
+            indices_everything.push_back(fi);
+            indices_patchy.push_back(fi);
+            obj->set_particle(v1, fi);
+            
+            }
+
+            pairs = obj->calculatepairs_parallel(boxes, indices_everything, 3.5);
+
+            pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5);
+    }
+
+    obj->advancemom_halfstep(F, T, indices_everything);
+    obj->advance_pos(indices_everything);
+    obj->rotate(indices_patchy); // only update the patchy particles with the rotate algorithm
+
+    F = obj->calculateforces(*pairs, wsa); // calculate the forces due to hard sphere forces
+
+    F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
+
+    T.reset(0.0);
+
+    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+
+    generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
+
+    obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
+
+    obj->advancemom_halfstep(F, T, indices_everything);
+
+    if (i % every == 0)
+    {
+
+            cout << i << endl;
+
+            stringstream ss;
+
+            ss << setw(number_of_digits) << setfill('0') << (i / every);
+
+            matrix<double> orient = obj->getorientation();
+            matrix<double> pos = obj->getdat();
+
+            string poss = "pos";
+            poss = poss + strbase;
+            string oris = "div";
+            oris = oris + strbase;
+
+            string elli = "eigs";
+            elli = elli + strbase;
+
+            poss += "_i=";
+            oris += "_i=";
+            // elli += "_i=";
+
+            string extension = ".csv";
+
+            poss += ss.str();
+            oris += ss.str();
+            // elli += ss.str();
+
+            poss += extension;
+            oris += extension;
+            elli += extension;
+
+            ofstream myfile;
+            myfile.open(poss.c_str());
+
+            ofstream myfile2;
+            myfile2.open(oris.c_str());
+
+            ofstream myfile3;
+            myfile3.open(elli.c_str(), std::ios_base::app);
+
+            myfile <<= pos;
+            for (int ik = 0; ik < indices_everything.size(); ik++)
+            myfile2 << indices_everything[ik] << endl;
+
+            matrix<double> eig = calculate_covariance(totnp);
+
+            myfile3 <<= eig;
+
+            myfile.close();
+            myfile2.close();
+            myfile3.close();
+
+            // pausel();
+    }
+    }
+}
+
 void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, string strbase = "")
 {
 

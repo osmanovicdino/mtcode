@@ -62,6 +62,7 @@ if(weights.size() <1 ) {
 else {
 double r1 = ((double)rand() / (double)(RAND_MAX));
     if(r1<rate) {
+        
         does_return = true;
         vector1<double> myvec1(generate_point_in_volume());
 
