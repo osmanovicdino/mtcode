@@ -15,4 +15,4 @@ echo $posfile
 echo $orifile
 echo $pfile
 cd $directory_path
-./a $fileparam $posfile $orifile $pfile
+./a $fileparam $posfile $orifile $pfile >log
