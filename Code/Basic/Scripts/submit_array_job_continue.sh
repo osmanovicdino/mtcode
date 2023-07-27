@@ -28,7 +28,7 @@ module load gcc/10.2.0
 #filename=~/Chemistry/Code/Basic/Scripts/paramsSA6.dat
 #basedir="SelfAssembly6"
 
-filename=~Chemistry/Code/Basic/Scripts/directories.dat
+filename=~/Chemistry/Code/Basic/Scripts/directories.dat
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    wt=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
