@@ -295,11 +295,14 @@ int main(int argc, char **argv)
     // matrix<double> constantF(Ns+NM,3);
     // constantF(0,2) = -100.;
     // constantF(4095,2) = 100.;
+    vector<string> posfiles;
+    return_csv_in_current_dir("pos",posfiles);
+
     double prod = sim_params(3, 0);
     WeiM c1;
     c1.M = sim_params(3, 1);
     c1.weight = sim_params(3, 2);
-    A.run_with_real_surface_add_particles_continue(100000000, 10000, B, prod, c1, olddat,oldind,stringbase);
+    A.run_with_real_surface_add_particles_continue(100000000, 10000, posfiles.size(), B, prod, c1, olddat,oldind,stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 

@@ -2069,7 +2069,7 @@ std::vector<T> complement(const std::vector<T> &v1, const std::vector<T> &v2)
     return result;
 }
 
-void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime, int every, ShellProperties &myshell, double prod, WeiM &c1, matrix<double> &olddat, vector1<int> &oldint, string strbase = "")
+void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime, int every, int starting_num, ShellProperties &myshell, double prod, WeiM &c1, matrix<double> &olddat, vector1<int> &oldint, string strbase = "")
 {
 
     int ccc;
@@ -2286,14 +2286,14 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     obj->advancemom_halfstep(F, T, indices_everything);
 
-    if (i % every == 0)
+    if (i>0 && i % every == 0)
     {
 
             cout << i << endl;
 
             stringstream ss;
 
-            ss << setw(number_of_digits) << setfill('0') << (i / every);
+            ss << setw(number_of_digits) << setfill('0') << starting_num+(i / every);
 
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();
