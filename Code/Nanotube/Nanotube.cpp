@@ -2032,6 +2032,9 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
             oris += extension;
             elli += extension;
 
+            string orie = "orient";
+            orie+= extension;
+
             ofstream myfile;
             myfile.open(poss.c_str());
 
@@ -2040,6 +2043,9 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
             ofstream myfile3;
             myfile3.open(elli.c_str(),  std::ios_base::app);
+
+            ofstream myfile4;
+            myfile4.open(orie.c_str());
 
             myfile <<= pos;
             for(int ik  = 0 ; ik < indices_everything.size() ; ik++)
@@ -2051,9 +2057,14 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
             myfile3 <<= eig;
 
+            myfile4 <<= obj->getorientation();
+
+
+
             myfile.close();
             myfile2.close();
             myfile3.close();
+            myfile4.close();
 
             // pausel();
     }
@@ -2069,7 +2080,7 @@ std::vector<T> complement(const std::vector<T> &v1, const std::vector<T> &v2)
     return result;
 }
 
-void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime, int every, int starting_num, ShellProperties &myshell, double prod, WeiM &c1, matrix<double> &olddat, vector1<int> &oldint, string strbase = "")
+void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime, int every, int starting_num, ShellProperties &myshell, double prod, WeiM &c1, matrix<double> &olddat, matrix<double> &oldori, vector1<int> &oldint, string strbase = "")
 {
 
     int ccc;
@@ -2112,6 +2123,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
     }
 
     obj->initialize(newdat);
+
+    obj->setorientation(oldori);
 
     // programmatic
     vector<int> indices_everything; // these are the indices of all the particles on the shell
@@ -2340,6 +2353,12 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
             myfile.close();
             myfile2.close();
             myfile3.close();
+
+            string orie = "orient"; //we want to overwrite it, as it is a lot of data without much utility
+            orie += extension;
+            ofstream myfile4;
+            myfile4.open(orie.c_str());
+            myfile4 <<= obj->getorientation(); 
 
             // pausel();
     }

@@ -58,25 +58,33 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
-    int NM2;
-    double deltaG2,angle2;
-    if (argc == 4)
+    // int NM2;
+    // double deltaG2,angle2;
+    string importstring;
+    if (argc == 2)
     {
-        NM2 = atof(argv[1]);
-        deltaG2 = atof(argv[2]);
-        angle2 = atof(argv[3]);
+        stringstream ss;
+        ss << argv[1];
+        importstring = ss.str();
     }
     else
     {
-        error("specify number of monomers");
+        error("specify input file");
     }
-    int NM = 2000;
+
+    double T3;
+    bool err3;
+    matrix<double> sim_params = importcsv(importstring, T3, err3);
+
+    if(err3) error("param file not imported correctly");
+
+    int NM = sim_params(0,0);
     //nm2 is the total amount of added crosslinks
 
     // signal(SIGSEGV, handler);
 
     ShellProperties B;
-    int Ns = 4096;
+    int Ns = 4096; //technically this should be overwrittable, however, because we generated the circle with mathematica we leave it fixed
     double targetdensity = 2.0;
 
     // stringstream sx1;
@@ -104,8 +112,10 @@ int main(int argc, char **argv)
     double T2;
     bool err2;
     matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
-    double k = 5.0;
-    double rm = 0.;
+    double k = sim_params(1, 0);
+    
+    double rm = sim_params(1, 1);
+    
 
     // system("rm Iso*.csv");
     B.k = k;
@@ -120,19 +130,19 @@ int main(int argc, char **argv)
 
     // vector1<double> mean = meanmat_end(pos,0);
     
-    double approxradius = sqrt(SQR(pos(0, 0)) + SQR(pos(0, 1)) + SQR(pos(0, 2)));
+    // double approxradius = sqrt(SQR(pos(0, 0)) + SQR(pos(0, 1)) + SQR(pos(0, 2)));
 
 
-    double radius = 1.1 * 2 * approxradius;
+    double radius = sim_params(1,2);
     double monomers = NM;
 
     // monomers/(4/3piradius3)
 
     cout << "starting" << endl;
     NanotubeAssembly A(radius, monomers);
-
-    double deltaG = deltaG2;
-    double angle = angle2;
+    int NM2 =  sim_params(2,0);
+    double deltaG = sim_params(2,1);
+    double angle = sim_params(2,2);
     // BivalentPatch c2(deltaG, 1.4, angle);
 
     matrix<double> orient(4, 3);
@@ -249,10 +259,11 @@ int main(int argc, char **argv)
     // matrix<double> constantF(Ns+NM,3);
     // constantF(0,2) = -100.;
     // constantF(4095,2) = 100.;
+    double prod = sim_params(3,0);
     WeiM c1;
-    c1.M=0;
-    c1.weight=1.;
-    A.run_with_real_surface_add_particles(100000000, 10000, B, 0.001, c1, stringbase);
+    c1.M=sim_params(3,1);
+    c1.weight=sim_params(3,2);
+    A.run_with_real_surface_add_particles(100000000, 10000, B, prod, c1, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 

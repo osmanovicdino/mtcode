@@ -64,20 +64,23 @@ int main(int argc, char **argv)
     
     string paramfile;
     string olddatfile;
+    string oldorifile;
     string oldindfile;
     string shellpairsfile;
-    if (argc == 5)
+    if (argc == 6)
     {
-        stringstream ss1,ss2,ss3,ss4;
+        stringstream ss1,ss2,ss3,ss4,ss5;
         ss1 << argv[1];
         ss2 << argv[2];
         ss3 << argv[3];
         ss4 << argv[4];
+        ss5 << argv[5];
 
         paramfile = ss1.str();
         olddatfile = ss2.str();
-        oldindfile = ss3.str();
-        shellpairsfile = ss4.str();
+        oldorifile = ss3.str();
+        oldindfile = ss4.str();
+        shellpairsfile = ss5.str();
         // NM2 = atof(argv[1]);
         // deltaG2 = atof(argv[2]);
         // angle2 = atof(argv[3]);
@@ -93,6 +96,9 @@ int main(int argc, char **argv)
     bool err2;
     matrix<double> olddat = importcsv(olddatfile, T, err2);
 
+    bool erro;
+    matrix<double> oldori = importcsv(oldorifile, T, erro);
+
     int T2;
     bool err3;
     matrix<double> oldind_temp = importcsv(oldindfile, T2, err3);
@@ -102,7 +108,7 @@ int main(int argc, char **argv)
     bool err4;
     matrix<int> pairs = importcsv(shellpairsfile, T2, err4);
 
-    if(err1 || err2 || err3 || err4) error("files not imported correctly");
+    if(err1 || err2 || err3 || err4 || erro ) error("files not imported correctly");
 
     int NM = sim_params(0, 0);
     //nm2 is the total amount of added crosslinks
@@ -180,6 +186,8 @@ int main(int argc, char **argv)
     double deltaG = sim_params(2, 1);
     double angle = sim_params(2, 2);
     // BivalentPatch c2(deltaG, 1.4, angle);
+
+
 
     matrix<double> orient(4, 3);
     matrix<double> orient2(2, 3);
@@ -267,8 +275,6 @@ int main(int argc, char **argv)
         params(i, 2) = angle;
     }
 
-    cout << orient << endl;
-    cout << orient2 << endl;
 
     TetrahedralWithBivalent c2(params, Ns+NM2 , Ns + NM,orient,orient2); //set the difference to be  greater
 
@@ -302,7 +308,7 @@ int main(int argc, char **argv)
     WeiM c1;
     c1.M = sim_params(3, 1);
     c1.weight = sim_params(3, 2);
-    A.run_with_real_surface_add_particles_continue(100000000, 10000, posfiles.size(), B, prod, c1, olddat,oldind,stringbase);
+    A.run_with_real_surface_add_particles_continue(100000000, 10000, posfiles.size(), B, prod, c1, olddat,oldori,oldind,stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 
