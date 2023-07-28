@@ -108,7 +108,16 @@ int main(int argc, char **argv)
     bool err4;
     matrix<int> pairs = importcsv(shellpairsfile, T2, err4);
 
-    if(err1 || err2 || err3 || err4 || erro ) error("files not imported correctly");
+    if(err1 || err2 || err3 || err4 || erro ) {
+        cout << paramfile << " " << err1 << endl;
+        cout << olddatfile << " " << err2 << endl;
+        cout << oldorifile << " " << err3 << endl;
+        cout << oldindfile << " " << err4 << endl;
+        cout << shellpairsfile << " " << erro << endl;
+
+        error("files not imported correctly");
+
+    }
 
     int NM = sim_params(0, 0);
     //nm2 is the total amount of added crosslinks
