@@ -9,11 +9,12 @@ fileparam=./params.csv
 posfile=$(ls -t ${directory_path}/pos* | head -n 1)
 orifile=$(ls -t ${directory_path}/ori* | head -n 1)
 indfile=$(ls -t ${directory_path}/div* | head -n 1)
-pfile=~/Chemistry/Code/IsocohedronI.csv
-cp $pfile ${directory_path}
+pfile=./IsocohedronI.csv
+#cp $pfile ${directory_path}
 echo $fileparam
 echo $posfile
 echo $orifile
+echo $indfile
 echo $pfile
 cd $directory_path
 ./a $fileparam $posfile $orifile $indfile $pfile >log
