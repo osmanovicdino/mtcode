@@ -2126,11 +2126,15 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     obj->setorientation(oldori);
 
+
+
     // programmatic
     vector<int> indices_everything; // these are the indices of all the particles on the shell
     vector<int> indices_shell;
     indices_everything.reserve(NN);
     vector<int> indices_patchy; // the index of all the patchy particles
+
+    indices_patchy.reserve(Nx);
     for (int i = 0; i < totnp; i++)
     {
     indices_everything.push_back(i);
@@ -2140,9 +2144,9 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
     for(int i = totnp ; i < oldint.getsize() ; i++) {
         already_added.push_back(oldint[i]);
         indices_everything.push_back(oldint[i]);
+        indices_patchy.push_back(oldint[i]);
     }
     
-    indices_patchy.reserve(Nx);
 
     vector<int> indices_to_add_temp;
     indices_to_add_temp.reserve(Nx);
@@ -2219,6 +2223,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes, indices_everything, 3.5); // for the hard sphere repulsion
 
     matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); // for the patchy particle binding
+
 
     // start with zero patchy particles in the simulation
     // indices_patchy.push_back(0);
@@ -2306,7 +2311,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
             stringstream ss;
 
-            ss << setw(number_of_digits) << setfill('0') << starting_num+(i / every);
+            ss << setw(number_of_digits) << setfill('0') << starting_num - 1 +(i / every);
 
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();
