@@ -17,4 +17,5 @@ echo $orifile
 echo $indfile
 echo $pfile
 cd $directory_path
+export OMP_NUM_THREADS=8
 ./a $fileparam $posfile $orifile $indfile $pfile >log
