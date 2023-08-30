@@ -123,6 +123,8 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
 
         double result = std::reduce(weights.begin(), weights.end());
 
+
+
         double randv = result*((double)rand() / (double)(RAND_MAX));
         double w = 0.0;
         int index_which =0;
@@ -133,6 +135,7 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
             break;
         }    
         }
+
 
   
 

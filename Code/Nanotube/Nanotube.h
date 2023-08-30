@@ -28,7 +28,7 @@ int num;
 
 LangevinNVTR *obj;
 
-TetrahedralWithBivalent *pots;
+ComboPatch *pots;
 
 spherical_confinement_3D conf;
 
@@ -47,7 +47,7 @@ void add_particle2();
 
 void add_particle42(int);
 
-void setpots(TetrahedralWithBivalent &);
+void setpots(ComboPatch &);
 
 matrix<double> calculate_covariance(int Ns);
 

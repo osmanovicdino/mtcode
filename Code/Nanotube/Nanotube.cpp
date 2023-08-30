@@ -790,6 +790,8 @@ void NanotubeAssembly::add_particle2() {
     // if (SQR(x - ll / 2.) + SQR(y - ll / 2.) + SQR(z - ll / 2.) < SQR(0.9 * myrmax / 2.))
 }
 
+
+/*
 void NanotubeAssembly::add_particle42(int which)
 {
 
@@ -1010,7 +1012,7 @@ void NanotubeAssembly::add_particle42(int which)
         error("add 4 2 choice must be either 0 or 1");
     }
 
-}
+    }*/
 
     void NanotubeAssembly::setviscosity(double a)
     {
@@ -1024,7 +1026,7 @@ void NanotubeAssembly::add_particle42(int which)
         obj->setkT(a);
     }
 
-    void NanotubeAssembly::setpots(TetrahedralWithBivalent &a)
+    void NanotubeAssembly::setpots(ComboPatch &a)
     {
         //ComboPatch *q = a.clone();
         //delete pots;
@@ -1214,159 +1216,159 @@ void NanotubeAssembly::add_particle42(int which)
         }
     }
 
-    void NanotubeAssembly::run_anneal(int runtime, int every, int cd, string strbase = "")
-    {
-       // matrix<double> par = (*pots).params2;
+    // void NanotubeAssembly::run_anneal(int runtime, int every, int cd, string strbase = "")
+    // {
+    //    // matrix<double> par = (*pots).params2;
 
-        int nt2 = (*pots).nt;
-        int nb2 = (*pots).nb;
-        int nb_count = 0;
-        // TetrahedralWithBivalent ax(par, nt2+nb2 - nb_count, nb_count);
+    //     int nt2 = (*pots).nt;
+    //     int nb2 = (*pots).nb;
+    //     int nb_count = 0;
+    //     // TetrahedralWithBivalent ax(par, nt2+nb2 - nb_count, nb_count);
 
-        // this->setpots(ax);
-
-
-
-        int ccc;
-
-        int tf = ceil((double)runtime / (double)every);
-        int number_of_digits = 0;
-        do
-        {
-            ++number_of_digits;
-            tf /= 10;
-        } while (tf);
-
-        matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
-
-        matrix<int> *pairs = obj->calculatepairs(boxes, 3.5);
-
-        WCAPotential wsa(3.0, 1.0, 0.0);
-
-        int NN = obj->getN();
+    //     // this->setpots(ax);
 
 
-        matrix<double> F(NN, 3);
-        matrix<double> T(NN, 3);
-        matrix<double> RT(NN, 6);
-        matrix<double> zeromatrix(NN, 3);
 
-        F = obj->calculateforces(*pairs, wsa);
+    //     int ccc;
 
-        // cout << "ok to here" << endl;
+    //     int tf = ceil((double)runtime / (double)every);
+    //     int number_of_digits = 0;
+    //     do
+    //     {
+    //         ++number_of_digits;
+    //         tf /= 10;
+    //     } while (tf);
 
-        F += obj->calculateforces_external(conf);
+    //     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
-        // cout << "trying to calculate this" << endl;
-        obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
+    //     matrix<int> *pairs = obj->calculatepairs(boxes, 3.5);
 
-        // double coru = 1.0;
-        //  double nxtemp = 0.95;
-        //  double nytemp = 0.31225;
-        //  double nztemp = 0.0;
-        //  KernFrenkelOnePatch2 testpot(nxtemp, nytemp, -nztemp, nxtemp, nytemp, nztemp, 100., 2., pi / 3., 0.75);
-        //  obj->calculate_forces_and_torques3D(*pairs, testpot, F, T);
+    //     WCAPotential wsa(3.0, 1.0, 0.0);
 
-        // obj->create_random_forces(RT, RR);
-        generate_uniform_random_matrix(RT);
-        obj->create_forces_and_torques_sphere(F, T, RT);
+    //     int NN = obj->getN();
 
-        vector1<double> tottemp(6);
 
-        for (int i = 0; i < runtime; i++)
-        {
-            // cout << i << endl;
-            vector1<double> meas(6);
-            // obj->measured_temperature(meas);
-            // tottemp += meas;
-            // cout << tottemp / (double)(i + 1) << endl;
+    //     matrix<double> F(NN, 3);
+    //     matrix<double> T(NN, 3);
+    //     matrix<double> RT(NN, 6);
+    //     matrix<double> zeromatrix(NN, 3);
 
-            // cout << i << endl;
-            if (i > 0 && i % 20 == 0)
-            {
-                // cout << "pairs recalculated" << endl;
-                delete pairs;
-                pairs = obj->calculatepairs(boxes, 3.5);
-            }
+    //     F = obj->calculateforces(*pairs, wsa);
 
-            obj->advancemom_halfstep(F, T);
+    //     // cout << "ok to here" << endl;
 
-            obj->advance_pos();
-            obj->rotate();
+    //     F += obj->calculateforces_external(conf);
 
-            F = obj->calculateforces(*pairs, wsa);
+    //     // cout << "trying to calculate this" << endl;
+    //     obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
 
-            F += obj->calculateforces_external(conf);
-            // cout << obj->calculateforces_external(conf) << endl;
-            // pausel();
-            T.reset(0.0);
+    //     // double coru = 1.0;
+    //     //  double nxtemp = 0.95;
+    //     //  double nytemp = 0.31225;
+    //     //  double nztemp = 0.0;
+    //     //  KernFrenkelOnePatch2 testpot(nxtemp, nytemp, -nztemp, nxtemp, nytemp, nztemp, 100., 2., pi / 3., 0.75);
+    //     //  obj->calculate_forces_and_torques3D(*pairs, testpot, F, T);
 
-            obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
+    //     // obj->create_random_forces(RT, RR);
+    //     generate_uniform_random_matrix(RT);
+    //     obj->create_forces_and_torques_sphere(F, T, RT);
 
-            // stringstream aa;
-            // aa << setw(number_of_digits+1) << setfill('0') << (i / 1);
-            // outfunc(T,"Tl_i="+aa.str());
-            // outfunc(F, "Fl_i=" + aa.str());
-            // obj->calculate_forces_and_torques3D(*pairs, *pots->potential_bundle[0], F, T);
+    //     vector1<double> tottemp(6);
 
-            // obj->create_random_forces(RT, RR);
-            generate_uniform_random_matrix(RT);
-            obj->create_forces_and_torques_sphere(F, T, RT);
+    //     for (int i = 0; i < runtime; i++)
+    //     {
+    //         // cout << i << endl;
+    //         vector1<double> meas(6);
+    //         // obj->measured_temperature(meas);
+    //         // tottemp += meas;
+    //         // cout << tottemp / (double)(i + 1) << endl;
 
-            // outfunc(T, "Tb_i=" + aa.str());
-            // outfunc(F, "Fb_i=" + aa.str());
+    //         // cout << i << endl;
+    //         if (i > 0 && i % 20 == 0)
+    //         {
+    //             // cout << "pairs recalculated" << endl;
+    //             delete pairs;
+    //             pairs = obj->calculatepairs(boxes, 3.5);
+    //         }
 
-            obj->advancemom_halfstep(F, T);
-            if(i % cd == 0) {
-                nb_count++;
-                pots->change_nt(nt2 + nb2 - nb_count);
+    //         obj->advancemom_halfstep(F, T);
 
-            }
+    //         obj->advance_pos();
+    //         obj->rotate();
 
-            if (i % every == 0)
-            {
+    //         F = obj->calculateforces(*pairs, wsa);
 
-                cout << i << endl;
+    //         F += obj->calculateforces_external(conf);
+    //         // cout << obj->calculateforces_external(conf) << endl;
+    //         // pausel();
+    //         T.reset(0.0);
 
-                stringstream ss;
+    //         obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
 
-                ss << setw(number_of_digits) << setfill('0') << (i / every);
+    //         // stringstream aa;
+    //         // aa << setw(number_of_digits+1) << setfill('0') << (i / 1);
+    //         // outfunc(T,"Tl_i="+aa.str());
+    //         // outfunc(F, "Fl_i=" + aa.str());
+    //         // obj->calculate_forces_and_torques3D(*pairs, *pots->potential_bundle[0], F, T);
 
-                matrix<double> orient = obj->getorientation();
-                matrix<double> pos = obj->getdat();
+    //         // obj->create_random_forces(RT, RR);
+    //         generate_uniform_random_matrix(RT);
+    //         obj->create_forces_and_torques_sphere(F, T, RT);
 
-                string poss = "pos";
-                poss = poss + strbase;
-                string oris = "orientation";
-                oris = oris + strbase;
+    //         // outfunc(T, "Tb_i=" + aa.str());
+    //         // outfunc(F, "Fb_i=" + aa.str());
 
-                poss += "_i=";
-                oris += "_i=";
+    //         obj->advancemom_halfstep(F, T);
+    //         if(i % cd == 0) {
+    //             nb_count++;
+    //             pots->change_nt(nt2 + nb2 - nb_count);
 
-                string extension = ".csv";
+    //         }
 
-                poss += ss.str();
-                oris += ss.str();
+    //         if (i % every == 0)
+    //         {
 
-                poss += extension;
-                oris += extension;
+    //             cout << i << endl;
 
-                ofstream myfile;
-                myfile.open(poss.c_str());
+    //             stringstream ss;
 
-                ofstream myfile2;
-                myfile2.open(oris.c_str());
+    //             ss << setw(number_of_digits) << setfill('0') << (i / every);
 
-                myfile <<= pos;
-                myfile2 <<= orient;
+    //             matrix<double> orient = obj->getorientation();
+    //             matrix<double> pos = obj->getdat();
 
-                myfile.close();
-                myfile2.close();
+    //             string poss = "pos";
+    //             poss = poss + strbase;
+    //             string oris = "orientation";
+    //             oris = oris + strbase;
 
-                // pausel();
-            }
-        }
-    }
+    //             poss += "_i=";
+    //             oris += "_i=";
+
+    //             string extension = ".csv";
+
+    //             poss += ss.str();
+    //             oris += ss.str();
+
+    //             poss += extension;
+    //             oris += extension;
+
+    //             ofstream myfile;
+    //             myfile.open(poss.c_str());
+
+    //             ofstream myfile2;
+    //             myfile2.open(oris.c_str());
+
+    //             myfile <<= pos;
+    //             myfile2 <<= orient;
+
+    //             myfile.close();
+    //             myfile2.close();
+
+    //             // pausel();
+    //         }
+    //     }
+    // }
 
     void ShellProperties::DoAnMC(double ll, bool FLAG = true)
     {
@@ -1886,6 +1888,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
         }
         indices_weights.push_back(ww);
     }
+
 
     particle_adder vv;
     vv.set_indices(indices_to_add);

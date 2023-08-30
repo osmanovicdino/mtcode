@@ -141,16 +141,12 @@ int main(int argc, char **argv)
     cout << "starting" << endl;
     NanotubeAssembly A(radius, monomers);
     int NM2 =  sim_params(2,0);
-    int NM3 = sim_params(2, 1);
-    double deltaG = sim_params(2,2);
-    double angle = sim_params(2,3);
+    double deltaG = sim_params(2,1);
+    double angle = sim_params(2,2);
     // BivalentPatch c2(deltaG, 1.4, angle);
-    vector1<int> vec1(3);
-    vec1[0] = 3;
-    vec1[1] = 2;
-    vec1[2] = 2;
 
-    matrix<double> orient(7, 3);
+    matrix<double> orient(4, 3);
+    matrix<double> orient2(2, 3);
 
     double nx4 = 1.0;
     double ny4 = 0.0;
@@ -188,118 +184,58 @@ int main(int argc, char **argv)
     orient(2, 1) = ny7;
     orient(2, 2) = nz7;
 
-    orient(3, 0) = nx4;
-    orient(3, 1) = ny4;
-    orient(3, 2) = nz4;
+    orient(3, 0) = nx9;
+    orient(3, 1) = ny9;
+    orient(3, 2) = nz9;
 
-    orient(4, 0) = nx5;
-    orient(4, 1) = ny5;
-    orient(4, 2) = nz5;
+    orient2(0, 0) = nx4;
+    orient2(0, 1) = ny4;
+    orient2(0, 2) = nz4;
 
-    orient(5, 0) = nx4;
-    orient(5, 1) = ny4;
-    orient(5, 2) = nz4;
+    orient2(1, 0) = nx5;
+    orient2(1, 1) = ny5;
+    orient2(1, 2) = nz5;
 
-    orient(6, 0) = nx5;
-    orient(6, 1) = ny5;
-    orient(6, 2) = nz5;
-
-
-    int tot = 3 * 3 + 3 * 2 + 3 * 2 + 2 * 2 + 2 * 2 + 2 * 2;
-    matrix<double> params(tot, 3);
     double range = 1.2;
-  
+    int tot = 4 * 4 + 4 * 2 + 2 * 2;
     int iter = 0;
-    for (int i = 0; i < 3; i++) // nanostar/nanostar interaction
+    matrix<double> params(tot, 3);
+    for (int i = 0; i < 4; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for(int j = 0  ; j < 4 ; j++) {
+        if(i<=1 && j <=1) {
+        params(iter, 0) = 00.0;
+        }
+        else if (i >= 2 && j >= 2)
         {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-            iter++;
+        params(iter, 0) = 00.0;
+        }
+        else{
+        params(iter, 0) = 00.0;
+        }
+        params(iter, 1) = range;
+        params(iter, 2) = angle;
+        iter++;
         }
     }
-
-    for (int i = 0; i < 3; i++) // nanostar/anti-invader interaction
+    for (int i = 4 * 4; i < 4 * 4+4*2; i++)
     {
-        for (int j = 0; j < 2; j++)
-        {
-            if(i==2) {
-            params(iter, 0) = deltaG;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-            }
-            else{
-            params(iter, 0) = 0.0;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-            }
-            iter++;
-        }
+        params(i, 0) = deltaG;
+        params(i, 1) = range;
+        params(i, 2) = angle;
+    }
+    for (int i = 4 * 4 + 4 * 2; i < tot; i++)
+    {
+        params(i, 0) = deltaG;
+        params(i, 1) = range;
+        params(i, 2) = angle;
     }
 
-    for (int i = 0; i < 3; i++) // nanonstar/invader interaction
-    {
-        for (int j = 0; j < 2; j++)
-        {
-            if (i == 2)
-            {
-            params(iter, 0) = 0.;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-            }
-            else
-            {
-            params(iter, 0) = deltaG;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-            }
-            iter++;
-        }
-    }
-    for (int i = 0; i < 2; i++) // anti-invader/anti-invader interaction
-    {
-        for (int j = 0; j < 2; j++)
-        {
-            params(iter, 0) = deltaG;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
+    cout << orient << endl;
+    cout << orient2 << endl;
 
-            iter++;
-        }
-    }
+    TetrahedralWithBivalent c2(params, Ns+NM2 , Ns + NM,orient,orient2); //set the difference to be  greater
 
-    for (int i = 0; i < 2; i++) // anti-invader/invader interaction
-    {
-        for (int j = 0; j < 2; j++)
-        {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-
-            iter++;
-        }
-    }
-
-    for (int i = 0; i < 2; i++) // invader/invader interaction
-    {
-        for (int j = 0; j < 2; j++)
-        {
-            params(iter, 0) = deltaG;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-
-            iter++;
-        }
-    }
-    vector1<int> numb(3);
-    numb[0]=Ns+NM2;
-    numb[1]=Ns+NM2+NM3;
-    numb[2]=Ns+NM;
- 
-//    TetrahedralWithBivalent c2(params, Ns+NM2 , Ns + NM,orient,orient2); //set the difference to be  greater
-    GeneralPatch c2(vec1, numb, params, orient);
     // c2.v = orient;
     // c2.v2= orient2;
 
@@ -334,4 +270,4 @@ int main(int argc, char **argv)
         // A.run(1000000, 1000);
 
         return 0;
-    }
+}

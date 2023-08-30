@@ -209,13 +209,20 @@ int main(int argc, char **argv)
     }
     for (int i = 4 * 4; i < 4 * 4+4*2; i++)
     {
-        params(i, 0) = deltaG;
+        if(i!=19 || i!=23) {
+        params(i, 0) = deltaG; //interaction of 4s with 2
         params(i, 1) = 1.2;
         params(i, 2) = angle;
+        }
+        else{
+        params(i, 0) = 0.0; // interaction of 4s with 2
+        params(i, 1) = 1.2;
+        params(i, 2) = angle;
+        }
     }
     for (int i = 4 * 4 + 4 * 2; i < tot; i++)
     {
-        params(i, 0) = deltaG;
+        params(i, 0) = deltaG; //interaction of backbone
         params(i, 1) = 1.2;
         params(i, 2) = angle;
     }
@@ -257,7 +264,7 @@ int main(int argc, char **argv)
     // constantF(0,2) = -100.;
     // constantF(4095,2) = 100.;
     A.conf.setv(0.0);//no confinement
-    A.run(2000000, 10000, stringbase);
+    A.run(20000000, 10000, stringbase);
         // A.run_add_particles(10000000, 10000, 0.001, stringbase);
         //  A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         //  A.run(1000000, 1000);
