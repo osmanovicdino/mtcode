@@ -28,7 +28,7 @@ module load gcc/10.2.0
 #filename=~/Chemistry/Code/Basic/Scripts/paramsSA6.dat
 #basedir="SelfAssembly6"
 
-filename=~/Chemistry/Code/Basic/Scripts/parameter_settings3.dat
+filename=~/Chemistry/Code/Basic/Scripts/parameter_settings4.dat
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    wt=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
@@ -37,7 +37,7 @@ else
    wt=~
    echo "did not read file correctly"
 fi
-basedir="SelfAssembly11"
+basedir="SelfAssembly12"
 dirwemake="try=${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeElasticShell.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
