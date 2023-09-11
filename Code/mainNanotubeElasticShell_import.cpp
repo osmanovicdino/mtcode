@@ -262,16 +262,26 @@ int main(int argc, char **argv)
     int tot = 3 * 3 + 3 * 2 + 3 * 2 + 2 * 2 + 2 * 2 + 2 * 2;
     matrix<double> params(tot, 3);
     double range = 1.2;
-  
+
     int iter = 0;
     for (int i = 0; i < 3; i++) // nanostar/nanostar interaction
     {
         for (int j = 0; j < 3; j++)
         {
-            params(iter, 0) = 0.0;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-            iter++;
+            if (i == 2 || j == 2)
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
+                iter++;
+            }
+            else
+            {
+                params(iter, 0) = deltaG;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
+                iter++;
+            }
         }
     }
 
@@ -279,15 +289,17 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            if(i==2) {
-            params(iter, 0) = deltaG;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
+            if (i == 2)
+            {
+                params(iter, 0) = deltaG;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
             }
-            else{
-            params(iter, 0) = 0.0;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
+            else
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
             }
             iter++;
         }
@@ -299,15 +311,15 @@ int main(int argc, char **argv)
         {
             if (i == 2)
             {
-            params(iter, 0) = 0.;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
+                params(iter, 0) = 0.;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
             }
             else
             {
-            params(iter, 0) = deltaG;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
+                params(iter, 0) = deltaG;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
             }
             iter++;
         }
