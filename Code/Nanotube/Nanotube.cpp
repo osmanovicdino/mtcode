@@ -1903,12 +1903,13 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
     vv.set_rate(prod);
 
     
-    matrix<int> *pairs = obj->calculatepairs_parallel(boxes,indices_everything, 3.5); //for the hard sphere repulsion
+    matrix<int> *pairs = new matrix<int>;
+    pairs = obj->calculatepairs_parallel(boxes,indices_everything, 3.5); //for the hard sphere repulsion
 
+    matrix<int> *pairs_onlyb = new matrix<int>;
 
-    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); //for the patchy particle binding
-    
-    
+    pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); // for the patchy particle binding
+
     //start with zero patchy particles in the simulation
     //indices_patchy.push_back(0);
 
@@ -2001,7 +2002,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
     obj->advancemom_halfstep(F, T, indices_everything);
 
-    if (i % every == 0)
+    if (i % every == 0 && i>0)
     {
 
             cout << i << endl;
@@ -2073,6 +2074,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
     }
 
     }
+    delete pairs;
+    delete pairs_onlyb;
 }
 
 template <typename T>
@@ -2088,19 +2091,21 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     int ccc;
 
-    // int tf = ceil((double)runtime / (double)every);
-    // int number_of_digits = 0;
-    // do
-    // {
-    // ++number_of_digits;
-    // tf /= 10;
-    // } while (tf);
+    int tf = ceil((double)runtime / (double)every);
+    int number_of_digits = 0;
+    do
+    {
+    ++number_of_digits;
+    tf /= 10;
+    } while (tf);
 
-    int number_of_digits = 5; // as the code continues to iterate, we shall set it 
+    // int number_of_digits = 2; // as the code continues to iterate, we shall set it 
 
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
+
     matrix<int> bindingpairs = myshell.par; // we can get all the binding pairs of the elastic shell
+
 
     int totnp = myshell.posi.getnrows(); // total particles that are not patchy
 
@@ -2108,13 +2113,20 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
     HSPotential wsa(3.0, 1.0);
     HarmonicPotential spr(myshell.k, myshell.rm);
 
-    int Nx = obj->getN(); // this defines the NN total,
+    // int Nx = obj->getN(); // this defines the NN total,
     // i.e. every particle that is going to be added to the simulation,
     // but which might not be included yet
-    int NN = Nx + totnp; // every particle
+    int NN = olddat.getnrows(); // every particle
+
+    int Nx = NN - totnp;
+
+    // cout << Nx << endl;
+    // cout << NN << endl;
+    // pausel();
 
     matrix<double> dat = olddat; // get the data, remember that a lot of these values will be initialized
     // to zero to begin with
+
 
     double ll = obj->getgeo().l;
 
@@ -2125,12 +2137,15 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
         newdat(i, j) = dat(i, j);
     }
 
+
     obj->initialize(newdat);
 
     obj->setorientation(oldori);
 
 
-
+    cout << NN << endl;
+    cout << totnp << endl;
+    cout << Nx << endl;
     // programmatic
     vector<int> indices_everything; // these are the indices of all the particles on the shell
     vector<int> indices_shell;
@@ -2158,11 +2173,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
     for (int i = totnp; i < NN; i++)
     {
     indices_to_add_temp.push_back(i);
-
-
-
     }
-
 
     // for(int i  = 0 ; i < already_added.size() ; i++){
     // int index_which = already_added[i];
@@ -2227,7 +2238,6 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); // for the patchy particle binding
 
-
     // start with zero patchy particles in the simulation
     // indices_patchy.push_back(0);
 
@@ -2247,6 +2257,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
     generate_uniform_random_matrix(RT, indices_patchy); // only generate random torques for the patchy particles
 
     obj->create_forces_and_torques_sphere(F, T, RT, indices_patchy, false); // only create torques and forces for patchy particles
+
 
     for (int i = 0; i < runtime; i++)
     {
@@ -2314,8 +2325,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
             stringstream ss;
 
-            ss << setw(number_of_digits) << setfill('0') << starting_num - 1 +(i / every);
-
+            ss << setw(number_of_digits) << setfill('0') << starting_num  +(i / every);
+            cout << "done 1" << endl;
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();
 
@@ -2356,6 +2367,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
             matrix<double> eig = calculate_covariance(totnp);
 
+            cout << "done 2" << endl;
             myfile3 <<= eig;
 
             myfile.close();
@@ -2366,11 +2378,14 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
             orie += extension;
             ofstream myfile4;
             myfile4.open(orie.c_str());
-            myfile4 <<= obj->getorientation(); 
-
+            myfile4 <<= obj->getorientation();
+            cout << "done 3" << endl;
             // pausel();
     }
     }
+
+    delete pairs;
+    delete pairs_onlyb;
 }
 
 void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, string strbase = "")
