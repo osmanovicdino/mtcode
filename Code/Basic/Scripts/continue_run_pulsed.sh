@@ -13,6 +13,6 @@ echo $fileparam
 # echo $indfile
 # echo $pfile
 cd $directory_path
-export OMP_NUM_THREADS=8
+export OMP_NUM_THREADS=6
 par=`ls -l pos* | wc -l`
 ./a $fileparam $par >log

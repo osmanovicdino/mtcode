@@ -379,7 +379,7 @@ int main(int argc, char **argv)
     int pulse2 = sim_params(4,1);
 
     // int m1 = 1000000;
-    int every = 100;
+    int every = 10000;
     int mod1 = pulse1 / every;
     int mod2 = pulse2 / every;
 
