@@ -8,7 +8,7 @@
 #$ -l h_rt=00:59:59,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 8
+#$ -pe shared 6
 #$ -t 1-20:1
 
 # echo job info on joblog:
