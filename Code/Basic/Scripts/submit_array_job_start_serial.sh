@@ -43,7 +43,8 @@ cp ~/Chemistry/Code/mainNanotubeElasticShell.cpp /u/scratch/d/dinoo/${basedir}/$
 cp ~/Chemistry/Code/IsocohedronI.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronP.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/Basic/InitialConditions/${wt} /u/scratch/d/dinoo/${basedir}/${dirwemake}/param.csv
-g++ -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShell.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
+# g++ -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShell.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
+cp ~/Chemistry/Code/single_core /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 ./angron 'param.csv' >log
 # cp ~/Chemistry/Code/mainNanotubeElasticShell.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
