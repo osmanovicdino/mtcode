@@ -42,7 +42,7 @@ fi
 # g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShell.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 # cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 echo $wt
-~/Chemistry/Code/Basic/Scripts/continue_run.sh $wt
+~/Chemistry/Code/Basic/Scripts/continue_run_serial.sh $wt
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `

@@ -4,7 +4,8 @@
 
 directory_path=$1
 # param_file=$2 this file should be in the directory
-g++ -std=c++17  ~/Chemistry/Code/mainNanotubeElasticShell_import.cpp -o ${directory_path}/a #copy to the directory we want 
+#g++ -std=c++17  ~/Chemistry/Code/mainNanotubeElasticShell_import.cpp -o ${directory_path}/a #copy to the directory we want 
+cp ~/Chemistry/Code/single_core_cont ${directory_path}/a
 fileparam=./param.csv
 posfile=$(ls -t ${directory_path}/pos* | head -n 1)
 orifile=./orient.csv
