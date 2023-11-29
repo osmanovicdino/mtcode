@@ -66,17 +66,22 @@ int main(int argc, char **argv)
     signal(SIGSEGV, handler);
 
 
-
+    double patchsize;
     
+    if (argc == 2)
+    {
+        patchsize = atof(argv[1]);
+    }
+
 
 
 
 
     
     int totN =2;
-    double l = 10.;
-    double int1 = 10.;
-    int runtime = 1000000;
+    double l = 5.;
+    double int1 = 15.;
+    int runtime = 10000000;
     int number_of_arms = 3;
 
 
@@ -112,7 +117,7 @@ int main(int argc, char **argv)
     matrix<double> params(tot, 3);
 
     double range  = 1.2; // range of the attraction
-    double patchsize = 0.927; //patch size in radians
+    // double patchsize = 0.927; //patch size in radians
     int iter = 0;
     for (int i = 0; i < number_of_arms; i++) //nanostar/nanostar interaction
     {
@@ -131,19 +136,30 @@ int main(int argc, char **argv)
     matrix<double> orient(3, 3);
 
 
-    //DEFINE THE VECTORS TO THE PATCH ENDPOINTS
-    double nx1 = sqrt(8. / 9.);
+    // //DEFINE THE VECTORS TO THE PATCH ENDPOINTS
+    // double nx1 = sqrt(8. / 9.);
+    // double ny1 = 0.;
+    // double nz1 = -1. / 3.;
+
+    // double nx2 = -sqrt(2. / 9.);
+    // double ny2 = sqrt(2. / 3.);
+    // double nz2 = -1. / 3.;
+
+    // double nx3 = -sqrt(2. / 9.);
+    // double ny3 = -sqrt(2. / 3.);
+    // double nz3 = -1. / 3.;
+
+    double nx1 = 1.;
     double ny1 = 0.;
-    double nz1 = -1. / 3.;
+    double nz1 = 0.;
 
-    double nx2 = -sqrt(2. / 9.);
-    double ny2 = sqrt(2. / 3.);
-    double nz2 = -1. / 3.;
+    double nx2 = -0.5;
+    double ny2 = sqrt(3. / 4.);
+    double nz2 = 0.;
 
-    double nx3 = -sqrt(2. / 9.);
-    double ny3 = -sqrt(2. / 3.);
-    double nz3 = -1. / 3.;
-
+    double nx3 = -0.5;
+    double ny3 = -sqrt(3. / 4.);
+    double nz3 = 0.;
 
     orient(0, 0) = nx1;
     orient(0, 1) = ny1;
@@ -219,8 +235,8 @@ int main(int argc, char **argv)
     base += ss.str();
 
     stringstream ss1;
-    ss1 << number_of_arms;
-    base += "_noarms=";
+    ss1 << patchsize;
+    base += "_patchsize=";
     base += ss1.str();
 
     base += "_temperature=";

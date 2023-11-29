@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=00:59:59,h_data=128M
+#$ -l h_rt=11:59:59,h_data=128M
 ## Modify the parallel environment
 
 #$ -t 1-100:1
@@ -36,7 +36,7 @@ else
    wt=~
    echo "did not read file correctly"
 fi
-basedir="SelfAssembly19"
+basedir="SelfAssembly20"
 dirwemake="try=${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeElasticShellPulsed.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
