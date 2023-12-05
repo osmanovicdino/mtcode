@@ -7,9 +7,9 @@ directory_path=$1
 #g++ -std=c++17  ~/Chemistry/Code/mainNanotubeElasticShell_import.cpp -o ${directory_path}/a #copy to the directory we want 
 cp ~/Chemistry/Code/single_core_cont ${directory_path}/a
 fileparam=./param.csv
-posfile=$(ls -t ${directory_path}/pos* | head -n 1)
+posfile=$(ls ${directory_path}/pos* | tail -n 1)
 orifile=./orient.csv
-indfile=$(ls -t ${directory_path}/div* | head -n 1)
+indfile=$(ls ${directory_path}/div* | tail -n 1)
 pfile=./IsocohedronI.csv
 #cp $pfile ${directory_path}
 echo $fileparam
