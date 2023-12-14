@@ -69,7 +69,9 @@ struct particle_adder {
     vector1<double> generate_point_in_volume();
 
     template<class vec>
-    void add_p(MD &obj, vec ind, bool&, vector1<double>&, int&); 
+    void add_p(MD &obj, vec ind, bool&, vector1<double>&, int&);
+
+    void add_p(bool &dd, int &fi);
     //returns a particle at int with position vector1<> avoiding ind of dat
 
 

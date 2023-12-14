@@ -622,7 +622,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
 
 
 
-    spherical_confinement_3D conf2(rmax/2.,1.0,ll/2.);
+    spherical_confinement_3D conf2(rmax,1.0,ll/2.);
     // conf2.rmax = rmax/2.;
     // conf.v = 1.0;
     // conf.shft  = ll/2.;
@@ -644,7 +644,9 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     vector<double> possible_pos_y;
     vector<double> possible_pos_z;
 
+
     myrmax = 0.7*rmax;
+
 
     for (int i = 0; i < pp; i++)
     {
@@ -655,7 +657,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
                 double x = 0.5 + i;
                 double y = 0.5 + j;
                 double z = 0.5 + k;
-                if (SQR(x - ll / 2.) + SQR(y - ll / 2.) + SQR(z - ll / 2.) < SQR(0.9 * myrmax/2.) )
+                if (SQR(x - ll / 2.) + SQR(y - ll / 2.) + SQR(z - ll / 2.) < SQR(0.9 * myrmax) )
                 {
                     possible_pos_x.push_back(x);
                     possible_pos_y.push_back(y);
@@ -685,6 +687,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     LangevinNVTR b(geo);
 
     // cout << "created" << endl;
+    outfunc(dat,"init");
 
     b.initialize(dat);
 
@@ -1962,10 +1965,9 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
            if (dd)
            {
                 cout << "added: " << fi << endl;
-                indices_everything.push_back(fi);
+                
                 indices_patchy.push_back(fi);
-                obj->set_particle(v1,fi);
-
+                
 
             }
 
@@ -2403,7 +2405,7 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
     tf /= 10;
     } while (tf);
 
-    double ll2 = 20.;
+    double ll2 = obj->getgeo().l;
     vector1<bool> pb(3, false);
     cube geo(ll2, pb, 3);
     int num2 = floor(ll2 / 4.);
@@ -2412,49 +2414,30 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num2, ccc);
 
     //matrix<int> bindingpairs = myshell.par; // we can get all the binding pairs of the elastic shell
-
+   
     //int totnp = myshell.posi.getnrows(); // total particles that are not patchy
 
     // Hard Sphere Forces
     HSPotential wsa(3.0, 1.0);
     //HarmonicPotential spr(myshell.k, myshell.rm);
-    int totnp = 0;
+    
     int Nx = obj->getN(); // this defines the NN total,
     // i.e. every particle that is going to be added to the simulation,
     // but which might not be included yet
+    int totnp = Nx;
     int NN = Nx;// + totnp; // every particle
 
-    matrix<double> dat = obj->getdat(); // get the data, remember that a lot of these values will be initialized
-    // to zero to begin with
 
-
-    double ll = obj->getgeo().l;
-
-    matrix<double> newdat(NN, 3);
-    for (int i = 0; i < NN; i++)
-    {
-    if (i < totnp)
-    {
-        // as there is no shell, nothing will happen
-    }
-    else
-    {
-            for (int j = 0; j < 3; j++)
-            newdat(i, j) = dat(i - totnp, j);
-    }
-    }
-
-    obj->initialize(newdat);
+    
 
     // programmatic
     vector<int> indices_everything; // these are the indices of all the particles on the shell
-    vector<int> indices_shell;
+    
     indices_everything.reserve(NN);
     vector<int> indices_patchy; // the index of all the patchy particles
     for (int i = 0; i < totnp; i++)
     {
-    indices_everything.push_back(i);
-    indices_shell.push_back(i);
+        indices_everything.push_back(i);
     }
     indices_patchy.reserve(Nx);
 
@@ -2462,10 +2445,12 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
     indices_to_add.reserve(Nx);
     vector<double> indices_weights;
     indices_weights.reserve(Nx);
-    for (int i = totnp; i < NN; i++)
+    for (int i = 0; i < NN; i++)
     {
-    indices_to_add.push_back(i);
-    indices_weights.push_back(1.);
+        indices_to_add.push_back(i);
+        double ww = 1.;
+
+        indices_weights.push_back(ww);
     }
 
     particle_adder vv;
@@ -2481,23 +2466,29 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
     vv.set_volume(vol);
     vv.set_rate(prod);
 
-    matrix<int> *pairs = obj->calculatepairs_parallel(boxes, indices_everything, 3.5); // for the hard sphere repulsion
-
-    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); // for the patchy particle binding
-
     // start with zero patchy particles in the simulation
     // indices_patchy.push_back(0);
 
     // define the full storage matrices of all the particles, despite the fact they won't all be utilized
     matrix<double> F(NN, 3);
-    matrix<double> Fs(NN, 3);
     matrix<double> T(NN, 3);
     matrix<double> RT(NN, 6);
     matrix<double> zeromatrix(NN, 3);
 
+    matrix<int> *pairs = new matrix<int>;
+    pairs = obj->calculatepairs_parallel(boxes, indices_everything, 3.5); // for the hard sphere repulsion
+
+    matrix<int> *pairs_onlyb = new matrix<int>;
+
+    pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); // for the patchy particle binding
+
     F = obj->calculateforces(*pairs, wsa); // calculate the forces due to hard sphere forces
 
+    cout << F << endl;
+    cout << NN << endl;
+    pausel();
     // F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
+    F += obj->calculateforces_external(conf);
 
     obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
 
@@ -2520,24 +2511,22 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
             vector1<double> v1(3);
             int fi;
 
-            vector1<double> me1 = meanish(obj->getdat(), indices_shell);
-
             sphere_vol vol2;
-            vol2.r = (1. / 5.) * ll;
+            vol2.r = (1. / 10.) * ll;
             vol2.ll = ll;
-            vol2.c1 = ll/2.;//me1[0];
-            vol2.c2 = ll/2.;//me1[1];
-            vol2.c3 = ll/2.;//me1[2];
+            vol2.c1 = ll/2;
+            vol2.c2 = ll / 2;
+            vol2.c3 = ll / 2;
             vv.set_volume(vol2);
 
-            vv.add_p(*obj, indices_everything, dd, v1, fi);
+            vv.add_p(dd, fi);
 
             if (dd)
             {
-            cout << "added: " << fi << " " << indices_patchy.size() << endl;
-            indices_everything.push_back(fi);
-            indices_patchy.push_back(fi);
-            obj->set_particle(v1, fi);
+                cout << "added: " << fi << endl;
+                //indices_everything.push_back(fi);
+                indices_patchy.push_back(fi);
+                //obj->set_particle(v1, fi);
             }
 
             pairs = obj->calculatepairs_parallel(boxes, indices_everything, 3.5);
@@ -2552,7 +2541,7 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
     F = obj->calculateforces(*pairs, wsa); // calculate the forces due to hard sphere forces
 
     // F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
-
+    F += obj->calculateforces_external(conf);
     T.reset(0.0);
 
     obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
@@ -2570,9 +2559,9 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
     
     // }
 
-    generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
+    generate_uniform_random_matrix(RT, indices_patchy); // only generate random torques for the patchy particles
 
-    obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
+    obj->create_forces_and_torques_sphere(F, T, RT, indices_patchy, false); // only create torques and forces for patchy particles
 
     obj->advancemom_halfstep(F, T, indices_everything);
 
@@ -2611,8 +2600,8 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
             myfile2.open(oris.c_str());
 
             myfile <<= pos;
-            for (int ik = 0; ik < indices_everything.size(); ik++)
-            myfile2 << indices_everything[ik] << endl;
+            for (int ik = 0; ik < indices_patchy.size(); ik++)
+            myfile2 << indices_patchy[ik] << endl;
 
             myfile.close();
             myfile2.close();
@@ -2620,6 +2609,8 @@ void NanotubeAssembly::run_add_particles(int runtime, int every, double prod, st
             // pausel();
     }
     }
+    delete pairs;
+    delete pairs_onlyb;
 }
 
 #endif /* NANOTUBE_CPP */

@@ -155,4 +155,49 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
     }
 }
 
-} 
+}
+
+void particle_adder::add_p(bool &does_return, int &fi)
+{
+
+    does_return = false;
+    if (weights.size() < 1)
+    {
+    }
+    else
+    {
+        double r1 = ((double)rand() / (double)(RAND_MAX));
+        if (r1 < rate)
+        {
+
+            does_return = true;
+            
+
+            // cout << mymin << endl;
+
+            double result = std::reduce(weights.begin(), weights.end());
+
+            double randv = result * ((double)rand() / (double)(RAND_MAX));
+            double w = 0.0;
+            int index_which = 0;
+            for (int i = 0; i < indices.size(); i++)
+            {
+                w += weights[i];
+                if (w > randv)
+                {
+                    index_which = i;
+                    break;
+                }
+            }
+
+            fi = indices[index_which];
+
+            remove_at(weights, index_which);
+            remove_at(indices, index_which);
+        }
+        else
+        {
+            // do nothing
+        }
+    }
+}
