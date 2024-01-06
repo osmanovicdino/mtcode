@@ -1962,15 +1962,14 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
            vv.set_volume(vol2);
 
            vv.add_p(*obj, indices_everything, dd, v1, fi);
-
+            
            if (dd)
            {
 
                 cout << "added: " << fi << endl;
                 indices_everything.push_back(fi);
                 indices_patchy.push_back(fi);
-                
-
+                obj->set_particle(v1, fi);
             }
 
             
