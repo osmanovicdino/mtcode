@@ -2022,7 +2022,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
             string oris = "div";
             oris = oris + strbase;
 
-            string elli = "eigs";
+            string elli = "or";
             elli = elli + strbase;
 
             poss += "_i=";
@@ -2033,7 +2033,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
             poss += ss.str();
             oris += ss.str();
-            //elli += ss.str();
+            elli += ss.str();
 
             poss += extension;
             oris += extension;
@@ -2062,7 +2062,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
             matrix<double> eig = calculate_covariance(totnp);
 
-            myfile3 <<= eig;
+            myfile3 <<= obj->getorientation();
 
             myfile4 <<= obj->getorientation();
 
@@ -2264,7 +2264,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     for (int i = 0; i < runtime; i++)
     {
-    //cout << i << endl;
+    cout << i << endl;
     if (i > 0 && i % 20 == 0)
     {
             // cout << "pairs recalculated" << endl;
