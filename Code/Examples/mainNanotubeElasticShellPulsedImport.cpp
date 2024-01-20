@@ -242,27 +242,19 @@ int main(int argc, char **argv)
     int tot = 3 * 3 + 3 * 2 + 3 * 2 + 2 * 2 + 2 * 2 + 2 * 2;
     matrix<double> params(tot, 3);
     double range = 1.2;
-
+  
     int iter = 0;
     for (int i = 0; i < 3; i++) // nanostar/nanostar interaction
     {
         for (int j = 0; j < 3; j++)
         {
-            if (i == 2 || j == 2) // the sides cannot interact
-            {
+            if(i==2||j==2) {
                 params(iter, 0) = 0.0;
                 params(iter, 1) = range;
                 params(iter, 2) = angle;
                 iter++;
             }
-            else if (i != j) // we want it to be directional
-            {
-                params(iter, 0) = 0.0;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
-                iter++;
-            }
-            else
+            else 
             {
                 params(iter, 0) = deltaG;
                 params(iter, 1) = range;
@@ -272,41 +264,39 @@ int main(int argc, char **argv)
         }
     }
 
-    for (int i = 0; i < 3; i++) // crosslinks
+    for (int i = 0; i < 3; i++) // nanostar/anti-invader interaction
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i == 2)
-            {
-                params(iter, 0) = deltaG;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
+            if(i==2) {
+            params(iter, 0) = deltaG;
+            params(iter, 1) = range;
+            params(iter, 2) = angle;
             }
-            else
-            {
-                params(iter, 0) = 0.0;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
+            else{
+            params(iter, 0) = 0.0;
+            params(iter, 1) = range;
+            params(iter, 2) = angle;
             }
             iter++;
         }
     }
 
-    for (int i = 0; i < 3; i++) // caps
+    for (int i = 0; i < 3; i++) // nanonstar/invader interaction
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i == 0 && j == 0) // only binds to one end
+            if (i == 2)
             {
-                params(iter, 0) = deltaG;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
+            params(iter, 0) = 0.;
+            params(iter, 1) = range;
+            params(iter, 2) = angle;
             }
             else
             {
-                params(iter, 0) = 0.0; // bind to one end, blocking further growth
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
+            params(iter, 0) = deltaG;
+            params(iter, 1) = range;
+            params(iter, 2) = angle;
             }
             iter++;
         }
@@ -315,7 +305,7 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            params(iter, 0) = 0.0; // deltaG;
+            params(iter, 0) = 0.0;//deltaG;
             params(iter, 1) = range;
             params(iter, 2) = angle;
 
@@ -339,7 +329,7 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            params(iter, 0) = 0.0; // deltaG
+            params(iter, 0) = 0.0;//deltaG;
             params(iter, 1) = range;
             params(iter, 2) = angle;
 

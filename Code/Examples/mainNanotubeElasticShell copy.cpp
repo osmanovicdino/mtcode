@@ -54,38 +54,6 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 
 using namespace std;
 
-
-void get_all_strings(string stringbase, int num, string &pos, string &ori, string &ort)
-{
-    stringstream ss;
-
-    ss << setw(2) << setfill('0') << num;
-    string poss = "pos";
-    poss = poss + stringbase;
-    string oris = "div";
-    oris = oris + stringbase;
-
-    poss += "_i=";
-    oris += "_i=";
-    // elli += "_i=";
-
-    string extension = ".csv";
-
-    poss += ss.str();
-    oris += ss.str();
-    // elli += ss.str();
-
-    poss += extension;
-    oris += extension;
-
-    string orie = "orient";
-    orie += extension;
-
-    pos = poss;
-    ori = oris;
-    ort = orie;
-}
-
 int main(int argc, char **argv)
 {
 
@@ -246,21 +214,13 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 3; j++)
         {
-            if (i == 2 || j == 2) // the sides cannot interact
-            {
+            if(i==2||j==2) {
                 params(iter, 0) = 0.0;
                 params(iter, 1) = range;
                 params(iter, 2) = angle;
                 iter++;
             }
-            else if (i != j) // we want it to be directional
-            {
-                params(iter, 0) = 0.0;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
-                iter++;
-            }
-            else
+            else 
             {
                 params(iter, 0) = deltaG;
                 params(iter, 1) = range;
@@ -270,41 +230,39 @@ int main(int argc, char **argv)
         }
     }
 
-    for (int i = 0; i < 3; i++) // crosslinks
+    for (int i = 0; i < 3; i++) // nanostar/anti-invader interaction
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i == 2)
-            {
-                params(iter, 0) = deltaG;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
+            if(i==2) {
+            params(iter, 0) = deltaG;
+            params(iter, 1) = range;
+            params(iter, 2) = angle;
             }
-            else
-            {
-                params(iter, 0) = 0.0;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
+            else{
+            params(iter, 0) = 0.0;
+            params(iter, 1) = range;
+            params(iter, 2) = angle;
             }
             iter++;
         }
     }
 
-    for (int i = 0; i < 3; i++) // caps
+    for (int i = 0; i < 3; i++) // nanonstar/invader interaction
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i == 0 && j == 0) // only binds to one end
+            if (i == 2)
             {
-                params(iter, 0) = deltaG;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
+            params(iter, 0) = 0.;
+            params(iter, 1) = range;
+            params(iter, 2) = angle;
             }
             else
             {
-                params(iter, 0) = 0.0; // bind to one end, blocking further growth
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
+            params(iter, 0) = deltaG;
+            params(iter, 1) = range;
+            params(iter, 2) = angle;
             }
             iter++;
         }
@@ -313,7 +271,7 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            params(iter, 0) = 0.0; // deltaG;
+            params(iter, 0) = 0.0;//deltaG;
             params(iter, 1) = range;
             params(iter, 2) = angle;
 
@@ -337,14 +295,13 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            params(iter, 0) = 0.0; // deltaG
+            params(iter, 0) = 0.0;//deltaG
             params(iter, 1) = range;
             params(iter, 2) = angle;
 
             iter++;
         }
     }
-
     vector1<int> numb(3);
     numb[0]=Ns+NM2;
     numb[1]=Ns+NM2+NM3;
@@ -380,79 +337,8 @@ int main(int argc, char **argv)
     c1.M=sim_params(3,1);
     c1.weight=sim_params(3,2);
 
-    WeiM c3;
-    c3.M = sim_params(3, 1);
-    c3.weight = 1./sim_params(3, 2);
 
-    int pulse1 = sim_params(4,0);
-    int pulse2 = sim_params(4,1);
-
-    // int m1 = 1000000;
-    int every = 10000;
-    int mod1 = pulse1 / every;
-    int mod2 = pulse2 / every;
-
-    A.run_with_real_surface_add_particles(pulse1+1, every, B, prod, c1, stringbase);
-// posfile=$(ls -t ${directory_path}/pos* | head -n 1)
-// orifile=./orient.csv
-// indfile=$(ls -t ${directory_path}/div* | head -n 1)
-    
-    cout << "done" << endl;
-    string poss,oris,orie;
-    int iter1 = 1;
-    int iter2 = 0;
-    
-
-
-    for(;;)
-    {
-        get_all_strings(stringbase,iter1*mod1+iter2*mod2,poss,oris,orie);
-        cout << poss << endl;
-        double Tx;
-        
-        bool err2;
-        matrix<double> olddat = importcsv(poss, Tx, err2);
-
-        bool erro;
-        matrix<double> oldori = importcsv(orie, Tx, erro);
-
-        int T2;
-        bool err3;
-        matrix<double> oldind_temp = importcsv(oris, T2, err3);
-
-
-        vector1<int> oldind(oldind_temp.getnrows());
-        for (int i = 0; i < oldind_temp.getnrows(); i++)
-        {
-            oldind[i] = oldind_temp(i, 0);
-        }
-
-        A.run_with_real_surface_add_particles_continue(pulse2 + 1, every, iter1 * mod1 + iter2 * mod2, B, prod, c3, olddat, oldori, oldind, stringbase);
-
-        iter2++;
-
-        get_all_strings(stringbase, iter1 * mod1 + iter2 * mod2, poss, oris, orie);
-
-        cout << "done" << endl;
-
-        matrix<double> olddat2 = importcsv(poss, Tx, err2);
-
-        matrix<double> oldori2 = importcsv(orie, Tx, erro);
-
-        matrix<int> oldind_temp2 = importcsv(oris, T2, err3);
-
-        vector1<int> oldind2(oldind_temp2.getnrows());
-        for (int i = 0; i < oldind_temp2.getnrows(); i++)
-        {
-            oldind2[i] = oldind_temp2(i, 0);
-        }
-
-        A.run_with_real_surface_add_particles_continue(pulse1 + 1, every, iter1 * mod1 + iter2 * mod2, B, prod, c1, olddat2, oldori2, oldind2, stringbase);
-
-        cout << "done" << endl;
-        iter1++;
-
-    }
+    A.run_with_real_surface_add_particles(100000000, 10000, B, prod, c1, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 
