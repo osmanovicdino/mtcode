@@ -252,6 +252,8 @@ int main(int argc, char **argv)
     orient(6, 1) = ny5;
     orient(6, 2) = nz5;
 
+
+
     int tot = 3 * 3 + 3 * 2 + 3 * 2 + 2 * 2 + 2 * 2 + 2 * 2;
     matrix<double> params(tot, 3);
     double range = 1.2;
@@ -285,31 +287,39 @@ int main(int argc, char **argv)
         }
     }
 
-    for (int i = 0; i < 3; i++) // crosslinks
+    for (int i = 0; i < 3; i++) // no crosslinker on it
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i == 2)
-            {
-                params(iter, 0) = deltaG;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
-            }
-            else
+            if (i == 2) // the sides cannot interact
             {
                 params(iter, 0) = 0.0;
                 params(iter, 1) = range;
                 params(iter, 2) = angle;
+                iter++;
             }
-            iter++;
+            else if (i != j) // we want it to be directional
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
+                iter++;
+            }
+            else
+            {
+                params(iter, 0) = deltaG;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
+                iter++;
+            }
         }
     }
 
-    for (int i = 0; i < 3; i++) // caps
+    for (int i = 0; i < 3; i++) // crosslinks
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i == 0 && j == 0) // only binds to one end
+            if (i == 2) // only binds to one end
             {
                 params(iter, 0) = deltaG;
                 params(iter, 1) = range;
@@ -324,19 +334,28 @@ int main(int argc, char **argv)
             iter++;
         }
     }
-    for (int i = 0; i < 2; i++) // anti-invader/anti-invader interaction
+    for (int i = 0; i < 2; i++) // monomer/monomer interaction
     {
         for (int j = 0; j < 2; j++)
         {
-            params(iter, 0) = 0.0; // deltaG;
-            params(iter, 1) = range;
-            params(iter, 2) = angle;
-
-            iter++;
+            if (i != j) // we want it to be directional
+            {
+                params(iter, 0) = 0.0;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
+                iter++;
+            }
+            else
+            {
+                params(iter, 0) = deltaG;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
+                iter++;
+            }
         }
     }
 
-    for (int i = 0; i < 2; i++) // anti-invader/invader interaction
+    for (int i = 0; i < 2; i++) // monomer/crosslinker interaction
     {
         for (int j = 0; j < 2; j++)
         {
@@ -348,7 +367,7 @@ int main(int argc, char **argv)
         }
     }
 
-    for (int i = 0; i < 2; i++) // invader/invader interaction
+    for (int i = 0; i < 2; i++) // crosslinker/crosslinker interaction
     {
         for (int j = 0; j < 2; j++)
         {
