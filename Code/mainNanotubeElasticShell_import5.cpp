@@ -415,7 +415,7 @@ int main(int argc, char **argv)
     WeiM c1;
     c1.M = sim_params(3, 1);
     c1.weight = sim_params(3, 2);
-    A.run_with_real_surface_add_particles_continue(10000, 10000, posfiles.size(), B, prod, c1, olddat, oldori, oldind, stringbase);
+    A.run_with_real_surface_add_particles_continue(100000000, 10000, posfiles.size(), B, prod, c1, olddat, oldori, oldind, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
     // A.run(1000000, 1000);
 
