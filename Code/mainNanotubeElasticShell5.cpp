@@ -360,7 +360,7 @@ int main(int argc, char **argv)
     c1.M = Ns + NM2 + NM3;
     c1.weight = sim_params(3, 2);
 
-    A.run_with_real_surface_add_particles(20000000, 10000, B, prod, c1, stringbase);
+    A.run_with_real_surface_add_particles(100000000, 10000, B, prod, c1, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
     // A.run(1000000, 1000);
 
