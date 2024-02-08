@@ -61,11 +61,14 @@ int main(int argc, char **argv)
     // int NM2;
     // double deltaG2,angle2;
     string importstring;
+    
     if (argc == 2)
     {
         stringstream ss;
         ss << argv[1];
         importstring = ss.str();
+
+
     }
     else
     {

@@ -269,7 +269,7 @@ int main(int argc, char **argv)
     //A.conf.setv(0.0);//no confinement
     // A.run(20000000, 10000, stringbase);
         // A.run_add_particles(10000000, 10000, 0.001, stringbase);
-         A.run_with_real_surface(1000000, 10000, B, constantF, stringbase);
+         A.run_with_real_surface(5000000, 10000, B, constantF, stringbase);
         //  A.run(1000000, 1000);
 
         return 0;
