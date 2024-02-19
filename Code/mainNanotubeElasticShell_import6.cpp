@@ -193,64 +193,6 @@ int main(int argc, char **argv)
     double angle = sim_params(2, 3);
     // BivalentPatch c2(deltaG, 1.4, angle);
 
-    vector1<int> vec1(3);
-    vec1[0] = 3;
-    vec1[1] = 2;
-    vec1[2] = 2;
-
-    matrix<double> orient(7, 3);
-
-    double nx4 = 1.0;
-    double ny4 = 0.0;
-    double nz4 = 0.0;
-
-    double nx5 = -1.0;
-    double ny5 = 0.0;
-    double nz5 = 0.0;
-
-    double nx6 = 1.0; //-0.5;
-    double ny6 = 0.0; // 0.5 * sqrt(3.);
-    double nz6 = 0.0;
-
-    double nx7 = 0.0; //-0.5;
-    double ny7 = 1.0; //-0.5 * sqrt(3.);
-    double nz7 = 0.0; // 0.;
-
-    double nx8 = -1.; // 0.5;
-    double ny8 = 0.;  // 0.5 * sqrt(3);
-    double nz8 = 0.;  // 0.0;
-
-    double nx9 = 0.;  // 0.5;
-    double ny9 = -1.; // 0.5 * sqrt(3);
-    double nz9 = 0.;  // 0.0;
-
-    orient(0, 0) = nx6;
-    orient(0, 1) = ny6;
-    orient(0, 2) = nz6;
-
-    orient(1, 0) = nx8;
-    orient(1, 1) = ny8;
-    orient(1, 2) = nz8;
-
-    orient(2, 0) = nx7;
-    orient(2, 1) = ny7;
-    orient(2, 2) = nz7;
-
-    orient(3, 0) = nx4;
-    orient(3, 1) = ny4;
-    orient(3, 2) = nz4;
-
-    orient(4, 0) = nx5;
-    orient(4, 1) = ny5;
-    orient(4, 2) = nz5;
-
-    orient(5, 0) = nx4;
-    orient(5, 1) = ny4;
-    orient(5, 2) = nz4;
-
-    orient(6, 0) = nx5;
-    orient(6, 1) = ny5;
-    orient(6, 2) = nz5;
 
     vector1<int> vec1(3);
     vec1[0] = 4;
