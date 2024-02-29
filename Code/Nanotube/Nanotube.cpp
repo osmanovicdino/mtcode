@@ -2146,9 +2146,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
     obj->setorientation(oldori);
 
 
-    cout << NN << endl;
-    cout << totnp << endl;
-    cout << Nx << endl;
+
     // programmatic
     vector<int> indices_everything; // these are the indices of all the particles on the shell
     vector<int> indices_shell;
@@ -2241,6 +2239,10 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5); // for the patchy particle binding
 
+    vector<patchint> pat = obj->calculate_patch_list(*pairs_onlyb, *pots);
+
+
+
     // start with zero patchy particles in the simulation
     // indices_patchy.push_back(0);
 
@@ -2255,7 +2257,16 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
 
-    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+
+
+
+
+
+    obj->calculate_forces_and_torques3D(pat, *pots, F, T); // calculate the forces involved due to patchy
+
+    // obj->calculate_forces_and_torques3D(pat, *pots, F2, T2); // calculate the forces involved due to patchy
+
+
 
     generate_uniform_random_matrix(RT, indices_patchy); // only generate random torques for the patchy particles
 
@@ -2301,6 +2312,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
             pairs = obj->calculatepairs_parallel(boxes, indices_everything, 3.5);
 
             pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_patchy, 3.5);
+
+            pat = obj->calculate_patch_list(*pairs_onlyb, *pots);
     }
 
     obj->advancemom_halfstep(F, T, indices_everything);
@@ -2313,7 +2326,7 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     T.reset(0.0);
 
-    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+    obj->calculate_forces_and_torques3D(pat, *pots, F, T); // calculate the forces involved due to patchy
 
     generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
 

@@ -909,6 +909,126 @@ int totp =  pairs.getnrows();
 
     }
 
+    void LangevinNVTR::calculate_forces_and_torques3D(vector<patchint> &pairs, ComboPatch &iny, matrix<double> &forces, matrix<double> &torques)
+    {
+        int totp = pairs.size();
+
+#pragma omp parallel for
+        for (int i = 0; i < totp; ++i)
+        {
+            int p1 = pairs[i].particle_index1;
+            int p2 = pairs[i].particle_index2;
+
+            if (p2 < p1)
+            { // INDICES NEED TO BE SORTED FOR IT TO WORK
+                int tp1 = p1;
+                p1 = p2;
+                p2 = tp1;
+            }
+            // int i1 = pairs(i,2);
+            double dis;
+            // vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+            vector1<double> un(dimension);
+            geo.distance_vector(*dat, p1, p2, un, dis);
+
+            // un = i-j
+            dis = sqrt(dis);
+
+            un /= dis;
+
+
+
+            // cout << p1 << " " << p2 << endl;
+            // cout << (*q)[0] << endl;
+            // cout << (*q)[1] << endl;
+            // pausel();
+            // iny.UpdateIterator(p1,p2); // this points the patch pointer to the correct particles
+
+            // cout << (*q)[0] << endl;
+
+            // int **q = new int *;
+
+            // if (iny.safe)
+            // {
+            //     iny.UpdateIterator(p1, p2);
+            //     *q = *iny.p;
+            // }
+            // else
+            // {
+            //     iny.UpdateIteratorSafe(p1, p2, q);
+            // }
+
+            ///int tp = pairs[i].potn;
+
+                // int potn = (*q)[tp];
+
+            int potn = pairs[i].potn;
+            double fx;
+            double fy;
+            double fz;
+
+            double tix;
+            double tiy;
+            double tiz;
+
+            double tjx;
+            double tjy;
+            double tjz;
+
+            (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
+
+            // cout << p1 << " " << p2 << " " << tp << " " << potn << endl;
+
+            // cout << "forces: " << fx <<" " << fy << " " << fz << endl;
+            // cout << dis << endl;
+            // cout << un << endl;
+            // cout << iny.potential_bundle[potn]->getparameters() << endl;
+
+            // pausel();
+
+            if (abs(fx) > 1.E-3 || abs(fy) > 1.E-3 || abs(fz) > 1.E-3)
+            {
+                }
+
+                if (abs(fx) > 1.E4 || abs(fy) > 1.E4 || abs(fz) > 1.E4)
+                {
+                    cout << p1 << " " << p2 << endl;
+                    cout << fx << " " << fy << " " << fz << " " << dis << endl;
+                }
+
+                // if((abs(fx)>1E-10 || abs(fy)>1E-10|| abs(fz)> 1E-10) /* &&(p1<2048+50 && p2 >= 2048+50) */ ) {
+                // int wp1,wp2;
+                // iny.which_patch(p1,p2,potn,wp1,wp2);
+                // cout << p1 <<" " << p2 << " " <<potn << " " << wp1 << " " << wp2 << endl;
+                // cout << un << endl;
+                // cout << dis << endl;
+                // cout << fx << " " << fy << " " << fz << endl;
+
+                // pausel();
+
+                // }
+
+                forces(p1, 0) += fx;
+                forces(p1, 1) += fy;
+                forces(p1, 2) += fz;
+
+                forces(p2, 0) += -fx;
+                forces(p2, 1) += -fy;
+                forces(p2, 2) += -fz;
+
+                torques(p1, 0) += tix;
+                torques(p1, 1) += tiy;
+                torques(p1, 2) += tiz;
+
+                torques(p2, 0) += tjx; // - dis * (fz * un[1] - fy * un[2]);
+                torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
+                torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
+            
+
+            //delete q;
+        }
+    }
+
 void LangevinNVTR::calculate_forces_and_torques3D_onlyone(matrix<int> &pairs, vector1<potentialtheta3D *> &iny,  BinaryBindStore &bo, AbstractBindingModel &bm, matrix<double> &forces, matrix<double> &torques)
     {
 
