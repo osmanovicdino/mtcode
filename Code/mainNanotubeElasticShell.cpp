@@ -124,6 +124,8 @@ int main(int argc, char **argv)
 
     double kappa = sim_params(1, 3);
 
+    Ns = pos.getnrows();
+
     double T4;
     bool err4;
     matrix<double> bindingdis = importcsv("./IsocohedronD.csv", T4, err4);
