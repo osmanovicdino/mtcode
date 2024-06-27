@@ -131,10 +131,10 @@ int main(int argc, char **argv)
     ShellProperties B(pairs,quads,pos,bindingdis,k,rm,kappa);
 
     // system("rm Iso*.csv");
-    B.k = k;
-    B.rm = rm;
-    B.par = pairs;
-    B.posi = pos;
+    // B.k = k;
+    // B.rm = rm;
+    // B.par = pairs;
+    // B.posi = pos;
 
     // B.DoAnMC(100.,false);
 

@@ -9,7 +9,7 @@
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 6
-#$ -t 1-10:1
+#$ -t 1-40:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -40,13 +40,13 @@ fi
 basedir="SelfAssembly1"
 dirwemake="try=${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
-cp ~/Chemistry/Code/mainNanotubeElasticShell6.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
+cp ~/Chemistry/Code/mainNanotubeElasticShell.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronI.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronI2.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronP2.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronD.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/Basic/InitialConditions/${wt} /u/scratch/d/dinoo/${basedir}/${dirwemake}/param.csv
-g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShell6.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
+g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShell.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 export OMP_NUM_THREADS=6
 ./angron 'param.csv' >log
