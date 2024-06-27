@@ -322,6 +322,10 @@ int main(int argc, char **argv)
     numb[0]=Ns+NM2;
     numb[1]=Ns+NM2+NM3;
     numb[2]=Ns+NM;
+    cout << NM2 << " " << NM3 << endl;
+    cout << numb << endl;
+    cout << deltaG << endl;
+    pausel();
 
  
  
