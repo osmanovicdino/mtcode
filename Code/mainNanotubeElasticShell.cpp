@@ -160,8 +160,6 @@ int main(int argc, char **argv)
     double deltaG = sim_params(2,2);
     double angle = sim_params(2,3);
 
-    cout << deltaG << endl;
-    pausel();
     // BivalentPatch c2(deltaG, 1.4, angle);
     vector1<int> vec1(3);
     vec1[0] = 3;
