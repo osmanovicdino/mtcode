@@ -1635,6 +1635,9 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 	// myfile.open("forces.csv", ios::out | ios::app);
 	//cout << pairs.getNsafe() << endl;
 	//potential * pot = ints(0,1,0).clone();
+
+
+
 	int totp = pairs.getNsafe();
 	#pragma omp parallel for
 	for(int i = 0 ; i < totp ; ++i ) {
@@ -1652,6 +1655,8 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 		double f1  = iny.force(sqrt(dis));
 	
 		if(abs(f1) > 1.E4) {
+			cout << "force too big" << endl;
+
 			cout << p1 << " " << p2 << endl;
 			cout << f1 << " " << dis << endl;
 			vector1<int> dim(3);
@@ -1688,6 +1693,8 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 			
 			pausel();
 		}  
+		
+
 		
 
 		for(int j = 0 ; j < dimension ; ++j) {
@@ -1943,6 +1950,350 @@ matrix<double> MD::calculateforces_fast3D(matrix<int> &pairs) {
 		}
 	}
 
+
+
+	return forces;
+}
+
+matrix<double> MD::calculateforcesharmonic(matrix<int> &pairs, matrix<double> &bondlengths, double k)
+{
+
+	matrix<double> forces((*dat).getNsafe(), dimension);
+	// vec_vec<double> outputs(pairs.getn());
+	//  ofstream myfile;
+	//  myfile.open("forces.csv", ios::out | ios::app);
+	// cout << pairs.getNsafe() << endl;
+	// potential * pot = ints(0,1,0).clone();
+
+	int totp = pairs.getNsafe();
+#pragma omp parallel for
+	for (int i = 0; i < totp; ++i)
+	{
+		int p1 = pairs.mat[i * 2 + 0];
+		int p2 = pairs.mat[i * 2 + 1];
+		// int i1 = pairs(i,2);
+		double dis;
+		// vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+		vector1<double> un(dimension);
+		geo.distance_vector(*dat, p1, p2, un, dis);
+
+		// un = i-j
+
+		double f1 = -k*(sqrt(dis)-bondlengths[i]);//iny.force(sqrt(dis));
+
+		if (abs(f1) > 1.E4)
+		{
+			cout << "force too big" << endl;
+
+			cout << p1 << " " << p2 << endl;
+			cout << f1 << " " << dis << endl;
+			vector1<int> dim(3);
+			for (int i1 = 0; i1 < 3; i1++)
+			{
+				int ij = 1;
+				for (int j = 0; j < i1; j++)
+				{
+					ij *= 38;
+				}
+				dim[i] = ij;
+			}
+
+			vector1<double> pr1 = (*dat).getrowvector(p1);
+
+			vector1<double> pr2 = (*dat).getrowvector(p2);
+
+			vector1<int> pri1(3);
+			vector1<int> pri2(3);
+
+			for (size_t i2 = 0; i2 < 3; i2++)
+			{
+				pri1[i2] = floor(pr1[i2] / 3.05908);
+				pri2[i2] = floor(pr2[i2] / 3.05908);
+			}
+
+			cout << pr1 << endl;
+			cout << pr2 << endl;
+
+			cout << scalar(dim, pri1) << endl;
+			cout << scalar(dim, pri2) << endl;
+
+			pausel();
+		}
+
+		for (int j = 0; j < dimension; ++j)
+		{
+			double fac = f1 * un[j] / sqrt(dis);
+			(forces).mat[p1 * dimension + j] += fac;
+			(forces).mat[p2 * dimension + j] += -fac;
+		}
+	}
+
+	return forces;
+}
+
+matrix<double> MD::calculateforcesdelauny(matrix<int> &quads, double kappa) {
+
+	matrix<double> forces((*dat).getNsafe(), dimension);
+	int totp = quads.getNsafe();
+	#pragma omp parallel for
+	for(int i = 0 ; i < totp ; i++ ) {
+		int p1 = quads.mat[i * 4 + 0];
+		int p2 = quads.mat[i * 4 + 1];
+		int p3 = quads.mat[i * 4 + 2];
+		int p4 = quads.mat[i * 4 + 3];
+
+		double x1 = (*dat)[p1 * dimension + 0];
+		double y1 = (*dat)[p1 * dimension + 1];
+		double z1 = (*dat)[p1 * dimension + 2];
+
+		double x2 = (*dat)[p2 * dimension + 0];
+		double y2 = (*dat)[p2 * dimension + 1];
+		double z2 = (*dat)[p2 * dimension + 2];
+
+		double x3 = (*dat)[p3 * dimension + 0];
+		double y3 = (*dat)[p3 * dimension + 1];
+		double z3 = (*dat)[p3 * dimension + 2];
+
+		double x4 = (*dat)[p4 * dimension + 0];
+		double y4 = (*dat)[p4 * dimension + 1];
+		double z4 = (*dat)[p4 * dimension + 2];
+
+		// double x1 = 0.;
+		// double y1 = 0.;
+		// double z1 = 0.;
+
+		// double x2 = 1.;
+		// double y2 = 0.;
+		// double z2 = 0.;
+
+		// double x3 = 0.5;
+		// double y3 = sqrt(3)/2;
+		// double z3 = -.3;
+
+		// double x4 = 0.5;
+		// double y4 = -sqrt(3)/2;;
+		// double z4 = -.3;
+
+		//assume that very sharp local fluctuations are impossible
+
+		//both normal vectors should be pointing out of the plane of the vesicle, or into the plane of the veiscle
+		double g1 = SQR(-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + SQR((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) + SQR(-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3)) ;
+		double g2 = SQR((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + SQR(-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4)) + SQR((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4)) ;
+		double normn = sqrt(g1) * sqrt(g2);
+		double fac1= sqrt(g2)/sqrt(g1);
+		double fac2 = 1./fac1;
+		double sumn = (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) +
+																																																					   ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4)) +
+																																																					   (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3)) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+
+		// double dnormdx1;
+		// double dnormdy1;
+		// double dnormdz1;
+		// double dnormdx2;
+		// double dnormdy2;
+		// double dnormdz2;
+		// double dnormdx3;
+		// double dnormdy3;
+		// double dnormdz3;
+		// double dnormdx4;
+		// double dnormdy4;
+		// double dnormdz4;
+		double dg1dx1 = 2 * (y2 - y3) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + 2 * (-z2 + z3) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3));
+
+		double dg2dx1 = 2 * (-y2 + y4) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + 2 * (z2 - z4) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4));
+
+		double dg1dy1 = 2 * (-x2 + x3) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + 2 * (z2 - z3) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3));
+
+		double dg2dy1 = 2 * (x2 - x4) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + 2 * (-z2 + z4) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+
+		double dg1dz1 = 2 * (x2 - x3) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) + 2 * (-y2 + y3) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3));
+
+		double dg2dz1 = 2 * (-x2 + x4) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4)) + 2 * (y2 - y4) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+
+		double dg1dx2 = 2 * (-y1 + y3) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + 2 * (z1 - z3) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3));
+
+		double dg2dx2 = 2 * (y1 - y4) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + 2 * (-z1 + z4) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4));
+
+		double dg1dy2 = 2 * (x1 - x3) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + 2 * (-z1 + z3) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3));
+
+		double dg2dy2 = 2 * (-x1 + x4) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + 2 * (z1 - z4) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+
+		double dg1dz2 = 2 * (-x1 + x3) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) + 2 * (y1 - y3) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3));
+
+		double dg2dz2 = 2 * (x1 - x4) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4)) + 2 * (-y1 + y4) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+
+		double dg1dx3 = 2 * (y1 - y2) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + 2 * (-z1 + z2) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3));
+
+		double dg2dx3 = 0;
+
+		double dg1dy3 = 2 * (-x1 + x2) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + 2 * (z1 - z2) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3));
+
+		double dg2dy3 = 0;
+
+		double dg1dz3 = 2 * (x1 - x2) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) + 2 * (-y1 + y2) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3));
+
+		double dg2dz3 = 0;
+
+		double dg1dx4 = 0;
+
+		double dg2dx4 = 2 * (-y1 + y2) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + 2 * (z1 - z2) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4));
+
+		double dg1dy4 = 0;
+
+		double dg2dy4 = 2 * (x1 - x2) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + 2 * (-z1 + z2) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+
+		double dg1dz4 = 0;
+
+		double dg2dz4 = 2 * (-x1 + x2) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4)) + 2 * (y1 - y2) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+
+
+		double dnormdx1 = 0.5 * (fac1 * dg1dx1 + fac2 * dg2dx1);
+		double dnormdy1 = 0.5 * (fac1 * dg1dy1 + fac2 * dg2dy1);
+		double dnormdz1 = 0.5 * (fac1 * dg1dz1 + fac2 * dg2dz1);
+		double dnormdx2 = 0.5 * (fac1 * dg1dx2 + fac2 * dg2dx2);
+		double dnormdy2 = 0.5 * (fac1 * dg1dy2 + fac2 * dg2dy2);
+		double dnormdz2 = 0.5 * (fac1 * dg1dz2 + fac2 * dg2dz2);
+		double dnormdx3 = 0.5 * (fac1 * dg1dx3 + fac2 * dg2dx3);
+		double dnormdy3 = 0.5 * (fac1 * dg1dy3 + fac2 * dg2dy3);
+		double dnormdz3 = 0.5 * (fac1 * dg1dz3 + fac2 * dg2dz3);
+		double dnormdx4 = 0.5 * (fac1 * dg1dx4 + fac2 * dg2dx4);
+		double dnormdy4 = 0.5 * (fac1 * dg1dy4 + fac2 * dg2dy4);
+		double dnormdz4 = 0.5 * (fac1 * dg1dz4 + fac2 * dg2dz4);
+
+		double dsumndx1 = (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) * (-y2 + y4) + (y2 - y3) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) * (z2 - z4) + (-z2 + z3) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4));
+		double dsumndy1 = (x2 - x4) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + (-x2 + x3) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3)) * (-z2 + z4) + (z2 - z3) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+		double dsumndz1 = (-x2 + x4) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) + (y2 - y4) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3)) + (x2 - x3) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4)) + (-y2 + y3) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+		double dsumndx2 = (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) * (y1 - y4) + (-y1 + y3) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) * (-z1 + z4) + (z1 - z3) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4));
+		double dsumndy2 = (-x1 + x4) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + (x1 - x3) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3)) * (z1 - z4) + (-z1 + z3) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+		double dsumndz2 = (x1 - x4) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) + (-y1 + y4) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3)) + (-x1 + x3) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4)) + (y1 - y3) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+		double dsumndx3 = (y1 - y2) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + (-z1 + z2) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4));
+		double dsumndy3 = (-x1 + x2) * ((-x2 + x4) * (-y1 + y4) - (-x1 + x4) * (-y2 + y4)) + (z1 - z2) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+		double dsumndz3 = (x1 - x2) * (-((-x2 + x4) * (-z1 + z4)) + (-x1 + x4) * (-z2 + z4)) + (-y1 + y2) * ((-y2 + y4) * (-z1 + z4) - (-y1 + y4) * (-z2 + z4));
+		double dsumndx4 = (-y1 + y2) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + (z1 - z2) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3));
+		double dsumndy4 = (x1 - x2) * (-((-x1 + x3) * (-y1 + y2)) + (-x1 + x2) * (-y1 + y3)) + (-z1 + z2) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3));
+		double dsumndz4 = (-x1 + x2) * ((-x1 + x3) * (-z1 + z2) - (-x1 + x2) * (-z1 + z3)) + (y1 - y2) * (-((-y1 + y3) * (-z1 + z2)) + (-y1 + y2) * (-z1 + z3));
+
+		double f1 = kappa * (sumn * dnormdx1 - normn * dsumndx1) / (2 * SQR(normn));
+		double f2 = kappa *(sumn * dnormdy1 - normn * dsumndy1) / (2 * SQR(normn));
+		double f3 = kappa *(sumn * dnormdz1 - normn * dsumndz1) / (2 * SQR(normn));
+
+		double f4 = kappa * (sumn * dnormdx2 - normn * dsumndx2) / (2 * SQR(normn));
+		double f5 = kappa * (sumn * dnormdy2 - normn * dsumndy2) / (2 * SQR(normn));
+		double f6 = kappa * (sumn * dnormdz2 - normn * dsumndz2) / (2 * SQR(normn));
+
+		double f7 = kappa * (sumn * dnormdx3 - normn * dsumndx3) / (2 * SQR(normn));
+		double f8 = kappa * (sumn * dnormdy3 - normn * dsumndy3) / (2 * SQR(normn));
+		double f9 = kappa * (sumn * dnormdz3 - normn * dsumndz3) / (2 * SQR(normn));
+
+		double f10 = kappa * (sumn * dnormdx4 - normn * dsumndx4) / (2 * SQR(normn));
+		double f11 = kappa * (sumn * dnormdy4 - normn * dsumndy4) / (2 * SQR(normn));
+		double f12 = kappa * (sumn * dnormdz4 - normn * dsumndz4) / (2 * SQR(normn));
+
+		bool cond1 =  abs(f1) > 1E3 || abs(f2) > 1E3 || abs(f3) > 1E3 || abs(f4) > 1E3 || abs(f5) > 1E3 || abs(f6) > 1E3 || abs(f7) > 1E3 || abs(f8) > 1E3 || abs(f9) > 1E3 || abs(f10) > 1E3 || abs(f11) > 1E3 || abs(f12) > 1E3;
+		if(cond1) {
+			cout << x1 << " " << y1 << " " << z1 << endl;
+			cout << x2 << " " << y2 << " " << z2 << endl;
+			cout << x3 << " " << y3 << " " << z3 << endl;
+			cout << x4 << " " << y4 << " " << z4 << endl;
+			cout << f1 << endl;
+			cout << f2 << endl;
+			cout << f3 << endl;
+			cout << f4 << endl;
+			cout << f5 << endl;
+			cout << f6 << endl;
+			cout << f7 << endl;
+			cout << f8 << endl;
+			cout << f9 << endl;
+			cout << f10 << endl;
+			cout << f11 << endl;
+			cout << f12 << endl;
+			cout << normn << endl;
+			cout << sumn << endl;
+			pausel();
+		}
+
+		// double v1[3] = {(y3 * (z1 - z2) + y1 * (z2 - z3) + y2 * (-z1 + z3)) / (SQR(x1) + x2 * x3 - x1 * (x2 + x3) + (y1 - y2) * (y1 - y3) + (z1 - z2) * (z1 - z3)),
+		// 				(x3 * (-z1 + z2) + x2 * (z1 - z3) + x1 * (-z2 + z3)) / (SQR(x1) + x2 * x3 - x1 * (x2 + x3) + (y1 - y2) * (y1 - y3) + (z1 - z2) * (z1 - z3)),
+		// 				(x3 * (y1 - y2) + x1 * (y2 - y3) + x2 * (-y1 + y3)) / (SQR(x1) + x2 * x3 - x1 * (x2 + x3) + (y1 - y2) * (y1 - y3) + (z1 - z2) * (z1 - z3)) };
+
+		// double v2[3] = {(y4 * (-z1 + z2) + y2 * (z1 - z4) + y1 * (-z2 + z4)) / ((-x1 + x4) * (-x2 + x4) + (-y1 + y4) * (-y2 + y4) + (-z1 + z4) * (-z2 + z4)), (x4 * (z1 - z2) + x1 * (z2 - z4) + x2 * (-z1 + z4)) / ((-x1 + x4) * (-x2 + x4) + (-y1 + y4) * (-y2 + y4) + (-z1 + z4) * (-z2 + z4)), (x4 * (-y1 + y2) + x2 * (y1 - y4) + x1 * (-y2 + y4)) / ((-x1 + x4) * (-x2 + x4) + (-y1 + y4) * (-y2 + y4) + (-z1 + z4) * (-z2 + z4))};
+
+		// double v3[3] = {(x1 + x2 + x3)/3.,(y1 + y2 + y3)/3.,(z1 + z2 + z3)/3.};
+
+		// double v4[3] = {(x1 + x2 + x4) / 3., (y1 + y2 + y4) / 3., (z1 + z2 + z4) / 3.};
+
+		// matrix<double> m(12,3);
+		// m(0, 0) = v1[0];
+		// m(0, 1) = v1[1];
+		// m(0, 2) = v1[2];
+
+		// m(1, 0) = v2[0];
+		// m(1, 1) = v2[1];
+		// m(1, 2) = v2[2];
+
+		// m(2, 0) = v3[0];
+		// m(2, 1) = v3[1];
+		// m(2, 2) = v3[2];
+
+		// m(3, 0) = v4[0];
+		// m(3, 1) = v4[1];
+		// m(3, 2) = v4[2];
+
+		// m(4, 0) = x1;
+		// m(4, 1) = y1;
+		// m(4, 2) = z1;
+
+		// m(5, 0) = x2;
+		// m(5, 1) = y2;
+		// m(5, 2) = z2;
+
+		// m(6, 0) = x3;
+		// m(6, 1) = y3;
+		// m(6, 2) = z3;
+
+		// m(7, 0) = x4;
+		// m(7, 1) = y4;
+		// m(7, 2) = z4;
+
+		// m(8, 0) = f1;
+		// m(8, 1) = f2;
+		// m(8, 2) = f3;
+
+		// m(9, 0) = f4;
+		// m(9, 1) = f5;
+		// m(9, 2) = f6;
+
+		// m(10, 0) = f7;
+		// m(10, 1) = f8;
+		// m(10, 2) = f9;
+
+		// m(11, 0) = f10;
+		// m(11, 1) = f11;
+		// m(11, 2) = f12;
+
+		// outfunc(m,"test");
+		// pausel();
+
+
+
+		forces.mat[p1 * dimension + 0] += -f1;
+		forces.mat[p1 * dimension + 1] += -f2;
+		forces.mat[p1 * dimension + 2] += -f3;
+
+		forces.mat[p2 * dimension + 0] += -f4;
+		forces.mat[p2 * dimension + 1] += -f5;
+		forces.mat[p2 * dimension + 2] += -f6;
+
+		forces.mat[p3 * dimension + 0] += -f7;
+		forces.mat[p3 * dimension + 1] += -f8;
+		forces.mat[p3 * dimension + 2] += -f9;
+
+		forces.mat[p4 * dimension + 0] += -f10;
+		forces.mat[p4 * dimension + 1] += -f11;
+		forces.mat[p4 * dimension + 2] += -f12;
+
+
+	}
 
 
 	return forces;

@@ -61,10 +61,13 @@ int main(int argc, char **argv)
     int NM2;
     double deltaG2,angle2;
     double F1;
-    if (argc == 2)
+    double k2,rm2,kapp2;
+    if (argc == 5)
     {
         F1 = atof(argv[1]);
-
+        k2 = atof(argv[2]);
+        rm2 = atof(argv[3]);
+        kapp2 = atof(argv[4]);
     }
     else
     {
@@ -74,13 +77,12 @@ int main(int argc, char **argv)
     //nm2 is the total amount of added crosslinks
 
     // signal(SIGSEGV, handler);
-    NM2 = 10;
+    NM2 = 2000;
     deltaG2 = 100.;
     angle2 = 0.6;
 
-    ShellProperties B;
-    int Ns = 4096;
-    double targetdensity = 2.0;
+
+    //double targetdensity = 2.0;
 
     // stringstream sx1;
     // stringstream sx2;
@@ -104,17 +106,32 @@ int main(int argc, char **argv)
     int T;
     bool err1;
     matrix<int> pairs = importcsv("./IsocohedronI.csv", T, err1);
+
+    int Ti;
+    bool erri;
+    matrix<int> quads= importcsv("./IsocohedronI2.csv", Ti, erri);
     double T2;
     bool err2;
-    matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
-    double k = 5.0;
-    double rm = 0.;
+    matrix<double> pos = importcsv("./IsocohedronP2.csv", T2, err2);
+    double k = k2;
+    double rm = rm2;
+    double kappa = kapp2;
+    double T3;
+    bool err3;
+    matrix<double> bindingdis = importcsv("./IsocohedronD.csv", T3, err3);
 
     // system("rm Iso*.csv");
-    B.k = k;
-    B.rm = rm;
-    B.par = pairs;
-    B.posi = pos;
+
+    ShellProperties B(pairs,quads,pos,bindingdis,k,rm,kappa);
+    int Ns = pos.getnrows();
+
+
+    // B.k = k;
+    // B.rm = rm;
+    // B.par = pairs;
+    // B.posi = pos;
+    // B.quad = quads;
+    // B.kappa = kappa;
 
     // B.DoAnMC(100.,false);
 
@@ -123,7 +140,7 @@ int main(int argc, char **argv)
 
     // vector1<double> mean = meanmat_end(pos,0);
     
-    double approxradius = 20.0;
+    double approxradius = 18.0;
 
 
     double radius = 1.1 * 2 * approxradius;
@@ -251,8 +268,16 @@ int main(int argc, char **argv)
     ss << F1;
     string str = ss.str();
 
-    stringbase += str;
+    stringstream ss2,ss3,ss4;
+    ss2 << k;
+    ss3 << rm;
+    ss4 << kappa;
 
+  
+    stringbase += str;
+    stringbase += string("_k=") + ss2.str();
+    stringbase += string("_rm=") + ss3.str();
+    stringbase += string("_kappa=") + ss4.str();
     // stringstream ss2;
     // ss2 << deltaG;
 
@@ -264,12 +289,14 @@ int main(int argc, char **argv)
     // stringbase += string("ang=")+ss3.str();
 
     matrix<double> constantF(Ns+NM,3);
-    constantF(0,2) = -F1;
-    constantF(4095,2) = F1;
+    constantF(2,2) = F1;
+    constantF(5,2) = -F1;
+
+
     //A.conf.setv(0.0);//no confinement
     // A.run(20000000, 10000, stringbase);
         // A.run_add_particles(10000000, 10000, 0.001, stringbase);
-         A.run_with_real_surface(5000000, 10000, B, constantF, stringbase);
+         A.run_with_real_surface(1000000, 1000, B, constantF, stringbase);
         //  A.run(1000000, 1000);
 
         return 0;

@@ -645,7 +645,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
     vector<double> possible_pos_z;
 
 
-    myrmax = 0.7*rmax;
+    myrmax = 0.4*rmax;
 
 
     for (int i = 0; i < pp; i++)
@@ -1613,9 +1613,13 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
 
     matrix<int> bindingpairs =  myshell.par;
 
+    matrix<int> quads =  myshell.quad;
+
+    matrix<double> diss = myshell.bindingdis;
+
     int totnp = myshell.posi.getnrows();
 
-
+ 
     
 
     //Hard Sphere Forces
@@ -1631,12 +1635,15 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
 
 
     double ll = obj->getgeo().l;
+
+
+
     matrix<double> newdat(totnp+NN,3);
     vector1<int> p1(NN);
     for(int i  = 0  ; i < totnp + NN ; i++) {
         if(i < totnp) {
             for(int j = 0  ; j < 3 ; j++)
-                newdat(i,j) = myshell.posi(i, j)+ll/2.;  
+                newdat(i,j) = myshell.posi(i, j)+ll/2.;
         }
         else{
             for (int j = 0; j < 3; j++)
@@ -1644,16 +1651,19 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
                 p1[i-totnp] =  i;
         }
     }
+
+
+
+
+    
     obj->initialize(newdat);
 
 
     NN =  obj->getN(); //set new N
     
 
-
     matrix<int> *pairs = obj->calculatepairs_parallel(boxes, 3.5);
     matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, p1, 3.5);
-
 
 
     matrix<double> F(NN, 3);
@@ -1662,16 +1672,28 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
     matrix<double> RT(NN, 6);
     matrix<double> zeromatrix(NN, 3);
 
+
+
+    F += obj->calculateforcesharmonic(bindingpairs, diss, myshell.k);
+
+
+
     F = obj->calculateforces(*pairs, wsa);
 
+    F += constantF;
     // double val;
     // F.maxima(val);
     // cout << val << endl;
     // pausel();
 
-    F += obj->calculateforces(bindingpairs,spr);
 
-    F += constantF;
+
+    F += obj->calculateforcesdelauny(quads, myshell.kappa);
+
+    // cout <<  obj->calculateforcesdelauny(quads, myshell.kappa) << endl;
+    // cout << myshell.kappa << endl;
+    // pausel();
+
 
     //cout << "ok to here" << endl;
 
@@ -1680,7 +1702,7 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
     //cout << "trying to calculate this" << endl;
 
     obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T);
-    
+
 
     //double coru = 1.0;
     // double nxtemp = 0.95;
@@ -1694,10 +1716,8 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
     matrix<double> F2= F;
     obj->create_forces_and_torques_sphere(F, T, RT);
 
-
+ 
     vector1<double> tottemp(6);
-
-
 
 
     for (int i = 0; i < runtime; i++)
@@ -1733,14 +1753,19 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
         (*obj).advance_mom(F, R);
 
         (*obj).advance_pos(); */
-        
+
+
+
         obj->advancemom_halfstep(F, T);
 
         obj->advance_pos();
+
+
         obj->rotate();
 
         F = obj->calculateforces(*pairs, wsa);
-        F += obj->calculateforces(bindingpairs, spr);
+        F += obj->calculateforcesharmonic(bindingpairs, diss, myshell.k);
+        F += obj->calculateforcesdelauny(quads, myshell.kappa);
         F += constantF;
 
         // F += obj->calculateforces_external(conf);
@@ -1830,7 +1855,11 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
-    matrix<int> bindingpairs = myshell.par; //we can get all the binding pairs of the elastic shell
+    matrix<int> bindingpairs = myshell.par;
+
+    matrix<int> quads = myshell.quad;
+
+    matrix<double> diss = myshell.bindingdis;
 
     int totnp = myshell.posi.getnrows(); // total particles that are not patchy
 
@@ -1926,8 +1955,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
     F = obj->calculateforces(*pairs, wsa); //calculate the forces due to hard sphere forces
 
-    F += obj->calculateforces(bindingpairs, spr); //calculate the forces involved due to elastic shell
-
+    F += obj->calculateforcesharmonic(bindingpairs, diss, myshell.k);
+    F += obj->calculateforcesdelauny(quads, myshell.kappa);
 
     obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); //calculate the forces involved due to patchy
 
@@ -1987,10 +2016,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles(int runtime, int ever
 
     F = obj->calculateforces(*pairs, wsa);        // calculate the forces due to hard sphere forces
 
-
-    F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
-
-
+    F += obj->calculateforcesharmonic(bindingpairs, diss, myshell.k);
+    F += obj->calculateforcesdelauny(quads, myshell.kappa);
 
     T.reset(0.0);
 
@@ -2106,9 +2133,11 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
 
+    matrix<int> bindingpairs = myshell.par;
 
-    matrix<int> bindingpairs = myshell.par; // we can get all the binding pairs of the elastic shell
+    matrix<int> quads = myshell.quad;
 
+    matrix<double> diss = myshell.bindingdis;
 
     int totnp = myshell.posi.getnrows(); // total particles that are not patchy
 
@@ -2255,12 +2284,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     F = obj->calculateforces(*pairs, wsa); // calculate the forces due to hard sphere forces
 
-    F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
-
-
-
-
-
+    F += obj->calculateforcesharmonic(bindingpairs, diss, myshell.k);
+    F += obj->calculateforcesdelauny(quads, myshell.kappa);
 
     obj->calculate_forces_and_torques3D(pat, *pots, F, T); // calculate the forces involved due to patchy
 
@@ -2322,7 +2347,8 @@ void NanotubeAssembly::run_with_real_surface_add_particles_continue(int runtime,
 
     F = obj->calculateforces(*pairs, wsa); // calculate the forces due to hard sphere forces
 
-    F += obj->calculateforces(bindingpairs, spr); // calculate the forces involved due to elastic shell
+    F += obj->calculateforcesharmonic(bindingpairs, diss, myshell.k);
+    F += obj->calculateforcesdelauny(quads, myshell.kappa);
 
     T.reset(0.0);
 

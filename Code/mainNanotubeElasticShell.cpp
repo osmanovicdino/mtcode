@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 
     // signal(SIGSEGV, handler);
 
-    ShellProperties B;
+    
     int Ns = 4096; //technically this should be overwrittable, however, because we generated the circle with mathematica we leave it fixed
     double targetdensity = 2.0;
 
@@ -108,17 +108,27 @@ int main(int argc, char **argv)
 
     // pausel();
 
-
     int T;
     bool err1;
     matrix<int> pairs = importcsv("./IsocohedronI.csv", T, err1);
+
+    int Ti;
+    bool erri;
+    matrix<int> quads = importcsv("./IsocohedronI2.csv", Ti, erri);
     double T2;
     bool err2;
-    matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
+    matrix<double> pos = importcsv("./IsocohedronP2.csv", T2, err2);
     double k = sim_params(1, 0);
     
     double rm = sim_params(1, 1);
-    
+
+    double kappa = sim_params(1, 3);
+
+    double T4;
+    bool err4;
+    matrix<double> bindingdis = importcsv("./IsocohedronD.csv", T4, err4);
+
+    ShellProperties B(pairs,quads,pos,bindingdis,k,rm,kappa);
 
     // system("rm Iso*.csv");
     B.k = k;
@@ -340,8 +350,7 @@ int main(int argc, char **argv)
     c1.M=sim_params(3,1);
     c1.weight=sim_params(3,2);
 
-
-    A.run_with_real_surface_add_particles(100000000, 10000, B, prod, c1, stringbase);
+    A.run_with_real_surface_add_particles(10000000, 10000, B, prod, c1, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 

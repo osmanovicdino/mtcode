@@ -14,9 +14,16 @@ struct WeiM
 struct ShellProperties
 {
     matrix<int> par;
+    matrix<int> quad;
     matrix<double> posi;
+    matrix<double> bindingdis;
     double k;
     double rm;
+    double kappa;
+
+    ShellProperties(matrix<int> parr,matrix<int> quadd,matrix<double> posii, matrix<double> bindingdiss,double kk, double rmm, double kappaa) : par(parr), quad(quadd), posi(posii),bindingdis(bindingdiss), k(kk), kappa(kappaa), rm(rmm) {
+
+    }
 
     void DoAnMC(double, bool);
 };

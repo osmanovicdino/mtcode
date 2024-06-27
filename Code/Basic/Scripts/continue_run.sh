@@ -9,7 +9,6 @@ fileparam=./param.csv
 posfile=$(ls -t ${directory_path}/pos* | head -n 1)
 orifile=./orient.csv
 indfile=$(ls -t ${directory_path}/div* | head -n 1)
-pfile=./IsocohedronI.csv
 #cp $pfile ${directory_path}
 echo $fileparam
 echo $posfile
@@ -18,4 +17,4 @@ echo $indfile
 echo $pfile
 cd $directory_path
 export OMP_NUM_THREADS=6
-./a $fileparam $posfile $orifile $indfile $pfile >log
+./a $fileparam $posfile $orifile $indfile >log
