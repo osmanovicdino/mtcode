@@ -2189,28 +2189,28 @@ matrix<double> MD::calculateforcesdelauny(matrix<int> &quads, double kappa) {
 		double f11 = kappa * (sumn * dnormdy4 - normn * dsumndy4) / (2 * SQR(normn));
 		double f12 = kappa * (sumn * dnormdz4 - normn * dsumndz4) / (2 * SQR(normn));
 
-		bool cond1 =  abs(f1) > 1E3 || abs(f2) > 1E3 || abs(f3) > 1E3 || abs(f4) > 1E3 || abs(f5) > 1E3 || abs(f6) > 1E3 || abs(f7) > 1E3 || abs(f8) > 1E3 || abs(f9) > 1E3 || abs(f10) > 1E3 || abs(f11) > 1E3 || abs(f12) > 1E3;
-		if(cond1) {
-			cout << x1 << " " << y1 << " " << z1 << endl;
-			cout << x2 << " " << y2 << " " << z2 << endl;
-			cout << x3 << " " << y3 << " " << z3 << endl;
-			cout << x4 << " " << y4 << " " << z4 << endl;
-			cout << f1 << endl;
-			cout << f2 << endl;
-			cout << f3 << endl;
-			cout << f4 << endl;
-			cout << f5 << endl;
-			cout << f6 << endl;
-			cout << f7 << endl;
-			cout << f8 << endl;
-			cout << f9 << endl;
-			cout << f10 << endl;
-			cout << f11 << endl;
-			cout << f12 << endl;
-			cout << normn << endl;
-			cout << sumn << endl;
-			pausel();
-		}
+		// bool cond1 =  abs(f1) > 1E3 || abs(f2) > 1E3 || abs(f3) > 1E3 || abs(f4) > 1E3 || abs(f5) > 1E3 || abs(f6) > 1E3 || abs(f7) > 1E3 || abs(f8) > 1E3 || abs(f9) > 1E3 || abs(f10) > 1E3 || abs(f11) > 1E3 || abs(f12) > 1E3;
+		// if(cond1) {
+		// 	cout << x1 << " " << y1 << " " << z1 << endl;
+		// 	cout << x2 << " " << y2 << " " << z2 << endl;
+		// 	cout << x3 << " " << y3 << " " << z3 << endl;
+		// 	cout << x4 << " " << y4 << " " << z4 << endl;
+		// 	cout << f1 << endl;
+		// 	cout << f2 << endl;
+		// 	cout << f3 << endl;
+		// 	cout << f4 << endl;
+		// 	cout << f5 << endl;
+		// 	cout << f6 << endl;
+		// 	cout << f7 << endl;
+		// 	cout << f8 << endl;
+		// 	cout << f9 << endl;
+		// 	cout << f10 << endl;
+		// 	cout << f11 << endl;
+		// 	cout << f12 << endl;
+		// 	cout << normn << endl;
+		// 	cout << sumn << endl;
+		// 	pausel();
+		// }
 
 		// double v1[3] = {(y3 * (z1 - z2) + y1 * (z2 - z3) + y2 * (-z1 + z3)) / (SQR(x1) + x2 * x3 - x1 * (x2 + x3) + (y1 - y2) * (y1 - y3) + (z1 - z2) * (z1 - z3)),
 		// 				(x3 * (-z1 + z2) + x2 * (z1 - z3) + x1 * (-z2 + z3)) / (SQR(x1) + x2 * x3 - x1 * (x2 + x3) + (y1 - y2) * (y1 - y3) + (z1 - z2) * (z1 - z3)),

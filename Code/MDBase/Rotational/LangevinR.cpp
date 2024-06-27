@@ -794,6 +794,9 @@ int totp =  pairs.getnrows();
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);
 
+
+            
+
             if (p2 < p1)
             { //INDICES NEED TO BE SORTED FOR IT TO WORK
                 int tp1 = p1;
@@ -807,13 +810,10 @@ int totp =  pairs.getnrows();
             geo.distance_vector(*dat, p1, p2, un, dis);
 
 
-
             //un = i-j
             dis = sqrt(dis);
 
             un /= dis;
-
-  
 
 
             int **q = new int *;
@@ -828,6 +828,7 @@ int totp =  pairs.getnrows();
                 iny.UpdateIteratorSafe(p1, p2, q);
             }
 
+
             // cout << p1 << " " << p2 << endl;
             // cout << (*q)[0] << endl;
             // cout << (*q)[1] << endl;
@@ -839,6 +840,7 @@ int totp =  pairs.getnrows();
             {
                 
                 int potn = (*q)[tp];
+                
                 double fx;
                 double fy;
                 double fz;

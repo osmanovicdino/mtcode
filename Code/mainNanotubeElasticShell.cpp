@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     // signal(SIGSEGV, handler);
 
     
-    int Ns = 4096; //technically this should be overwrittable, however, because we generated the circle with mathematica we leave it fixed
+    int Ns = 4322; //technically this should be overwrittable, however, because we generated the circle with mathematica we leave it fixed
     double targetdensity = 2.0;
 
     // stringstream sx1;
@@ -319,6 +319,8 @@ int main(int argc, char **argv)
     numb[0]=Ns+NM2;
     numb[1]=Ns+NM2+NM3;
     numb[2]=Ns+NM;
+
+ 
  
 //    TetrahedralWithBivalent c2(params, Ns+NM2 , Ns + NM,orient,orient2); //set the difference to be  greater
     GeneralPatch c2(vec1, numb, params, orient);
