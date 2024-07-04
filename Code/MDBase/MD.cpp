@@ -2443,6 +2443,65 @@ class spherical_confinement_3D {
 
 };
 
+class planar_confinement {
+	private :
+		vector1<double> lmax;
+		double v;
+
+	public:
+		planar_confinement() : lmax(vector1<double>(3,10.)), v(1.0)
+		{
+		}
+
+		planar_confinement(vector1<double> rmaxx, double vv) : lmax(rmaxx), v(vv)
+		{
+		}
+		planar_confinement &operator=(const planar_confinement &old)
+		{
+			lmax = old.lmax;
+			v = old.v;
+			return *this;
+		}
+		void setv(double vv)
+		{
+			v = vv;
+		}
+
+		void setl(const vector1<double> &ll) {
+			lmax = ll;
+		}
+
+		vector1<double> operator()(const vector1<double> &x) const
+		{
+
+			// for(int j = 0  ; j < 3 ; )
+			//  double r = sqrt(SQR(x.gpcons(0)) + SQR(x.gpcons(1)) + SQR(x.gpcons(2)));
+			//double r = sqrt(SQR(x.gpcons(0) - shft) + SQR(x.gpcons(1) - shft) + SQR(x.gpcons(2) - shft));
+
+			vector1<double> force(3);
+
+
+				for(int j = 0 ; j < 3 ; j++) {
+				double r2 = SQR(x.gpcons(j) - lmax.gpcons(j));
+
+				double r6 = CUB(r2);
+
+				double r12 = SQR(r6);
+
+				double q2 = SQR(x.gpcons(j));
+
+				double q6 = CUB(r2);
+
+				double q12 = SQR(r6);
+
+				force[j] = v * ((12. / (x.gpcons(j) * q12)) + (12. / ((x.gpcons(2)-lmax.gpcons(j)) * r12)));
+				}
+				return force;
+			
+		}
+};
+
+
 template <class Q>
 matrix<double> MD::calculateforces_external(Q &func)
 {

@@ -67,6 +67,7 @@ void run_with_real_surface_add_particles(int, int, ShellProperties &, double pro
 void run_with_real_surface_add_particles_continue(int, int, int, ShellProperties &, double prod, WeiM &c1, matrix<double>&, matrix<double>&, vector1<int>&,string strbase);
 void run_with_real_surface_remove_add_particles_continue(int, int, int, ShellProperties &, double prod, double, double, WeiM &c1, matrix<double> &, matrix<double> &, vector1<int> &, string strbase);
 void run_add_particles(int, int, double prod, string strbase);
+void run_bending_modulus(int, int, double,string);
 
 //AbstractBindingModel *bm;
 

@@ -144,17 +144,17 @@ int main(int argc, char **argv)
     double ny5 = 0.0;
     double nz5 = 0.0;
 
-    double nx6 = 1.0; //-0.5;
+    double nx6 = 0.0; //-0.5;
     double ny6 = 0.0; // 0.5 * sqrt(3.);
-    double nz6 = 0.0;
+    double nz6 = 1.0;
 
     double nx7 = 0.0; //-0.5;
     double ny7 = 1.0; //-0.5 * sqrt(3.);
     double nz7 = 0.0; // 0.;
 
-    double nx8 = -1.; // 0.5;
+    double nx8 = 0.; // 0.5;
     double ny8 = 0.;  // 0.5 * sqrt(3);
-    double nz8 = 0.;  // 0.0;
+    double nz8 = -1.;  // 0.0;
 
     double nx9 = 0.;  // 0.5;
     double ny9 = -1.; // 0.5 * sqrt(3);
@@ -176,13 +176,13 @@ int main(int argc, char **argv)
     orient(3, 1) = ny9;
     orient(3, 2) = nz9;
 
-    orient2(0, 0) = nx4;
-    orient2(0, 1) = ny4;
-    orient2(0, 2) = nz4;
+    orient2(0, 0) = nx6;
+    orient2(0, 1) = ny6;
+    orient2(0, 2) = nz6;
 
-    orient2(1, 0) = nx5;
-    orient2(1, 1) = ny5;
-    orient2(1, 2) = nz5;
+    orient2(1, 0) = nx8;
+    orient2(1, 1) = ny8;
+    orient2(1, 2) = nz8;
 
     int tot = 4 * 4 + 4 * 2 + 2 * 2;
     int iter = 0;
@@ -221,6 +221,7 @@ int main(int argc, char **argv)
         params(i, 2) = angle;
     }
 
+
     TetrahedralWithBivalent c2(params, NM2, Ns + NM, orient, orient2); // set the difference to be  greater
 
     // c2.v = orient;
@@ -257,7 +258,8 @@ int main(int argc, char **argv)
     // constantF(0,2) = -100.;
     // constantF(4095,2) = 100.;
     A.conf.setv(0.0); // no confinement
-    A.run(10000000, 10000, stringbase);
+    //A.run(10000000, 10000, stringbase);
+    A.run_bending_modulus(1000000,1000,1E-4,stringbase);
     // A.run_add_particles(10000000, 10000, 0.001, stringbase);
     //  A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
     //  A.run(1000000, 1000);

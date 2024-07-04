@@ -1219,6 +1219,216 @@ void NanotubeAssembly::add_particle42(int which)
         }
     }
 
+    void NanotubeAssembly::run_bending_modulus(int runtime, int every, double rate, string strbase = "")
+    {
+
+        int ccc;
+
+        int tf = ceil((double)runtime / (double)every);
+        int number_of_digits = 0;
+        do
+        {
+            ++number_of_digits;
+            tf /= 10;
+        } while (tf);
+
+
+        double ll = 110.;
+        int total_beads = 100;
+        vector1<bool> pb(3, false);
+        cube geo(ll+10., pb, 3);
+
+        obj->setgeometry(geo);
+
+        matrix<double> dat(total_beads, 3);
+
+        double mp = 10.;
+
+        for(int i  = 0 ; i < total_beads ; i++) {
+            dat(i,0) = mp;
+            dat(i,1) = mp;
+            dat(i,2) = 1+1.1*i;
+        }
+        matrix<double> orientation(total_beads,9);
+        for(int i = 0 ; i < total_beads ; i++) {
+            orientation(i, 0)=1.;
+            orientation(i, 4) = 1.;
+            orientation(i, 8) = 1.;
+        }
+        matrix<double> mom(total_beads,3);
+        matrix<double> angmom(total_beads,9);
+       
+
+        obj->setdat(dat);
+        obj->setorientation(orientation);
+        obj->setmom(mom);
+        obj->setangularmomenta(angmom);
+
+        vector1<double> lls(3);
+        lls[0] = 20.;
+        lls[1] = 20.;
+        lls[2] = ll+1;
+
+        planar_confinement conf2(lls,100.);
+
+        matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+        matrix<int> *pairs = obj->calculatepairs(boxes, 3.5);
+
+        WCAPotential wsa(3.0, 1.0, 0.0);
+
+        int NN = obj->getN();
+
+        cout << NN << endl;
+
+  
+
+        matrix<double> F(NN, 3);
+        matrix<double> T(NN, 3);
+        matrix<double> RT(NN, 6);
+        matrix<double> zeromatrix(NN, 3);
+
+
+
+        F = obj->calculateforces(*pairs, wsa);
+   
+        double spring_constant = 100.;
+
+        F(total_beads - 1, 0) += -spring_constant * (obj->getcoordinate(total_beads - 1, 0) - mp);
+        F(total_beads - 1, 1) += - spring_constant*(obj->getcoordinate(total_beads-1, 1) - mp);
+        F(total_beads - 1, 2) += spring_constant * (ll + 1. - obj->getcoordinate(total_beads-1, 2));
+        F(0, 2) += -spring_constant * (obj->getcoordinate(0, 2));
+
+        F(0, 0) += -spring_constant * (obj->getcoordinate(0, 0) - mp);
+        F(0, 1) += -spring_constant * (obj->getcoordinate(0, 1) - mp);
+        // cout << "ok to here" << endl;
+
+        F += obj->calculateforces_external(conf2);
+
+
+        // cout << "trying to calculate this" << endl;
+        // cout << F << endl;
+        
+        obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
+        // cout << F << endl;
+        
+        // double coru = 1.0;
+        //  double nxtemp = 0.95;
+        //  double nytemp = 0.31225;
+        //  double nztemp = 0.0;
+        //  KernFrenkelOnePatch2 testpot(nxtemp, nytemp, -nztemp, nxtemp, nytemp, nztemp, 100., 2., pi / 3., 0.75);
+        //  obj->calculate_forces_and_torques3D(*pairs, testpot, F, T);
+
+        // obj->create_random_forces(RT, RR);
+        generate_uniform_random_matrix(RT);
+        obj->create_forces_and_torques_sphere(F, T, RT);
+        
+
+        vector1<double> tottemp(6);
+
+        for (int i = 0; i < runtime; i++)
+        {
+            ll -= rate;
+            // cout << i << endl;
+            vector1<double> meas(6);
+            // obj->measured_temperature(meas);
+            // tottemp += meas;
+            // cout << tottemp / (double)(i + 1) << endl;
+
+            // cout << i << endl;
+            if (i > 0 && i % 20 == 0)
+            {
+                // cout << "pairs recalculated" << endl;
+                delete pairs;
+                pairs = obj->calculatepairs(boxes, 3.5);
+            }
+ 
+            obj->advancemom_halfstep(F, T);
+            obj->advance_pos();
+            obj->rotate();
+
+            F = obj->calculateforces(*pairs, wsa);
+            F(total_beads - 1, 0) += -spring_constant * (obj->getcoordinate(total_beads - 1, 0) - mp);
+            F(total_beads - 1, 1) += -spring_constant * (obj->getcoordinate(total_beads - 1, 1) - mp);
+            F(total_beads - 1, 2) += spring_constant * (ll +1 - obj->getcoordinate(total_beads - 1, 2));
+            F(0, 2) += -spring_constant * (obj->getcoordinate(0, 2));
+            F(0, 0) += -spring_constant * (obj->getcoordinate(0, 0) - mp);
+            F(0, 1) += -spring_constant * (obj->getcoordinate(0, 1) - mp);
+
+            lls[2] = ll + 1;
+            conf2.setl(lls);
+            F += obj->calculateforces_external(conf2);
+            // cout << obj->calculateforces_external(conf) << endl;
+            // pausel();
+            T.reset(0.0);
+
+            obj->calculate_forces_and_torques3D(*pairs, *pots, F, T);
+
+            // stringstream aa;
+            // aa << setw(number_of_digits+1) << setfill('0') << (i / 1);
+            // outfunc(T,"Tl_i="+aa.str());
+            // outfunc(F, "Fl_i=" + aa.str());
+            // obj->calculate_forces_and_torques3D(*pairs, *pots->potential_bundle[0], F, T);
+
+            // obj->create_random_forces(RT, RR);
+            generate_uniform_random_matrix(RT);
+            obj->create_forces_and_torques_sphere(F, T, RT);
+
+            // outfunc(T, "Tb_i=" + aa.str());
+            // outfunc(F, "Fb_i=" + aa.str());
+
+            obj->advancemom_halfstep(F, T);
+            if (i % every == 0)
+            {
+
+                cout << i << endl;
+
+                stringstream ss;
+
+                ss << setw(number_of_digits) << setfill('0') << (i / every);
+
+                matrix<double> orient = obj->getorientation();
+                matrix<double> pos = obj->getdat();
+
+                string poss = "pos";
+                poss = poss + strbase;
+                string oris = "orientation";
+                oris = oris + strbase;
+
+                vector<patchint> pairsbound = obj->calculate_bound_pairs(*pairs, *pots);
+
+                poss += "_i=";
+                oris += "_i=";
+
+                string extension = ".csv";
+
+                poss += ss.str();
+                oris += ss.str();
+
+                poss += extension;
+                oris += extension;
+
+                ofstream myfile;
+                myfile.open(poss.c_str());
+
+                ofstream myfile2;
+                myfile2.open(oris.c_str());
+
+                myfile <<= pos;
+                // myfile2 <<= orient;
+                for (int j = 0; j < pairsbound.size(); j++)
+                {
+                    myfile2 << pairsbound[j].particle_index1 << "," << pairsbound[j].particle_index2 << endl;
+                }
+
+                myfile.close();
+                myfile2.close();
+
+                // pausel();
+            }
+        }
+    }
+
     // void NanotubeAssembly::run_anneal(int runtime, int every, int cd, string strbase = "")
     // {
     //    // matrix<double> par = (*pots).params2;

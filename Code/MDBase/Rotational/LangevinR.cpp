@@ -838,9 +838,11 @@ int totp =  pairs.getnrows();
             //cout << (*q)[0] << endl;
             for (int tp = 1; tp < (*q)[0] + 1; tp++)
             {
-                
+
+
                 int potn = (*q)[tp];
-                
+
+     
                 double fx;
                 double fy;
                 double fz;
@@ -855,6 +857,8 @@ int totp =  pairs.getnrows();
 
                 (iny.potential_bundle)[potn]->force_and_torque(un, dis, *orient, p1, p2, fx, fy, fz, tix, tiy, tiz, tjx, tjy, tjz);
 
+
+                
                 // cout << p1 << " " << p2 << " " << tp << " " << potn << endl;
 
                 // cout << "forces: " << fx <<" " << fy << " " << fz << endl;
