@@ -59,31 +59,30 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
     int NM2;
-    double deltaG2,angle2;
-    
-    
+    double deltaG2, angle2;
+
     string paramfile;
     string olddatfile;
     string oldorifile;
     string oldindfile;
     string shellpairsfile;
-    if (argc == 6)
+    if (argc == 5)
     {
-        stringstream ss1,ss2,ss3,ss4,ss5;
+        stringstream ss1, ss2, ss3, ss4, ss5;
         ss1 << argv[1];
         ss2 << argv[2];
         ss3 << argv[3];
         ss4 << argv[4];
-        ss5 << argv[5];
+        // ss5 << argv[5];
 
         paramfile = ss1.str();
         olddatfile = ss2.str();
         oldorifile = ss3.str();
         oldindfile = ss4.str();
-        shellpairsfile = ss5.str();
-        // NM2 = atof(argv[1]);
-        // deltaG2 = atof(argv[2]);
-        // angle2 = atof(argv[3]);
+        // shellpairsfile = ss5.str();
+        //  NM2 = atof(argv[1]);
+        //  deltaG2 = atof(argv[2]);
+        //  angle2 = atof(argv[3]);
     }
     else
     {
@@ -103,12 +102,28 @@ int main(int argc, char **argv)
     bool err3;
     matrix<double> oldind_temp = importcsv(oldindfile, T2, err3);
 
-
-
+    int Td;
     bool err4;
-    matrix<int> pairs = importcsv(shellpairsfile, T2, err4);
+    matrix<int> pairs = importcsv("./IsocohedronI.csv", Td, err4);
 
-    if(err1 || err2 || err3 || err4 || erro ) {
+    int Ti;
+    bool erri;
+    matrix<int> quads = importcsv("./IsocohedronI2.csv", Ti, erri);
+
+    double k = sim_params(1, 0);
+
+    double rm = sim_params(1, 1);
+
+    double kappa = sim_params(1, 3);
+
+    double Td4;
+    bool errd4;
+    matrix<double> bindingdis = importcsv("./IsocohedronD.csv", Td4, errd4);
+
+    ShellProperties B(pairs, quads, olddat, bindingdis, k, rm, kappa);
+
+    if (err1 || err2 || err3 || err4 || erri || errd4)
+    {
         cout << paramfile << " " << err1 << endl;
         cout << olddatfile << " " << err2 << endl;
         cout << oldorifile << " " << err3 << endl;
@@ -116,11 +131,10 @@ int main(int argc, char **argv)
         cout << shellpairsfile << " " << erro << endl;
 
         error("files not imported correctly");
-
     }
 
     int NM = sim_params(0, 0);
-    //nm2 is the total amount of added crosslinks
+    // nm2 is the total amount of added crosslinks
 
     // signal(SIGSEGV, handler);
     vector1<int> oldind(oldind_temp.getnrows());
@@ -129,13 +143,13 @@ int main(int argc, char **argv)
         oldind[i] = oldind_temp(i, 0);
     }
 
-
-
-    ShellProperties B;
+    // ShellProperties B;
     int Ns = sim_params(0, 1);
-    //double targetdensity = 2.0;
-    if(olddat.getnrows() < Ns) error("size of shell larger than number of monomers being imported");
-    if(oldind_temp.getnrows() < Ns) error("size of index file is mismatched");
+    // double targetdensity = 2.0;
+    if (olddat.getnrows() < Ns)
+        error("size of shell larger than number of monomers being imported");
+    if (oldind_temp.getnrows() < Ns)
+        error("size of index file is mismatched");
     // stringstream sx1;
     // stringstream sx2;
 
@@ -154,18 +168,16 @@ int main(int argc, char **argv)
 
     // pausel();
 
-
-
     // double T2;
     // bool err2;
     // matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
-    double k = sim_params(1, 0);
-    double rm = sim_params(1, 1);
 
-    matrix<double> pos(Ns,3);
-    for(int i = 0  ; i < Ns ; i++) {
-        for(int j = 0  ; j < 3 ; j++) {
-            pos(i,j)=olddat(i,j);
+    matrix<double> pos(Ns, 3);
+    for (int i = 0; i < Ns; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            pos(i, j) = olddat(i, j);
         }
     }
 
@@ -181,22 +193,26 @@ int main(int argc, char **argv)
     // pausel();
 
     // vector1<double> mean = meanmat_end(pos,0);
-    
-//    double approxradius = sqrt(SQR(pos(0, 0)) + SQR(pos(0, 1)) + SQR(pos(0, 2)));
+
+    //    double approxradius = sqrt(SQR(pos(0, 0)) + SQR(pos(0, 1)) + SQR(pos(0, 2)));
 
     double radius = sim_params(1, 2);
     double monomers = NM;
 
     // monomers/(4/3piradius3)
 
-    cout << "starting" << endl;
     NanotubeAssembly A(radius, monomers);
-    NM2 = sim_params(2,0);
-    double deltaG = sim_params(2, 1);
-    double angle = sim_params(2, 2);
-    // BivalentPatch c2(deltaG, 1.4, angle);
+    NM2 = sim_params(2, 0);
+    int NM3 = sim_params(2, 1);
+    double deltaG = sim_params(2, 2);
+    double angle = sim_params(2, 3);
+    
 
 
+
+
+    matrix<double> orient(4, 3);
+    matrix<double> orient2(2, 3);
 
     matrix<double> orient(4, 3);
     matrix<double> orient2(2, 3);
@@ -209,21 +225,21 @@ int main(int argc, char **argv)
     double ny5 = 0.0;
     double nz5 = 0.0;
 
-    double nx6 = 1.0;//-0.5;
-    double ny6 = 0.0;//0.5 * sqrt(3.);
+    double nx6 = 1.0; //-0.5;
+    double ny6 = 0.0; // 0.5 * sqrt(3.);
     double nz6 = 0.0;
 
-    double nx7 = 0.0;//-0.5;
-    double ny7 = 1.0;//-0.5 * sqrt(3.);
-    double nz7 = 0.0;//0.;
+    double nx7 = 0.0; //-0.5;
+    double ny7 = 1.0; //-0.5 * sqrt(3.);
+    double nz7 = 0.0; // 0.;
 
-    double nx8 = -1.;//0.5;
-    double ny8 = 0.;//0.5 * sqrt(3);
-    double nz8 = 0.;//0.0;
+    double nx8 = -1.; // 0.5;
+    double ny8 = 0.;  // 0.5 * sqrt(3);
+    double nz8 = 0.;  // 0.0;
 
-    double nx9 = 0.;//0.5;
-    double ny9 = -1.;//0.5 * sqrt(3);
-    double nz9 = 0.;//0.0;
+    double nx9 = 0.;  // 0.5;
+    double ny9 = -1.; // 0.5 * sqrt(3);
+    double nz9 = 0.;  // 0.0;
 
     orient(0, 0) = nx6;
     orient(0, 1) = ny6;
