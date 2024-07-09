@@ -214,8 +214,6 @@ int main(int argc, char **argv)
     matrix<double> orient(4, 3);
     matrix<double> orient2(2, 3);
 
-    matrix<double> orient(4, 3);
-    matrix<double> orient2(2, 3);
 
     double nx4 = 1.0;
     double ny4 = 0.0;
