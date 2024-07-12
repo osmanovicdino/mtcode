@@ -9,7 +9,7 @@
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 6
-#$ -t 1-60:1
+#$ -t 1-45:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
