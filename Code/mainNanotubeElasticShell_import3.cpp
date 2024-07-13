@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
-    int NM2;
+
     double deltaG2, angle2;
 
     string paramfile;
@@ -411,7 +411,7 @@ int main(int argc, char **argv)
     vector<string> posfiles;
     return_csv_in_current_dir("pos", posfiles);
 
-    
+
     double prod = sim_params(3,0);
     WeiM c1;
     c1.M=sim_params(3,1);
