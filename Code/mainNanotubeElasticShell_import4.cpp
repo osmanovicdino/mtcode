@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 {
 
     srand(time(NULL));
-    int NM2;
+
     double deltaG2, angle2;
 
     string paramfile;
@@ -66,23 +66,23 @@ int main(int argc, char **argv)
     string oldorifile;
     string oldindfile;
     string shellpairsfile;
-    if (argc == 6)
+    if (argc == 5)
     {
         stringstream ss1, ss2, ss3, ss4, ss5;
         ss1 << argv[1];
         ss2 << argv[2];
         ss3 << argv[3];
         ss4 << argv[4];
-        ss5 << argv[5];
+        // ss5 << argv[5];
 
         paramfile = ss1.str();
         olddatfile = ss2.str();
         oldorifile = ss3.str();
         oldindfile = ss4.str();
-        shellpairsfile = ss5.str();
-        // NM2 = atof(argv[1]);
-        // deltaG2 = atof(argv[2]);
-        // angle2 = atof(argv[3]);
+        // shellpairsfile = ss5.str();
+        //  NM2 = atof(argv[1]);
+        //  deltaG2 = atof(argv[2]);
+        //  angle2 = atof(argv[3]);
     }
     else
     {
@@ -102,10 +102,27 @@ int main(int argc, char **argv)
     bool err3;
     matrix<double> oldind_temp = importcsv(oldindfile, T2, err3);
 
+    int Td;
     bool err4;
-    matrix<int> pairs = importcsv(shellpairsfile, T2, err4);
+    matrix<int> pairs = importcsv("./IsocohedronI.csv", Td, err4);
 
-    if (err1 || err2 || err3 || err4 || erro)
+    int Ti;
+    bool erri;
+    matrix<int> quads = importcsv("./IsocohedronI2.csv", Ti, erri);
+
+    double k = sim_params(1, 0);
+
+    double rm = sim_params(1, 1);
+
+    double kappa = sim_params(1, 3);
+
+    double Td4;
+    bool errd4;
+    matrix<double> bindingdis = importcsv("./IsocohedronD.csv", Td4, errd4);
+
+    ShellProperties B(pairs, quads, olddat, bindingdis, k, rm, kappa);
+
+    if (err1 || err2 || err3 || err4 || erri || errd4)
     {
         cout << paramfile << " " << err1 << endl;
         cout << olddatfile << " " << err2 << endl;
@@ -126,7 +143,7 @@ int main(int argc, char **argv)
         oldind[i] = oldind_temp(i, 0);
     }
 
-    ShellProperties B;
+    // ShellProperties B;
     int Ns = sim_params(0, 1);
     // double targetdensity = 2.0;
     if (olddat.getnrows() < Ns)
@@ -154,8 +171,6 @@ int main(int argc, char **argv)
     // double T2;
     // bool err2;
     // matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
-    double k = sim_params(1, 0);
-    double rm = sim_params(1, 1);
 
     matrix<double> pos(Ns, 3);
     for (int i = 0; i < Ns; i++)
@@ -187,12 +202,11 @@ int main(int argc, char **argv)
     // monomers/(4/3piradius3)
 
     NanotubeAssembly A(radius, monomers);
-    NM2 = sim_params(2, 0);
+    int NM2 = sim_params(2, 0);
     int NM3 = sim_params(2, 1);
     double deltaG = sim_params(2, 2);
     double angle = sim_params(2, 3);
     // BivalentPatch c2(deltaG, 1.4, angle);
-
     vector1<int> vec1(3);
     vec1[0] = 3;
     vec1[1] = 2;
@@ -370,6 +384,10 @@ int main(int argc, char **argv)
     // c2.v2= orient2;
 
     A.setpots(c2);
+    // c2.v = orient;
+    // c2.v2= orient2;
+
+    A.setpots(c2);
     A.setkT(1.0);
 
     cout << "done" << endl;
@@ -388,15 +406,16 @@ int main(int argc, char **argv)
     // matrix<double> constantF(Ns+NM,3);
     // constantF(0,2) = -100.;
     // constantF(4095,2) = 100.;
+
     vector<string> posfiles;
-    cout << "ok1" << endl;
     return_csv_in_current_dir("pos", posfiles);
-    cout << "ok2" << endl;
+
     double prod = sim_params(3, 0);
     WeiM c1;
     c1.M = sim_params(3, 1);
     c1.weight = sim_params(3, 2);
-    A.run_with_real_surface_add_particles_continue(40000000, 10000, posfiles.size(), B, prod, c1, olddat, oldori, oldind, stringbase);
+
+    A.run_with_real_surface_add_particles_continue(10000000, 10000, posfiles.size(), B, prod, c1, olddat, oldori, oldind, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
     // A.run(1000000, 1000);
 

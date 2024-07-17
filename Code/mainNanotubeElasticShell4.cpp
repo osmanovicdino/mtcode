@@ -56,11 +56,11 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-
     srand(time(NULL));
     // int NM2;
     // double deltaG2,angle2;
     string importstring;
+
     if (argc == 2)
     {
         stringstream ss;
@@ -84,8 +84,7 @@ int main(int argc, char **argv)
 
     // signal(SIGSEGV, handler);
 
-    ShellProperties B;
-    int Ns = 4096; // technically this should be overwrittable, however, because we generated the circle with mathematica we leave it fixed
+    int Ns = 2432; // technically this should be overwrittable, however, because we generated the circle with mathematica we leave it fixed
     double targetdensity = 2.0;
 
     // stringstream sx1;
@@ -109,18 +108,32 @@ int main(int argc, char **argv)
     int T;
     bool err1;
     matrix<int> pairs = importcsv("./IsocohedronI.csv", T, err1);
+
+    int Ti;
+    bool erri;
+    matrix<int> quads = importcsv("./IsocohedronI2.csv", Ti, erri);
     double T2;
     bool err2;
-    matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
+    matrix<double> pos = importcsv("./IsocohedronP2.csv", T2, err2);
     double k = sim_params(1, 0);
 
     double rm = sim_params(1, 1);
 
+    double kappa = sim_params(1, 3);
+
+    Ns = pos.getnrows();
+
+    double T4;
+    bool err4;
+    matrix<double> bindingdis = importcsv("./IsocohedronD.csv", T4, err4);
+
+    ShellProperties B(pairs, quads, pos, bindingdis, k, rm, kappa);
+
     // system("rm Iso*.csv");
-    B.k = k;
-    B.rm = rm;
-    B.par = pairs;
-    B.posi = pos;
+    // B.k = k;
+    // B.rm = rm;
+    // B.par = pairs;
+    // B.posi = pos;
 
     // B.DoAnMC(100.,false);
 
@@ -134,9 +147,6 @@ int main(int argc, char **argv)
     double radius = sim_params(1, 2);
     double monomers = NM;
 
-    // monomers/(4/3piradius3)
-
-    cout << "starting" << endl;
     NanotubeAssembly A(radius, monomers);
     int NM2 = sim_params(2, 0);
     int NM3 = sim_params(2, 1);
@@ -211,20 +221,20 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 3; j++)
         {
-            if (i == 2 || j == 2) //the sides cannot interact
+            if (i == 2 || j == 2) // the sides cannot interact
             {
                 params(iter, 0) = 0.0;
                 params(iter, 1) = range;
                 params(iter, 2) = angle;
                 iter++;
             }
-            else if(i!=j) // we want it to be directional
-            {
-                params(iter, 0) = 0.0;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
-                iter++;
-            }
+            // else if (i != j) // we want it to be directional
+            // {
+            //     params(iter, 0) = 0.0;
+            //     params(iter, 1) = range;
+            //     params(iter, 2) = angle;
+            //     iter++;
+            // }
             else
             {
                 params(iter, 0) = deltaG;
@@ -259,7 +269,7 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i == 0 && j==0)  //only binds to one end
+            if (i == 0 && j == 0) // only binds to one end
             {
                 params(iter, 0) = deltaG;
                 params(iter, 1) = range;
@@ -267,7 +277,7 @@ int main(int argc, char **argv)
             }
             else
             {
-                params(iter, 0) = 0.0; //bind to one end, blocking further growth
+                params(iter, 0) = 0.0; // bind to one end, blocking further growth
                 params(iter, 1) = range;
                 params(iter, 2) = angle;
             }
@@ -320,6 +330,10 @@ int main(int argc, char **argv)
     // c2.v2= orient2;
 
     A.setpots(c2);
+    // c2.v = orient;
+    // c2.v2= orient2;
+
+    A.setpots(c2);
     A.setkT(1.0);
 
     cout << "done" << endl;
@@ -340,10 +354,10 @@ int main(int argc, char **argv)
     // constantF(4095,2) = 100.;
     double prod = sim_params(3, 0);
     WeiM c1;
-    c1.M = Ns + NM2 + NM3;
+    c1.M = sim_params(3, 1);
     c1.weight = sim_params(3, 2);
 
-    A.run_with_real_surface_add_particles(20000000, 10000, B, prod, c1, stringbase);
+    A.run_with_real_surface_add_particles(100000000, 10000, B, prod, c1, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
     // A.run(1000000, 1000);
 
