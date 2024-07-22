@@ -9,7 +9,7 @@
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 6
-#$ -t 1-30:1
+#$ -t 1-45:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -28,7 +28,7 @@ module load gcc/10.2.0
 #filename=~/Chemistry/Code/Basic/Scripts/paramsSA6.dat
 #basedir="SelfAssembly6"
 
-filename=~/Chemistry/Code/Basic/Scripts/parameter_settings9.dat
+filename=~/Chemistry/Code/Basic/Scripts/parameter_settings10.dat
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    wt=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
@@ -37,7 +37,7 @@ else
    wt=~
    echo "did not read file correctly"
 fi
-basedir="SelfAssembly9"
+basedir="SelfAssembly10"
 dirwemake="try=${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeElasticShell.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
