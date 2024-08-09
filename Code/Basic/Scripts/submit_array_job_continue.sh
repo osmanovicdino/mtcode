@@ -9,7 +9,7 @@
 ## Modify the parallel environment
 ## and the number of cores as needed:
 #$ -pe shared 8
-#$ -t 1-10:1
+#$ -t 1-60:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -43,7 +43,7 @@ fi
 # g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShell.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 # cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 echo $wt
-export OMP_NUM_THREADS=8
+export OMP_NUM_THREADS=6
 ~/Chemistry/Code/Basic/Scripts/continue_run.sh $wt
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`

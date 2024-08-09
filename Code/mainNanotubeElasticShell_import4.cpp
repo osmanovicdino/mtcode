@@ -282,13 +282,13 @@ int main(int argc, char **argv)
                 params(iter, 2) = angle;
                 iter++;
             }
-            else if (i != j) // we want it to be directional
-            {
-                params(iter, 0) = 0.0;
-                params(iter, 1) = range;
-                params(iter, 2) = angle;
-                iter++;
-            }
+            // else if (i != j) // we want it to be directional
+            // {
+            //     params(iter, 0) = 0.0;
+            //     params(iter, 1) = range;
+            //     params(iter, 2) = angle;
+            //     iter++;
+            // }
             else
             {
                 params(iter, 0) = deltaG;
