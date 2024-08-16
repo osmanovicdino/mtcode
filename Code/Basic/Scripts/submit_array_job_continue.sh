@@ -8,8 +8,8 @@
 #$ -l h_rt=00:59:59,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 8
-#$ -t 1-60:1
+#$ -pe shared 6
+#$ -t 1-45:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
