@@ -69,10 +69,13 @@ void run_with_real_surface_remove_add_particles_continue(int, int, int, ShellPro
 void run_add_particles(int, int, double prod, string strbase);
 void run_bending_modulus(int, int, double,string);
 
+void run_no_patchy(int, int, ShellProperties &, double prod, double ks, double ks2, string strbase);
+
 //AbstractBindingModel *bm;
 
 };
 
 #include "Nanotube.cpp"
+#include "Nanotube2.cpp"
 
 #endif /* NANOTUBE_H */

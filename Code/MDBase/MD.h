@@ -42,7 +42,7 @@ void setdat(const matrix<double>&);
 void setinteractions(potential&);
 void setgeometry(cube&);
 void set_particle(const vector1<double>&,int);
-
+vector1<double> get_particle(int);
 
 double getcoordinate(int,int);
 
@@ -104,10 +104,12 @@ matrix<int>* calculatepairs_sorted(matrix<int>&,double); //calculate the pairs o
 
 matrix<double> calculateforces(matrix<int>&); //calculate the forces using the pairs as an input
 matrix<double> calculateforces(matrix<int>&,potential&); //calculate the forces using the pairs as an input
+matrix<double> calculateforces(vector<mdpair> &, potential &); // calculate the forces using the pairs as an input
 matrix<double> calculateforcesDV(matrix<int> &, potential &, vector1<double> &); // calculate the forces using the pairs as an input
 matrix<double> calculateforces_sp(matrix<int>&,potential&,matrix<vector1<double> >&);
 matrix<double> calculateforceslist(matrix<int>&,potential&); //calculate the forces using the pairs as an input
 matrix<double> calculateforces_threebody(matrix<int>&,potential3&);
+matrix<double> calculateforces_threebody(vector<mdtriplet> &, potential3 &);
 matrix<double> calculatestress(matrix<int>&); //calculate the stress;
 matrix<double> calculateforces_truncated(matrix<int>&, double); //calculate the forces using the pairs as an input
 matrix<double> calculateforces_fast3D(matrix<int>&);

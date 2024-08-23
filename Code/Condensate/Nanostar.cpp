@@ -114,22 +114,7 @@ Nanostar::Nanostar(int N, double ll, vector1<int> &length_of_branchh, matrix<dou
     obj->setmom(moms);
 }
 
-matrix<double> rotationmatrix(double theta, double phi, double psi) {
-matrix<double> rot(3,3);
 
-rot(0, 0) = cos(theta)*cos(psi);
-rot(0, 1) = -cos(phi)*sin(psi)+sin(phi)*sin(theta)*cos(psi);
-rot(0, 2) = sin(phi)*sin(psi) + cos(phi)*sin(theta)*cos(psi);
-rot(1, 0) = cos(theta)*sin(psi);
-rot(1, 1) = cos(phi)*cos(psi)+sin(phi)*sin(theta)*sin(psi);
-rot(1, 2) = -sin(phi)*cos(psi) + cos(phi)*sin(theta)*sin(psi);
-rot(2, 0) = -sin(theta);
-rot(2, 1) = sin(phi)*cos(theta);
-rot(2, 2) = cos(phi)*cos(theta);
-
-return rot;
-
-}
 
 matrix<double> Nanostar::create_initial_state(matrix<double> &ori) {
 

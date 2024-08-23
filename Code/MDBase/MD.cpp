@@ -87,6 +87,18 @@ void MD::set_particle(const vector1<double> &a, int index)
 
 }
 
+vector1<double> MD::get_particle(int index)
+{
+	// matrix<double> *res =  a.clone();
+	// dat = res;
+	vector1<double> a(dimension);
+
+
+	for (int i1 = 0; i1 < dimension; i1++)
+		a[i1] = (*dat)(index, i1);
+	return a;
+}
+
 void MD::setinteractions(potential &a) {
 	potential* q = a.clone();
 	ints = q;
@@ -1709,6 +1721,18 @@ matrix<double> MD::calculateforces(matrix<int> &pairs,potential &iny) {
 	return forces;
 }
 
+matrix<double> MD::calculateforces(vector<mdpair> &pairs,potential &iny) {
+//NOT the most efficient way to do this, but I am being quick right now
+
+matrix<int> pp(pairs.size(),2);
+for(int i = 0  ; i < pairs.size() ; i++) {
+	pp(i, 0) = pairs[i].a;
+	pp(i, 1) = pairs[i].b;
+}
+return calculateforces(pp,iny);
+
+}
+
 matrix<double> MD::calculateforcesDV(matrix<int> &pairs, potential &iny, vector1<double> &mags)
 {
 
@@ -1914,6 +1938,19 @@ matrix<double> MD::calculateforces_threebody(matrix<int> &triplets,potential3 &i
 
 
 	return forces;
+}
+
+matrix<double> MD::calculateforces_threebody(vector<mdtriplet> &trips, potential3 &iny) {
+	matrix<int> pp(trips.size(),3);
+	for (int i = 0; i < trips.size(); i++)
+	{
+		pp(i, 0) = trips[i].a;
+		pp(i, 1) = trips[i].b;
+		pp(i, 2) = trips[i].c;
+
+		
+	}
+	return calculateforces_threebody(pp, iny);
 }
 
 matrix<double> MD::calculateforces_fast3D(matrix<int> &pairs) {
