@@ -340,7 +340,7 @@ void NanotubeAssembly::run_no_patchy(int runtime, int every, ShellProperties &my
                     for(int ij = 0  ; ij < indices_everything.size() ; ij++) {
                     double dis = obj->getgeo().distance(obj->get_particle(indices_everything[ij]),x3);
                     if(indices_everything[ij]<totnp) {
-                        if (dis < 1.4)
+                        if (dis < 1.5)
                         {
 
                             overlap = true;
