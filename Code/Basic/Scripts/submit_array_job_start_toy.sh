@@ -46,7 +46,7 @@ cp ~/Chemistry/Code/IsocohedronI2.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronP2.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/IsocohedronD.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/Basic/InitialConditions/${wt} /u/scratch/d/dinoo/${basedir}/${dirwemake}/param.csv
-g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShellSF_import.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
+g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShellSF.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
 export OMP_NUM_THREADS=6
 ./angron 'param.csv' >log
