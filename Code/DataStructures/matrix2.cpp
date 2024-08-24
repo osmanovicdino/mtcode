@@ -1585,6 +1585,14 @@ void outfunc(const vector1<T> &a, string s) {
     
 }
 
+template<class T>
+void printvector(const vector<T> &a) {
+    for(int i  = 0 ; i < a.size()-1 ; i++) {
+        cout << a[i] <<",";
+    }
+    cout << a[a.size()-1] << endl;
+}
+
 template <class T>
 matrix<T> importcsv(string filename, T temp, bool &error) {
     ifstream data(filename.c_str());
@@ -1630,13 +1638,47 @@ matrix<T> importcsv(string filename, T temp, bool &error) {
     
 }
 
-matrix<double> periodic(matrix<double> &a, matrix<double> &b, double l) {
-if(a.getnrows() != b.getnrows() ) error("size of matrices must be the same");
+template <class T>
+vector<vector<T>> importcsvvector(string filename, T temp, bool &error)
+{
 
-matrix<double> res(a.getnrows(),3);
-for(int i = 0 ; i < a.getnrows() ; i++ ) {
-double dx  = a(i,0)-b(i,0);
-if(abs(dx)>l/2) dx = dx-SIGN(l,dx);
+    vector<vector<T>> a;
+
+    ifstream data(filename.c_str());
+    if (!data.is_open())
+    {
+        cout << "file not found during import" << endl;
+        error = true;
+        return a;
+    }
+    string line;
+    while (getline(data, line))
+    {
+
+        stringstream lineStream(line);
+        string cell;
+        vector<T> b;
+        while (getline(lineStream, cell, ','))
+        {
+            b.push_back(atof(cell.c_str()));
+        }
+        a.push_back(b);
+    }
+
+    return a;
+
+}
+
+    matrix<double> periodic(matrix<double> & a, matrix<double> & b, double l)
+    {
+        if (a.getnrows() != b.getnrows())
+            error("size of matrices must be the same");
+
+        matrix<double> res(a.getnrows(), 3);
+        for (int i = 0; i < a.getnrows(); i++)
+        {
+            double dx = a(i, 0) - b(i, 0);
+            if (abs(dx) > l / 2) dx = dx-SIGN(l,dx);
 double dy  = a(i,1) - b(i,1);
 if(abs(dy)>l/2) dy = dy-SIGN(l,dy);
 double dz  = a(i,2) - b(i,2);

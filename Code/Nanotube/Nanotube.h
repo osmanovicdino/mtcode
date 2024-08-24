@@ -70,6 +70,7 @@ void run_add_particles(int, int, double prod, string strbase);
 void run_bending_modulus(int, int, double,string);
 
 void run_no_patchy(int, int, ShellProperties &, double prod, double ks, double ks2, string strbase);
+void run_no_patchy_continue(int, int, int, ShellProperties &, double prod, double ks, double ks2, matrix<double>&, vector1<int>&, vector<vector<int>>&, string strbase);
 
 //AbstractBindingModel *bm;
 
