@@ -414,7 +414,7 @@ int main(int argc, char **argv)
 
 
 
-    A.run_no_patchy_continue(10000000, 1000, posfiles.size() , B, prod, deltaG, angle, olddat, oldind, oldori, stringbase);
+    A.run_no_patchy_continue(10000000, 10000, posfiles.size() , B, prod, deltaG, angle, olddat, oldind, oldori, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 
