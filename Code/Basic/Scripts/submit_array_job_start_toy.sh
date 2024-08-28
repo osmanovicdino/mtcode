@@ -8,8 +8,8 @@
 #$ -l h_rt=00:59:59,h_data=128M
 ## Modify the parallel environment
 ## and the number of cores as needed:
-#$ -pe shared 6
-#$ -t 1-63:1
+#$ -pe shared 8
+#$ -t 1-45:1
 
 # echo job info on joblog:
 echo "Job $JOB_ID started on:   " `hostname -s`
@@ -28,7 +28,7 @@ module load gcc/10.2.0
 #filename=~/Chemistry/Code/Basic/Scripts/paramsSA6.dat
 #basedir="SelfAssembly6"
 
-filename=~/Chemistry/Code/Basic/Scripts/parameter_settings_toy1.dat
+filename=~/Chemistry/Code/Basic/Scripts/parameter_settings_toy2.dat
 if [ -e ${filename}   ]; then
    # use the unix command sed -n ${line_number}p to read by line
    wt=`sed -n ${SGE_TASK_ID}p ${filename} | awk '{print $1}'`
@@ -37,7 +37,7 @@ else
    wt=~
    echo "did not read file correctly"
 fi
-basedir="ToyModel1"
+basedir="ToyModel2"
 dirwemake="try=${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeElasticShellSF.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
@@ -48,7 +48,7 @@ cp ~/Chemistry/Code/IsocohedronD.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/Basic/InitialConditions/${wt} /u/scratch/d/dinoo/${basedir}/${dirwemake}/param.csv
 g++ -fopenmp -std=c++17 ~/Chemistry/Code/mainNanotubeElasticShellSF.cpp -o /u/scratch/d/dinoo/${basedir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${basedir}/${dirwemake}
-export OMP_NUM_THREADS=6
+export OMP_NUM_THREADS=8
 ./angron 'param.csv' >log
 # cp ~/Chemistry/Code/mainNanotubeElasticShell.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
 # cp ~/Chemistry/Code/params.csv /u/scratch/d/dinoo/${basedir}/${dirwemake}
