@@ -62,14 +62,19 @@ void run(int, int, string strbase);
 
 void run_anneal(int, int, int, string strbase);
 
-void run_with_real_surface(int, int, ShellProperties &, matrix<double> &constantF, string strbase);
+void run_with_real_surface(int, int, ShellProperties &, matrix<double> &constantF, string strbase, bool);
 void run_with_real_surface_add_particles(int, int, ShellProperties &, double prod, WeiM &c1, string strbase);
 void run_with_real_surface_add_particles_continue(int, int, int, ShellProperties &, double prod, WeiM &c1, matrix<double>&, matrix<double>&, vector1<int>&,string strbase);
 void run_with_real_surface_remove_add_particles_continue(int, int, int, ShellProperties &, double prod, double, double, WeiM &c1, matrix<double> &, matrix<double> &, vector1<int> &, string strbase);
 void run_add_particles(int, int, double prod, string strbase);
 void run_bending_modulus(int, int, double,string);
 
+void run_with_real_surface_add_particles_steric(int, int, ShellProperties &, double prod, WeiM &c1, string strbase);
+
 void run_no_patchy(int, int, ShellProperties &, double prod, double ks, double ks2, string strbase);
+
+void run_no_patchy_noshell(int, int, double prod, double ks, double ks2, string strbase);
+
 void run_no_patchy_continue(int, int, int, ShellProperties &, double prod, double ks, double ks2, matrix<double>&, vector1<int>&, vector<vector<int>>&, string strbase);
 
 //AbstractBindingModel *bm;

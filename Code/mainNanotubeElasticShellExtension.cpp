@@ -263,21 +263,7 @@ int main(int argc, char **argv)
 
     // pausel();
 
-    string stringbase = "F=";
-    stringstream ss;
-    ss << F1;
-    string str = ss.str();
 
-    stringstream ss2,ss3,ss4;
-    ss2 << k;
-    ss3 << rm;
-    ss4 << kappa;
-
-  
-    stringbase += str;
-    stringbase += string("_k=") + ss2.str();
-    stringbase += string("_rm=") + ss3.str();
-    stringbase += string("_kappa=") + ss4.str();
     // stringstream ss2;
     // ss2 << deltaG;
 
@@ -285,19 +271,50 @@ int main(int argc, char **argv)
 
     // stringstream ss3;
     // ss3 << angle;
+    string stringbase = "F=";
+    stringstream ss;
+    ss << 0.;
+    string str = ss.str();
 
+    stringstream ss2, ss3, ss4;
+    ss2 << k;
+    ss3 << rm;
+    ss4 << kappa;
+
+    stringbase += str;
+    stringbase += string("_k=") + ss2.str();
+    stringbase += string("_rm=") + ss3.str();
+    stringbase += string("_kappa=") + ss4.str();
+
+    matrix<double> constantF(Ns + NM, 3);
+
+    A.run_with_real_surface(500000, 10000, B, constantF, stringbase, false);
     // stringbase += string("ang=")+ss3.str();
+    for(double g=0 ; g <51. ; g+=10. ) {
+    
+    constantF(2,2) +=  g;
+    constantF(5,2) -= g;
 
-    matrix<double> constantF(Ns+NM,3);
-    constantF(2,2) = F1;
-    constantF(5,2) = -F1;
+    string stringbase = "F=";
+    stringstream ss;
+    ss << F1+g;
+    string str = ss.str();
 
+    stringstream ss2, ss3, ss4;
+    ss2 << k;
+    ss3 << rm;
+    ss4 << kappa;
+
+    stringbase += str;
+    stringbase += string("_k=") + ss2.str();
+    stringbase += string("_rm=") + ss3.str();
+    stringbase += string("_kappa=") + ss4.str();
 
     //A.conf.setv(0.0);//no confinement
     // A.run(20000000, 10000, stringbase);
         // A.run_add_particles(10000000, 10000, 0.001, stringbase);
-         A.run_with_real_surface(1000000, 1000, B, constantF, stringbase);
+         A.run_with_real_surface(500000, 10000, B, constantF, stringbase,true);
         //  A.run(1000000, 1000);
-
+    }
         return 0;
 }

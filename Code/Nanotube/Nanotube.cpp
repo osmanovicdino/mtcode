@@ -1804,7 +1804,7 @@ void NanotubeAssembly::add_particle42(int which)
 //     double rm;
 // };
 
-void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProperties &myshell, matrix<double> &constantF, string strbase = "")
+void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProperties &myshell, matrix<double> &constantF, string strbase = "", bool cont = false)
 {
     //constant F is a constant force applied on the system
     //WARNING, WE ARE NOT CHECKING WHETHER THE SHELL WE ARE ADDING IS NOT OVERLAPPING WITH THE ORIGINAL SYSTEM,
@@ -1841,6 +1841,7 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
 
     //Combine Our Data Into One
     int NN = obj->getN();
+    if(cont) NN -= totnp;
     matrix<double> dat = obj->getdat();
 
 
@@ -1850,15 +1851,26 @@ void NanotubeAssembly::run_with_real_surface(int runtime, int every, ShellProper
 
     matrix<double> newdat(totnp+NN,3);
     vector1<int> p1(NN);
-    for(int i  = 0  ; i < totnp + NN ; i++) {
-        if(i < totnp) {
-            for(int j = 0  ; j < 3 ; j++)
-                newdat(i,j) = myshell.posi(i, j)+ll/2.;
+    if(cont) {
+        newdat=dat;
+        for (int i = totnp; i < totnp + NN; i++)
+        {
+
+                p1[i - totnp] = i;
+            
         }
-        else{
-            for (int j = 0; j < 3; j++)
-                newdat(i, j) = dat(i-totnp, j);
-                p1[i-totnp] =  i;
+    }
+    else{
+        for(int i  = 0  ; i < totnp + NN ; i++) {
+            if(i < totnp) {
+                for(int j = 0  ; j < 3 ; j++)
+                    newdat(i,j) = myshell.posi(i, j)+ll/2.;
+            }
+            else{
+                for (int j = 0; j < 3; j++)
+                    newdat(i, j) = dat(i-totnp, j);
+                    p1[i-totnp] =  i;
+            }
         }
     }
 

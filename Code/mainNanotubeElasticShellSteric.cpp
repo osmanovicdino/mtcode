@@ -322,7 +322,10 @@ int main(int argc, char **argv)
     numb[0]=Ns+NM2;
     numb[1]=Ns+NM2+NM3;
     numb[2]=Ns+NM;
-
+    cout << NM2 << " " << NM3 << endl;
+    cout << numb << endl;
+    cout << deltaG << endl;
+    pausel();
 
  
  
@@ -356,9 +359,7 @@ int main(int argc, char **argv)
     c1.M=sim_params(3,1);
     c1.weight=sim_params(3,2);
 
-    double ks = 10.;
-    double ks2 = 500.;
-    A.run_no_patchy(40000000, 10000, B, prod, deltaG, angle, stringbase);
+    A.run_with_real_surface_add_particles_steric(40000000, 10000, B, prod, c1, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 
