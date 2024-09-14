@@ -358,7 +358,7 @@ int main(int argc, char **argv)
 
     double ks = 10.;
     double ks2 = 500.;
-    A.run_no_patchy_noshell(40000000, 10000, prod, deltaG, angle, stringbase);
+    A.run_no_patchy_noshell(1000000, 10000, prod, deltaG, angle, stringbase);
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
         // A.run(1000000, 1000);
 
