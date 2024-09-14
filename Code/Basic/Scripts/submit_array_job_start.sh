@@ -37,7 +37,7 @@ else
    wt=~
    echo "did not read file correctly"
 fi
-basedir="SelfAssembly16"
+basedir="SelfAssembly17"
 dirwemake="try=${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/${basedir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeElasticShell4.cpp /u/scratch/d/dinoo/${basedir}/${dirwemake}
