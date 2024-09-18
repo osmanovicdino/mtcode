@@ -105,13 +105,29 @@ int main(int argc, char **argv)
     bool err4;
     matrix<int> pairs = importcsv(shellpairsfile, T2, err4);
 
-    if (err1 || err2 || err3 || err4 || erro)
+    int Ti;
+    bool erri;
+    matrix<int> quads = importcsv("./IsocohedronI2.csv", Ti, erri);
+
+    double k = sim_params(1, 0);
+
+    double rm = sim_params(1, 1);
+
+    double kappa = sim_params(1, 3);
+
+    double Td4;
+    bool errd4;
+    matrix<double> bindingdis = importcsv("./IsocohedronD.csv", Td4, errd4);
+
+    ShellProperties B(pairs, quads, olddat, bindingdis, k, rm, kappa);
+
+    if (err1 || err2 || err3 || err4 || erri || errd4)
     {
         cout << paramfile << " " << err1 << endl;
         cout << olddatfile << " " << err2 << endl;
         cout << oldorifile << " " << err3 << endl;
         cout << oldindfile << " " << err4 << endl;
-        cout << shellpairsfile << " " << erro << endl;
+        cout << shellpairsfile << " " << erri << endl;
 
         error("files not imported correctly");
     }
@@ -126,7 +142,6 @@ int main(int argc, char **argv)
         oldind[i] = oldind_temp(i, 0);
     }
 
-    ShellProperties B;
     int Ns = sim_params(0, 1);
     // double targetdensity = 2.0;
     if (olddat.getnrows() < Ns)
@@ -154,8 +169,6 @@ int main(int argc, char **argv)
     // double T2;
     // bool err2;
     // matrix<double> pos = importcsv("./IsocohedronP.csv", T2, err2);
-    double k = sim_params(1, 0);
-    double rm = sim_params(1, 1);
 
     matrix<double> pos(Ns, 3);
     for (int i = 0; i < Ns; i++)
@@ -261,6 +274,10 @@ int main(int argc, char **argv)
     matrix<double> params(tot, 3);
     double range = 1.2;
 
+    double directional = sim_params(4,0);
+    double cb = sim_params(4, 1);
+    int fourmer = sim_params(4, 2);
+
     int iter = 0;
     for (int i = 0; i < 4; i++) // nanostar/nanostar interaction
     {
@@ -275,7 +292,7 @@ int main(int argc, char **argv)
             }
             else if (i != j) // we want it to be directional
             {
-                params(iter, 0) = 0.0;
+                params(iter, 0) = (1-directional)*deltaG;
                 params(iter, 1) = range;
                 params(iter, 2) = angle;
                 iter++;
@@ -294,8 +311,14 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 2; j++)
         {
-            if (i == 2 || i == 3) // the sides cannot interact
+            if (i == 2) // the sides cannot interact
             {
+                params(iter, 0) = deltaG;
+                params(iter, 1) = range;
+                params(iter, 2) = angle;
+                iter++;
+            }
+            else if(i ==3 && fourmer ==1) {
                 params(iter, 0) = deltaG;
                 params(iter, 1) = range;
                 params(iter, 2) = angle;
@@ -335,14 +358,14 @@ int main(int argc, char **argv)
         for (int j = 0; j < 2; j++)
         {
 
-            params(iter, 0) = 0.0; // crosslinkers don't bind
+            params(iter, 0) = cb*deltaG; // crosslinkers don't bind
             params(iter, 1) = range;
             params(iter, 2) = angle;
             iter++;
         }
     }
 
-    for (int i = 0; i < 2; i++) // monomer/crosslinker interaction
+    for (int i = 0; i < 2; i++) // crosslinker/cap interaction
     {
         for (int j = 0; j < 2; j++)
         {
@@ -354,7 +377,7 @@ int main(int argc, char **argv)
         }
     }
 
-    for (int i = 0; i < 2; i++) // crosslinker/crosslinker interaction
+    for (int i = 0; i < 2; i++) // cap/cap interaction
     {
         for (int j = 0; j < 2; j++)
         {
