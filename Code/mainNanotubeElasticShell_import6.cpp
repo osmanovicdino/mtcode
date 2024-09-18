@@ -66,23 +66,23 @@ int main(int argc, char **argv)
     string oldorifile;
     string oldindfile;
     string shellpairsfile;
-    if (argc == 6)
+    if (argc == 5)
     {
         stringstream ss1, ss2, ss3, ss4, ss5;
         ss1 << argv[1];
         ss2 << argv[2];
         ss3 << argv[3];
         ss4 << argv[4];
-        ss5 << argv[5];
+        // ss5 << argv[5];
 
         paramfile = ss1.str();
         olddatfile = ss2.str();
         oldorifile = ss3.str();
         oldindfile = ss4.str();
-        shellpairsfile = ss5.str();
-        // NM2 = atof(argv[1]);
-        // deltaG2 = atof(argv[2]);
-        // angle2 = atof(argv[3]);
+        // shellpairsfile = ss5.str();
+        //  NM2 = atof(argv[1]);
+        //  deltaG2 = atof(argv[2]);
+        //  angle2 = atof(argv[3]);
     }
     else
     {
