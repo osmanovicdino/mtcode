@@ -102,8 +102,9 @@ int main(int argc, char **argv)
     bool err3;
     matrix<double> oldind_temp = importcsv(oldindfile, T2, err3);
 
+    int Td;
     bool err4;
-    matrix<int> pairs = importcsv(shellpairsfile, T2, err4);
+    matrix<int> pairs = importcsv("./IsocohedronI.csv", Td, err4);
 
     int Ti;
     bool erri;
@@ -127,7 +128,7 @@ int main(int argc, char **argv)
         cout << olddatfile << " " << err2 << endl;
         cout << oldorifile << " " << err3 << endl;
         cout << oldindfile << " " << err4 << endl;
-        cout << shellpairsfile << " " << erri << endl;
+        cout << shellpairsfile << " " << erro << endl;
 
         error("files not imported correctly");
     }
