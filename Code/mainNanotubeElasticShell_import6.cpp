@@ -284,7 +284,7 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < 4; j++)
         {
-            if (i > 2 || j > 2) // the sides cannot interact
+            if (i >= 2 || j >= 2) // the sides cannot interact
             {
                 params(iter, 0) = 0.0;
                 params(iter, 1) = range;
