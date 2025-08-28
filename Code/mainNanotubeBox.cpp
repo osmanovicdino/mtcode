@@ -299,14 +299,14 @@ int main(int argc, char **argv)
     bool cc;
     NanotubeAssembly A(40., (g.no_types)*5000+1,cc);
 
-    cout << *(g.patch_num) << endl;
-    for(int i = 0  ; i < g.interactions.size() ; i++) {
-    for(int k = 0 ; k < g.interactions[i].size() ; k++ ) {
-    cout << g.interactions[i][k] << " ";
-    }
-    cout << endl;
-    }
-    pausel();
+    // cout << *(g.patch_num) << endl;
+    // for(int i = 0  ; i < g.interactions.size() ; i++) {
+    // for(int k = 0 ; k < g.interactions[i].size() ; k++ ) {
+    // cout << g.interactions[i][k] << " ";
+    // }
+    // cout << endl;
+    // }
+    // pausel();
 
     GeneralPatch c(CreateGeneralPatch(50., 1, 1.2, 0.8, g));
 
@@ -316,7 +316,7 @@ int main(int argc, char **argv)
     A.setkT(1.0);
     A.setviscosity(1.0);
 
-    A.run_box(1000000,1000,30.,g,"");
+    A.run_box(1000000,1000,50.,g,"");
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;
