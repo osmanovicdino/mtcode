@@ -45,6 +45,7 @@ void set_particle(const vector1<double>&,int);
 vector1<double> get_particle(int);
 
 double getcoordinate(int,int);
+void setcoordinate(int,int,double);
 
 int getN(); // get the number of particles
 int getdimension();

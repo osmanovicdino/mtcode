@@ -663,6 +663,312 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
     }
 };
 
+
+struct TorsionPotential : KernFrenkelOnePatch2 { //this potential adds a torsion to the bonds
+    // double nxb1; // positon to the patch relative to centre of mass of the sphere
+    // double nyb1;
+    // double nzb1;
+
+    double mxb1;
+    double myb1;
+    double mzb1; //torsion vector relative to centre of mass
+
+    // double nxb2;
+    // double nyb2;
+    // double nzb2;
+
+    double mxb2;
+    double myb2;
+    double mzb2;
+
+    // double att;
+    // double dis;
+    // double thetam;
+
+    // double v;
+
+    TorsionPotential(double nxx1, double nyy1, double nzz1, double mxx1, double myy1, double mzz1, double nxx2, double nyy2, double nzz2, double mxx2, double myy2, double mzz2, double attt, double diss, double thetamm, double vv) : KernFrenkelOnePatch2(nxx1,nyy1,nzz1,nxx2,nyy2,nzz2,attt,diss,thetamm,vv)
+    {
+
+        // nxb1 = nxx1;
+        // nyb1 = nyy1;
+        // nzb1 = nzz1;
+
+        mxb1 = mxx1;
+        myb1 = myy1;
+        mzb1 = mzz1;
+        
+        // nxb2 = nxx2;
+        // nyb2 = nyy2;
+        // nzb2 = nzz2;
+
+        mxb2 = mxx2;
+        myb2 = myy2;
+        mzb2 = mzz2;
+
+
+        // if (abs(SQR(nxb1) + SQR(nyb1) + SQR(nzb1) - 1) > 1E-5)
+        // {
+        //     cout << SQR(nxb1) + SQR(nyb1) + SQR(nzb1) << endl;
+        //     error("patch potential should be called with unit vector (vector not normalized)");
+        // }
+        // if (abs(SQR(nxb2) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+        // {
+        //     cout << SQR(nxb2) + SQR(nyb2) + SQR(nzb2) << endl;
+        //     error("patch potential should be called with unit vector (vector not normalized)");
+        // }
+        // dl = false;
+        // dis = diss;
+        // att = attt;
+        // interaction_distance = dis;
+        // v =  vv;
+
+    }
+
+    double energy(double rij, double ang1, double ang2) { //too lazy to write this out right now
+        return 0.;
+    }
+
+    void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
+    {
+        // un is r_i-r_j
+
+        // dpos is the vector of differences of distance in each dimension
+        if (rij > interaction_distance)
+        {
+            // cout << "dis" << endl;
+            fx = 0.0;
+            fy = 0.0;
+            fz = 0.0;
+            tix = 0.0;
+            tiy = 0.0;
+            tiz = 0.0;
+            tjx = 0.0;
+            tjy = 0.0;
+            tjz = 0.0;
+        }
+        else
+        {
+
+            double qtemp0 = orient.gpcons(i, 0);
+            double qtemp1 = orient.gpcons(i, 1);
+            double qtemp2 = orient.gpcons(i, 2);
+            double qtemp3 = orient.gpcons(i, 3);
+            double qtemp4 = orient.gpcons(i, 4);
+            double qtemp5 = orient.gpcons(i, 5);
+            double qtemp6 = orient.gpcons(i, 6);
+            double qtemp7 = orient.gpcons(i, 7);
+            double qtemp8 = orient.gpcons(i, 8);
+
+            double gtemp0 = orient.gpcons(j, 0);
+            double gtemp1 = orient.gpcons(j, 1);
+            double gtemp2 = orient.gpcons(j, 2);
+            double gtemp3 = orient.gpcons(j, 3);
+            double gtemp4 = orient.gpcons(j, 4);
+            double gtemp5 = orient.gpcons(j, 5);
+            double gtemp6 = orient.gpcons(j, 6);
+            double gtemp7 = orient.gpcons(j, 7);
+            double gtemp8 = orient.gpcons(j, 8);
+
+            double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+            double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+            double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+            double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+            double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+            double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+            double mx1 = mxb1 * qtemp0 + myb1 * qtemp3 + mzb1 * qtemp6;
+            double my1 = mxb1 * qtemp1 + myb1 * qtemp4 + mzb1 * qtemp7;
+            double mz1 = mxb1 * qtemp2 + myb1 * qtemp5 + mzb1 * qtemp8;
+
+            double mx2 = mxb2 * gtemp0 + myb2 * gtemp3 + mzb2 * gtemp6;
+            double my2 = mxb2 * gtemp1 + myb2 * gtemp4 + mzb2 * gtemp7;
+            double mz2 = mxb2 * gtemp2 + myb2 * gtemp5 + mzb2 * gtemp8;
+
+            double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
+            double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
+
+            double f;
+            double g;
+
+            if (argthetai > cos(thetam) && argthetaj > cos(thetam))
+            {
+                if (argthetai > 1.)
+                    argthetai = 0.999999;
+
+                if (argthetaj > 1.)
+                    argthetaj = 0.999999;
+
+                double thetai = acos(argthetai);
+
+                double thetaj = acos(argthetaj);
+
+                f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
+                g = -(mx1*mx2+my1*my2+mz1*mz2); // the dot product of the vectors, this is minimzed when they point in the same direction, in other words we have a preferred twist 
+                double fac = (rij / dis);
+                double fac2 = SQR(fac);
+                double fac4 = SQR(fac2);
+                double fac8 = SQR(fac4);
+                double fac10 = fac2 * fac8;
+
+                double expf = exp(-0.5 * fac10);
+
+                double pot = -att * expf;
+
+                double potf = -5. * att * fac8 * (fac / dis) * expf;
+                // double potf = ((24 * att) / dis) * (2 * fac * fac12 - fac * fac6);
+
+                fx = g * f * potf * un.gpcons(0);
+                fy = g * f * potf * un.gpcons(1);
+                fz = g * f * potf * un.gpcons(2);
+
+                // cout << fx << " " << fy << " " << fz << endl;
+
+                double d1;
+                if (abs(SQR(argthetai) - 1) < 1E-5)
+                {
+                    d1 = 0.0;
+                }
+                else
+                {
+                    d1 = -1. / sqrt(1 - SQR(argthetai));
+                }
+                double d2;
+                if (abs(SQR(argthetaj) - 1) < 1E-5)
+                {
+                    d2 = 0.0;
+                }
+                else
+                {
+                    d2 = -1. / sqrt(1 - SQR(argthetaj));
+                }
+
+                // double factor = ((rij/dis)-SQR(rij/dis));
+                // cout << "DONE" << endl;
+
+                double temp1 = -pot * ((pi / (2 * thetam)) * sin(pi * thetai / (2. * thetam)) * d1 * cos((pi * thetaj) / (2 * thetam)));
+
+                double temp2 = -pot * ((pi / (2 * thetam)) * sin(pi * thetaj / (2. * thetam)) * d2 * cos((pi * thetai) / (2 * thetam)));
+
+                fx += (temp1 / rij) * (nx1 + (argthetai)*un.gpcons(0));
+                fy += (temp1 / rij) * (ny1 + (argthetai)*un.gpcons(1));
+                fz += (temp1 / rij) * (nz1 + (argthetai)*un.gpcons(2));
+                // cout << temp1 * (-nx1 / rij + (argthetai / SQR(rij)) * un.gpcons(0)) << " " << temp1 * (-ny1 / rij + (argthetai / SQR(rij)) * un.gpcons(1)) << " " << fz << endl;
+
+                fx += -(temp2 / rij) * (nx2 - (argthetaj)*un.gpcons(0));
+                fy += -(temp2 / rij) * (ny2 - (argthetaj)*un.gpcons(1));
+                fz += -(temp2 / rij) * (nz2 - (argthetaj)*un.gpcons(2));
+
+                tix = -(pi / (2. * thetam)) * pot * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(2) * ny1 - un.gpcons(1) * nz1);
+                tiy = -(pi / (2. * thetam)) * pot * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (-un.gpcons(2) * nx1 + un.gpcons(0) * nz1);
+                tiz = -(pi / (2. * thetam)) * pot * sin(pi * thetai / (2 * thetam)) * d1 * cos(pi * thetaj / (2 * thetam)) * (un.gpcons(1) * nx1 - un.gpcons(0) * ny1);
+                // cout << tx << " " << ty << " " << tz << endl;
+                tjx = -(pi / (2. * thetam)) * pot * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(2) * ny2 + un.gpcons(1) * nz2);
+                tjy = -(pi / (2. * thetam)) * pot * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (un.gpcons(2) * nx2 - un.gpcons(0) * nz2);
+                tjz = -(pi / (2. * thetam)) * pot * sin(pi * thetaj / (2 * thetam)) * d2 * cos(pi * thetai / (2 * thetam)) * (-un.gpcons(1) * nx2 + un.gpcons(0) * ny2);
+
+                tix += f * potf * (-my2*mz1+my1*mz2);
+                tiy += f * potf * (mx2*mz1-mx1*mz2);
+                tiz += f * potf * (-mx2*my1+mx1*my2);
+
+                tjx += -f * potf * (-my2 * mz1 + my1 * mz2);
+                tjy += -f * potf * (mx2 * mz1 - mx1 * mz2);
+                tjz += -f * potf * (-mx2 * my1 + mx1 * my2);
+              }
+            else
+            {
+                // cout << "ang" << endl;
+                f = 0.;
+                fx = 0.0;
+                fy = 0.0;
+                fz = 0.0;
+                tix = 0.0;
+                tiy = 0.0;
+                tiz = 0.0;
+                tjx = 0.0;
+                tjy = 0.0;
+                tjz = 0.0;
+            }
+        }
+        // if(abs(fx)<1E-10) {
+        //     cout << "why zero" << endl;
+        //     pausel();
+        // }
+    }
+
+    void setparameters(const vector1<double> &param)
+    {
+        nxb1 = param.gpcons(0);
+        nyb1 = param.gpcons(1);
+        nzb1 = param.gpcons(2);
+
+        mxb1 = param.gpcons(3);
+        myb1 = param.gpcons(4);
+        mzb1 = param.gpcons(5);
+
+
+        nxb2 = param.gpcons(6);
+        nyb2 = param.gpcons(7);
+        nzb2 = param.gpcons(8);
+
+        mxb2 = param.gpcons(9);
+        myb2 = param.gpcons(10);
+        mzb2 = param.gpcons(11);
+
+
+        if (abs(SQR(nxb1) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+            error("patch potential should be called with unit vector (vector not normalized)");
+        if (abs(SQR(nxb2) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+            error("patch potential should be called with unit vector (vector not normalized)");
+
+        if (abs(SQR(mxb1) + SQR(myb2) + SQR(mzb2) - 1) > 1E-5)
+            error("patch potential should be called with unit vector (vector not normalized)");
+        if (abs(SQR(mxb2) + SQR(myb2) + SQR(mzb2) - 1) > 1E-5)
+            error("patch potential should be called with unit vector (vector not normalized)");
+
+
+
+        dis = param.gpcons(12);
+        interaction_distance = 1.4 * dis;
+        att = param.gpcons(13);
+        thetam = param.gpcons(14);
+        v = param.gpcons(15);
+    }
+
+    vector1<double> getparameters()
+    {
+        vector1<double> param(13);
+        param[0] = nxb1;
+        param[1] = nyb1; // = param.gpcons(1);
+        param[2] = nzb1; // = param.gpcons(2);
+        param[3] = mxb1;
+        param[4] = myb1; // = param.gpcons(1);
+        param[5] = mzb1; // = param.gpcons(2);
+        param[6] = nxb2; // = param.gpcons(3);
+        param[7] = nyb2; // = param.gpcons(4);
+        param[8] = nzb2; // = param.gpcons(5);
+        param[9] = mxb2; // = param.gpcons(3);
+        param[10] =myb2; // = param.gpcons(4);
+        param[11] = mzb2; // = param.gpcons(5);
+        // if (abs(SQR(nxb1) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+        //     error("patch potential should be called with unit vector (vector not normalized)");
+        // if (abs(SQR(nxb2) + SQR(nyb2) + SQR(nzb2) - 1) > 1E-5)
+        //     error("patch potential should be called with unit vector (vector not normalized)");
+
+        param[12] = dis;                  // = param.gpcons(6);
+        param[13] = att;                  // = param.gpcons(7);
+        param[14] = thetam;               // = param.gpcons(8);
+        param[15] = interaction_distance; // = param.gpcons(9);
+        return param;
+    }
+
+    TorsionPotential *clone() const
+    {
+        return new TorsionPotential(*this);
+    }
+};
+
 struct trapf {
 double d;
 double d2;

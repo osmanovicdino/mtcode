@@ -362,244 +362,6 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
 
     obj = new LangevinNVTR;
 
-    // cout << "set" << endl;
-
-    // BivalentPatch temp_patch(100., 1.3, pi / 4.); //initialize abstract base class to be a one patch system
-
-    // int nop = 12;
-    // //pots = new ComboPatch;
-    // vector1<int> vec1(1);
-    // vec1[0] = nop;
-
-    // vector1<int> numb(1);
-
-    // numb[0] = N;
-
-    // int tot = nop * nop;
-    // matrix<double> params(tot, 3);
-
-    // int iter = 0;
-    // for (int i = 0; i < nop; i++)
-    // {
-    //     for (int j = 0; j < nop; j++)
-    //     {
-    //         bool cond1 = i < 6 && j < 6;
-    //         bool cond2 = i >= 6 && j >= 6 && i < 12 && j < 12;
-    //         bool cond3 = i >=12 && j >= 12;
-
-
-
-    //         if( cond1  || cond2 ) {
-    //             params(iter, 0) = 10.0;
-    //             params(iter, 1) = 1.4;
-    //             params(iter, 2) = 0.4;
-    //             iter++;
-    //         }
-    //         else if(cond3) {
-    //             params(iter, 0) = 30.0;
-    //             params(iter, 1) = 1.2;
-    //             params(iter, 2) = 0.4;
-    //             iter++;
-    //         }
-    //         else{
-    //             params(iter, 0) = 0.0;
-    //             params(iter, 1) = 1.4;
-    //             params(iter, 2) = 0.3;
-    //             iter++;
-    //         }
-    //     }
-    // }
-
-    // outfunc(params,"ligand");
-
-
-    // matrix<double> orient(nop, 3);
-
-    // mypoin B;
-    // // orient(0, 0) = 0.;
-    // // orient(0, 1) = 0.;
-    // // orient(0, 2) = 1.;
-
-    // // orient(1, 0) = 1;
-    // // orient(1, 1) = 0.;
-    // // orient(1, 2) = 0.;
-
-    // // orient(2, 0) = -0.5;
-    // // orient(2, 1) = sqrt(3)/2;
-    // // orient(2, 2) = 0.;
-
-    // // orient(3, 0) = 0.;
-    // // orient(3, 1) = 0.;
-    // // orient(3, 2) = -1.;
-
-    // double dphi = 0.2;
-    // double dtheta =0.1;
-    // vector1<double> p1 = B(1, dtheta + pid / 2., -dphi);
-    // vector1<double> p2 = B(1, pid / 2., -dphi);
-    // vector1<double> p3 = B(1, -dtheta + pid / 2., -dphi);
-
-    // vector1<double> p4 = B(1, dtheta + pid / 2.,(2.*pid/3.)  + dphi);
-    // vector1<double> p5 = B(1, pid / 2., (2. * pid / 3.) + dphi );
-    // vector1<double> p6 = B(1, -dtheta + pid / 2., (2. * pid / 3.) + dphi );
-
-    // vector1<double> p7 = B(1, dtheta + pid / 2., dphi);
-    // vector1<double> p8 = B(1, pid / 2., dphi);
-    // vector1<double> p9 = B(1, -dtheta + pid / 2., dphi);
-
-    // vector1<double> p10 = B(1, dtheta + pid / 2., (2. * pid / 3.) - dphi);
-    // vector1<double> p11 = B(1, pid / 2., (2. * pid / 3.) - dphi);
-    // vector1<double> p12 = B(1, -dtheta + pid / 2., (2. * pid / 3.) - dphi);
-
-    // // vector1<double> p13(3);
-    // // vector1<double> p14(3);
-
-    // // double p1[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
-
-    // // double p2[3] = {cos(pid / 18.), -sin(pid / 18.), 0};
-
-    // // double p3[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), -((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
-
-    // // double p4[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
-
-    // // double p5[3] = {-sin((2 * pid) / 9.), cos((2 * pid) / 9.), 0};
-
-    // // double p6[3] = {-((1 + sqrt(3)) * sin((2 * pid) / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos((2 * pid) / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
-
-    // // double p7[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
-
-    // // double p8[3] = {cos(pid / 18.), sin(pid / 18.), 0};
-
-    // // double p9[3] = {((1 + sqrt(3)) * cos(pid / 18.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * sin(pid / 18.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
-
-    // // double p10[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), -(-1 + sqrt(3)) / (2. * sqrt(2))};
-
-    // // double p11[3] = {-sin(pid / 9.), cos(pid / 9.), 0};
-
-    // // double p12[3] = {-((1 + sqrt(3)) * sin(pid / 9.)) / (2. * sqrt(2)), ((1 + sqrt(3)) * cos(pid / 9.)) / (2. * sqrt(2)), (-1 + sqrt(3)) / (2. * sqrt(2))};
-
-    // orient(0,0) = p1[0];
-    // orient(0,1) = p1[1];
-    // orient(0,2) = p1[2];
-
-    // orient(1,0) = p2[0];
-    // orient(1,1) = p2[1];
-    // orient(1,2) = p2[2];
-
-    // orient(2,0) = p3[0];
-    // orient(2,1) = p3[1];
-    // orient(2,2) = p3[2];
-
-    // orient(3,0) = p4[0];
-    // orient(3,1) = p4[1];
-    // orient(3,2) = p4[2];
-
-    // orient(4,0) = p5[0];
-    // orient(4,1) = p5[1];
-    // orient(4,2) = p5[2];
-
-    // orient(5,0) = p6[0];
-    // orient(5,1) = p6[1];
-    // orient(5,2) = p6[2];
-
-    // orient(6,0) = p7[0];
-    // orient(6,1) = p7[1];
-    // orient(6,2) = p7[2];
-
-    // orient(7,0) = p8[0];
-    // orient(7,1) = p8[1];
-    // orient(7,2) = p8[2];
-
-    // orient(8,0) = p9[0];
-    // orient(8,1) = p9[1];
-    // orient(8,2) = p9[2];
-
-    // orient(9,0) = p10[0];
-    // orient(9,1) = p10[1];
-    // orient(9,2) = p10[2];
-
-    // orient(10,0) = p11[0];
-    // orient(10,1) = p11[1];
-    // orient(10,2) = p11[2];
-
-    // orient(11,0) = p12[0];
-    // orient(11,1) = p12[1];
-    // orient(11,2) = p12[2];
-
-    // // orient(12,0) = 0.;
-    // // orient(12,1) = 0.;
-    // // orient(12,2) = 1.0;
-
-    // // orient(13, 0) = 0.;
-    // // orient(13, 1) = 0.;
-    // // orient(13, 2) = -1.0;
-    // double deltaG = 30.0;
-    // double angle = 0.5;
-    // // BivalentPatch c2(deltaG, 1.4, angle);
-
-    // matrix<double> orient(5, 3);
-
-    // double nx4 = 1.0;
-    // double ny4 = 0.0;
-    // double nz4 = 0.0;
-
-    // double nx5 = -1.0;
-    // double ny5 = 0.0;
-    // double nz5 = 0.0;
-
-    // double nx6 = -0.5;
-    // double ny6 = 0.5 * sqrt(3.);
-    // double nz6 = 0.;
-
-    // double nx7 = -0.5;
-    // double ny7 = -0.5 * sqrt(3.);
-    // double nz7 = 0.;
-
-    // double nx8 = 0.5;
-    // double ny8 = 0.5 * sqrt(3);
-    // double nz8 = 0.0;
-
-    // orient(0, 0) = nx6;
-    // orient(0, 1) = ny6;
-    // orient(0, 2) = nz6;
-
-    // orient(1, 0) = nx7;
-    // orient(1, 1) = ny7;
-    // orient(1, 2) = nz7;
-
-    // orient(2, 0) = nx8;
-    // orient(2, 1) = ny8;
-    // orient(2, 2) = nz8;
-
-    // orient(3, 0) = nx4;
-    // orient(3, 1) = ny4;
-    // orient(3, 2) = nz4;
-
-    // orient(4, 0) = nx5;
-    // orient(4, 1) = ny5;
-    // orient(4, 2) = nz5;
-
-    // int tot = 3 * 3 + 3 * 2 + 2 * 2;
-    // matrix<double> params(tot, 3);
-
-    // for (int i = 0; i < tot; i++)
-    // {
-    //     params(i, 0) = deltaG;
-    //     params(i, 1) = 1.4;
-    //     params(i, 2) = angle;
-    // }
-    // vector1<int> vec1(3);
-    // vec1[0] = 4;
-    // vec1[1] = 3;
-    // vec1[2] = 2;
-
-    // vector1<int> numb(3);
-
-    // numb[0] = N;
-    // numb[1] = N;
-    // numb[2] = N;
-
-    // GeneralPatch c2(vec1, numb, params, orient);
-    // GeneralPatch c(vec1, numb, params, orient, true);
 
     double deltaG =  20.;
     double angle = 0.5;
@@ -659,6 +421,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
                 double z = 0.5 + k;
                 if (SQR(x - ll / 2.) + SQR(y - ll / 2.) + SQR(z - ll / 2.) < SQR(0.9 * myrmax) )
                 {
+                    //cout << i <<  " " << j << " " << k << endl;
                     possible_pos_x.push_back(x);
                     possible_pos_y.push_back(y);
                     possible_pos_z.push_back(z);
@@ -666,6 +429,7 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
             }
         }
     }
+
 
 
 
@@ -705,6 +469,88 @@ NanotubeAssembly::NanotubeAssembly(double rmax, int N) {
 
     *obj = b;
 
+}
+
+NanotubeAssembly::NanotubeAssembly(double llx, int N, bool cc)
+{
+
+    ll = llx;
+
+    num = floor(ll / 4.);
+
+    // cout << "beginning to set" << endl;
+
+    obj = new LangevinNVTR;
+
+    double deltaG = 20.;
+    double angle = 0.5;
+
+    int tot = 4 * 4 + 4 * 2 + 2 * 2;
+    matrix<double> params(tot, 3);
+
+    for (int i = 0; i < tot; i++)
+    {
+        params(i, 0) = deltaG;
+        params(i, 1) = 1.4;
+        params(i, 2) = angle;
+    }
+
+    TetrahedralWithBivalent c2(params, N, N);
+
+    this->setpots(c2);
+
+    spherical_confinement_3D conf2(ll, 1.0, ll / 2.);
+    // conf2.rmax = rmax/2.;
+    // conf.v = 1.0;
+    // conf.shft  = ll/2.;
+    conf = conf2;
+    // conf.rmax = rmax/2.;
+    // conf.v = 1.0;
+    // conf.shft =  ll/2.;
+    // conf = conf2;
+
+    vector1<bool> pb(3, false);
+    cube geo(ll, pb, 3);
+
+    matrix<double> dat(N, 3);
+
+    int pp = floor(ll - 1.);
+
+    vector<double> possible_pos_x;
+    vector<double> possible_pos_y;
+    vector<double> possible_pos_z;
+
+
+    for (int i = 0; i < N; i++)
+    { //we do not care about overlaps
+        
+        dat(i, 0) = ll * (double)rand() / (double)RAND_MAX;
+        dat(i, 1) = ll * (double)rand() / (double)RAND_MAX;
+        dat(i, 2) = ll * (double)rand() / (double)RAND_MAX;
+    }
+
+    // cout << "beginning" << endl;
+
+    LangevinNVTR b(geo);
+
+    // cout << "created" << endl;
+   // outfunc(dat, "init");
+
+    b.initialize(dat);
+
+    double kT = 1.0;
+    double dt = 0.005;
+    b.setdt(dt);
+
+    double viscosity = 1.0;
+    double hdradius = 0.5;
+
+    b.setgamma(6. * pi * viscosity * hdradius);
+    b.setgammar(8. * pi * viscosity * hdradius * hdradius * hdradius);
+
+    b.setkT(kT);
+
+    *obj = b;
 }
 
 void NanotubeAssembly::add_particle2() {
@@ -1233,10 +1079,10 @@ void NanotubeAssembly::add_particle42(int which)
         } while (tf);
 
 
-        double ll = 110.;
-        int total_beads = 100;
+        double ll = 50.;
+        int total_beads = 2000;
         vector1<bool> pb(3, false);
-        cube geo(ll+10., pb, 3);
+        cube geo(ll+3., pb, 3);
 
         obj->setgeometry(geo);
 
@@ -1244,11 +1090,30 @@ void NanotubeAssembly::add_particle42(int which)
 
         double mp = 10.;
 
+      
+
         for(int i  = 0 ; i < total_beads ; i++) {
-            dat(i,0) = mp;
-            dat(i,1) = mp;
-            dat(i,2) = 1+1.1*i;
+            double rr1 = (double)rand() / (double)(RAND_MAX);
+            double rr2 = (double)rand() / (double)(RAND_MAX);
+            double rr3 = (double)rand() / (double)(RAND_MAX);
+            dat(i,0) = 1+   ll*rr1;
+            dat(i, 1) = 1 + ll * rr2;
+            dat(i, 2) = 1 + ll * rr3;
+
+            bool overlap=false;
+            for(int j = 0 ; j < i ; j++ ) {
+                
+                overlap = geo.distance_less_than(dat, i, j, 1.2);
+                
+                if(overlap) {
+                i--;
+                break;
+                }
+            }
         }
+
+
+
         matrix<double> orientation(total_beads,9);
         for(int i = 0 ; i < total_beads ; i++) {
             orientation(i, 0)=1.;
@@ -1265,13 +1130,15 @@ void NanotubeAssembly::add_particle42(int which)
         obj->setangularmomenta(angmom);
 
         vector1<double> lls(3);
-        lls[0] = 20.;
-        lls[1] = 20.;
-        lls[2] = ll+1;
+        lls[0] = ll+3;
+        lls[1] = ll+3;
+        lls[2] = ll+3;
 
         planar_confinement conf2(lls,100.);
 
-        matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+        int num2 = floor(ll / 4.);
+
+        matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num2, ccc);
 
         matrix<int> *pairs = obj->calculatepairs(boxes, 3.5);
 
@@ -1292,15 +1159,15 @@ void NanotubeAssembly::add_particle42(int which)
 
         F = obj->calculateforces(*pairs, wsa);
    
-        double spring_constant = 100.;
+        // double spring_constant = 100.;
 
-        F(total_beads - 1, 0) += -spring_constant * (obj->getcoordinate(total_beads - 1, 0) - mp);
-        F(total_beads - 1, 1) += - spring_constant*(obj->getcoordinate(total_beads-1, 1) - mp);
-        F(total_beads - 1, 2) += spring_constant * (ll + 1. - obj->getcoordinate(total_beads-1, 2));
-        F(0, 2) += -spring_constant * (obj->getcoordinate(0, 2));
+        // F(total_beads - 1, 0) += -spring_constant * (obj->getcoordinate(total_beads - 1, 0) - mp);
+        // F(total_beads - 1, 1) += - spring_constant*(obj->getcoordinate(total_beads-1, 1) - mp);
+        // F(total_beads - 1, 2) += spring_constant * (ll + 1. - obj->getcoordinate(total_beads-1, 2));
+        // F(0, 2) += -spring_constant * (obj->getcoordinate(0, 2));
 
-        F(0, 0) += -spring_constant * (obj->getcoordinate(0, 0) - mp);
-        F(0, 1) += -spring_constant * (obj->getcoordinate(0, 1) - mp);
+        // F(0, 0) += -spring_constant * (obj->getcoordinate(0, 0) - mp);
+        // F(0, 1) += -spring_constant * (obj->getcoordinate(0, 1) - mp);
         // cout << "ok to here" << endl;
 
         F += obj->calculateforces_external(conf2);
@@ -1348,12 +1215,12 @@ void NanotubeAssembly::add_particle42(int which)
             obj->rotate();
 
             F = obj->calculateforces(*pairs, wsa);
-            F(total_beads - 1, 0) += -spring_constant * (obj->getcoordinate(total_beads - 1, 0) - mp);
-            F(total_beads - 1, 1) += -spring_constant * (obj->getcoordinate(total_beads - 1, 1) - mp);
-            F(total_beads - 1, 2) += spring_constant * (ll +1 - obj->getcoordinate(total_beads - 1, 2));
-            F(0, 2) += -spring_constant * (obj->getcoordinate(0, 2));
-            F(0, 0) += -spring_constant * (obj->getcoordinate(0, 0) - mp);
-            F(0, 1) += -spring_constant * (obj->getcoordinate(0, 1) - mp);
+            // F(total_beads - 1, 0) += -spring_constant * (obj->getcoordinate(total_beads - 1, 0) - mp);
+            // F(total_beads - 1, 1) += -spring_constant * (obj->getcoordinate(total_beads - 1, 1) - mp);
+            // F(total_beads - 1, 2) += spring_constant * (ll +1 - obj->getcoordinate(total_beads - 1, 2));
+            // F(0, 2) += -spring_constant * (obj->getcoordinate(0, 2));
+            // F(0, 0) += -spring_constant * (obj->getcoordinate(0, 0) - mp);
+            // F(0, 1) += -spring_constant * (obj->getcoordinate(0, 1) - mp);
 
             lls[2] = ll + 1;
             conf2.setl(lls);

@@ -1,4 +1,5 @@
-particle_adder::particle_adder() : weights(vector<double>()),indices(vector<int>()) {
+particle_adder::particle_adder() : weights(vector<double>()), indices(vector<int>()), irreducibleweights(vector1<int>()), counts(vector1<int>())
+{
     rate = 0.0;
     vol = new sphere_vol;
 }
@@ -17,6 +18,18 @@ void particle_adder::set_rate(double &r) {
 void particle_adder::set_weights(vector<double> &we)
 {
     weights = we;
+}
+
+void particle_adder::set_irreducible_weights(vector1<int> &we)
+{
+    irreducibleweights = we;
+    tw = 0;
+    for(int i = 0 ; i < we.getsize() ; i++)
+        tw += we[i];
+}
+void particle_adder::set_counts(vector1<int> &we)
+{
+    counts = we;
 }
 
 void particle_adder::set_indices(vector<int> &in)
@@ -156,6 +169,121 @@ double r1 = ((double)rand() / (double)(RAND_MAX));
     }
 }
 
+}
+
+template <class vec>
+void particle_adder::add_p_w(MD &obj, vec ind, bool &does_return, vector1<double> &ve, int &fi)
+{
+
+    does_return = false;
+    if (irreducibleweights.getsize() < 1)
+    {
+    }
+    else
+    {
+        double r1 = ((double)rand() / (double)(RAND_MAX));
+
+        if (r1 < rate)
+        {
+
+
+            does_return = true;
+            vector1<double> myvec1(generate_point_in_volume());
+
+            vector1<double> mydistances(ind.size());
+
+            for (int j = 0; j < ind.size(); j++)
+            {
+                int i = ind[j];
+
+                double x2 = obj.getcoordinate(i, 0);
+                double y2 = obj.getcoordinate(i, 1);
+                double z2 = obj.getcoordinate(i, 2);
+                vector1<double> myvec2(3);
+                myvec2[0] = x2;
+                myvec2[1] = y2;
+                myvec2[2] = z2;
+                mydistances[j] = obj.getgeo().distance(myvec1, myvec2);
+            }
+
+            double mymin;
+            if (ind.size() > 0)
+            {
+                mymin = minval(mydistances);
+            }
+            else
+            {
+                mymin = 2.;
+            }
+            int iter = 0;
+
+            while (mymin < 1.0)
+            {
+                iter++;
+                myvec1 = generate_point_in_volume();
+
+                for (int j = 0; j < ind.size(); j++)
+                {
+                    int i = ind[j];
+
+                    double x2 = obj.getcoordinate(i, 0);
+                    double y2 = obj.getcoordinate(i, 1);
+                    double z2 = obj.getcoordinate(i, 2);
+                    vector1<double> myvec2(3);
+                    myvec2[0] = x2;
+                    myvec2[1] = y2;
+                    myvec2[2] = z2;
+                    mydistances[j] = obj.getgeo().distance(myvec1, myvec2);
+                }
+                mymin = minval(mydistances);
+
+                if (iter > 1000)
+                {
+                    cout << "couldn't place" << endl;
+                    pausel();
+                }
+            }
+
+            // cout << mymin << endl;
+
+            double result = (double)tw;
+
+            double randv = result * ((double)rand() / (double)(RAND_MAX));
+            double w = 0.0;
+            int index_which = 0;
+            for (int i = 0; i < irreducibleweights.getsize(); i++)
+            {
+                w += irreducibleweights[i];
+                if (w > randv)
+                {
+                    index_which = i;
+                    break;
+                }
+            }
+            
+
+
+            int index_choice = counts[index_which] + rand() % (counts[index_which+1]-counts[index_which]);
+            // cout << index_choice << endl;
+            for(int j = index_which+1 ; j < counts.getsize() ; j++) {
+                // cout << j << endl;
+                counts[j] = counts[j] - 1;
+            }
+            // cout << counts << endl;
+            // pausel();
+
+            ve = myvec1;
+            fi = indices[index_choice];
+
+
+            //remove_at(weights, index_which);
+            remove_at(indices, index_choice);
+        }
+        else
+        {
+            // do nothing
+        }
+    }
 }
 
 void particle_adder::add_p(bool &does_return, int &fi)

@@ -834,6 +834,8 @@ int totp =  pairs.getnrows();
 
 
             int **q = new int *;
+
+     
             
             if (iny.safe)
             {
@@ -845,7 +847,7 @@ int totp =  pairs.getnrows();
                 iny.UpdateIteratorSafe(p1, p2, q);
             }
 
-
+            // cout << "part 1" << endl;
             // cout << p1 << " " << p2 << endl;
             // cout << (*q)[0] << endl;
             // cout << (*q)[1] << endl;
@@ -855,6 +857,7 @@ int totp =  pairs.getnrows();
             //cout << (*q)[0] << endl;
             for (int tp = 1; tp < (*q)[0] + 1; tp++)
             {
+                // cout << tp << endl;
 
 
                 int potn = (*q)[tp];
@@ -924,6 +927,7 @@ int totp =  pairs.getnrows();
                     torques(p2, 1) += tjy; // - dis * (fz * un[0] + fx * un[2]);
                     torques(p2, 2) += tjz; // - dis * (fy * un[0] - fx * un[1]);
                 }
+                // cout << "part 2" << endl;
 
             delete q;
         }

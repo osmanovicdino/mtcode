@@ -1,10 +1,10 @@
-#ifndef GENERALPATCH_CPP
-#define GENERALPATCH_CPP
+#ifndef GENERALPATCHTORSION_CPP
+#define GENERALPATCHTORSION_CPP
 
 // we define here a general patch model such that we may quickly be able to create new simulations of whichever
 // geometry we are interested in
 
-GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_per_typee, matrix<double> &paramss, matrix<double> &orientt, bool flatt = false) : ComboPatch(paramss.getnrows()), params(paramss), orient(orientt), /*no_patches_per_type(no_patches_per_typee), num_per_type(num_per_typee), total_patches_per_type(vector1<int>(no_patches_per_typee.getsize())),*/ pot_starters(matrix<int>(num_per_typee.getsize(), num_per_typee.getsize()))
+GeneralPatchTorsion::GeneralPatchTorsion(vector1<int> no_patches_per_typee, vector1<int> num_per_typee, matrix<double> &paramss, matrix<double> &orientt, vector1<int> &torsionn, bool flatt = false) : ComboPatch(paramss.getnrows()), params(paramss), orient(orientt),torsion(torsionn), /*no_patches_per_type(no_patches_per_typee), num_per_type(num_per_typee), total_patches_per_type(vector1<int>(no_patches_per_typee.getsize())),*/ pot_starters(matrix<int>(num_per_typee.getsize(), num_per_typee.getsize()))
 {
     no_types = no_patches_per_typee.getsize();
     flat = flatt;
@@ -91,15 +91,40 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
                             // }
                            // else {
                                 //cout << "create normal" << endl;
-                            mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
-                            //}
-                            if (pot1->interaction_distance > max_check)
-                                max_check = pot1->interaction_distance;
-                            if (cos(pot1->thetam) < max_ang)
-                                max_ang = cos(pot1->thetam);
-                            potential_bundle[iter] = pot1->clone();
-                            delete pot1;
-                            iter++;     
+                            if(torsion[iter]==0) {
+                                mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
+                                //}
+                                if (pot1->interaction_distance > max_check)
+                                    max_check = pot1->interaction_distance;
+                                if (cos(pot1->thetam) < max_ang)
+                                    max_ang = cos(pot1->thetam);
+                                potential_bundle[iter] = pot1->clone();
+                                delete pot1;
+                                iter++;
+                            }
+                            else if(torsion[iter]==1) {
+                                double o1 = -orient(i2,1);
+                                double o2 = orient(i2,0);
+                                double o3 = orient(i2,2);
+
+                                double y1 = -orient(j1, 1);
+                                double y2 = orient(j1, 0);
+                                double y3 = orient(j1, 2);
+
+
+                                mypot *pot1 = new TorsionPotential(orient(i2, 0), orient(i2, 1), orient(i2, 2),o1,o2,o3, orient(j1, 0), orient(j1, 1), orient(j1, 2),y1,y2,y3, params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
+                                //}
+                                if (pot1->interaction_distance > max_check)
+                                    max_check = pot1->interaction_distance;
+                                if (cos(pot1->thetam) < max_ang)
+                                    max_ang = cos(pot1->thetam);
+                                potential_bundle[iter] = pot1->clone();
+                                delete pot1;
+                                iter++;
+                            }
+                            else{
+
+                            }
                 }
             }
         }
@@ -120,7 +145,7 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
 
 }
 
-GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnrows()), params(a.params), orient(a.orient), /*no_patches_per_type(a.no_patches_per_type), num_per_type(a.num_per_type), total_patches_per_type(a.total_patches_per_type),*/ pot_starters(a.pot_starters)
+GeneralPatchTorsion::GeneralPatchTorsion(const GeneralPatchTorsion &a) : ComboPatch((a.params).getnrows()), params(a.params), orient(a.orient), /*no_patches_per_type(a.no_patches_per_type), num_per_type(a.num_per_type), total_patches_per_type(a.total_patches_per_type),*/ pot_starters(a.pot_starters), torsion(a.torsion)
 {
     flat = a.flat;
     no_types = a.no_types;//no_patches_per_type.getsize();
@@ -197,22 +222,42 @@ GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnro
             {
                 for (int j1 = startj; j1 < endj; j1++)
                 {
-                    //mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.75);
-                    // potentialtheta3D *pot1;
-                    // if (flat) {
-                        //cout << "create flat bottom" << endl;
-                        
-                        // pot1 = new KernFrenkelOnePatchFlatBottom(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.5);
-                        // }
-                    //else {
-                        //cout << "create normal" << endl;
-                    mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
-                    //}
-                    if(pot1->interaction_distance > max_check) max_check = pot1->interaction_distance;
-                    if(cos(pot1->thetam) < max_ang) max_ang = cos(pot1->thetam);
-                    potential_bundle[iter] = pot1->clone();
-                    delete pot1;
-                    iter++;
+
+                    if (torsion[iter] == 0)
+                    {
+                        mypot *pot1 = new mypot(orient(i2, 0), orient(i2, 1), orient(i2, 2), orient(j1, 0), orient(j1, 1), orient(j1, 2), params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
+                        //}
+                        if (pot1->interaction_distance > max_check)
+                            max_check = pot1->interaction_distance;
+                        if (cos(pot1->thetam) < max_ang)
+                            max_ang = cos(pot1->thetam);
+                        potential_bundle[iter] = pot1->clone();
+                        delete pot1;
+                        iter++;
+                    }
+                    else if (torsion[iter] == 1)
+                    {
+                        double o1 = -orient(i2, 1);
+                        double o2 = orient(i2, 0);
+                        double o3 = orient(i2, 2);
+
+                        double y1 = -orient(j1, 1);
+                        double y2 = orient(j1, 0);
+                        double y3 = orient(j1, 2);
+
+                        mypot *pot1 = new TorsionPotential(orient(i2, 0), orient(i2, 1), orient(i2, 2), o1, o2, o3, orient(j1, 0), orient(j1, 1), orient(j1, 2), y1, y2, y3, params(iter, 0), params(iter, 1), params(iter, 2), 0.2);
+                        //}
+                        if (pot1->interaction_distance > max_check)
+                            max_check = pot1->interaction_distance;
+                        if (cos(pot1->thetam) < max_ang)
+                            max_ang = cos(pot1->thetam);
+                        potential_bundle[iter] = pot1->clone();
+                        delete pot1;
+                        iter++;
+                    }
+                    else
+                    {
+                    }
                 }
             }
         }
@@ -227,7 +272,7 @@ GeneralPatch::GeneralPatch(const GeneralPatch &a) : ComboPatch((a.params).getnro
     //whpa = new matrix<mdpair>(*(a.whpa));
 }
 
-inline int GeneralPatch::return_type(int i) {
+inline int GeneralPatchTorsion::return_type(int i) {
 
     
     for(int j = 0 ; j < no_types; j++ ) 
@@ -237,7 +282,7 @@ inline int GeneralPatch::return_type(int i) {
     return 0;
 }
 
-inline int GeneralPatch::return_type_patch(int i)
+inline int GeneralPatchTorsion::return_type_patch(int i)
 {
 
     // if (i < total_patches_per_type[0])
@@ -251,7 +296,7 @@ inline int GeneralPatch::return_type_patch(int i)
     return 0;        
 }
 
-int GeneralPatch::num_patches(const int &i)
+int GeneralPatchTorsion::num_patches(const int &i)
 {
     // int k1 = return_type(i);
     
@@ -262,8 +307,8 @@ int GeneralPatch::num_patches(const int &i)
 
 // }
 
-void GeneralPatch::UpdateIterator(const int &i, const int &j) {
-    // cout << "called update iterator" << endl;
+void GeneralPatchTorsion::UpdateIterator(const int &i, const int &j) {
+
     int k1 = typef[i];
     int k2 = typef[j];
 
@@ -273,16 +318,14 @@ void GeneralPatch::UpdateIterator(const int &i, const int &j) {
 }
 
 
-void GeneralPatch::UpdateIteratorSafe(const int &i, const int &j, int **q) {
-    // cout << "called update iterator safe" << endl;
+void GeneralPatchTorsion::UpdateIteratorSafe(const int &i, const int &j, int **q) {
     int k1 = typef[i];
     int k2 = typef[j];
 
     *q = (i1[no_types * k1 - (k1 * (1 + k1)) / 2 + k2]);
-
 }
 
-int GeneralPatch::get_total_patches(const int &N) {
+int GeneralPatchTorsion::get_total_patches(const int &N) {
     int num = 0 ;
     for(int i = 0  ; i < no_types; i++) {
     int k1 = num_per_type[i];
@@ -294,7 +337,7 @@ int GeneralPatch::get_total_patches(const int &N) {
     return num;
  }
 
- void GeneralPatch::which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
+ void GeneralPatchTorsion::which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
  { // what this function does is take
      int k1 = typef[i];
      int k2 = typef[j];
@@ -319,7 +362,7 @@ int GeneralPatch::get_total_patches(const int &N) {
      //  wpj = j;
  }
 
- void GeneralPatch::pre_which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
+ void GeneralPatchTorsion::pre_which_patch(const int &i, const int &j, const int &potn, int &wpi, int &wpj)
  { // what this function does is take
      int k1 = return_type(i);
      int k2 = return_type(j);
@@ -344,7 +387,7 @@ int GeneralPatch::get_total_patches(const int &N) {
      //  wpj = j;
  }
 
- matrix<mdpair> GeneralPatch::preallocate_which_patch() {
+ matrix<mdpair> GeneralPatchTorsion::preallocate_which_patch() {
     //  Nt = num_per_type[num_per_type.getsize()-1];
 
      int max_depth = i1[0][0];
@@ -428,7 +471,7 @@ int GeneralPatch::get_total_patches(const int &N) {
 //     //  cout << "patches: " << wpi << " " << wpj << endl;
 //  }
 
- void GeneralPatch::which_particle(const int &wpi, const int &wpj, int &i, int &j)
+ void GeneralPatchTorsion::which_particle(const int &wpi, const int &wpj, int &i, int &j)
  {
 
      int ki = return_type_patch(wpi);
@@ -447,7 +490,7 @@ int GeneralPatch::get_total_patches(const int &N) {
      //j = wpj;
  }
 
- int GeneralPatch::which_potential(const int &i, const int &j, const int &wpi, const int &wpj)
+ int GeneralPatchTorsion::which_potential(const int &i, const int &j, const int &wpi, const int &wpj)
  {
     //  int k1 = return_type(i);
     //  int k2 = return_type(j);
@@ -464,7 +507,7 @@ int GeneralPatch::get_total_patches(const int &N) {
      return potstart + patchi*no_patches_per_type[k2]+patchj;
  }
 
- void GeneralPatch::get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12) {
+ void GeneralPatchTorsion::get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12) {
      d12 = potential_bundle[potn]->interaction_distance;
      ang12 = params(potn, 2);
 
@@ -501,4 +544,7 @@ int GeneralPatch::get_total_patches(const int &N) {
     nzb2 = orient(startj + k4, 2);
  }
 
+ void GeneralPatchTorsion::CreateFiles() {
+
+ }
 #endif /* GENERALPATCH_CPP */

@@ -68,7 +68,11 @@ matrix<double> CreateRandomSample(matrix<double> &pos, int n, double l, int boxe
 
     std::vector<unsigned int> indices(v.size());
     std::iota(indices.begin(), indices.end(), 0);
-    std::random_shuffle(indices.begin(), indices.end());
+
+    std::random_device rd; // to check whether this is too long
+    std::mt19937 g(rd());
+
+    std::shuffle(indices.begin(), indices.end(),g);
 
     /*
     cout << possible_boxes.size() << endl;

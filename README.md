@@ -16,3 +16,12 @@ the output of the program is a csv of all the particle positions every 1000 time
 The GPU method is found in the corresponding .cu files.
 
 To run on GPU compile mainMT.cu using nvcc
+
+01/27/2025
+
+random_shuffle depreciated, replaced with shuffle and    
+
+std::random_device rd; //to check whether this is too long
+    std::mt19937 g(rd());
+
+as the RNG. To be tested whether this decreases performance

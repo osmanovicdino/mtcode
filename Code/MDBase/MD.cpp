@@ -108,6 +108,10 @@ double MD::getcoordinate(int i, int j) {
 	return (*dat).mat[i*dimension+j];
 }
 
+void MD::setcoordinate(int i, int j, double pos) {
+	(*dat).mat[i * dimension + j] = pos;
+}
+
 int MD::getdimension() {
 	return dimension;
 }

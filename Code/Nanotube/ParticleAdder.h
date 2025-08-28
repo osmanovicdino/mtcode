@@ -20,6 +20,21 @@ struct volume_vol {
     virtual volume_vol *clone() const = 0;
 };
 
+struct box_vol : public volume_vol {
+    double llx,lly,llz;
+    bool in_volume(vector1<double> &myvec) {
+        if(myvec[0] < llx && myvec[1] < lly && myvec[2] <llz) {
+            return true;
+        }
+        else return false;
+
+    }
+
+    box_vol *clone() const {
+        return new box_vol(*this);
+    }
+};
+
 struct sphere_vol : public volume_vol  {
     double r = 5.; //default to 5,;
     double c1 =10.;
@@ -55,12 +70,19 @@ struct particle_adder {
     vector<int> indices;
     double rate; //this is the base rate at which particles are added, a particle is added for sure at this rate
 
+    vector1<int> irreducibleweights;
+    int tw;
+    vector1<int> counts; //set the counts i.e (0,4999,5000,etc)
     volume_vol *vol;
+
 
     particle_adder();
 
     void set_volume(volume_vol&);
-    void set_weights(vector<double>&);
+    void set_weights(vector<double> &);
+    void set_irreducible_weights(vector1<int> &);
+    void set_counts(vector1<int> &);
+
     void set_indices(vector<int>&);
     void set_rate(double &r);
 
@@ -70,6 +92,9 @@ struct particle_adder {
 
     template<class vec>
     void add_p(MD &obj, vec ind, bool&, vector1<double>&, int&);
+
+    template <class vec>
+    void add_p_w(MD &obj, vec ind, bool &, vector1<double> &, int &);
 
     void add_p(bool &dd, int &fi);
     //returns a particle at int with position vector1<> avoiding ind of dat

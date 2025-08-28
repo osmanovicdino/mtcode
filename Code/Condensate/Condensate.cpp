@@ -14,7 +14,7 @@ Condensate::Condensate(double ll, int N)  {
 
     this->setBindingModel(temp_bind);
 
-    vector1<bool> pb(3,true);
+    vector1<bool> pb(3,false);
     cube geo(ll,pb,3);
 
     matrix<double> dat(N,3);
@@ -126,7 +126,10 @@ void Condensate::setup_tight_packing(double size) {
         iters.push_back(i);
     }
 
-    std::random_shuffle(iters.begin(), iters.end());
+    std::random_device rd; // to check whether this is too long
+    std::mt19937 g(rd());
+
+    std::shuffle(iters.begin(), iters.end(),g);
 
     for (int i = sp; i < sp + nc; i++)
     {
@@ -274,7 +277,7 @@ void Condensate::setkT(double a) {
 void Condensate::setpots(ComboPatch &a) {
     ComboPatch *q = a.clone();
     pots = q;
-    (*pots).CreateFiles();
+    //(*pots).CreateFiles();
 }
 
 void Condensate::setBindingModel(AbstractBindingModel &a) { 
@@ -331,11 +334,11 @@ void Condensate::run(int runtime, int every, string strbase = "")
 
     for (int i = 0; i < runtime; i++)
     {
-        cout << i << endl;
+        // cout << i << endl;
         vector1<double> meas(6);
         obj->measured_temperature(meas);
         tottemp += meas;
-        cout << tottemp/(double)(i+1) << endl;
+        // cout << tottemp/(double)(i+1) << endl;
 
 
        // cout << i << endl;
@@ -375,7 +378,7 @@ void Condensate::run(int runtime, int every, string strbase = "")
         if (i % every == 0)
         {
 
-            //cout << i << endl;
+            cout << i << endl;
 
             stringstream ss;
 

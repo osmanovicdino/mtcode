@@ -120,7 +120,7 @@ int main(int argc, char **argv)
     LangevinNVT b(bc);
 
     double kT = 1.0;
-    double dt = 0.005;
+    double dt = 0.05;
     double eta = 20.;
     // gamma = eta;
 
@@ -134,18 +134,24 @@ int main(int argc, char **argv)
 
     double baseline = (ll / 2.);
 
+
     matrix<double> dat(NN, dimension);
     matrix<double> moms(NN, dimension);
 
-    for (int i = 0; i < NN; i++)
+    dat(0,0) = ll/2.;
+    dat(0,1) = ll/2.;
+    dat(0,2) = 0.1;
+
+    for (int i = 1; i < NN; i++)
     {
-        for (int j = 0; j < dimension; j++)
+        for (int j = 0; j < dimension-1; j++)
         {
             double rr = (double)rand() / (double)(RAND_MAX);
 
             double rr1 = 2 * rr - 1;
             dat(i, j) = baseline + rr1; // start them all together
         }
+        dat(i,2) = 0.1;
     }
     b.setdat(dat);
     b.setmom(moms);
@@ -215,6 +221,12 @@ int main(int argc, char **argv)
     myfile.open(datas.c_str());
 
     double mf = 0.5;
+    vector1<int> p1(NN-1);
+    for(int i = 0 ; i < NN-1 ; i++) {
+        p1[i]=i+1;
+    }
+
+    
 
     for (int i = 0; i < runtime; i++)
     {
@@ -242,12 +254,13 @@ int main(int argc, char **argv)
         }
         if (i % every == 0)
         {
+            cout << i << endl;
             matrix<double> pos = b.getdat();
             myfile <<= pos;
         }
         b.advance_mom(F, R);
 
-        b.advance_pos();
+        b.advance_pos(p1);
     }
     myfile.close();
 

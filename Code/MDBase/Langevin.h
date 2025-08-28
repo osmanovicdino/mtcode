@@ -37,6 +37,7 @@ public:
 
 	double getkT() {return kT;}
 	double getm() {return m;}
+	double getgamma() {return gamma;}
 	double getc1() {return c1;}
 	double getc2() {return c2;}
 	double getc3() {return c3;}

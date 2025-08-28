@@ -3,6 +3,7 @@
 
 #include "../MDBase/Rotational/LangevinR.h"
 #include "ParticleAdder.h"
+#include "GeneticDataStructure.h"
 
 struct WeiM
 {
@@ -46,6 +47,7 @@ double ll;
 // matrix<double> create_spherical_shell(int N, double R);
 
 NanotubeAssembly(double, int); //argument one is radius, argument 2 is the amount
+NanotubeAssembly(double,int,bool); //just add randomly
 
 void setviscosity(double);
 void setkT(double);
@@ -77,11 +79,13 @@ void run_no_patchy_noshell(int, int, double prod, double ks, double ks2, string 
 
 void run_no_patchy_continue(int, int, int, ShellProperties &, double prod, double ks, double ks2, matrix<double>&, vector1<int>&, vector<vector<int>>&, string strbase);
 
+void run_box(int,int,double,geneticcode&,string);
 //AbstractBindingModel *bm;
 
 };
 
 #include "Nanotube.cpp"
 #include "Nanotube2.cpp"
+#include "Nanotube3.cpp"
 
 #endif /* NANOTUBE_H */

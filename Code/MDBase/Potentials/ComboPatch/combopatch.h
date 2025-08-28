@@ -37,6 +37,7 @@ virtual void CreateFiles();
 #include "TwoTetrahedral.h"
 #include "TwoTetrahedralAndSingle.h"
 #include "GeneralPatch.h"
+#include "GeneralPatchTorsion.h"
 #include "combopatch.cpp"
 #include "combopatchoutput.cpp"
 

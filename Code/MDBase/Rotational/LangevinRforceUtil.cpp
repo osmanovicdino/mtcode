@@ -945,8 +945,10 @@ void LangevinNVTR::setup_random_binding(vector<patchint> &pairs, vector<int> &di
             }
         }
     }
+    std::random_device rd; //to check whether this is too long
+    std::mt19937 g(rd());
 
-    std::random_shuffle(edgelist.begin(), edgelist.end()); //every day I'm shuffling
+    std::shuffle(edgelist.begin(), edgelist.end(), g); // every day I'm shuffling
 
     // PairHistogramExtendedParallel(edgelist, boindices, boscores, tempbound);
 

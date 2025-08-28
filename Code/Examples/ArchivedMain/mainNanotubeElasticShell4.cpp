@@ -333,7 +333,7 @@ int main(int argc, char **argv)
     // c2.v = orient;
     // c2.v2= orient2;
 
-    A.setpots(c2);
+    // A.setpots(c2);
     A.setkT(1.0);
 
     cout << "done" << endl;
