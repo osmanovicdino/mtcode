@@ -31,9 +31,9 @@ module load gcc/11.3.0
 
 dirwemake="den${SGE_TASK_ID}"
 mkdir /u/scratch/d/dinoo/GeneticTry2/${dirwemake}
-cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/GeneticTry/${dirwemake}
-g++ ~/Chemistry/Code/mainNanotubeBox.cpp -o /u/scratch/d/dinoo/GeneticTry/${dirwemake}/angron
-cd /u/scratch/d/dinoo/GeneticTry/${dirwemake}
+cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/GeneticTry2/${dirwemake}
+g++ ~/Chemistry/Code/mainNanotubeBox.cpp -o /u/scratch/d/dinoo/GeneticTry2/${dirwemake}/angron
+cd /u/scratch/d/dinoo/GeneticTry2/${dirwemake}
 
 ./angron >log
 # echo job info on joblog:
