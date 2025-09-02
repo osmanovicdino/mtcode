@@ -66,7 +66,7 @@ int main(int argc, char **argv)
     vector<string> s;
 
 
-    int str1 = 2 + rand() % 3;
+    int str1 = 1 + rand() % 3;
 
     s.push_back(to_string(str1));
     vector1<int> opt1(6);
@@ -239,8 +239,8 @@ int main(int argc, char **argv)
             int totn = (olg(i, 0) * olg(j, 0));
             vector1<int> ints(totn,1);
             for(int k  = 0 ; k < totn ; k++) {
-                int ran = rand() % 3;
-                if(ran==2) ints[k] = 0;
+                int ran = rand() % 6;
+                if(ran==5) ints[k] = 0;
             }
             string result;
 
