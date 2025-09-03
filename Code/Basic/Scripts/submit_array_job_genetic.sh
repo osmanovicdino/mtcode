@@ -30,10 +30,10 @@ module load gcc/11.3.0
 ##/usr/bin/time -v hostname
 
 dirwemake="den${SGE_TASK_ID}"
-mkdir /u/scratch/d/dinoo/GeneticTry3/${dirwemake}
-cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/GeneticTry3/${dirwemake}
-g++ ~/Chemistry/Code/mainNanotubeBox.cpp -o /u/scratch/d/dinoo/GeneticTry3/${dirwemake}/angron
-cd /u/scratch/d/dinoo/GeneticTry3/${dirwemake}
+mkdir /u/scratch/d/dinoo/GeneticTry4/${dirwemake}
+cp ~/Chemistry/Code/main.cpp /u/scratch/d/dinoo/GeneticTry4/${dirwemake}
+g++ ~/Chemistry/Code/mainNanotubeBox.cpp -o /u/scratch/d/dinoo/GeneticTry4/${dirwemake}/angron
+cd /u/scratch/d/dinoo/GeneticTry4/${dirwemake}
 
 ./angron >log
 # echo job info on joblog:
