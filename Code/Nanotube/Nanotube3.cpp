@@ -212,7 +212,7 @@ void NanotubeAssembly::run_box(int runtime, int every, double mass, geneticcode 
     } //random force
     forcep1 += sqrt(2 * ((*obj).getgamma() ) *mass * (*obj).getkT() / (*obj).getdt()) * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808); // temperature
     if(h>hmin)
-    forcep1 -= mass; //constant downwards force if above hmin.
+    forcep1 -= mass*(h-hmin); //constant downwards force if above hmin.
     
     
     obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
@@ -328,7 +328,7 @@ void NanotubeAssembly::run_box(int runtime, int every, double mass, geneticcode 
         forcep1 += sqrt(2 * ((*obj).getgamma())  * (*obj).getkT() / (*obj).getdt()) * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808); // temperature
         // cout << forcep1 << " ";
         if (h > hmin)
-            forcep1 -= mass; // constant downwards force
+            forcep1 -= mass*(h-hmin); // constant downwards force
 
         // cout << forcep1 << endl;
         // pausel();

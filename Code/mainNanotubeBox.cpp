@@ -298,6 +298,7 @@ int main(int argc, char **argv)
 
     bool cc;
     NanotubeAssembly A(20., (g.no_types)*5000+1,cc);
+    
 
     // cout << *(g.patch_num) << endl;
     // for(int i = 0  ; i < g.interactions.size() ; i++) {

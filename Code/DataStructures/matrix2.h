@@ -18,11 +18,13 @@
 
 //we'd like these classes below to have access to the matrix class
 struct cube;
+struct cuboid;
 class MD; 
 
 template <class T>
 class matrix  {
 friend struct cube;
+friend struct cuboid;
 friend class MD;
 friend struct Bilinear2<T>;
 friend struct Bilinear3;

@@ -564,7 +564,7 @@ struct cube  {
 
 };
 
-/*
+
 struct cuboid : geometry {
 	vector1<double> l;
 
@@ -577,42 +577,269 @@ struct cuboid : geometry {
 	
 	}
 
-	double distance(const vector1<double> &x1,const vector1<double> &x2) {
-		double temp = 0.0;
-		//vector1<double> dx(dimension);
-		for(int i1  = 0; i1 < dimension ; i1++ ) {
-			double dx = x1.gpcons(i1)-x2.gpcons(i1);
-			if(pb[i1]) { 
-				if(abs(dx) > l[i1]*0.5 ) 
-					dx = dx - SIGN(l[i1],dx); 
-			}
-			
-				temp += SQR(dx);
-			
-		}
 
-		return sqrt(temp);	
-
+	cuboid() : pb(vector1<bool>(1, true)), l(vector1<double>(1, 1.))
+	{
+		dimension = 1;
+		
+		
 	}
 
-	bool distance_less_than(const vector1<double> &x1,const vector1<double> &x2, double val) {
+	cuboid(const cuboid &c) : pb(c.pb), l(c.l)
+	{
+		dimension = c.dimension;
+		
+	}
+
+	cuboid &operator=(const cube &c)
+	{
+		pb = c.pb;
+		dimension = c.dimension;
+		l = c.l;
+
+		return *this;
+	}
+
+	~cuboid()
+	{
+		// everything is dellocated automatically
+	}
+
+	double distance(const vector1<double> &x1, const vector1<double> &x2)
+	{
 		double temp = 0.0;
-		//vector1<double> dx(dimension);
-		for(int i1  = 0; i1 < dimension ; i1++ ) {
-			double dx = x1.gpcons(i1)-x2.gpcons(i1);
-			if(pb[i1]) { 
-				if(abs(dx) > l[i1]*0.5 ) 
-					dx = dx - SIGN(l[i1],dx); 
+		// vector1<double> dx(dimension);
+		for (int i1 = 0; i1 < dimension; i1++)
+		{
+			double dx = x1.gpcons(i1) - x2.gpcons(i1);
+			if (pb[i1])
+			{
+				if (abs(dx) > l[i1] * 0.5)
+					dx = dx - SIGN(l[i1], dx);
 			}
-			if(abs(dx)>val) {return false; }
+
 			temp += SQR(dx);
-			
 		}
 
-		if(temp < SQR(val)) return true;
-		else return false;	
+		return sqrt(temp);
+	}
+
+	double distance(const matrix<double> &r, int i, int j)
+	{
+		double temp = 0.0;
+		// vector1<double> dx(dimension);
+		for (int i1 = 0; i1 < dimension; i1++)
+		{
+			double dx = r.gpcons(i, i1) - r.gpcons(j, i1);
+			if (pb[i1])
+			{
+				if (abs(dx) > l[i1] * 0.5)
+					dx = dx - SIGN(l[i1], dx);
+			}
+
+			temp += SQR(dx);
+		}
+
+		return sqrt(temp);
+	}
+
+
+
+	bool distance_less_than(matrix<double> &r, int i, int j, double val)
+	{
+		double temp = 0.0;
+		// vector1<double> dx(dimension);
+		for (int i1 = 0; i1 < dimension; i1++)
+		{
+			double dx = r.mat[i * dimension + i1] - r.mat[j * dimension + i1];
+
+			if (periodic)
+			{
+				if (fabs(dx) > l[i1] * 0.5)
+					dx = dx - SIGN(l[i1], dx);
+			}
+			dx = SQR(dx);
+			if (dx > SQR(val))
+			{
+				return false;
+			}
+			temp += dx;
+		}
+
+		if (temp < SQR(val))
+			return true;
+		else
+			return false;
+	}
+
+	bool exceed_dis(matrix<double> &r1, matrix<double> &r2, double d)
+	{ // returns the square distance to d and the distance between to uv
+		// vector1<double> dx(dimension);
+
+		// vector1<double> dx(dimension);
+		for (int i = 0; i < r1.getNsafe(); i++)
+		{
+			double temp = 0.0;
+			for (int i1 = 0; i1 < dimension; i1++)
+			{
+				double dx = r1.mat[i * dimension + i1] - r2.mat[i * dimension + i1];
+
+				if (periodic)
+				{
+					if (fabs(dx) > l[i1] * 0.5)
+						dx = dx - SIGN(l[i1], dx);
+				}
+				dx = SQR(dx);
+				if (dx > d)
+				{
+					return true;
+				}
+				temp += dx;
+			}
+
+			if (temp > d)
+				return true;
+		}
+		return false;
 
 	}
+
+
+	void distance3v(double &x1, double &x2, double &y1, double &y2, double &z1, double &z2, vector1<double> &uv, double &d)
+	{ // returns the square distance to d and the distance between to uv
+		// vector1<double> dx(dimension);
+
+		double dx = x1 - x2;
+		double dy = y1 - y2;
+		double dz = z1 - z2;
+		if (periodic)
+		{
+			if (SQR(dx) > SQR(l[0]) )
+				dx = dx - SIGN(l[0], dx);
+			if (SQR(dy) > SQR(l[1]) )
+				dy = dy - SIGN(l[1], dy);
+			if (SQR(dz) > SQR(l[2]))
+				dz = dz - SIGN(l[2], dz);
+		}
+		d = SQR(dx) + SQR(dy) + SQR(dz);
+		uv[0] = dx;
+		uv[1] = dy;
+		uv[2] = dz;
+
+		// uv*=(1./d);
+		//  for(int i1 = 0 ; i1 < dimension ; i1++) {
+		//  	dx[i1]=d2*dx[i1];
+		//  }
+		// return dx;
+	}
+
+	void distance_vector(matrix<double> &r, int &i, int &j, vector1<double> &uv, double &d)
+	{ // returns the square distance to d and the distance between to uv
+		// vector1<double> dx(dimension);
+		double temp = 0.0;
+		for (int i1 = 0; i1 < dimension; i1++)
+		{
+			// double as = r.mat[i*dimension+i1]-r.mat[j*dimension+i1];
+			double as = r.gpcons(i, i1) - r.gpcons(j, i1);
+			if (periodic)
+			{
+				if (SQR(as) > SQR(l[i1]))
+					as = as - SIGN(l[i1], as);
+			}
+			temp += SQR(as);
+			uv[i1] = as;
+		}
+		d = temp;
+		// uv*=(1./d);
+		//  for(int i1 = 0 ; i1 < dimension ; i1++) {
+		//  	dx[i1]=d2*dx[i1];
+		//  }
+		// return dx;
+	}
+
+	void distance_vector(matrix<double> *r, const int &i, const int &j, vector1<double> &uv, double &d)
+	{ // returns the square distance to d and the distance between to uv
+		// vector1<double> dx(dimension);
+		double temp = 0.0;
+		for (int i1 = 0; i1 < dimension; i1++)
+		{
+			// double as = r.mat[i*dimension+i1]-r.mat[j*dimension+i1];
+			double as = r->gpcons(i, i1) - r->gpcons(j, i1);
+			if (periodic)
+			{
+				if (SQR(as) > SQR(l[i1]))
+					as = as - SIGN(l[i1], as);
+			}
+			temp += SQR(as);
+			uv[i1] = as;
+		}
+		d = temp;
+		// uv*=(1./d);
+		//  for(int i1 = 0 ; i1 < dimension ; i1++) {
+		//  	dx[i1]=d2*dx[i1];
+		//  }
+		// return dx;
+	}
+
+	void distance_vector(vector1<double> &r1, vector1<double> &r2, vector1<double> &uv, double &d)
+	{ // returns the square distance to d and the distance between to uv
+		// vector1<double> dx(dimension);
+		double temp = 0.0;
+		for (int i1 = 0; i1 < dimension; i1++)
+		{
+			double as = r1[i1] - r2[i1];
+			if (periodic)
+			{
+				if (SQR(as) > SQR(l[i1]))
+					as = as - SIGN(l[i1], as);
+			}
+			temp += SQR(as);
+			uv[i1] = as;
+		}
+		d = temp;
+		// uv*=(1./d);
+		//  for(int i1 = 0 ; i1 < dimension ; i1++) {
+		//  	dx[i1]=d2*dx[i1];
+		//  }
+		// return dx;
+	}
+
+	// double distance(const vector1<double> &x1,const vector1<double> &x2) {
+	// 	double temp = 0.0;
+	// 	//vector1<double> dx(dimension);
+	// 	for(int i1  = 0; i1 < dimension ; i1++ ) {
+	// 		double dx = x1.gpcons(i1)-x2.gpcons(i1);
+	// 		if(pb[i1]) { 
+	// 			if(abs(dx) > l[i1]*0.5 ) 
+	// 				dx = dx - SIGN(l[i1],dx); 
+	// 		}
+			
+	// 			temp += SQR(dx);
+			
+	// 	}
+
+	// 	return sqrt(temp);	
+
+	// }
+
+	// bool distance_less_than(const vector1<double> &x1,const vector1<double> &x2, double val) {
+	// 	double temp = 0.0;
+	// 	//vector1<double> dx(dimension);
+	// 	for(int i1  = 0; i1 < dimension ; i1++ ) {
+	// 		double dx = x1.gpcons(i1)-x2.gpcons(i1);
+	// 		if(pb[i1]) { 
+	// 			if(abs(dx) > l[i1]*0.5 ) 
+	// 				dx = dx - SIGN(l[i1],dx); 
+	// 		}
+	// 		if(abs(dx)>val) {return false; }
+	// 		temp += SQR(dx);
+			
+	// 	}
+
+	// 	if(temp < SQR(val)) return true;
+	// 	else return false;	
+
+	// }
 
 	vector1<double> unit_vector(vector1<double> x1, vector1<double> x2, double &d) {
 		vector1<double> dx(dimension);
@@ -726,12 +953,150 @@ struct cuboid : geometry {
 		}
 	}
 
-	int assign_box(vector1<double> v1,vector1<int> &dim, int n) {
-		return 0;
+	int assign_box(matrix<double> &v1, int i, vector1<int> &dim, int n)
+	{
+
+		double lmin = minval(l);
+		vector1<int> ns(3);
+		ns[0] = n * (int)(l[0] / lmin);
+		ns[1] = n * (int)(l[1] / lmin);
+		ns[2] = n * (int)(l[2] / lmin);
+
+
+		vector1<int> cs(dimension);
+		for (int i1 = 0; i1 < dimension; i1++)
+		{
+			int m = fasterfloor(ns[i1] * (v1(i, i1)) / l[i1]);
+			if (m < 0)
+				m = 0;
+			else if (m > n - 1)
+				m = n - 1;
+			cs[i1] = m;
+		}
+
+		int c = scalar(dim, cs);
+		return c;
 	}
 
-	matrix<int> generate_boxes_relationships(int c, int &a) {
-		return matrix<int>(1,3);
+	matrix<int> generate_boxes_relationships(int n, int &tb)
+	{
+		
+		// n is the number of boxes along the minimal distance
+		double lmin = minval(l);
+		vector1<int> ns(3);
+		ns[0] = n * (int)(l[0] / lmin);
+		ns[1] = n * (int)(l[1] / lmin);
+		ns[2] = n * (int)(l[2] / lmin);
+
+		tb =  ns[0]*ns[1]*ns[2];
+		vector1<double> box_size = l;
+		box_size[0] /= (double)ns[0];
+		box_size[1] /= (double)ns[1];
+		box_size[2] /= (double)ns[2];
+		// for(int i = 0 ; i < n ; i++)
+		matrix<int> boxcheckk(tb, pow(3, dimension));
+		vector1<int> cvec(dimension);
+		for (int i = 0; i < dimension; i++)
+		{
+			int ij = 1;
+			for (int j = 0; j < i; j++)
+			{
+				ij *= ns[j];
+			}
+			cvec[i] = ij;
+		}
+
+		int iter = 0;
+		vector1<int> iterator(dimension, 0);
+
+		for (;;)
+		{
+			// cout << iterator << endl;
+			for (int j = 0; j < dimension - 1; j++)
+			{
+				iterator[j + 1] = floor(iterator[j] / ns[j]);
+			}
+
+			vector1<int> iterator2(dimension);
+			for (int j = 0; j < dimension; j++)
+			{
+				iterator2[j] = (iterator[j]) % (ns[j]);
+			}
+
+			int c = scalar(iterator2, cvec);
+
+			int j = 0;
+
+			vector1<int> temp(dimension, 0);
+			for (;;)
+			{
+				for (int j1 = 0; j1 < dimension - 1; j1++)
+				{
+					temp[j1 + 1] = floor(temp[j1] / 3);
+				}
+				vector1<int> temp2(dimension);
+				for (int j1 = 0; j1 < dimension; j1++)
+				{
+					temp2[j1] = (temp[j1] % 3) - 1;
+				}
+
+				vector1<int> cint(dimension);
+				for (int j1 = 0; j1 < dimension; j1++)
+				{
+					cint[j1] = iterator2[j1] + temp2[j1];
+					if (cint[j1] < 0)
+					{
+						cint[j1] = cint[j1] + ns[j1];
+					}
+					else if (cint[j1] > ns[j1] - 1)
+					{
+						cint[j1] = cint[j1] - ns[j1];
+					}
+					else
+					{
+					}
+				}
+				int c2 = scalar(cint, cvec);
+				boxcheckk(c, temp[0]) = c2;
+
+				temp[0] = temp[0] + 1;
+				if (temp[0] > pow(3, dimension) - 1)
+					break;
+			}
+			iterator[0] = iterator[0] + 1;
+			if (c >= tb - 1)
+				break;
+		}
+
+		vector<int> chckvec;
+		for (int i = 0; i < boxcheckk.getncols(); i++)
+		{
+			chckvec.push_back(boxcheckk(0, i));
+		}
+
+		sort(chckvec.begin(), chckvec.end());
+		chckvec.erase(unique(chckvec.begin(), chckvec.end()), chckvec.end());
+
+		matrix<int> boxcheckk2(boxcheckk.getNsafe(), chckvec.size());
+
+		for (int i = 0; i < boxcheckk2.getNsafe(); i++)
+		{
+			vector<int> chckvec2;
+			for (int i1 = 0; i1 < boxcheckk.getncols(); i1++)
+			{
+				chckvec2.push_back(boxcheckk(i, i1));
+			}
+			sort(chckvec2.begin(), chckvec2.end());
+			chckvec2.erase(unique(chckvec2.begin(), chckvec2.end()), chckvec2.end());
+
+			for (int j = 0; j < chckvec2.size(); j++)
+			{
+				boxcheckk2(i, j) = chckvec2[j];
+			}
+		}
+
+		matrix<int> res(boxcheckk2);
+		return res;
 	}
 
 	bool geometrytest(vector1<double> &r) {
@@ -750,7 +1115,7 @@ struct cuboid : geometry {
 	}
 };
 
-// */
+// 
 
 // struct freespace : geometry {
 
