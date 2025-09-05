@@ -317,7 +317,7 @@ int main(int argc, char **argv)
     A.setkT(1.0);
     A.setviscosity(1.0);
 
-    A.run_box(1000000,1000,200.,g,"");
+    A.run_box(10000000,1000,200.,g,"");
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;
