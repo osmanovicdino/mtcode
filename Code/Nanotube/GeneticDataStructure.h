@@ -86,7 +86,7 @@ struct geneticcode {
 
  
         double exponent = (double)stoi(s[line]);
-        exponent -=3.;
+        exponent -=2.;
         rate = pow(10.,exponent);
 
         line++;
