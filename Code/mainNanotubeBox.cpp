@@ -54,10 +54,42 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 
 using namespace std;
 
+unsigned long mix(unsigned long a, unsigned long b, unsigned long c)
+{
+    a = a - b;
+    a = a - c;
+    a = a ^ (c >> 13);
+    b = b - c;
+    b = b - a;
+    b = b ^ (a << 8);
+    c = c - a;
+    c = c - b;
+    c = c ^ (b >> 13);
+    a = a - b;
+    a = a - c;
+    a = a ^ (c >> 12);
+    b = b - c;
+    b = b - a;
+    b = b ^ (a << 16);
+    c = c - a;
+    c = c - b;
+    c = c ^ (b >> 5);
+    a = a - b;
+    a = a - c;
+    a = a ^ (c >> 3);
+    b = b - c;
+    b = b - a;
+    b = b ^ (a << 10);
+    c = c - a;
+    c = c - b;
+    c = c ^ (b >> 15);
+    return c;
+}
+
 int main(int argc, char **argv)
 {
-
-    srand(time(NULL));
+    unsigned long seed = mix(clock(), time(NULL), getpid());
+    srand(seed);
     // int NM2;
     // double deltaG2,angle2;
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
