@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=23:59:59,h_data=512M
+#$ -l h_rt=23:59:00,h_data=512M
 ## Modify the parallel environment
 #$ -t 1-100:1
 
@@ -28,8 +28,8 @@ module load gcc/11.3.0
 dirwemake="den${SGE_TASK_ID}"
 subdir="GeneticTry7"
 mkdir /u/scratch/d/dinoo/${subdir}/${dirwemake}
-cp ~/Chemistry/Code/mainNanotubeBox.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
-g++ ~/Chemistry/Code/mainNanotubeBox.cpp -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
+cp ~/Chemistry/Code/mainNanotubeBoxImport.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
+g++ ~/Chemistry/Code/mainNanotubeBoxImport.cpp -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${subdir}/${dirwemake}
 
 ./angron >log
