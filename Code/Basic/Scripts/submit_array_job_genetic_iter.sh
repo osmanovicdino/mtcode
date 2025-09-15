@@ -6,8 +6,10 @@
 #$ -j y
 ## Edit the line below as needed:
 #$ -l h_rt=23:59:00,h_data=512M
+## and the number of cores as needed:
+#$ -pe shared 12
 ## Modify the parallel environment
-#$ -t 1-100:1
+#$ -t 1-6:1
 
 
 # echo job info on joblog:
@@ -26,8 +28,7 @@ module load gcc/11.3.0
 ##/usr/bin/time -v hostname
 
 dirwemake="den${SGE_TASK_ID}"
-subdir="GeneticTry7"
-mkdir /u/scratch/d/dinoo/${subdir}/${dirwemake}
+subdir="GeneticTry8"
 cp ~/Chemistry/Code/mainNanotubeBoxImport.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
 g++ ~/Chemistry/Code/mainNanotubeBoxImport.cpp -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${subdir}/${dirwemake}
