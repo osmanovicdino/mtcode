@@ -689,8 +689,111 @@ void LangevinNVTR::rotate() {
 
 }
 
+double LangevinNVTR::particle_energy(int i, int j, ComboPatch &iny) {
+// {
+//     vector1<double> un(dimension);
+//     double dis;
+//     geo.distance_vector(*dat, i, j, un, dis);
+
+//     // un = i-j
+//     dis = sqrt(dis);
+
+//     un /= dis;
+    //return iny.energy(un, dis, *orient, i, j);
 
 
+        int p1 = i;
+        int p2 = j;
+
+        if (p2 < p1)
+        { // INDICES NEED TO BE SORTED FOR IT TO WORK
+            int tp1 = p1;
+            p1 = p2;
+            p2 = tp1;
+        }
+        // int i1 = pairs(i,2);
+        double dis;
+        // vector1<double> un = unitvector((*dat)[p1],(*dat)[p2],dis);
+        vector1<double> un(dimension);
+        geo.distance_vector(*dat, p1, p2, un, dis);
+
+        // un = i-j
+        dis = sqrt(dis);
+
+        un /= dis;
+
+        int **q = new int *;
+
+        if (iny.safe)
+        {
+            iny.UpdateIterator(p1, p2);
+            *q = *iny.p;
+        }
+        else
+        {
+            iny.UpdateIteratorSafe(p1, p2, q);
+        }
+
+        // cout << "part 1" << endl;
+        // cout << p1 << " " << p2 << endl;
+        // cout << (*q)[0] << endl;
+        // cout << (*q)[1] << endl;
+        // pausel();
+        // iny.UpdateIterator(p1,p2); // this points the patch pointer to the correct particles
+
+        // cout << (*q)[0] << endl;
+        double en = 0;
+
+        for (int tp = 1; tp < (*q)[0] + 1; tp++)
+        {
+            // cout << tp << endl;
+
+            int potn = (*q)[tp];
+
+            double fx;
+            double fy;
+            double fz;
+
+            double tix;
+            double tiy;
+            double tiz;
+
+            double tjx;
+            double tjy;
+            double tjz;
+
+            en += (iny.potential_bundle)[potn]->energy(un, dis, *orient, p1, p2);
+
+            // cout << p1 << " " << p2 << " " << tp << " " << potn << endl;
+
+            // cout << "forces: " << fx <<" " << fy << " " << fz << endl;
+            // cout << dis << endl;
+            // cout << un << endl;
+            // cout << iny.potential_bundle[potn]->getparameters() << endl;
+
+            // pausel();
+
+
+            // if((abs(fx)>1E-10 || abs(fy)>1E-10|| abs(fz)> 1E-10) /* &&(p1<2048+50 && p2 >= 2048+50) */ ) {
+            // int wp1,wp2;
+            // iny.which_patch(p1,p2,potn,wp1,wp2);
+            // cout << p1 <<" " << p2 << " " <<potn << " " << wp1 << " " << wp2 << endl;
+            // cout << un << endl;
+            // cout << dis << endl;
+            // cout << fx << " " << fy << " " << fz << endl;
+
+            // pausel();
+
+            // }
+
+
+        }
+        // cout << "part 2" << endl;
+
+        delete q;
+
+        return en;
+}
 
 void LangevinNVTR::calculate_forces_and_torques3D(matrix<int> &pairs, potentialtheta3D &iny, matrix<double> &forces, matrix<double> &torques)
 {

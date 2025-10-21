@@ -57,43 +57,16 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-    srand(time(NULL));
-    int n = 400;
 
-    Condensate A(27.5, n);
+    unsigned long seed = mix(clock(), time(NULL), getpid());
+    srand(seed);
 
-    double angle = 0.5;
-    
-    int tot = 4 * 4 + 4 * 2 + 2 * 2;
-    matrix<double> params(tot, 3);
-    for (int i = 0; i < 16; i++)
-    {
-        params(i, 0) = 0.0;
-        params(i, 1) = 1.4;
-        params(i, 2) = angle;
+    vector1<int> count(3);
+    for(;;) {
+    int choice = rand() % 15000;
+    count[int(choice/5000)]++;
+    cout << count << endl;
     }
-    for (int i = 16; i < 24; i++)
-    {
-        params(i, 0) = 100.0;
-        params(i, 1) = 1.4;
-        params(i, 2) = angle;
-    }
-    for (int i = 24; i < tot; i++)
-    {
-        params(i, 0) = 100.0;
-        params(i, 1) = 1.4;
-        params(i, 2) = angle;
-    }
-
-    TetrahedralWithBivalent c2(params, 50,n);
-    A.setpots(c2);
-
-    int runtime = 1000000;
-    int every = 1000;
-    A.setviscosity(10.0);
-    // A.run_singlebond(runtime, every);
-
-    A.run(10000000, 1000);
 
     return 0;
 }

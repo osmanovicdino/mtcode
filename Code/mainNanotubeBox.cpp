@@ -54,37 +54,7 @@ inline omp_int_t omp_get_num_threads() { return 1; }
 
 using namespace std;
 
-unsigned long mix(unsigned long a, unsigned long b, unsigned long c)
-{
-    a = a - b;
-    a = a - c;
-    a = a ^ (c >> 13);
-    b = b - c;
-    b = b - a;
-    b = b ^ (a << 8);
-    c = c - a;
-    c = c - b;
-    c = c ^ (b >> 13);
-    a = a - b;
-    a = a - c;
-    a = a ^ (c >> 12);
-    b = b - c;
-    b = b - a;
-    b = b ^ (a << 16);
-    c = c - a;
-    c = c - b;
-    c = c ^ (b >> 5);
-    a = a - b;
-    a = a - c;
-    a = a ^ (c >> 3);
-    b = b - c;
-    b = b - a;
-    b = b ^ (a << 10);
-    c = c - a;
-    c = c - b;
-    c = c ^ (b >> 15);
-    return c;
-}
+
 
 int main(int argc, char **argv)
 {
@@ -329,7 +299,7 @@ int main(int argc, char **argv)
 
 
     bool cc;
-    NanotubeAssembly A(20., (g.no_types)*5000+1,cc);
+    NanotubeAssembly A(10., (g.no_types)*5000+1,cc);
     
 
     // cout << *(g.patch_num) << endl;
@@ -349,7 +319,7 @@ int main(int argc, char **argv)
     A.setkT(1.0);
     A.setviscosity(1.0);
 
-    A.run_box(10000000,1000,200.,g,"");
+    A.run_box_equil(10000000,1000,100.,g,"");
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;

@@ -230,6 +230,7 @@ public:
 
 	template <class vec>
 	void rotate(vec&);
+	double particle_energy(int i, int j, ComboPatch &iny); // the energy associated with particle i
 
 	// void one_bond_per_patch_condition(matrix<int> &pairs, vector<potentialtheta3D*> &);
 	//void create_random_forces(matrix<double>&, matrix<double>&);

@@ -58,7 +58,8 @@ void disvec(int &p1,int&p2,vector1<double>&uv,double&);
 
 
 
-double distance(const int&,const int&); //the distance between particles i and j; 
+double distance(const int&,const int&); //the distance between particles i and j;
+double distance(const int&,vector1<double> &v); 
 // bool distance_less_than(const int&,const int&, double);
 // inline vector1<double> unit_vector(const int&, const int&, double&);
 // inline void unit_vector(const int&, const int&, vector1<double>&, double&);
@@ -68,6 +69,8 @@ double distance(const int&,const int&); //the distance between particles i and j
 //void setinteractions();
 // double distance(int&, int&); //the distance between particles i and j; 
 // bool distance_less_than(const int&,const int&, double);
+vector1<int> pairs_to_specific_particle(matrix<int>&, int, double);
+
 matrix<int> precalculatepairs(vector<vector<int> > &, matrix<int>&, double);
 
 matrix<int> precalculatepairs(const matrix<int>&, const vector1<int>&, matrix<int> &, double);

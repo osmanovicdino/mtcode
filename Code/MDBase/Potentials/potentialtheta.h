@@ -12,6 +12,8 @@ struct potentialtheta3D
     virtual potentialtheta3D *clone() const = 0;
 
     virtual double energy(double rij, double ang1, double ang2) = 0;
+
+    virtual double energy(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j) =0;
     // virtual double force(vector1<double> &pos, const matrix<double> &A1,const matrix<double> &A2 ) = 0;
     virtual void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &, double &, double &, double &, double &, double &, double &, double &, double &) = 0;
     // virtual double torque(double,double) = 0;
@@ -82,6 +84,68 @@ struct KernFrenkelOnePatch : potentialtheta3D {
         double fac6 = CUB(fac2);
 
         return 4 * att * (-fac6) * f;
+    }
+
+    double energy(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j)
+    {
+
+        if (rij > interaction_distance)
+        {
+            return 0.;
+        }
+        else
+        {
+            double qtemp0 = orient.gpcons(i, 0);
+            double qtemp1 = orient.gpcons(i, 1);
+            double qtemp2 = orient.gpcons(i, 2);
+            double qtemp3 = orient.gpcons(i, 3);
+            double qtemp4 = orient.gpcons(i, 4);
+            double qtemp5 = orient.gpcons(i, 5);
+            double qtemp6 = orient.gpcons(i, 6);
+            double qtemp7 = orient.gpcons(i, 7);
+            double qtemp8 = orient.gpcons(i, 8);
+
+            double gtemp0 = orient.gpcons(j, 0);
+            double gtemp1 = orient.gpcons(j, 1);
+            double gtemp2 = orient.gpcons(j, 2);
+            double gtemp3 = orient.gpcons(j, 3);
+            double gtemp4 = orient.gpcons(j, 4);
+            double gtemp5 = orient.gpcons(j, 5);
+            double gtemp6 = orient.gpcons(j, 6);
+            double gtemp7 = orient.gpcons(j, 7);
+            double gtemp8 = orient.gpcons(j, 8);
+
+            double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+            double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+            double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+            double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+            double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+            double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+            double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
+            double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
+
+            if(argthetai >cos(thetam) && argthetaj > cos(thetam)) {
+                if (argthetai > 1.)
+                    argthetai = 0.999999;
+
+                if (argthetaj > 1.)
+                    argthetaj = 0.999999;
+
+                double thetai = acos(argthetai);
+
+                double thetaj = acos(argthetaj);
+
+                double f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
+                double fac = (dis / (rij));
+                double fac2 = SQR(fac);
+                double fac6 = CUB(fac2);
+
+                return 4 * att * (-fac6) * f;
+            }
+            else return 0.0;
+        }
     }
 
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
@@ -379,6 +443,75 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
         double expf = exp(-0.5 * fac10);
 
         return -att * expf * f;
+    }
+
+    double energy(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j)
+    {
+
+        if (rij > interaction_distance)
+        {
+            return 0.;
+        }
+        else
+        {
+            double qtemp0 = orient.gpcons(i, 0);
+            double qtemp1 = orient.gpcons(i, 1);
+            double qtemp2 = orient.gpcons(i, 2);
+            double qtemp3 = orient.gpcons(i, 3);
+            double qtemp4 = orient.gpcons(i, 4);
+            double qtemp5 = orient.gpcons(i, 5);
+            double qtemp6 = orient.gpcons(i, 6);
+            double qtemp7 = orient.gpcons(i, 7);
+            double qtemp8 = orient.gpcons(i, 8);
+
+            double gtemp0 = orient.gpcons(j, 0);
+            double gtemp1 = orient.gpcons(j, 1);
+            double gtemp2 = orient.gpcons(j, 2);
+            double gtemp3 = orient.gpcons(j, 3);
+            double gtemp4 = orient.gpcons(j, 4);
+            double gtemp5 = orient.gpcons(j, 5);
+            double gtemp6 = orient.gpcons(j, 6);
+            double gtemp7 = orient.gpcons(j, 7);
+            double gtemp8 = orient.gpcons(j, 8);
+
+            double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+            double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+            double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+            double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+            double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+            double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+            double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
+            double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
+
+            if (argthetai > cos(thetam) && argthetaj > cos(thetam))
+            {
+                if (argthetai > 1.)
+                    argthetai = 0.999999;
+
+                if (argthetaj > 1.)
+                    argthetaj = 0.999999;
+
+                double thetai = acos(argthetai);
+
+                double thetaj = acos(argthetaj);
+
+                double f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
+
+                double fac = (rij / dis);
+                double fac2 = SQR(fac);
+                double fac4 = SQR(fac2);
+                double fac8 = SQR(fac4);
+                double fac10 = fac2 * fac8;
+
+                double expf = exp(-0.5 * fac10);
+
+                return -att * expf * f;
+            }
+            else
+                return 0.0;
+        }
     }
 
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
@@ -729,6 +862,11 @@ struct TorsionPotential : KernFrenkelOnePatch2 { //this potential adds a torsion
         return 0.;
     }
 
+    double energy(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j)
+    {
+        return 0.;
+    }
+
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)
     {
         // un is r_i-r_j
@@ -1051,6 +1189,8 @@ struct KernFrenkelOnePatchFlatBottom : potentialtheta3D
         v = vv;
     }
 
+    
+
     double energy(double rij, double argthetai, double argthetaj) {
         if (argthetai > 1.)
             argthetai = 0.999999;
@@ -1077,6 +1217,80 @@ struct KernFrenkelOnePatchFlatBottom : potentialtheta3D
         double pot = -att * expf;
 
         return pot*f;
+    }
+
+    double energy(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j) {
+        if(rij > interaction_distance) {
+            return 0.0;
+        }
+        else{
+
+            double qtemp0 = orient.gpcons(i, 0);
+            double qtemp1 = orient.gpcons(i, 1);
+            double qtemp2 = orient.gpcons(i, 2);
+            double qtemp3 = orient.gpcons(i, 3);
+            double qtemp4 = orient.gpcons(i, 4);
+            double qtemp5 = orient.gpcons(i, 5);
+            double qtemp6 = orient.gpcons(i, 6);
+            double qtemp7 = orient.gpcons(i, 7);
+            double qtemp8 = orient.gpcons(i, 8);
+
+            double gtemp0 = orient.gpcons(j, 0);
+            double gtemp1 = orient.gpcons(j, 1);
+            double gtemp2 = orient.gpcons(j, 2);
+            double gtemp3 = orient.gpcons(j, 3);
+            double gtemp4 = orient.gpcons(j, 4);
+            double gtemp5 = orient.gpcons(j, 5);
+            double gtemp6 = orient.gpcons(j, 6);
+            double gtemp7 = orient.gpcons(j, 7);
+            double gtemp8 = orient.gpcons(j, 8);
+
+            double nx1 = nxb1 * qtemp0 + nyb1 * qtemp3 + nzb1 * qtemp6;
+            double ny1 = nxb1 * qtemp1 + nyb1 * qtemp4 + nzb1 * qtemp7;
+            double nz1 = nxb1 * qtemp2 + nyb1 * qtemp5 + nzb1 * qtemp8;
+
+            double nx2 = nxb2 * gtemp0 + nyb2 * gtemp3 + nzb2 * gtemp6;
+            double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
+            double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
+
+            double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
+            double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
+
+            double f;
+
+            if (argthetai > cos(thetam) && argthetaj > cos(thetam))
+            {
+                if (argthetai > 1.)
+                    argthetai = 0.999999;
+
+                if (argthetaj > 1.)
+                    argthetaj = 0.999999;
+
+                double thetai = acos(argthetai);
+
+                double thetaj = acos(argthetaj);
+
+                // f = cos(pi * thetai / (2. * thetam)) * cos(pi * thetaj / (2. * thetam));
+
+                f = flat(thetai) * flat(thetaj);
+
+                double fac = (rij / dis);
+                double fac2 = SQR(fac);
+                double fac4 = SQR(fac2);
+                double fac8 = SQR(fac4);
+                double fac10 = fac2 * fac8;
+
+                double expf = exp(-0.5 * fac10);
+
+                double pot = -att * expf;
+
+                return pot * f;
+            }
+            else {
+                return 0.;
+            }
+        }
+
     }
 
     void force_and_torque(const vector1<double> &un, double rij, const matrix<double> &orient, int i, int j, double &fx, double &fy, double &fz, double &tix, double &tiy, double &tiz, double &tjx, double &tjy, double &tjz)

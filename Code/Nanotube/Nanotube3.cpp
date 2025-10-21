@@ -94,6 +94,29 @@ GeneralPatch CreateGeneralPatch(double int1, double size, double range, double a
     return c;
 }
 
+
+struct anchoringpoints {
+    double epsilon;
+    double sigma;
+    double anchorpointx,anchorpointy,anchorpointz;
+
+    vector1<double> force(double x, double y, double z) {
+        double r2 = SQR(x-anchorpointx)+SQR(y-anchorpointy)+SQR(z-anchorpointz);
+    
+        vector1<double> force(3);
+        if(r2 > 4*sigma*sigma) return force;
+        else{
+        double prefactor=(12*epsilon)/((exp((3*r2)/SQR(sigma))*SQR(1 + exp(-3*r2)/SQR(sigma)))*SQR(sigma));
+        force[0] = -prefactor * (x - anchorpointx);
+        force[1] = -prefactor * (y - anchorpointy);
+        force[2] = -prefactor * (z - anchorpointz);
+        return force;
+        }
+    }
+
+
+};
+
 void NanotubeAssembly::run_box(int runtime, int every, double mass, geneticcode &g, string strbase)
 {
 
@@ -428,6 +451,1497 @@ void NanotubeAssembly::run_box(int runtime, int every, double mass, geneticcode 
     // differential rates
 
     //we can just add the first element of each
+}
+
+void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneticcode &g, string strbase)
+{
+
+    // generate boxes first
+    int no_types = g.no_types;
+    int ccc;
+
+    int tf = ceil((double)runtime / (double)every);
+    int number_of_digits = 0;
+    do
+    {
+        ++number_of_digits;
+        tf /= 10;
+    } while (tf);
+
+    matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+    int NN = obj->getN() + 1; // one particle is the wall
+    // we also need to define the position of the "particle" that acts as a wall on the
+
+    matrix<double> newdat(NN, 3);
+    double hmin = 10.;
+    double h = hmin; // the height of our flap to start with
+
+    newdat(0, 0) = ll / 2.;
+    newdat(0, 1) = ll / 2.;
+    newdat(0, 2) = h;
+
+    obj->initialize(newdat);
+
+    // start with a single particle
+    vector<vector<int>> indices(no_types);
+    for (int i = 0; i < no_types; i++)
+    {
+        vector<int> a;
+        indices[i] = a;
+    }
+
+    indices[0].push_back(1);
+
+    vector<vector<int>> indices_to_add(no_types);
+    for (int j = 2; j < 5000; j++)
+        indices_to_add[0].push_back(j);
+
+    for (int i = 1; i < no_types; i++)
+    {
+        vector<int> a;
+        indices_to_add[i] = a;
+        for (int j = i * 5000; j < (i + 1) * 5000; j++)
+            indices_to_add[i].push_back(j);
+    }
+
+    vector1<int> counts(no_types + 1);
+    counts[0] = 0;    // index start type 0
+    counts[1] = 4999; // index start type 1
+    for (int j = 2; j < no_types + 1; j++)
+    {
+        counts[j] = counts[j - 1] + 5000;
+    }
+
+    WCAPotential wsa(3.0, 1.0, 0.0);
+
+    vector<int> temp;
+    for (int ty = 0; ty < no_types; ty++)
+        for (int i1 = 0; i1 < indices[ty].size(); i1++)
+        {
+            double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices[ty][i1], 2);
+            if (dis < 4.)
+                temp.push_back(indices[ty][i1]);
+        }
+    
+    vector1<int> pairs_lid(temp.size());
+    for (int i1 = 0; i1 < temp.size(); i1++)
+    {
+        pairs_lid[i1] = temp[i1];
+    }
+
+    vector<int> indices_combine = flatten(indices);
+
+    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_combine, 3.5);
+
+    matrix<double> F(NN, 3);
+    matrix<double> Fs(NN, 3);
+    matrix<double> T(NN, 3);
+    matrix<double> RT(NN, 6);
+    matrix<double> zeromatrix(NN, 3);
+
+    double forcep1 = 0; // the force on the lid
+    double momp1 = 0;
+    // double mass = 10.;
+
+    F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+
+    for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
+    {
+        double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(pairs_lid[i1], 2);
+        double F1 = wsa.force(dis);
+        forcep1 += F1;             // force pushes lid up
+        F(pairs_lid[i1], 2) -= F1; // pushes particle down
+    } // random force
+    forcep1 += sqrt(2 * ((*obj).getgamma()) * mass * (*obj).getkT() / (*obj).getdt()) * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808); // temperature
+    if (h > hmin)
+        forcep1 -= mass * (h - hmin); // constant downwards force if above hmin.
+
+    
+
+    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+
+    generate_uniform_random_matrix(RT, indices_combine); // only generate random torques for the patchy particles
+
+    obj->create_forces_and_torques_sphere(F, T, RT, indices_combine, false); // only create torques and forces for patchy particles
+
+    // particle_adder vv;
+    // vv.set_indices(indices_to_add);
+    // vv.set_counts(counts);
+
+    // vector1<int> weights;
+
+    // weights = *(g.proportions);
+
+    // we want to choose a
+    double mu = g.rate; // can potentially set different chemical potentials
+
+    cout << mu << endl;
+    // cout << *(g.proportions) << endl;
+    // pausel();
+    // box_vol vol2;
+    // vol2.ll = ll;
+    // vol2.llx = ll;
+    // vol2.lly = ll;
+    // vol2.llz = obj->getcoordinate(0, 2);
+    // vv.set_volume(vol2);
+    // vv.set_rate(g.rate);
+    // vv.set_irreducible_weights(weights);
+
+    //we choose mu such that under an ideal gas, the total number of particles will be 
+    // <N> =  V exp(\mu) where V is the size of our chamber. If we choose individual \mu_i for each
+    // particle then we have to choose individual mu. However, we need to solve it such that it still follows
+    // the ideal gas scaling for the *total* number of particles, as this is going to be the most relevant
+    // quantity in pushing the lid, that we want to keep under control. 
+
+    // so we have exp(p1 x) + exp(p2 x) up to the total number of types and we want it to be equal to exp(mu)
+
+
+    //perhaps this is not what we want though, we want the reserve to be larger? This would be a bit like playing with the 
+    // yes I think what I will do is choose particles non randomly according to the proportion;
+
+    vector1<double> partialmus(no_types);
+
+    if(no_types == 1) {
+        //proportions do not matter
+        partialmus[0] =  mu;
+    }
+    else if(no_types == 2) {    
+        int xp1 = (*(g.proportions))[0];
+        int xp2 = (*(g.proportions))[1];
+        // if(xp1==xp2) { //we do not need to do anything
+        //     partialmus[0] = mu;
+        //     partialmus[1] = mu;
+        // }
+        // else{
+            /*
+            this code sets proportions of chemical potential, the bottom one sets proportions of abundances
+
+        double mu2 = 0.0;
+        for(int k = 0 ; k < 10 ; k++) {
+            //mu2 = mu2 -  ( ( exp(xp1*mu2)+exp(xp2*mu2) -exp(mu) )/(xp1*exp(xp1*mu2)+xp2*(exp(xp2*mu2)) ) );
+            mu2 = mu2 - (log((exp(xp1 * mu2) + exp(xp2 * mu2) )) - mu) / ((xp1 * exp(xp1 * mu2) + xp2 * (exp(xp2 * mu2) )) / (exp(xp1 * mu2) + exp(xp2 * mu2) ));
+        }
+        partialmus[0]=xp1*mu2;
+        partialmus[1]=xp2*mu2;
+            */
+            double mu2 = log(exp(mu) / ((double)(xp1 + xp2 )));
+            partialmus[0] = log(double(xp1)) + mu2;
+            partialmus[1] = log(double(xp2)) + mu2;
+        //}
+    }
+    else if(no_types == 3) {
+        int xp1 = (*(g.proportions))[0];
+        int xp2 = (*(g.proportions))[1];
+        int xp3 = (*(g.proportions))[2];
+        // if(xp1 ==  xp2 && xp2 == xp3) {
+        //     partialmus[0] = mu;
+        //     partialmus[1] = mu;
+        //     partialmus[2] = mu;
+        // }
+        // else{
+            /*
+            double mu2 = 0.;
+            for (int k = 0; k < 10; k++)
+            {
+                mu2 = mu2 - (log((exp(xp1 * mu2) + exp(xp2 * mu2) + exp(xp3 * mu2))) - mu) / ((xp1 * exp(xp1 * mu2) + xp2 * (exp(xp2 * mu2) + xp3 * (exp(xp3 * mu2)))) / (exp(xp1 * mu2) + exp(xp2 * mu2) + exp(xp3 * mu2)));
+                //cout << mu2 << endl;
+            }
+            partialmus[0] = xp1 * mu2;
+            partialmus[1] = xp2 * mu2;
+            partialmus[2] = xp3 * mu2;
+            */
+           double mu2 = log(exp(mu)/((double)(xp1+xp2+xp3)));
+           partialmus[0] = log(double(xp1)) + mu2;
+           partialmus[1] = log(double(xp2)) + mu2;
+           partialmus[2] = log(double(xp3)) + mu2;
+        
+
+    }
+    else{
+
+    }
+
+    for(int k = 0  ; k < partialmus.getsize() ; k++)
+    cout << exp(partialmus[k])<< " ";
+    cout << endl;
+    cout << partialmus << endl;
+    cout << exp(mu) << endl;
+    pausel();
+
+
+
+    int MC_Move = 200;
+
+
+    for (int i = 0; i < runtime; i++)
+    {
+        //cout << i << endl;
+        if(i % MC_Move == 0 ) {
+            int type_choice = rand() % no_types;
+            int ins = rand() % 2;
+
+
+            if(ins == 0 ) { //insert a particle
+                double rangex = ll;
+                double rangey = ll;
+                double rangez = obj->getcoordinate(0, 2);
+                double r1 = rangex * ((double)rand() / (double)(RAND_MAX));
+                double r2 = rangey * ((double)rand() / (double)(RAND_MAX));
+                double r3 = rangez * ((double)rand() / (double)(RAND_MAX));
+
+                vector1<double> myvec1(3);
+                myvec1[0] = r1;
+                myvec1[1] = r2;
+                myvec1[2] = r3;
+
+                //we can set the particle to be at a particular place first, then calculate the energies
+                int index_which = rand() % indices_to_add[type_choice].size();
+                int myindex = indices_to_add[type_choice][index_which];
+
+                obj->set_particle(myvec1, myindex);
+                double NNN = (double)indices[type_choice].size();
+
+                double en = 0;
+                en += wsa.energy(rangez-r3);
+
+
+                 for(int j = 0 ; j < indices_combine.size() ; j++) {
+
+                     double dis = obj->distance(myindex,indices_combine[j]);
+                    if(dis < 2.) en += wsa.energy(dis);
+                    en += obj->particle_energy(myindex, indices_combine[j], *pots);
+                    if(en > 1000. ) {goto energ; }
+                    //if any overlaps are found the particle will be rejected and we can skip the rest
+                 }
+                    energ:
+
+                 double V = rangex*rangey*rangez;
+
+                 double mymu = partialmus[type_choice];
+                 cout << "add: " <<  myindex << " " << mymu << " " << en << endl;
+                 double acceptance = min(1.,(V/(1.+NNN))*exp(mymu)*exp(-en));
+
+                 double r = (double) rand()/(double)RAND_MAX;
+
+                 if(r < acceptance) {
+                     indices[type_choice].push_back(myindex); //particle is added
+                     remove_at(indices_to_add[type_choice], index_which); 
+                 }
+                 else{
+
+                 }
+
+
+            }
+            else{ //remove a particle
+                //choose a random particle;
+                if(indices[type_choice].size() > 0 ) {
+                    int index_which = (rand() % indices[type_choice].size());
+
+                    int myindex =  indices[type_choice][index_which];
+
+                    double NNN = (double)indices[type_choice].size();
+
+                    double rangex = ll;
+                    double rangey = ll;
+                    double rangez = obj->getcoordinate(0, 2);
+
+                    double en = 0.0;
+                    en += wsa.energy(rangez - obj->getcoordinate(myindex,2));
+
+                    for (int j = 0; j < indices_combine.size() ; j++)
+                    {
+                        if(myindex != indices_combine[j]) {
+                        double dis = obj->distance(myindex, indices_combine[j]);
+                        if (dis < 2.)
+                            en += wsa.energy(dis);
+                        en += obj->particle_energy(myindex, indices_combine[j], *pots);
+                        }
+                        // if any overlaps are found the particle will be rejected and we can skip the rest
+                    }
+                    //that's the energy currently, we want deltaU, so the energy if it's taken away
+
+
+                    double V = rangex * rangey * rangez;
+
+                    double mymu = partialmus[type_choice];
+                    cout << "remove: " << myindex << " " << mymu << " " << en << endl;
+
+                    double acceptance = min(1., (NNN / V) * exp(-mymu) * exp(en));
+
+                    double r = (double)rand() / (double)RAND_MAX;
+
+                    if(r < acceptance) {
+                        remove_at(indices[type_choice],index_which);
+
+                        auto pos = std::lower_bound(indices_to_add[type_choice].begin(), indices_to_add[type_choice].end(), myindex);
+                        indices_to_add[type_choice].insert(pos, myindex);
+                    }
+                }
+            }
+
+            indices_combine = flatten(indices); // all present particles updated
+
+        }
+        
+        //after the particle is added, pairs need to be recomputed. This happens so long as i % MC and i % pairs are both zero
+
+        if (i > 0 && i % 20 == 0)
+        {
+
+            // pairs = obj->calculatepairs(boxes, 3.5);
+
+            // ADD THE PARTICLE ADDITION METHOD HERE
+            // bool dd = false;
+            // vector1<double> v1(3);
+            // int fi;
+
+            // cout << obj->getcoordinate(0, 2) << endl;
+            // box_vol vol2;
+            // vol2.ll = ll;
+            // vol2.llx = ll;
+            // vol2.lly = ll;
+            // vol2.llz = obj->getcoordinate(0, 2) - 1;
+
+            // // cout << "created box vol" << endl;
+
+            // vv.set_volume(vol2);
+            // vv.add_p_w(*obj, indices, dd, v1, fi);
+            // cout << "added particle" << endl;
+            // if (dd)
+            // {
+
+            //     // cout << "added: " << fi << endl;
+
+            //     indices.push_back(fi);
+
+            //     obj->set_particle(v1, fi);
+            // }
+
+            vector<int> temp;
+            for (int i1 = 0; i1 < indices_combine.size(); i1++)
+            {
+                double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices_combine[i1], 2);
+                if (dis < 4.)
+                    temp.push_back(indices_combine[i1]);
+            }
+
+            // delete pairs_lid;
+            pairs_lid.resize(temp.size());
+            for (int i1 = 0; i1 < temp.size(); i1++)
+            {
+                pairs_lid[i1] = temp[i1];
+            }
+            // cout << "checking lids" << endl;
+
+            delete pairs_onlyb;
+
+            pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_combine, 3.5);
+            // cout << "done"  << endl;
+        }
+
+        momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+        obj->advancemom_halfstep(F, T, indices_combine);
+        obj->advance_pos(indices_combine);
+
+        h = h + ((*obj).getdt() / mass) * momp1; // how heavy do we make the wall? Choose mass = 100.;
+        if (h < hmin)
+            h = hmin + (hmin - h);   // reflect if hit the bottom
+        obj->setcoordinate(0, 2, h); // update in storage
+
+        obj->rotate(indices_combine);                        // only update the patchy particles with the rotate algorithm
+        F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+        forcep1 = 0;
+        for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
+        {
+
+            double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(pairs_lid[i1], 2);
+
+            double F1 = wsa.force(dis);
+            forcep1 += F1;                 // force pushes lid up
+            F(((pairs_lid))[i1], 2) -= F1; // pushes particle down
+        }
+        // cout << forcep1 << " ";
+
+        // stochastic force
+        forcep1 += sqrt(2 * ((*obj).getgamma()) * (*obj).getkT() / (*obj).getdt()) * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808); // temperature
+        // cout << forcep1 << " ";
+        if (h > hmin)
+            forcep1 -= mass * (h - hmin); // constant downwards force
+
+        // cout << forcep1 << endl;
+        // pausel();
+        T.reset(0.0);
+        // cout << *pairs_onlyb << endl;
+        obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+        // cout << "huh" << endl;
+        generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
+
+        obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
+        obj->advancemom_halfstep(F, T, indices_combine);
+
+        momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+
+        if (i % every == 0 && i > 0)
+        {
+
+            // cout << i << endl;
+
+            stringstream ss;
+
+            ss << setw(number_of_digits) << setfill('0') << (i / every);
+
+            matrix<double> orient = obj->getorientation();
+            matrix<double> pos = obj->getdat();
+
+            string poss = "pos";
+            poss = poss + strbase;
+            string oris = "div";
+            oris = oris + strbase;
+
+            string elli = "or";
+            elli = elli + strbase;
+
+            poss += "_i=";
+            oris += "_i=";
+            // elli += "_i=";
+
+            string extension = ".csv";
+
+            poss += ss.str();
+            oris += ss.str();
+            elli += ss.str();
+
+            poss += extension;
+            oris += extension;
+            elli += extension;
+
+            string orie = "orient";
+            orie += extension;
+
+            ofstream myfile;
+            myfile.open(poss.c_str());
+
+            ofstream myfile2;
+            myfile2.open(oris.c_str());
+
+            ofstream myfile3;
+            myfile3.open(elli.c_str(), std::ios_base::app);
+
+            ofstream myfile4;
+            myfile4.open(orie.c_str());
+
+            myfile <<= pos.getrowvector(0);
+            myfile << "\n";
+            for (int ik = 0; ik < indices_combine.size(); ik++)
+            {
+                myfile <<= pos.getrowvector(indices_combine[ik]);
+                myfile << "\n";
+                myfile2 << indices_combine[ik] << endl;
+            }
+
+            myfile4 <<= obj->getorientation();
+
+            myfile.close();
+            myfile2.close();
+            myfile3.close();
+            myfile4.close();
+
+            // pausel();
+        }
+    }
+    delete pairs_onlyb;
+
+    // in this example, we probably want to specify the weights to be such that the total rate of each remains fixed?
+
+    // i.e. if we have  rates as (rate*p1) and (rate*p2) and rate*p3 where p1 are the proportions we want to keep the ps proportional
+
+    // but the complication is that each weight has to change
+
+    // we can make all the weights point to the same reference? And then as the particle is released we update the reference?
+
+    // we can also make it so that the length of indicies to add is the number of types * 5000 (for instance)
+
+    // there's probably a better way of doing this
+
+    // differential rates
+
+    // we can just add the first element of each
+}
+
+void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, double mass, geneticcode &g, string strbase)
+{
+
+    // generate boxes first
+    int no_types = g.no_types;
+    int ccc;
+
+    int tf = ceil((double)runtime / (double)every);
+    int number_of_digits = 0;
+    do
+    {
+        ++number_of_digits;
+        tf /= 10;
+    } while (tf);
+
+    matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+    int NN = obj->getN() + 1; // one particle is the wall
+    // we also need to define the position of the "particle" that acts as a wall on the
+
+    matrix<double> newdat(NN, 3);
+    double hmin = 10.;
+    double h = hmin; // the height of our flap to start with
+
+    newdat(0, 0) = ll / 2.;
+    newdat(0, 1) = ll / 2.;
+    newdat(0, 2) = h;
+
+    obj->initialize(newdat);
+
+    // start with a single particle
+    vector< vector<int> > indices(no_types);
+    for(int i = 0  ; i < no_types ; i++) {
+        vector<int> a;
+        indices[i] = a;
+    }
+    
+    indices[0].push_back(1);
+
+    vector< vector<int> > indices_to_add(no_types);
+    for (int j = 2 ; j< 5000; j++)
+        indices_to_add[0].push_back(j);
+
+    for(int i =1 ; i < no_types ; i++) {
+        vector<int> a;
+        indices_to_add[i] = a;
+        for(int j = i*5000 ; j < (i+1)*5000 ; j++ )
+            indices_to_add[i].push_back(j);
+    }
+    for(int i = 0  ; i < no_types ; i++)
+    cout << indices_to_add[i].size() << endl;
+    pausel();
+
+    vector1<int> counts(no_types + 1);
+    counts[0] = 0;    // index start type 0
+    counts[1] = 4999; // index start type 1
+    for (int j = 2; j < no_types + 1; j++)
+    {
+        counts[j] = counts[j - 1] + 5000;
+    }
+
+    WCAPotential wsa(3.0, 1.0, 0.0);
+
+    vector<int> temp;
+    for(int ty = 0 ; ty < no_types ; ty++)
+    for (int i1 = 0; i1 < indices[ty].size(); i1++)
+    {
+        double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices[ty][i1], 2);
+        if (dis < 4.)
+            temp.push_back(indices[ty][i1]);
+    }
+    vector1<int> pairs_lid(temp.size());
+    for (int i1 = 0; i1 < temp.size(); i1++)
+    {
+        pairs_lid[i1] = temp[i1];
+    }
+
+    // matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices, 3.5);
+
+    matrix<double> F(NN, 3);
+    matrix<double> Fs(NN, 3);
+    matrix<double> T(NN, 3);
+    matrix<double> RT(NN, 6);
+    matrix<double> zeromatrix(NN, 3);
+
+    double forcep1 = 0; // the force on the lid
+    double momp1 = 0;
+    // double mass = 10.;
+
+    // F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+
+    for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
+    {
+        double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(pairs_lid[i1], 2);
+        double F1 = wsa.force(dis);
+        forcep1 += F1;             // force pushes lid up
+        F(pairs_lid[i1], 2) -= F1; // pushes particle down
+    } // random force
+    forcep1 += sqrt(2 * ((*obj).getgamma()) * mass * (*obj).getkT() / (*obj).getdt()) * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808); // temperature
+    if (h > hmin)
+        forcep1 -= mass * (h - hmin); // constant downwards force if above hmin.
+
+    // obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+
+    vector<int> indices_combine = flatten(indices);
+
+    generate_uniform_random_matrix(RT, indices_combine); // only generate random torques for the patchy particles
+
+    obj->create_forces_and_torques_sphere(F, T, RT, indices_combine, false); // only create torques and forces for patchy particles
+
+    // particle_adder vv;
+    // vv.set_indices(indices_to_add);
+    // vv.set_counts(counts);
+
+    // vector1<int> weights;
+
+    // weights = *(g.proportions);
+
+    // we want to choose a
+    double mu = g.rate; // can potentially set different chemical potentials
+
+    cout << mu << endl;
+    // cout << *(g.proportions) << endl;
+    // pausel();
+    // box_vol vol2;
+    // vol2.ll = ll;
+    // vol2.llx = ll;
+    // vol2.lly = ll;
+    // vol2.llz = obj->getcoordinate(0, 2);
+    // vv.set_volume(vol2);
+    // vv.set_rate(g.rate);
+    // vv.set_irreducible_weights(weights);
+
+    // we choose mu such that under an ideal gas, the total number of particles will be
+    //  <N> =  V exp(\mu) where V is the size of our chamber. If we choose individual \mu_i for each
+    //  particle then we have to choose individual mu. However, we need to solve it such that it still follows
+    //  the ideal gas scaling for the *total* number of particles, as this is going to be the most relevant
+    //  quantity in pushing the lid, that we want to keep under control.
+
+    // so we have exp(p1 x) + exp(p2 x) up to the total number of types and we want it to be equal to exp(mu)
+
+    // perhaps this is not what we want though, we want the reserve to be larger? This would be a bit like playing with the
+    //  yes I think what I will do is choose particles non randomly according to the proportion;
+
+    vector1<double> partialmus(no_types);
+
+    if (no_types == 1)
+    {
+        // proportions do not matter
+        partialmus[0] = mu;
+    }
+    else if (no_types == 2)
+    {
+        int xp1 = (*(g.proportions))[0];
+        int xp2 = (*(g.proportions))[1];
+        // if(xp1==xp2) { //we do not need to do anything
+        //     partialmus[0] = mu;
+        //     partialmus[1] = mu;
+        // }
+        // else{
+        /*
+        this code sets proportions of chemical potential, the bottom one sets proportions of abundances
+
+    double mu2 = 0.0;
+    for(int k = 0 ; k < 10 ; k++) {
+        //mu2 = mu2 -  ( ( exp(xp1*mu2)+exp(xp2*mu2) -exp(mu) )/(xp1*exp(xp1*mu2)+xp2*(exp(xp2*mu2)) ) );
+        mu2 = mu2 - (log((exp(xp1 * mu2) + exp(xp2 * mu2) )) - mu) / ((xp1 * exp(xp1 * mu2) + xp2 * (exp(xp2 * mu2) )) / (exp(xp1 * mu2) + exp(xp2 * mu2) ));
+    }
+    partialmus[0]=xp1*mu2;
+    partialmus[1]=xp2*mu2;
+        */
+        double mu2 = log(exp(mu) / ((double)(xp1 + xp2)));
+        partialmus[0] = log(double(xp1)) + mu2;
+        partialmus[1] = log(double(xp2)) + mu2;
+        //}
+    }
+    else if (no_types == 3)
+    {
+        int xp1 = (*(g.proportions))[0];
+        int xp2 = (*(g.proportions))[1];
+        int xp3 = (*(g.proportions))[2];
+        // if(xp1 ==  xp2 && xp2 == xp3) {
+        //     partialmus[0] = mu;
+        //     partialmus[1] = mu;
+        //     partialmus[2] = mu;
+        // }
+        // else{
+        /*
+        double mu2 = 0.;
+        for (int k = 0; k < 10; k++)
+        {
+            mu2 = mu2 - (log((exp(xp1 * mu2) + exp(xp2 * mu2) + exp(xp3 * mu2))) - mu) / ((xp1 * exp(xp1 * mu2) + xp2 * (exp(xp2 * mu2) + xp3 * (exp(xp3 * mu2)))) / (exp(xp1 * mu2) + exp(xp2 * mu2) + exp(xp3 * mu2)));
+            //cout << mu2 << endl;
+        }
+        partialmus[0] = xp1 * mu2;
+        partialmus[1] = xp2 * mu2;
+        partialmus[2] = xp3 * mu2;
+        */
+        double mu2 = log(exp(mu) / ((double)(xp1 + xp2 + xp3)));
+        partialmus[0] = log(double(xp1)) + mu2;
+        partialmus[1] = log(double(xp2)) + mu2;
+        partialmus[2] = log(double(xp3)) + mu2;
+    }
+    else
+    {
+    }
+
+    for (int k = 0; k < partialmus.getsize(); k++)
+        cout << exp(partialmus[k]) << " ";
+    cout << endl;
+    cout << partialmus << endl;
+    cout << exp(mu) << endl;
+    cout << indices_to_add.size() << endl;
+    pausel();
+
+    vector1<int> present_particles(no_types);
+    present_particles[0]=1;
+
+    int MC_Move = 1;
+
+    vector1<int> added(3);
+    vector1<int> removed(3);
+
+    for (int i = 0; i < runtime; i++)
+    {
+        // cout << i << endl;
+        if (i % MC_Move == 0)
+        {
+
+            int type_choice =  rand() % no_types;   //randomly choose a particle type
+
+            int ins = rand() % 2; //insert or remove a particle
+            // cout << "start " << ins << " " << type_choice << endl;
+            // pausel();
+
+
+            if (ins == 0 )
+                { // insert a particle
+
+                    double rangex = ll;
+                    double rangey = ll;
+                    double rangez = obj->getcoordinate(0, 2) - 1;
+                    double r1 = rangex * ((double)rand() / (double)(RAND_MAX));
+                    double r2 = rangey * ((double)rand() / (double)(RAND_MAX));
+                    double r3 = rangez * ((double)rand() / (double)(RAND_MAX));
+
+                    vector1<double> myvec1(3);
+                    myvec1[0] = r1;
+                    myvec1[1] = r2;
+                    myvec1[2] = r3;
+
+                    // we can set the particle to be at a particular place first, then calculate the energies
+                    int index_which = rand() % indices_to_add[type_choice].size();
+
+  
+                    int myindex = indices_to_add[type_choice][index_which];
+                    
+                    // cout << "allparams: " << type_choice << " " << index_which << " " << myindex << endl;
+
+                    obj->set_particle(myvec1, myindex);
+                    double NNN = (double)present_particles[type_choice];
+                    added[type_choice]++;
+                    //double probabilityratio = 5000/(5000-NNN);
+
+
+                    double en = 0;
+                //     for (int j = 0; j < (int)NNN; j++)
+                //     {
+
+                //         double dis = obj->distance(myindex, indices[j]);
+                //         if (dis < 2.)
+                //             en += wsa.energy(dis);
+                //         en += obj->particle_energy(myindex, indices[j], *pots);
+                //         if (en > 1000.)
+                //         {
+                //             goto energ;
+                //         }
+                //         // if any overlaps are found the particle will be rejected and we can skip the rest
+                //     }
+                // energ:
+
+                    double V = rangex * rangey * rangez;
+
+                    double mymu = partialmus[type_choice];
+                    cout << "add: " << myindex << " " << mymu << " " << NNN<< endl;
+                    cout << present_particles << endl;
+                    
+
+                    double acceptance = min(1.,  (V / (1. + NNN)) * exp(mymu) * exp(-en));
+
+                    double r = (double)rand() / (double)RAND_MAX;
+                    cout << (V / (1. + NNN)) * exp(mymu) * exp(-en) << endl;
+                    cout << acceptance << endl;
+                    cout << added << endl;
+                    //cout << endl;
+
+                    if (r < acceptance)
+                    {
+                        indices[type_choice].push_back(myindex); // particle is added
+                        remove_at(indices_to_add[type_choice], index_which);
+                        cout << "Particle added!" << endl;
+                        cout << endl;
+                        present_particles[type_choice]++;
+                    }
+                    else
+                    {
+                        cout << endl;
+                    }
+                }
+                else
+                { // remove a particle
+                    // choose a random particle;
+                    
+                    if(present_particles[type_choice] > 0 ) {
+
+                        
+                        int index_which = rand() % indices[type_choice].size();
+                        int myindex = indices[type_choice][index_which];
+                        cout << "remove: " << type_choice <<  " " << index_which << " " << myindex << endl;
+                        pausel();
+                        double NNN = (double)present_particles[type_choice];
+                        removed[type_choice]++;
+                        double en = 0.0;
+
+
+                        double rangex = ll;
+                        double rangey = ll;
+                        double rangez = obj->getcoordinate(0, 2) - 1;
+
+                        double V = rangex * rangey * rangez;
+
+                        double mymu = partialmus[type_choice];
+
+                        
+
+                        cout << "remove: " << myindex << " " << mymu << " " << NNN << endl;
+                        cout << present_particles << endl;
+                        
+
+                        double acceptance = min(1., (NNN / V) * exp(-mymu) * exp(-en));
+
+                        double r = (double)rand() / (double)RAND_MAX;
+                        cout << r << endl;
+                        cout << acceptance << endl;
+                        cout <<  (NNN / V) * exp(-mymu) * exp(-en) << endl;
+                        cout << removed << endl;
+                        //cout << endl;
+
+                        
+                        if (r < acceptance)
+                        {
+                            remove_at(indices[type_choice], index_which);
+
+                            auto pos = std::lower_bound(indices_to_add[type_choice].begin(), indices_to_add[type_choice].end(), myindex);
+                            indices_to_add[type_choice].insert(pos, myindex);
+                            present_particles[type_choice]--;
+                            cout << "Particle Removed!" << endl;
+                            cout << endl;
+                        }
+                        else{
+                            cout << endl;
+                        }
+                    }
+                    else {
+                        //do nothing (nothing to remove)
+                    }
+                }
+        }
+
+        indices_combine = flatten(indices);
+
+        // after the particle is added, pairs need to be recomputed. This happens so long as i % MC and i % pairs are both zero
+
+        if (i > 0 && i % 20 == 0)
+        {
+
+            // pairs = obj->calculatepairs(boxes, 3.5);
+
+            // ADD THE PARTICLE ADDITION METHOD HERE
+            // bool dd = false;
+            // vector1<double> v1(3);
+            // int fi;
+
+            // cout << obj->getcoordinate(0, 2) << endl;
+            // box_vol vol2;
+            // vol2.ll = ll;
+            // vol2.llx = ll;
+            // vol2.lly = ll;
+            // vol2.llz = obj->getcoordinate(0, 2) - 1;
+
+            // // cout << "created box vol" << endl;
+
+            // vv.set_volume(vol2);
+            // vv.add_p_w(*obj, indices, dd, v1, fi);
+            // cout << "added particle" << endl;
+            // if (dd)
+            // {
+
+            //     // cout << "added: " << fi << endl;
+
+            //     indices.push_back(fi);
+
+            //     obj->set_particle(v1, fi);
+            // }
+
+            vector<int> temp;
+            for(int ty = 0 ; ty < no_types ; ty++)
+            for (int i1 = 0; i1 < indices.size(); i1++)
+            {
+                double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices[ty][i1], 2);
+                if (dis < 4.)
+                    temp.push_back(indices[ty][i1]);
+            }
+
+            // delete pairs_lid;
+            pairs_lid.resize(temp.size());
+            for (int i1 = 0; i1 < temp.size(); i1++)
+            {
+                pairs_lid[i1] = temp[i1];
+            }
+            // cout << "checking lids" << endl;
+
+            // delete pairs_onlyb;
+
+            // pairs_onlyb = obj->calculatepairs_parallel(boxes, indices, 3.5);
+            // cout << "done"  << endl;
+        }
+
+        momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+        obj->advancemom_halfstep(F, T, indices_combine);
+        obj->advance_pos(indices_combine);
+
+        h = h + ((*obj).getdt() / mass) * momp1; // how heavy do we make the wall? Choose mass = 100.;
+        if (h < hmin)
+            h = hmin + (hmin - h);   // reflect if hit the bottom
+        obj->setcoordinate(0, 2, h); // update in storage
+
+        obj->rotate(indices_combine);                        // only update the patchy particles with the rotate algorithm
+        // F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+        F = matrix<double>(NN, 3);
+        
+        forcep1 = 0;
+        for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
+        {
+
+            double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(pairs_lid[i1], 2);
+
+            double F1 = wsa.force(dis);
+            forcep1 += F1;                 // force pushes lid up
+            F(((pairs_lid))[i1], 2) -= F1; // pushes particle down
+        }
+        // cout << forcep1 << " ";
+
+        // stochastic force
+        forcep1 += sqrt(2 * ((*obj).getgamma()) * (*obj).getkT() / (*obj).getdt()) * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808); // temperature
+        // cout << forcep1 << " ";
+        if (h > hmin)
+            forcep1 -= mass * (h - hmin); // constant downwards force
+
+        // cout << forcep1 << endl;
+        // pausel();
+        T.reset(0.0);
+        // cout << *pairs_onlyb << endl;
+        // obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+        // cout << "huh" << endl;
+        generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
+
+        obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
+        obj->advancemom_halfstep(F, T, indices_combine);
+
+        momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+
+        if (i % every == 0 && i > 0)
+        {
+
+            // cout << i << endl;
+
+            stringstream ss;
+
+            ss << setw(number_of_digits) << setfill('0') << (i / every);
+
+            matrix<double> orient = obj->getorientation();
+            matrix<double> pos = obj->getdat();
+
+            string poss = "pos";
+            poss = poss + strbase;
+            string oris = "div";
+            oris = oris + strbase;
+
+            string elli = "or";
+            elli = elli + strbase;
+
+            poss += "_i=";
+            oris += "_i=";
+            // elli += "_i=";
+
+            string extension = ".csv";
+
+            poss += ss.str();
+            oris += ss.str();
+            elli += ss.str();
+
+            poss += extension;
+            oris += extension;
+            elli += extension;
+
+            string orie = "orient";
+            orie += extension;
+
+            ofstream myfile;
+            myfile.open(poss.c_str());
+
+            ofstream myfile2;
+            myfile2.open(oris.c_str());
+
+            ofstream myfile3;
+            myfile3.open(elli.c_str(), std::ios_base::app);
+
+            ofstream myfile4;
+            myfile4.open(orie.c_str());
+
+            myfile <<= pos.getrowvector(0);
+            myfile << "\n";
+            for (int ik = 0; ik < indices_combine.size(); ik++)
+            {
+                myfile <<= pos.getrowvector(indices_combine[ik]);
+                myfile << "\n";
+                myfile2 << indices_combine[ik] << endl;
+            }
+
+            myfile4 <<= obj->getorientation();
+
+            myfile.close();
+            myfile2.close();
+            myfile3.close();
+            myfile4.close();
+
+            // pausel();
+        }
+    }
+    // delete pairs_onlyb;
+
+    // in this example, we probably want to specify the weights to be such that the total rate of each remains fixed?
+
+    // i.e. if we have  rates as (rate*p1) and (rate*p2) and rate*p3 where p1 are the proportions we want to keep the ps proportional
+
+    // but the complication is that each weight has to change
+
+    // we can make all the weights point to the same reference? And then as the particle is released we update the reference?
+
+    // we can also make it so that the length of indicies to add is the number of types * 5000 (for instance)
+
+    // there's probably a better way of doing this
+
+    // differential rates
+
+    // we can just add the first element of each
+}
+
+void NanotubeAssembly::run_box_anchors(int runtime, int every, double mass, int NumA, geneticcode &g, string strbase)
+{
+
+    // generate boxes first
+    int no_types = g.no_types;
+    int ccc;
+
+    int tf = ceil((double)runtime / (double)every);
+    int number_of_digits = 0;
+    do
+    {
+        ++number_of_digits;
+        tf /= 10;
+    } while (tf);
+
+    matrix<int> boxes = obj->getgeo().generate_boxes_relationships(num, ccc);
+
+    int NN = obj->getN() + 1; // one particle is the wall
+    // we also need to define the position of the "particle" that acts as a wall on the
+
+    matrix<double> newdat(NN, 3);
+    double hmin = 10.;
+    double h = hmin; // the height of our flap to start with
+
+    newdat(0, 0) = ll / 2.;
+    newdat(0, 1) = ll / 2.;
+    newdat(0, 2) = h;
+
+    obj->initialize(newdat);
+
+    // start with a single particle
+    vector<int> indices;
+    indices.reserve(NN); // these are all the particles we will be adding
+
+    indices.push_back(1);
+    
+    double dl = ll/(double)NumA;
+
+    vector<vector1<double> > anchorpoints;
+    for(int ix = 0 ; ix < NumA ; ix++) {
+        for(int iy = 0 ; iy < NumA ; iy++) {
+            
+            vector1<double> pos(3);
+            pos[0] = (ix+0.5)*dl;
+            pos[1] = (iy+0.5)*dl;
+            pos[2] = 0.5;
+            anchorpoints.push_back(pos);
+        }
+    }
+    // the density is the  number of points
+
+
+    // vector<double> indices_weights;
+    //  vector<int> indices_to_add;
+    //  indices_to_add.reserve(NN-2);
+    //  for(int i =2 ; i < NN ; i++) {
+    //      indices_to_add.push_back(i); // all the ones to add
+    //  }
+
+    // vector<vector<int> > indices_to_add;
+
+    // int i1 = 0;
+    // vector<int> v;
+    // for (int k = 1; k < 5000; k++)
+    // {
+    //     v.push_back(i1);
+    //     i1++;
+    // }
+    // indices_to_add.push_back(v);
+
+    // for(int j = 1 ; j < no_types ; j++) {
+    //     vector<int> v;
+    //     int i = 0 ;
+    //     for(int k = 0  ; k < 5000 ; k++) {
+    //         v.push_back(i);
+    //         i++;
+    //     }
+    //     indices_to_add.push_back(v);
+    // }
+    vector<int> indices_to_add;
+    for (int i = 2; i < no_types * 5000; i++)
+        indices_to_add.push_back(i);
+    // 1 is already present
+
+    vector1<int> counts(no_types + 1);
+    counts[0] = 0;    // index start type 0
+    counts[1] = 4999; // index start type 1
+    for (int j = 2; j < no_types + 1; j++)
+    {
+        counts[j] = counts[j - 1] + 5000;
+    }
+
+    WCAPotential wsa(3.0, 1.0, 0.0);
+
+    vector<int> temp;
+    for (int i1 = 0; i1 < indices.size(); i1++)
+    {
+        double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices[i1], 2);
+        if (dis < 4.)
+            temp.push_back(indices[i1]);
+    }
+    vector1<int> pairs_lid(temp.size());
+    for (int i1 = 0; i1 < temp.size(); i1++)
+    {
+        pairs_lid[i1] = temp[i1];
+    }
+
+    vector<int> temp2;
+    for (int i1 = 0; i1 < indices.size(); i1++)
+    {
+        double dis = obj->getcoordinate(indices[i1], 2);
+        if (dis < 4.)
+            temp2.push_back(indices[i1]);
+    }
+    vector1<int> pairs_anchor(temp2.size());
+    for (int i1 = 0; i1 < temp2.size(); i1++)
+    {
+        pairs_anchor[i1] = temp2[i1];
+    }
+
+    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices, 3.5);
+
+    matrix<double> F(NN, 3);
+    matrix<double> Fs(NN, 3);
+    matrix<double> T(NN, 3);
+    matrix<double> RT(NN, 6);
+    matrix<double> zeromatrix(NN, 3);
+
+    double forcep1 = 0; // the force on the lid
+    double momp1 = 0;
+    // double mass = 10.;
+
+    F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+
+    for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
+    {
+        double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(pairs_lid[i1], 2);
+        double F1 = wsa.force(dis);
+        forcep1 += F1;             // force pushes lid up
+        F(pairs_lid[i1], 2) -= F1; // pushes particle down
+    } // random force
+    forcep1 += sqrt(2 * ((*obj).getgamma()) * mass * (*obj).getkT() / (*obj).getdt()) * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808); // temperature
+    if (h > hmin)
+        forcep1 -= mass * (h - hmin); // constant downwards force if above hmin.
+
+    anchoringpoints apot;
+    apot.epsilon = 10.;
+    apot.sigma = 1.;
+
+    for (int i1 = 0; i1 < pairs_anchor.getsize(); i1++)
+    {
+        for (int k = 0; k < anchorpoints.size(); k++)
+        {
+            double dis = obj->distance(pairs_anchor[i1], anchorpoints[k]);
+            if (dis < 2.)
+            {
+                apot.anchorpointx = anchorpoints[k][0];
+                apot.anchorpointy = anchorpoints[k][1];
+                apot.anchorpointz = anchorpoints[k][2];
+                vector1<double> df = apot.force(obj->getcoordinate(pairs_anchor[i1], 0), obj->getcoordinate(pairs_anchor[i1], 1), obj->getcoordinate(pairs_anchor[i1], 2));
+                F(pairs_anchor[i1], 0) += df[0];
+                F(pairs_anchor[i1], 1) += df[1];
+                F(pairs_anchor[i1], 2) += df[2];
+
+                break;
+            }
+        }
+    }
+
+    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+
+    generate_uniform_random_matrix(RT, indices); // only generate random torques for the patchy particles
+
+    obj->create_forces_and_torques_sphere(F, T, RT, indices, false); // only create torques and forces for patchy particles
+
+    particle_adder vv;
+    vv.set_indices(indices_to_add);
+    vv.set_counts(counts);
+
+    vector1<int> weights;
+
+    weights = *(g.proportions);
+
+    // we want to choose a
+
+    box_vol vol2;
+    vol2.ll = ll;
+    vol2.llx = ll;
+    vol2.lly = ll;
+    vol2.llz = obj->getcoordinate(0, 2);
+    vv.set_volume(vol2);
+    vv.set_rate(g.rate);
+    vv.set_irreducible_weights(weights);
+
+    for (int i = 0; i < runtime; i++)
+    {
+        cout << i << endl;
+        if (i > 0 && i % 20 == 0)
+        {
+
+            // pairs = obj->calculatepairs(boxes, 3.5);
+
+            // ADD THE PARTICLE ADDITION METHOD HERE
+            bool dd = false;
+            vector1<double> v1(3);
+            int fi;
+
+            cout << obj->getcoordinate(0, 2) << endl;
+            box_vol vol2;
+            vol2.ll = ll;
+            vol2.llx = ll;
+            vol2.lly = ll;
+            vol2.llz = obj->getcoordinate(0, 2) - 1;
+
+            // cout << "created box vol" << endl;
+
+            vv.set_volume(vol2);
+            vv.add_p_w(*obj, indices, dd, v1, fi);
+            // cout << "added particle" << endl;
+            if (dd)
+            {
+
+                // cout << "added: " << fi << endl;
+
+                indices.push_back(fi);
+
+                obj->set_particle(v1, fi);
+            }
+
+            vector<int> temp;
+            for (int i1 = 0; i1 < indices.size(); i1++)
+            {
+                double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices[i1], 2);
+                if (dis < 4.)
+                    temp.push_back(indices[i1]);
+            }
+
+            // delete pairs_lid;
+            pairs_lid.resize(temp.size());
+            for (int i1 = 0; i1 < temp.size(); i1++)
+            {
+                pairs_lid[i1] = temp[i1];
+            }
+
+            vector<int> temp2;
+            for (int i1 = 0; i1 < indices.size(); i1++)
+            {
+                double dis =obj->getcoordinate(indices[i1], 2);
+                if (dis < 4.)
+                    temp2.push_back(indices[i1]);
+            }
+
+            // delete pairs_lid;
+            pairs_anchor.resize(temp2.size());
+            for (int i1 = 0; i1 < temp2.size(); i1++)
+            {
+                pairs_anchor[i1] = temp2[i1];
+            }
+            // cout << "checking lids" << endl;
+
+            delete pairs_onlyb;
+
+            pairs_onlyb = obj->calculatepairs_parallel(boxes, indices, 3.5);
+            // cout << "done"  << endl;
+        }
+
+        momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+        obj->advancemom_halfstep(F, T, indices);
+        obj->advance_pos(indices);
+
+        h = h + ((*obj).getdt() / mass) * momp1; // how heavy do we make the wall? Choose mass = 100.;
+        if (h < hmin)
+            h = hmin + (hmin - h);   // reflect if hit the bottom
+        obj->setcoordinate(0, 2, h); // update in storage
+
+        obj->rotate(indices);                        // only update the patchy particles with the rotate algorithm
+        F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+        forcep1 = 0;
+        for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
+        {
+
+            double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(pairs_lid[i1], 2);
+
+            double F1 = wsa.force(dis);
+            forcep1 += F1;                 // force pushes lid up
+            F(((pairs_lid))[i1], 2) -= F1; // pushes particle down
+        }
+        // cout << forcep1 << " ";
+
+        // stochastic force
+        forcep1 += sqrt(2 * ((*obj).getgamma()) * (*obj).getkT() / (*obj).getdt()) * (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808); // temperature
+        // cout << forcep1 << " ";
+        if (h > hmin)
+            forcep1 -= mass * (h - hmin); // constant downwards force
+
+        for (int i1 = 0; i1 < pairs_anchor.getsize(); i1++)
+        {
+            for (int k = 0; k < anchorpoints.size(); k++)
+            {
+                double dis = obj->distance(pairs_anchor[i1], anchorpoints[k]);
+                if (dis < 2.)
+                {
+                    apot.anchorpointx = anchorpoints[k][0];
+                    apot.anchorpointy = anchorpoints[k][1];
+                    apot.anchorpointz = anchorpoints[k][2];
+                    vector1<double> df = apot.force(obj->getcoordinate(pairs_anchor[i1], 0), obj->getcoordinate(pairs_anchor[i1], 1), obj->getcoordinate(pairs_anchor[i1], 2));
+                    F(pairs_anchor[i1], 0) += df[0];
+                    F(pairs_anchor[i1], 1) += df[1];
+                    F(pairs_anchor[i1], 2) += df[2];
+
+                    //break;
+                }
+            }
+        }
+
+        // cout << forcep1 << endl;
+        // pausel();
+        T.reset(0.0);
+        // cout << *pairs_onlyb << endl;
+        obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+        // cout << "huh" << endl;
+        generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
+
+        obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
+        obj->advancemom_halfstep(F, T, indices);
+
+        momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+
+        if (i % every == 0 && i > 0)
+        {
+
+            // cout << i << endl;
+
+            stringstream ss;
+
+            ss << setw(number_of_digits) << setfill('0') << (i / every);
+
+            matrix<double> orient = obj->getorientation();
+            matrix<double> pos = obj->getdat();
+
+            string poss = "pos";
+            poss = poss + strbase;
+            string oris = "div";
+            oris = oris + strbase;
+
+            string elli = "or";
+            elli = elli + strbase;
+
+            poss += "_i=";
+            oris += "_i=";
+            // elli += "_i=";
+
+            string extension = ".csv";
+
+            poss += ss.str();
+            oris += ss.str();
+            elli += ss.str();
+
+            poss += extension;
+            oris += extension;
+            elli += extension;
+
+            string orie = "orient";
+            orie += extension;
+
+            ofstream myfile;
+            myfile.open(poss.c_str());
+
+            ofstream myfile2;
+            myfile2.open(oris.c_str());
+
+            ofstream myfile3;
+            myfile3.open(elli.c_str(), std::ios_base::app);
+
+            ofstream myfile4;
+            myfile4.open(orie.c_str());
+
+            myfile <<= pos.getrowvector(0);
+            myfile << "\n";
+            for (int ik = 0; ik < indices.size(); ik++)
+            {
+                myfile <<= pos.getrowvector(indices[ik]);
+                myfile << "\n";
+                myfile2 << indices[ik] << endl;
+            }
+
+            myfile4 <<= obj->getorientation();
+
+            myfile.close();
+            myfile2.close();
+            myfile3.close();
+            myfile4.close();
+
+            // pausel();
+        }
+    }
+    delete pairs_onlyb;
+
+    // in this example, we probably want to specify the weights to be such that the total rate of each remains fixed?
+
+    // i.e. if we have  rates as (rate*p1) and (rate*p2) and rate*p3 where p1 are the proportions we want to keep the ps proportional
+
+    // but the complication is that each weight has to change
+
+    // we can make all the weights point to the same reference? And then as the particle is released we update the reference?
+
+    // we can also make it so that the length of indicies to add is the number of types * 5000 (for instance)
+
+    // there's probably a better way of doing this
+
+    // differential rates
+
+    // we can just add the first element of each
 }
 
 #endif

@@ -53,6 +53,7 @@ inline void input (char *s, T &x) { cout << s; cin >> x; }
 #define CUB(x) ((x)*(x)*(x))
 #define SIGN(a,b)((b)>= 0 ? fabs(a) : -fabs(a))
 #define ABS(a)( (a>0? (a) :(-a)) )
+#define min(a,b)( (a)<(b) ? (a) : (b) )
 
 int inline fasterfloor( const double &x ) { return x > 0 ? (int) x : (int) x - 1; }
 
@@ -759,6 +760,52 @@ void handler(int sig)
     exit(1);
 }
 
+unsigned long mix(unsigned long a, unsigned long b, unsigned long c)
+{
+    a = a - b;
+    a = a - c;
+    a = a ^ (c >> 13);
+    b = b - c;
+    b = b - a;
+    b = b ^ (a << 8);
+    c = c - a;
+    c = c - b;
+    c = c ^ (b >> 13);
+    a = a - b;
+    a = a - c;
+    a = a ^ (c >> 12);
+    b = b - c;
+    b = b - a;
+    b = b ^ (a << 16);
+    c = c - a;
+    c = c - b;
+    c = c ^ (b >> 5);
+    a = a - b;
+    a = a - c;
+    a = a ^ (c >> 3);
+    b = b - c;
+    b = b - a;
+    b = b ^ (a << 10);
+    c = c - a;
+    c = c - b;
+    c = c ^ (b >> 15);
+    return c;
+}
+
+vector<int> flatten(const vector<vector<int> > &v) {
+    size_t total_size = 0;
+    for (const auto &sub : v)
+        total_size += sub.size();
+
+    std::vector<int> out;
+    out.reserve(total_size);
+
+    // append all subvectors
+    for (const auto &sub : v)
+        out.insert(out.end(), sub.begin(), sub.end());
+
+    return out;
+}
 
 #endif	/* BASIC_H */
 

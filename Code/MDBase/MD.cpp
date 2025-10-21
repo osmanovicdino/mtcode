@@ -140,6 +140,10 @@ double MD::distance(const int &i,const int &j) {
 return geo.distance(*dat,i,j);
 }
 
+double MD::distance(const int &i, vector1<double> &v) { //distance between a point and a particle
+	return geo.distance(dat->getrowvector(i),v);
+}
+
 // bool MD::distance_less_than(const int &i,const int &j, double R) {
 // return (*this->geo).distance_less_than((*dat)[i],(*dat)[j],R);
 // }
@@ -994,6 +998,38 @@ vector<mdpair> MD::precalculatepairs_md(const matrix<int> &b, const vector1<int>
 
 	}
 	return index1;
+}
+
+vector1<int> MD::pairs_to_specific_particle(matrix<int> &boxlist, int i, double cut_off) {
+	//this was my attempt to make a function that finds all the pairs to a specific particle
+	//I wanted to do this for a GCMC, however, as I need to calculate all pairs anyway, I've decided
+	// that I will just implement it in the function for the MD run for now.  I will
+	// return to this function later if it proves to be necessary to do a more elaborate version 
+	// of GCMC
+	
+	int total_cubes = boxlist.getNsafe();
+
+	double dims = (double)this->getdimension();
+
+	int cubes_per_length = (int)round(exp(log(total_cubes) / dims));
+	vector1<int> dim(dimension);
+	for (int i = 0; i < dimension; i++)
+	{
+		int ij = 1;
+		for (int j = 0; j < i; j++)
+		{
+			ij *= cubes_per_length;
+		}
+		dim[i] = ij;
+	}
+
+	int c = geo.assign_box((*dat), i, dim, cubes_per_length); // where our particle is
+	
+	//I've decided to go a different way, but I've left this 
+	
+	vector1<int> aa(3);
+	return aa;
+
 }
 
 matrix<int>* MD::calculatepairs(matrix<int> &boxlist, double cut_off) {

@@ -80,6 +80,9 @@ void run_no_patchy_noshell(int, int, double prod, double ks, double ks2, string 
 void run_no_patchy_continue(int, int, int, ShellProperties &, double prod, double ks, double ks2, matrix<double>&, vector1<int>&, vector<vector<int>>&, string strbase);
 
 void run_box(int,int,double,geneticcode&,string);
+void run_box_equil(int, int, double, geneticcode &, string);
+void run_box_equil_no_interactions(int, int, double, geneticcode &, string);
+void run_box_anchors(int, int, double, int, geneticcode &, string);
 //AbstractBindingModel *bm;
 
 };
