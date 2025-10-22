@@ -717,6 +717,7 @@ double LangevinNVTR::particle_energy(int i, int j, ComboPatch &iny) {
         vector1<double> un(dimension);
         geo.distance_vector(*dat, p1, p2, un, dis);
 
+        if(dis>2.5) return 0.;
         // un = i-j
         dis = sqrt(dis);
 

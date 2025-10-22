@@ -233,33 +233,51 @@ int main(int argc, char **argv)
     }
 
     //from 0 to 600 is excitable
-    bool excitation_on=false;
+    vector1<bool> excitation_on(100,false);
 
-    double rate_on  = 0.0001;
-    double rate_off = 0.00001;
+    double rate_on  = 0.0001*200.;
+    double rate_off = 0.00001*200;
     
 
     matrix<int> *pairs = b.calculatepairs_parallel(boxes, 3.5);
 
     for (int i = 0; i < runtime; i++)
     {
-        double r = (double)rand()/(double)RAND_MAX;
-        if(!excitation_on && r <rate_on) {
-            int rr = rand() % 540;
-            for(int pp = rr ; pp < rr+60 ; pp++) {
-                tempmod[pp] = 2.5;
-            }
-            excitation_on = true;
-        }
-        else if(excitation_on && r < rate_off) {
-            for(int pp = 0 ; pp < 600 ; pp++) {
-                tempmod[pp] = 1.;
-            }
-            excitation_on = false;
-        }
-        else{
+        if(i%200 ==0 ) {
 
+            double r = (double)rand() / (double)RAND_MAX;
+            //int len = rand() % 60;
+            int reg =  rand() % 100; 
+            int alls = total_bool(excitation_on);
+            if( r <rate_on && excitation_on[reg] == false && alls <= 10) {
+                
+                for(int pp = reg*6 ; pp < (reg+1)*6 ; pp++) {
+                tempmod[pp] = 2.5;
+                
+                }
+                excitation_on[reg] = true;
+            }
+            r = (double)rand() / (double)RAND_MAX;
+            if(r < rate_off  ) {
+                vector<int> pos;
+                for(int j = 0 ; j < 100 ; j++) {
+                    if(excitation_on[j]==true) pos.push_back(j);
+                }
+                if(pos.size() > 0) {
+                    int reg = pos[rand() % pos.size()];
+                    for (int pp = reg * 6; pp < (reg + 1) * 6; pp++)
+                    {
+                        tempmod[pp] = 1.0;
+                    }
+                    excitation_on[reg] = false;
+                }
+            }
         }
+
+
+
+
+        
 
         // if(i%1000000 == 0 && i > 0 ) {
 
