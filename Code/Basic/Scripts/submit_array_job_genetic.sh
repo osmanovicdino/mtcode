@@ -29,7 +29,7 @@ dirwemake="den${SGE_TASK_ID}"
 subdir="GeneticTry2"
 mkdir /u/scratch/d/dinoo/${subdir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeBox.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
-g++ ~/Chemistry/Code/mainNanotubeBox.cpp -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
+g++ ~/Chemistry/Code/mainNanotubeBox.cpp -std=c++17 -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${subdir}/${dirwemake}
 
 ./angron >log
