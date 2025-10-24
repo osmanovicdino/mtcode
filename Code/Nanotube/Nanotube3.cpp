@@ -662,15 +662,6 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
 
     }
 
-    for(int k = 0  ; k < partialmus.getsize() ; k++)
-    cout << exp(partialmus[k])<< " ";
-    cout << endl;
-    cout << partialmus << endl;
-    cout << exp(mu) << endl;
-    pausel();
-
-
-
     int MC_Move = 200;
 
 
@@ -970,7 +961,7 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
     // we can just add the first element of each
 }
 
-void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, double mass, geneticcode &g, string strbase)
+void NanotubeAssembly::run_box_equil_cont(int runtime, int every, double mass, geneticcode &g, string strbase, matrix<double> &pos, matrix<double> &ori, matrix<int> &ind)
 {
 
     // generate boxes first
@@ -994,60 +985,97 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
     double hmin = 10.;
     double h = hmin; // the height of our flap to start with
 
-    newdat(0, 0) = ll / 2.;
-    newdat(0, 1) = ll / 2.;
-    newdat(0, 2) = h;
+    // newdat(0, 0) = ll / 2.;
+    // newdat(0, 1) = ll / 2.;
+    // newdat(0, 2) = h;
 
-    obj->initialize(newdat);
+
+    
 
     // start with a single particle
-    vector< vector<int> > indices(no_types);
-    for(int i = 0  ; i < no_types ; i++) {
+    vector<vector<int>> indices(no_types);
+    for (int i = 0; i < no_types; i++)
+    {
         vector<int> a;
         indices[i] = a;
     }
-    
-    indices[0].push_back(1);
 
-    vector< vector<int> > indices_to_add(no_types);
-    for (int j = 2 ; j< 5000; j++)
+    //indices[0].push_back(1);
+    
+
+    for(int i = 0; i < ind.getnrows() ; i++) {
+        int which_type = (int)(ind(i,0)/5000);
+        indices[which_type].push_back(ind(i,0));
+    }
+
+
+    vector<vector<int>> indices_to_add(no_types);
+    for (int j = 2; j < 5000; j++)
         indices_to_add[0].push_back(j);
 
-    for(int i =1 ; i < no_types ; i++) {
+    for (int i = 1; i < no_types; i++)
+    {
         vector<int> a;
         indices_to_add[i] = a;
-        for(int j = i*5000 ; j < (i+1)*5000 ; j++ )
+        for (int j = i * 5000; j < (i + 1) * 5000; j++)
             indices_to_add[i].push_back(j);
     }
-    for(int i = 0  ; i < no_types ; i++)
-    cout << indices_to_add[i].size() << endl;
-    pausel();
 
-    vector1<int> counts(no_types + 1);
-    counts[0] = 0;    // index start type 0
-    counts[1] = 4999; // index start type 1
-    for (int j = 2; j < no_types + 1; j++)
-    {
-        counts[j] = counts[j - 1] + 5000;
+
+    for(int kk = 0  ; kk < no_types ; kk++) {
+        std::unordered_set<int> to_remove(indices[kk].begin(), indices[kk].end());
+
+        indices_to_add[kk].erase(std::remove_if(indices_to_add[kk].begin(), indices_to_add[kk].end(),
+                           [&](int x)
+                           { return to_remove.count(x); }),
+            indices_to_add[kk].end());
     }
+    vector<int> indices_combine = flatten(indices);
+
+    newdat(0, 0) = pos(0,0);
+    newdat(0, 1) = pos(0,1);
+    newdat(0, 2) = pos(0,2);
+
+    h = newdat(0,2);
+
+    for(int j = 1 ; j < pos.getnrows() ; j++) {
+        newdat(indices_combine[j-1], 0) = pos(j, 0);
+        newdat(indices_combine[j-1], 1) = pos(j, 1);
+        newdat(indices_combine[j-1], 2) = pos(j, 2);
+    }
+
+
+
+    obj->initialize(newdat);
+
+
+
+    obj->setorientation(ori);
+
+
 
     WCAPotential wsa(3.0, 1.0, 0.0);
 
     vector<int> temp;
-    for(int ty = 0 ; ty < no_types ; ty++)
-    for (int i1 = 0; i1 < indices[ty].size(); i1++)
-    {
-        double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices[ty][i1], 2);
-        if (dis < 4.)
-            temp.push_back(indices[ty][i1]);
-    }
+    for (int ty = 0; ty < no_types; ty++)
+        for (int i1 = 0; i1 < indices[ty].size(); i1++)
+        {
+            double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices[ty][i1], 2);
+            if (dis < 4.)
+                temp.push_back(indices[ty][i1]);
+        }
+
     vector1<int> pairs_lid(temp.size());
     for (int i1 = 0; i1 < temp.size(); i1++)
     {
         pairs_lid[i1] = temp[i1];
     }
 
-    // matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices, 3.5);
+
+
+
+    matrix<int> *pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_combine, 3.5);
+
 
     matrix<double> F(NN, 3);
     matrix<double> Fs(NN, 3);
@@ -1059,7 +1087,9 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
     double momp1 = 0;
     // double mass = 10.;
 
-    // F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+    F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+
+
 
     for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
     {
@@ -1072,13 +1102,19 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
     if (h > hmin)
         forcep1 -= mass * (h - hmin); // constant downwards force if above hmin.
 
-    // obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
 
-    vector<int> indices_combine = flatten(indices);
+
+    obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+
+
 
     generate_uniform_random_matrix(RT, indices_combine); // only generate random torques for the patchy particles
 
+
+
     obj->create_forces_and_torques_sphere(F, T, RT, indices_combine, false); // only create torques and forces for patchy particles
+
+
 
     // particle_adder vv;
     // vv.set_indices(indices_to_add);
@@ -1177,169 +1213,125 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
     {
     }
 
-    for (int k = 0; k < partialmus.getsize(); k++)
-        cout << exp(partialmus[k]) << " ";
-    cout << endl;
-    cout << partialmus << endl;
-    cout << exp(mu) << endl;
-    cout << indices_to_add.size() << endl;
-    pausel();
+    int MC_Move = 200;
 
-    vector1<int> present_particles(no_types);
-    present_particles[0]=1;
-
-    int MC_Move = 1;
-
-    vector1<int> added(3);
-    vector1<int> removed(3);
 
     for (int i = 0; i < runtime; i++)
     {
-        // cout << i << endl;
-        if (i % MC_Move == 0)
+        cout << "time: " << i << endl;
+        if (i % MC_Move == 0 )
         {
+            int type_choice = rand() % no_types;
+            int ins = rand() % 2;
 
-            int type_choice =  rand() % no_types;   //randomly choose a particle type
+            if (ins == 0)
+            { // insert a particle
+                double rangex = ll;
+                double rangey = ll;
+                double rangez = obj->getcoordinate(0, 2);
+                double r1 = rangex * ((double)rand() / (double)(RAND_MAX));
+                double r2 = rangey * ((double)rand() / (double)(RAND_MAX));
+                double r3 = rangez * ((double)rand() / (double)(RAND_MAX));
 
-            int ins = rand() % 2; //insert or remove a particle
-            // cout << "start " << ins << " " << type_choice << endl;
-            // pausel();
+                vector1<double> myvec1(3);
+                myvec1[0] = r1;
+                myvec1[1] = r2;
+                myvec1[2] = r3;
 
+                // we can set the particle to be at a particular place first, then calculate the energies
+                int index_which = rand() % indices_to_add[type_choice].size();
+                int myindex = indices_to_add[type_choice][index_which];
 
-            if (ins == 0 )
-                { // insert a particle
+                obj->set_particle(myvec1, myindex);
+                double NNN = (double)indices[type_choice].size();
+
+                double en = 0;
+                en += wsa.energy(rangez - r3);
+
+                for (int j = 0; j < indices_combine.size(); j++)
+                {
+
+                    double dis = obj->distance(myindex, indices_combine[j]);
+                    if (dis < 2.)
+                        en += wsa.energy(dis);
+                    en += obj->particle_energy(myindex, indices_combine[j], *pots);
+                    if (en > 1000.)
+                    {
+                        goto energ;
+                    }
+                    // if any overlaps are found the particle will be rejected and we can skip the rest
+                }
+            energ:
+
+                double V = rangex * rangey * rangez;
+
+                double mymu = partialmus[type_choice];
+                cout << "add: " << myindex << " " << mymu << " " << en << endl;
+                double acceptance = min(1., (V / (1. + NNN)) * exp(mymu) * exp(-en));
+
+                double r = (double)rand() / (double)RAND_MAX;
+
+                if (r < acceptance)
+                {
+                    indices[type_choice].push_back(myindex); // particle is added
+                    remove_at(indices_to_add[type_choice], index_which);
+                }
+                else
+                {
+                }
+            }
+            else
+            { // remove a particle
+                // choose a random particle;
+                if (indices[type_choice].size() > 0)
+                {
+                    int index_which = (rand() % indices[type_choice].size());
+
+                    int myindex = indices[type_choice][index_which];
+
+                    double NNN = (double)indices[type_choice].size();
 
                     double rangex = ll;
                     double rangey = ll;
-                    double rangez = obj->getcoordinate(0, 2) - 1;
-                    double r1 = rangex * ((double)rand() / (double)(RAND_MAX));
-                    double r2 = rangey * ((double)rand() / (double)(RAND_MAX));
-                    double r3 = rangez * ((double)rand() / (double)(RAND_MAX));
+                    double rangez = obj->getcoordinate(0, 2);
 
-                    vector1<double> myvec1(3);
-                    myvec1[0] = r1;
-                    myvec1[1] = r2;
-                    myvec1[2] = r3;
+                    double en = 0.0;
+                    en += wsa.energy(rangez - obj->getcoordinate(myindex, 2));
 
-                    // we can set the particle to be at a particular place first, then calculate the energies
-                    int index_which = rand() % indices_to_add[type_choice].size();
-
-  
-                    int myindex = indices_to_add[type_choice][index_which];
-                    
-                    // cout << "allparams: " << type_choice << " " << index_which << " " << myindex << endl;
-
-                    obj->set_particle(myvec1, myindex);
-                    double NNN = (double)present_particles[type_choice];
-                    added[type_choice]++;
-                    //double probabilityratio = 5000/(5000-NNN);
-
-
-                    double en = 0;
-                //     for (int j = 0; j < (int)NNN; j++)
-                //     {
-
-                //         double dis = obj->distance(myindex, indices[j]);
-                //         if (dis < 2.)
-                //             en += wsa.energy(dis);
-                //         en += obj->particle_energy(myindex, indices[j], *pots);
-                //         if (en > 1000.)
-                //         {
-                //             goto energ;
-                //         }
-                //         // if any overlaps are found the particle will be rejected and we can skip the rest
-                //     }
-                // energ:
+                    for (int j = 0; j < indices_combine.size(); j++)
+                    {
+                        if (myindex != indices_combine[j])
+                        {
+                            double dis = obj->distance(myindex, indices_combine[j]);
+                            if (dis < 2.)
+                                en += wsa.energy(dis);
+                            en += obj->particle_energy(myindex, indices_combine[j], *pots);
+                        }
+                        // if any overlaps are found the particle will be rejected and we can skip the rest
+                    }
+                    // that's the energy currently, we want deltaU, so the energy if it's taken away
 
                     double V = rangex * rangey * rangez;
 
                     double mymu = partialmus[type_choice];
-                    cout << "add: " << myindex << " " << mymu << " " << NNN<< endl;
-                    cout << present_particles << endl;
-                    
+                    cout << "remove: " << myindex << " " << mymu << " " << en << endl;
 
-                    double acceptance = min(1.,  (V / (1. + NNN)) * exp(mymu) * exp(-en));
+                    double acceptance = min(1., (NNN / V) * exp(-mymu) * exp(en));
 
                     double r = (double)rand() / (double)RAND_MAX;
-                    cout << (V / (1. + NNN)) * exp(mymu) * exp(-en) << endl;
-                    cout << acceptance << endl;
-                    cout << added << endl;
-                    //cout << endl;
 
                     if (r < acceptance)
                     {
-                        indices[type_choice].push_back(myindex); // particle is added
-                        remove_at(indices_to_add[type_choice], index_which);
-                        cout << "Particle added!" << endl;
-                        cout << endl;
-                        present_particles[type_choice]++;
-                    }
-                    else
-                    {
-                        cout << endl;
+                        remove_at(indices[type_choice], index_which);
+
+                        auto pos = std::lower_bound(indices_to_add[type_choice].begin(), indices_to_add[type_choice].end(), myindex);
+                        indices_to_add[type_choice].insert(pos, myindex);
                     }
                 }
-                else
-                { // remove a particle
-                    // choose a random particle;
-                    
-                    if(present_particles[type_choice] > 0 ) {
+            }
 
-                        
-                        int index_which = rand() % indices[type_choice].size();
-                        int myindex = indices[type_choice][index_which];
-                        cout << "remove: " << type_choice <<  " " << index_which << " " << myindex << endl;
-                        pausel();
-                        double NNN = (double)present_particles[type_choice];
-                        removed[type_choice]++;
-                        double en = 0.0;
-
-
-                        double rangex = ll;
-                        double rangey = ll;
-                        double rangez = obj->getcoordinate(0, 2) - 1;
-
-                        double V = rangex * rangey * rangez;
-
-                        double mymu = partialmus[type_choice];
-
-                        
-
-                        cout << "remove: " << myindex << " " << mymu << " " << NNN << endl;
-                        cout << present_particles << endl;
-                        
-
-                        double acceptance = min(1., (NNN / V) * exp(-mymu) * exp(-en));
-
-                        double r = (double)rand() / (double)RAND_MAX;
-                        cout << r << endl;
-                        cout << acceptance << endl;
-                        cout <<  (NNN / V) * exp(-mymu) * exp(-en) << endl;
-                        cout << removed << endl;
-                        //cout << endl;
-
-                        
-                        if (r < acceptance)
-                        {
-                            remove_at(indices[type_choice], index_which);
-
-                            auto pos = std::lower_bound(indices_to_add[type_choice].begin(), indices_to_add[type_choice].end(), myindex);
-                            indices_to_add[type_choice].insert(pos, myindex);
-                            present_particles[type_choice]--;
-                            cout << "Particle Removed!" << endl;
-                            cout << endl;
-                        }
-                        else{
-                            cout << endl;
-                        }
-                    }
-                    else {
-                        //do nothing (nothing to remove)
-                    }
-                }
+            indices_combine = flatten(indices); // all present particles updated
         }
-
-        indices_combine = flatten(indices);
 
         // after the particle is added, pairs need to be recomputed. This happens so long as i % MC and i % pairs are both zero
 
@@ -1376,12 +1368,11 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
             // }
 
             vector<int> temp;
-            for(int ty = 0 ; ty < no_types ; ty++)
-            for (int i1 = 0; i1 < indices.size(); i1++)
+            for (int i1 = 0; i1 < indices_combine.size(); i1++)
             {
-                double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices[ty][i1], 2);
+                double dis = obj->getcoordinate(0, 2) - obj->getcoordinate(indices_combine[i1], 2);
                 if (dis < 4.)
-                    temp.push_back(indices[ty][i1]);
+                    temp.push_back(indices_combine[i1]);
             }
 
             // delete pairs_lid;
@@ -1392,9 +1383,9 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
             }
             // cout << "checking lids" << endl;
 
-            // delete pairs_onlyb;
+            delete pairs_onlyb;
 
-            // pairs_onlyb = obj->calculatepairs_parallel(boxes, indices, 3.5);
+            pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_combine, 3.5);
             // cout << "done"  << endl;
         }
 
@@ -1407,10 +1398,11 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
             h = hmin + (hmin - h);   // reflect if hit the bottom
         obj->setcoordinate(0, 2, h); // update in storage
 
-        obj->rotate(indices_combine);                        // only update the patchy particles with the rotate algorithm
-        // F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
-        F = matrix<double>(NN, 3);
-        
+        obj->rotate(indices_combine);                // only update the patchy particles with the rotate algorithm
+        F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
+
+
+
         forcep1 = 0;
         for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
         {
@@ -1421,6 +1413,8 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
             forcep1 += F1;                 // force pushes lid up
             F(((pairs_lid))[i1], 2) -= F1; // pushes particle down
         }
+
+
         // cout << forcep1 << " ";
 
         // stochastic force
@@ -1433,14 +1427,20 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
         // pausel();
         T.reset(0.0);
         // cout << *pairs_onlyb << endl;
-        // obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
+        obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
         // cout << "huh" << endl;
+        
+
+
         generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
 
         obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
+
+
         obj->advancemom_halfstep(F, T, indices_combine);
 
         momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+
 
         if (i % every == 0 && i > 0)
         {
@@ -1510,7 +1510,7 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
             // pausel();
         }
     }
-    // delete pairs_onlyb;
+    delete pairs_onlyb;
 
     // in this example, we probably want to specify the weights to be such that the total rate of each remains fixed?
 
@@ -1527,6 +1527,10 @@ void NanotubeAssembly::run_box_equil_no_interactions(int runtime, int every, dou
     // differential rates
 
     // we can just add the first element of each
+
+    // cout << total_timeMC << endl;
+    // cout << total_timePairs << endl;
+    // cout << total_timeForce << endl;
 }
 
 void NanotubeAssembly::run_box_anchors(int runtime, int every, double mass, int NumA, geneticcode &g, string strbase)

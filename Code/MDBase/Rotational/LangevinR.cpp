@@ -930,7 +930,7 @@ int totp =  pairs.getnrows();
             vector1<double> un(dimension);
             geo.distance_vector(*dat, p1, p2, un, dis);
 
-
+            if(dis<max_distance_check) {
             //un = i-j
             dis = sqrt(dis);
 
@@ -1034,6 +1034,7 @@ int totp =  pairs.getnrows();
                 // cout << "part 2" << endl;
 
             delete q;
+            }
         }
 
 

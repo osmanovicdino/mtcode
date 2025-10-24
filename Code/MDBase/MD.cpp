@@ -1268,6 +1268,7 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vec &p1, double c
 	// 	int_dl[i] = (ints.access_potential(i).dl);
 	// }
 
+
 	int total_cubes = boxlist.getNsafe();
 
 	double dims = (double)this->getdimension();
@@ -1275,6 +1276,8 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vec &p1, double c
 	int cubes_per_length = (int)round(exp(log(total_cubes) / dims));
 
 	int ressize = pow((int)ceil(cut_off), dimension);
+
+
 	// b.reserve(total_cubes);
 	// for (int j = 0; j < total_cubes; j++)
 	// {
@@ -1303,20 +1306,22 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vec &p1, double c
 		dim[i] = ij;
 	}
 
+
+
 	int partn =  p1.size();
 	vector1<int> indexes(partn);
+
+	cout << partn << endl;
 
 	#pragma omp parallel for
 	for (int i = 0; i < partn; i++)
 	{
 
 		int c = geo.assign_box((*dat), p1[i], dim, cubes_per_length);
-
+		
 		//b[c].push_back(p1[i]);
 		indexes[i] = c;
 	}
-
-
 
 	//when they are added out of order, we do not correspond the entries properly?
 
@@ -1330,7 +1335,6 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vec &p1, double c
 			b(i,j) = p1[b(i,j)];
 		}
 	}
-
 
 	//find all the particles 
 
@@ -1352,10 +1356,8 @@ matrix<int> *MD::calculatepairs_parallel(matrix<int> &boxlist, vec &p1, double c
 	int ss = boxlist.getncols();
 	matrix<int> *a = new matrix<int>();
 	*a = precalculatepairs(b, ccs, boxlist, cut_off);
-	
 
 
-	
 
 	return a;
 }

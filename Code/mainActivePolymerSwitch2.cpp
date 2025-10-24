@@ -220,7 +220,7 @@ int main(int argc, char **argv)
 
     ofstream mytemps;
     mytemps.open(temps.c_str());
-    mytemps <<= tempmod;
+    // mytemps <<= tempmod;
     //mytemps.close();
 
     ofstream myfile;
@@ -235,8 +235,8 @@ int main(int argc, char **argv)
     //from 0 to 600 is excitable
     vector1<bool> excitation_on(100,false);
 
-    double rate_on  = 0.0001*200.;
-    double rate_off = 0.00001*200;
+    double rate_on  = 0.001*200.;
+    double rate_off = 0.0001*200;
     
 
     matrix<int> *pairs = b.calculatepairs_parallel(boxes, 3.5);

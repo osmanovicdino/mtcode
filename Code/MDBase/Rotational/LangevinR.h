@@ -67,6 +67,7 @@ protected:
 	matrix<double> *angmom; //angular momemntum in 3d
 	matrix<double> *orient; //orientation (matrix)
 	double gammar;
+	double max_distance_check =  2.4; // if the distance is above the max distance check, do not calculate any force/torque
 
 
 	double Rt;
@@ -131,6 +132,9 @@ public:
 		Rr = sqrt(2 * gammar * kT / dt);
 	}
 
+	void setmaxdistance(double distance) {
+		max_distance_check = distance;
+	}
 	// genmatx(const vector1<double> &arg);
 	// genmaty(const vector1<double> &arg);
 	// genmatz(const vector1<double> &arg);

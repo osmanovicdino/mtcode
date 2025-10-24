@@ -25,7 +25,9 @@
 #include <signal.h>
 #include <unistd.h>
 #include <algorithm>
+#include <unordered_set>
 #include <parallel/algorithm>
+#include <chrono>
 // #include <thrust/host_vector.h>
 // #include <thrust/device_vector.h>
 #if defined(_OPENMP)
@@ -84,7 +86,7 @@ int main(int argc, char **argv)
     //     myfile << s[i] << endl;
     // }
     // myfile.close();
-    std::ifstream file("g.csv"); // your CSV file
+    std::ifstream file("/home/dino/External/GeneticTry2/den14/g.csv"); // your CSV file
     std::vector<std::string> s;
     std::string line;
 
@@ -109,7 +111,11 @@ int main(int argc, char **argv)
     bool cc;
     NanotubeAssembly A(10., (g.no_types)*5000+1,cc);
 
-
+    bool err1,err2,err3;
+    double T;
+    matrix<double> pos = importcsv("/home/dino/External/GeneticTry2/den14/pos_i=01116.csv",T,err1);
+    matrix<int> ind = importcsv("/home/dino/External/GeneticTry2/den14/div_i=01116.csv", T, err2);
+    matrix<double> ori = importcsv("/home/dino/External/GeneticTry2/den14/orient.csv", T, err3);
 
     GeneralPatch c(CreateGeneralPatch(100., 1, 1.2, 0.6, g));
 
@@ -118,9 +124,10 @@ int main(int argc, char **argv)
     A.setpots(c);
     A.setkT(1.0);
     A.setviscosity(1.0);
+    A.obj->setmaxdistance(2.);
 
 
-    A.run_box_equil(10000000, 1000, 100., g, "");
+    A.run_box_equil_cont(10000, 1000, 100., g, "",pos,ori,ind);
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;
