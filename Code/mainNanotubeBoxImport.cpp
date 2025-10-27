@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 
 
     bool cc;
-    NanotubeAssembly A(10., (g.no_types)*5000+1,cc);
+    NanotubeAssembly A(20., (g.no_types)*5000+1,cc);
 
     bool err1,err2,err3;
     double T;
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
     A.obj->setmaxdistance(2.);
 
 
-    A.run_box_equil_cont(10000, 1000, 100., g, "",pos,ori,ind);
+    A.run_box_equil_cont(10000000, 1000, 100., g, "",pos,ori,ind);
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;
