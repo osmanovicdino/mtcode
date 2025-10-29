@@ -320,7 +320,7 @@ int main(int argc, char **argv)
     A.setkT(1.0);
     A.setviscosity(1.0);
 
-    A.run_box_equil(10000000,1000,10.,g,"");
+    A.run_box_equil(10000000,1000,100.,g,"");
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;
