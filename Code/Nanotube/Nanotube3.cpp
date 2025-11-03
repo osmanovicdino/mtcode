@@ -961,7 +961,7 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
     // we can just add the first element of each
 }
 
-void NanotubeAssembly::run_box_equil_cont(int runtime, int every, double mass, geneticcode &g, string strbase, matrix<double> &pos, matrix<double> &ori, matrix<int> &ind)
+void NanotubeAssembly::run_box_equil_cont(int runtime, int every, int startno, double mass, geneticcode &g, string strbase, matrix<double> &pos, matrix<double> &ori, matrix<int> &ind)
 {
 
     // generate boxes first
@@ -1449,7 +1449,7 @@ void NanotubeAssembly::run_box_equil_cont(int runtime, int every, double mass, g
 
             stringstream ss;
 
-            ss << setw(number_of_digits) << setfill('0') << (i / every);
+            ss << setw(number_of_digits) << setfill('0') << startno + (i / every);
 
             matrix<double> orient = obj->getorientation();
             matrix<double> pos = obj->getdat();

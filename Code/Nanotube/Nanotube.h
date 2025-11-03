@@ -81,7 +81,7 @@ void run_no_patchy_continue(int, int, int, ShellProperties &, double prod, doubl
 
 void run_box(int,int,double,geneticcode&,string);
 void run_box_equil(int, int, double, geneticcode &, string);
-void run_box_equil_cont(int, int, double, geneticcode &, string, matrix<double>&,matrix<double>&, matrix<int>&);
+void run_box_equil_cont(int, int, int, double, geneticcode &, string, matrix<double>&,matrix<double>&, matrix<int>&);
 void run_box_anchors(int, int, double, int, geneticcode &, string);
 //AbstractBindingModel *bm;
 
