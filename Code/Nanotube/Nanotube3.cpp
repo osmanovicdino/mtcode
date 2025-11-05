@@ -662,6 +662,7 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
 
     }
 
+
     int MC_Move = 200;
 
 
@@ -1212,6 +1213,8 @@ void NanotubeAssembly::run_box_equil_cont(int runtime, int every, int startno, d
     else
     {
     }
+
+
 
     int MC_Move = 200;
 

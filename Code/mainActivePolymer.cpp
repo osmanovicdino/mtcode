@@ -117,7 +117,7 @@ int main(int argc, char **argv)
 
     // HarmonicPotential pot(att_epp, 0.);
 
-    FENEPotential pot(30.0,1.5);
+    FENEPotential pot(30.0,3.0);
     LJPotential pot2(att_epp,1.0);
 
     // double att_epp2 = 0.1;

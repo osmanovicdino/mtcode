@@ -27,7 +27,7 @@ module load gcc/11.3.0
 ##/usr/bin/time -v hostname
 
 dirwemake="den${SGE_TASK_ID}"
-subdir="GeneticTry6"
+subdir="GeneticTry7"
 mkdir /u/scratch/d/dinoo/${subdir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeBox.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
 g++ ~/Chemistry/Code/mainNanotubeBox.cpp -fopenmp -std=c++17 -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron

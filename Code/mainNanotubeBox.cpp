@@ -255,7 +255,7 @@ int main(int argc, char **argv)
         }
     }
 
-    s.push_back("0");
+    s.push_back("-2");
 
     vector1<int> weig(str1);
 
@@ -297,6 +297,7 @@ int main(int argc, char **argv)
     geneticcode g(s);
 
     // g.rate = 0.0;
+
 
 
     bool cc;
