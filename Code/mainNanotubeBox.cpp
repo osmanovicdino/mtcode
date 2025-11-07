@@ -255,7 +255,7 @@ int main(int argc, char **argv)
         }
     }
 
-    s.push_back("-2");
+    s.push_back("-5");
 
     vector1<int> weig(str1);
 
