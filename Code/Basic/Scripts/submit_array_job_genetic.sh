@@ -7,7 +7,7 @@
 ## Edit the line below as needed:
 #$ -l h_rt=23:59:59,h_data=512M
 ## Modify the parallel environment
-#$ -pe shared 8
+#$ -pe shared 6
 #$ -t 1-100:1
 
 
@@ -27,12 +27,12 @@ module load gcc/11.3.0
 ##/usr/bin/time -v hostname
 
 dirwemake="den${SGE_TASK_ID}"
-subdir="GeneticTry8"
+subdir="GeneticTry9"
 mkdir /u/scratch/d/dinoo/${subdir}/${dirwemake}
 cp ~/Chemistry/Code/mainNanotubeBox.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
 g++ ~/Chemistry/Code/mainNanotubeBox.cpp -fopenmp -std=c++17 -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${subdir}/${dirwemake}
-export OMP_NUM_THREADS=8
+export OMP_NUM_THREADS=6
 ./angron >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`

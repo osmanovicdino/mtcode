@@ -868,9 +868,9 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
         // cout << *pairs_onlyb << endl;
         obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
         // cout << "huh" << endl;
-        generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
+        generate_uniform_random_matrix(RT,indices_combine); // only generate random torques for the patchy particles
 
-        obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
+        obj->create_forces_and_torques_sphere(F, T, RT, indices_combine, false); // only create torques and forces for patchy particles
         obj->advancemom_halfstep(F, T, indices_combine);
 
         momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
@@ -1435,9 +1435,9 @@ void NanotubeAssembly::run_box_equil_cont(int runtime, int every, int startno, d
         
 
 
-        generate_uniform_random_matrix(RT); // only generate random torques for the patchy particles
+        generate_uniform_random_matrix(RT, indices_combine); // only generate random torques for the patchy particles
 
-        obj->create_forces_and_torques_sphere(F, T, RT); // only create torques and forces for patchy particles
+        obj->create_forces_and_torques_sphere(F, T, RT, indices_combine,false); // only create torques and forces for patchy particles
 
 
         obj->advancemom_halfstep(F, T, indices_combine);
