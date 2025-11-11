@@ -671,14 +671,34 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
     for (int i = 0; i < runtime; i++)
     {
         //cout << i << endl;
-        auto start = std::chrono::high_resolution_clock::now();
 
-        if(i % MC_Move == 0 ) {
+
+        auto start = std::chrono::high_resolution_clock::now();
+        momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+        obj->advancemom_halfstep(F, T, indices_combine);
+        obj->advance_pos(indices_combine);
+        auto end = std::chrono::high_resolution_clock::now();
+        total_time[2] += std::chrono::duration<double>(end - start).count();
+
+        h = h + ((*obj).getdt() / mass) * momp1; // how heavy do we make the wall? Choose mass = 100.;
+        if (h < hmin)
+            h = hmin + (hmin - h);   // reflect if hit the bottom
+        obj->setcoordinate(0, 2, h); // update in storage
+
+        start = std::chrono::high_resolution_clock::now();
+        obj->rotate(indices_combine);
+        end = std::chrono::high_resolution_clock::now(); // only update the patchy particles with the rotate algorithm
+        total_time[3] += std::chrono::duration<double>(end - start).count();
+
+        start = std::chrono::high_resolution_clock::now();
+
+        if (i % MC_Move == 0)
+        {
             int type_choice = rand() % no_types;
             int ins = rand() % 2;
 
-
-            if(ins == 0 ) { //insert a particle
+            if (ins == 0)
+            { // insert a particle
                 double rangex = ll;
                 double rangey = ll;
                 double rangez = obj->getcoordinate(0, 2);
@@ -691,7 +711,7 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
                 myvec1[1] = r2;
                 myvec1[2] = r3;
 
-                //we can set the particle to be at a particular place first, then calculate the energies
+                // we can set the particle to be at a particular place first, then calculate the energies
                 int index_which = rand() % indices_to_add[type_choice].size();
                 int myindex = indices_to_add[type_choice][index_which];
 
@@ -699,44 +719,50 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
                 double NNN = (double)indices[type_choice].size();
 
                 double en = 0;
-                en += wsa.energy(rangez-r3);
+                en += wsa.energy(rangez - r3);
 
+                for (int j = 0; j < indices_combine.size(); j++)
+                {
 
-                 for(int j = 0 ; j < indices_combine.size() ; j++) {
-
-                     double dis = obj->distance(myindex,indices_combine[j]);
-                    if(dis < 2.) { en += wsa.energy(dis);
-                    en += obj->particle_energy(myindex, indices_combine[j], *pots);
+                    double dis = obj->distance(myindex, indices_combine[j]);
+                    if (dis < 2.)
+                    {
+                        en += wsa.energy(dis);
+                        en += obj->particle_energy(myindex, indices_combine[j], *pots);
                     }
-                    if(en > 1000. ) {goto energ; }
-                    //if any overlaps are found the particle will be rejected and we can skip the rest
-                 }
-                    energ:
+                    if (en > 1000.)
+                    {
+                        goto energ;
+                    }
+                    // if any overlaps are found the particle will be rejected and we can skip the rest
+                }
+            energ:
 
-                 double V = rangex*rangey*rangez;
+                double V = rangex * rangey * rangez;
 
-                 double mymu = partialmus[type_choice];
-                 //cout << "add: " <<  myindex << " " << mymu << " " << en << endl;
-                 double acceptance = min(1.,(V/(1.+NNN))*exp(mymu)*exp(-en));
+                double mymu = partialmus[type_choice];
+                // cout << "add: " <<  myindex << " " << mymu << " " << en << endl;
+                double acceptance = min(1., (V / (1. + NNN)) * exp(mymu) * exp(-en));
 
-                 double r = (double) rand()/(double)RAND_MAX;
+                double r = (double)rand() / (double)RAND_MAX;
 
-                 if(r < acceptance) {
-                     indices[type_choice].push_back(myindex); //particle is added
-                     remove_at(indices_to_add[type_choice], index_which); 
-                 }
-                 else{
-
-                 }
-
-
+                if (r < acceptance)
+                {
+                    indices[type_choice].push_back(myindex); // particle is added
+                    remove_at(indices_to_add[type_choice], index_which);
+                }
+                else
+                {
+                }
             }
-            else{ //remove a particle
-                //choose a random particle;
-                if(indices[type_choice].size() > 0 ) {
+            else
+            { // remove a particle
+                // choose a random particle;
+                if (indices[type_choice].size() > 0)
+                {
                     int index_which = (rand() % indices[type_choice].size());
 
-                    int myindex =  indices[type_choice][index_which];
+                    int myindex = indices[type_choice][index_which];
 
                     double NNN = (double)indices[type_choice].size();
 
@@ -745,33 +771,35 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
                     double rangez = obj->getcoordinate(0, 2);
 
                     double en = 0.0;
-                    en += wsa.energy(rangez - obj->getcoordinate(myindex,2));
+                    en += wsa.energy(rangez - obj->getcoordinate(myindex, 2));
 
-                    for (int j = 0; j < indices_combine.size() ; j++)
+                    for (int j = 0; j < indices_combine.size(); j++)
                     {
-                        if(myindex != indices_combine[j]) {
-                        double dis = obj->distance(myindex, indices_combine[j]);
-                        if (dis < 2.) {
-                            en += wsa.energy(dis);
-                        en += obj->particle_energy(myindex, indices_combine[j], *pots);
+                        if (myindex != indices_combine[j])
+                        {
+                            double dis = obj->distance(myindex, indices_combine[j]);
+                            if (dis < 2.)
+                            {
+                                en += wsa.energy(dis);
+                                en += obj->particle_energy(myindex, indices_combine[j], *pots);
+                            }
                         }
-                    }
                         // if any overlaps are found the particle will be rejected and we can skip the rest
                     }
-                    //that's the energy currently, we want deltaU, so the energy if it's taken away
-
+                    // that's the energy currently, we want deltaU, so the energy if it's taken away
 
                     double V = rangex * rangey * rangez;
 
                     double mymu = partialmus[type_choice];
-                    //cout << "remove: " << myindex << " " << mymu << " " << en << endl;
+                    // cout << "remove: " << myindex << " " << mymu << " " << en << endl;
 
                     double acceptance = min(1., (NNN / V) * exp(-mymu) * exp(en));
 
                     double r = (double)rand() / (double)RAND_MAX;
 
-                    if(r < acceptance) {
-                        remove_at(indices[type_choice],index_which);
+                    if (r < acceptance)
+                    {
+                        remove_at(indices[type_choice], index_which);
 
                         auto pos = std::lower_bound(indices_to_add[type_choice].begin(), indices_to_add[type_choice].end(), myindex);
                         indices_to_add[type_choice].insert(pos, myindex);
@@ -780,13 +808,12 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
             }
 
             indices_combine = flatten(indices); // all present particles updated
-
         }
 
-        auto end = std::chrono::high_resolution_clock::now();
+        end = std::chrono::high_resolution_clock::now();
         total_time[0] += std::chrono::duration<double>(end - start).count();
 
-        //after the particle is added, pairs need to be recomputed. This happens so long as i % MC and i % pairs are both zero
+        // after the particle is added, pairs need to be recomputed. This happens so long as i % MC and i % pairs are both zero
         start = std::chrono::high_resolution_clock::now();
 
         if (i > 0 && i % 20 == 0)
@@ -844,23 +871,6 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
         }
         end = std::chrono::high_resolution_clock::now();
         total_time[1] += std::chrono::duration<double>(end - start).count();
-
-        start = std::chrono::high_resolution_clock::now();
-        momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
-        obj->advancemom_halfstep(F, T, indices_combine);
-        obj->advance_pos(indices_combine);
-        end = std::chrono::high_resolution_clock::now();
-        total_time[2] += std::chrono::duration<double>(end - start).count();
-
-        h = h + ((*obj).getdt() / mass) * momp1; // how heavy do we make the wall? Choose mass = 100.;
-        if (h < hmin)
-            h = hmin + (hmin - h);   // reflect if hit the bottom
-        obj->setcoordinate(0, 2, h); // update in storage
-
-        start = std::chrono::high_resolution_clock::now();
-        obj->rotate(indices_combine);
-        end = std::chrono::high_resolution_clock::now(); // only update the patchy particles with the rotate algorithm
-        total_time[3] += std::chrono::duration<double>(end - start).count();
 
         start = std::chrono::high_resolution_clock::now();
         F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
