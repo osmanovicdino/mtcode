@@ -665,10 +665,14 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
 
     int MC_Move = 200;
 
+    static vector1<double> total_time(8);
+
 
     for (int i = 0; i < runtime; i++)
     {
         //cout << i << endl;
+        auto start = std::chrono::high_resolution_clock::now();
+
         if(i % MC_Move == 0 ) {
             int type_choice = rand() % no_types;
             int ins = rand() % 2;
@@ -711,7 +715,7 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
                  double V = rangex*rangey*rangez;
 
                  double mymu = partialmus[type_choice];
-                 cout << "add: " <<  myindex << " " << mymu << " " << en << endl;
+                 //cout << "add: " <<  myindex << " " << mymu << " " << en << endl;
                  double acceptance = min(1.,(V/(1.+NNN))*exp(mymu)*exp(-en));
 
                  double r = (double) rand()/(double)RAND_MAX;
@@ -758,7 +762,7 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
                     double V = rangex * rangey * rangez;
 
                     double mymu = partialmus[type_choice];
-                    cout << "remove: " << myindex << " " << mymu << " " << en << endl;
+                    //cout << "remove: " << myindex << " " << mymu << " " << en << endl;
 
                     double acceptance = min(1., (NNN / V) * exp(-mymu) * exp(en));
 
@@ -776,8 +780,12 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
             indices_combine = flatten(indices); // all present particles updated
 
         }
-        
+
+        auto end = std::chrono::high_resolution_clock::now();
+        total_time[0] += std::chrono::duration<double>(end - start).count();
+
         //after the particle is added, pairs need to be recomputed. This happens so long as i % MC and i % pairs are both zero
+        start = std::chrono::high_resolution_clock::now();
 
         if (i > 0 && i % 20 == 0)
         {
@@ -832,17 +840,27 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
             pairs_onlyb = obj->calculatepairs_parallel(boxes, indices_combine, 3.5);
             // cout << "done"  << endl;
         }
+        end = std::chrono::high_resolution_clock::now();
+        total_time[1] += std::chrono::duration<double>(end - start).count();
 
+        start = std::chrono::high_resolution_clock::now();
         momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
         obj->advancemom_halfstep(F, T, indices_combine);
         obj->advance_pos(indices_combine);
+        end = std::chrono::high_resolution_clock::now();
+        total_time[2] += std::chrono::duration<double>(end - start).count();
 
         h = h + ((*obj).getdt() / mass) * momp1; // how heavy do we make the wall? Choose mass = 100.;
         if (h < hmin)
             h = hmin + (hmin - h);   // reflect if hit the bottom
         obj->setcoordinate(0, 2, h); // update in storage
 
-        obj->rotate(indices_combine);                        // only update the patchy particles with the rotate algorithm
+        start = std::chrono::high_resolution_clock::now();
+        obj->rotate(indices_combine);
+        end = std::chrono::high_resolution_clock::now(); // only update the patchy particles with the rotate algorithm
+        total_time[3] += std::chrono::duration<double>(end - start).count();
+
+        start = std::chrono::high_resolution_clock::now();
         F = obj->calculateforces(*pairs_onlyb, wsa); // calculate the forces due to hard sphere forces
         forcep1 = 0;
         for (int i1 = 0; i1 < (pairs_lid).getsize(); i1++)
@@ -861,16 +879,31 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
         // cout << forcep1 << " ";
         if (h > hmin)
             forcep1 -= mass * (h - hmin); // constant downwards force
-
+        end = std::chrono::high_resolution_clock::now();
+        total_time[4] += std::chrono::duration<double>(end - start).count();
         // cout << forcep1 << endl;
         // pausel();
         T.reset(0.0);
         // cout << *pairs_onlyb << endl;
+        start = std::chrono::high_resolution_clock::now();
         obj->calculate_forces_and_torques3D(*pairs_onlyb, *pots, F, T); // calculate the forces involved due to patchy
-        // cout << "huh" << endl;
-        generate_uniform_random_matrix(RT,indices_combine); // only generate random torques for the patchy particles
+        end = std::chrono::high_resolution_clock::now();
 
+        total_time[5] += std::chrono::duration<double>(end - start).count();
+
+        start = std::chrono::high_resolution_clock::now();
+        generate_uniform_random_matrix(RT,indices_combine); // only generate random torques for the patchy particles
+        end = std::chrono::high_resolution_clock::now();
+        total_time[6] += std::chrono::duration<double>(end - start).count();
+
+        start = std::chrono::high_resolution_clock::now();
         obj->create_forces_and_torques_sphere(F, T, RT, indices_combine, false); // only create torques and forces for patchy particles
+        end = std::chrono::high_resolution_clock::now();
+        total_time[7] += std::chrono::duration<double>(end - start).count();
+
+
+        cout << total_time << endl;
+
         obj->advancemom_halfstep(F, T, indices_combine);
 
         momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
