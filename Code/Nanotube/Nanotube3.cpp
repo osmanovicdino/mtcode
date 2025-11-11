@@ -705,8 +705,9 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
                  for(int j = 0 ; j < indices_combine.size() ; j++) {
 
                      double dis = obj->distance(myindex,indices_combine[j]);
-                    if(dis < 2.) en += wsa.energy(dis);
+                    if(dis < 2.) { en += wsa.energy(dis);
                     en += obj->particle_energy(myindex, indices_combine[j], *pots);
+                    }
                     if(en > 1000. ) {goto energ; }
                     //if any overlaps are found the particle will be rejected and we can skip the rest
                  }
@@ -750,10 +751,11 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
                     {
                         if(myindex != indices_combine[j]) {
                         double dis = obj->distance(myindex, indices_combine[j]);
-                        if (dis < 2.)
+                        if (dis < 2.) {
                             en += wsa.energy(dis);
                         en += obj->particle_energy(myindex, indices_combine[j], *pots);
                         }
+                    }
                         // if any overlaps are found the particle will be rejected and we can skip the rest
                     }
                     //that's the energy currently, we want deltaU, so the energy if it's taken away
