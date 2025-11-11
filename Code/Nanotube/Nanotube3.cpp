@@ -673,11 +673,14 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
         //cout << i << endl;
 
 
-        auto start = std::chrono::high_resolution_clock::now();
+        
         momp1 = (1 - 0.5 * (*obj).getdt() * ((*obj).getgamma()) / mass) * momp1 + ((*obj).getdt() / 2.) * forcep1;
+        auto start = std::chrono::high_resolution_clock::now();
         obj->advancemom_halfstep(F, T, indices_combine);
+        
         obj->advance_pos(indices_combine);
         auto end = std::chrono::high_resolution_clock::now();
+        
         total_time[2] += std::chrono::duration<double>(end - start).count();
 
         h = h + ((*obj).getdt() / mass) * momp1; // how heavy do we make the wall? Choose mass = 100.;
@@ -730,7 +733,7 @@ void NanotubeAssembly::run_box_equil(int runtime, int every, double mass, geneti
                         en += wsa.energy(dis);
                         en += obj->particle_energy(myindex, indices_combine[j], *pots);
                     }
-                    if (en > 1000.)
+                    if (en > 100.)
                     {
                         goto energ;
                     }

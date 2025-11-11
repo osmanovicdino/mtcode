@@ -240,7 +240,7 @@ void LangevinNVT::advance_pos(vec &p1)
 	}
 	}
 
-	geo.correct_position_and_momentum(*dat, *mom);
+	geo.correct_position_and_momentum(*dat, *mom, p1);
 }
 
 // double c1 = (dt/m);

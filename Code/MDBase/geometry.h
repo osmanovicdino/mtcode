@@ -443,13 +443,75 @@ struct cube  {
 				}
 			}
 		}
-	
 
-	int assign_box(matrix<double> &v1,int i,vector1<int> &dim, int n) {
-		vector1<int> cs(dimension);
-		for(int i1 = 0; i1 < dimension ; i1++ ) {
-			int m = fasterfloor(n*(v1(i,i1))/l);
-			if(m<0) m=0;
+		template <class vec>
+		void correct_position_and_momentum(matrix<double> &r, matrix<double> &p, vec &ind)
+		{
+			// for(int j = 0 ; j < r.getNsafe() ; j++) {
+			int totv = ind.size();
+			for (int i = 0; i < dimension; i++)
+			{
+				if (pb[i])
+				{
+				#pragma omp parallel for schedule(static)
+					for (int j1 = 0; j1 < totv; j1++)
+					{
+						int j = ind[j1] ;
+						double temp = r(j, i);
+						if (temp < 0)
+						{
+							while (temp < 0)
+							{
+								temp += l;
+							}
+							r(j, i) = temp;
+						}
+						else if (temp > l)
+						{
+							while (temp > l)
+							{
+								temp -= l;
+							}
+							r(j, i) = temp;
+						}
+						else
+						{
+							// do nothing
+						}
+					}
+				}
+				else
+				{
+			#pragma omp parallel for schedule(static)
+					for (int j1 = 0; j1 < totv; j1++)
+					{
+						int j = ind[j1];
+						if (r(j, i) < 0)
+						{
+							r(j, i) = -r(j, i);
+							p(j, i) = -p(j, i);
+						}
+						else if (r(j, i) > l)
+						{
+							r(j, i) = l - (r(j, i) - l);
+							p(j, i) = -p(j, i);
+						}
+						else
+						{
+							// do nothing
+						}
+					}
+				}
+			}
+		}
+
+		int assign_box(matrix<double> &v1, int i, vector1<int> &dim, int n)
+		{
+			vector1<int> cs(dimension);
+			for (int i1 = 0; i1 < dimension; i1++)
+			{
+				int m = fasterfloor(n * (v1(i, i1)) / l);
+				if (m < 0) m=0;
 			else if(m>n-1) m=n-1;
 			cs[i1]=m;
 		}
