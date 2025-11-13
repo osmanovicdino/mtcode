@@ -354,6 +354,7 @@ void LangevinNVTR::advancemom_halfstep(matrix<double> &F, matrix<double> &T, vec
     // and T is in BODY FRAME
     int np = p1.size();
 
+
 #pragma omp parallel for schedule(static)
     for (int j = 0; j < np; j++)
     {
@@ -368,6 +369,10 @@ void LangevinNVTR::advancemom_halfstep(matrix<double> &F, matrix<double> &T, vec
         (*mom)(i, 2) += (dt / 2.) * F(i, 2);
         (*angmom)(i, 2) += (dt / 2.) * T(i, 2);
     }
+
+
+
+
 }
 
 // void LangevinNVTR::advance_pos() {

@@ -1823,10 +1823,12 @@ void generate_uniform_random_matrix(matrix<double> &ra) { //gen random value wit
 template <class vec>
 void generate_uniform_random_matrix(matrix<double> &ra, vec &subset) {
 
+    int nc = ra.ncols;
     for (int i = 0; i < subset.size(); i++)
     {   
         int j =  subset[i];
-        ra.mat[j] = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
+        for(int k = 0 ; k < nc ; k++)
+        ra(j,k) = (3.464101615 * ((double)rand() / (RAND_MAX)) - 1.732050808);
     }
 }
 
