@@ -233,7 +233,7 @@ int main(int argc, char **argv)
     double rate_on = 0.001 * 200.;
     double rate_off = 0.0001 * 200;
 
-    int block_size = 6;
+    int block_size = 1;
     int potential_blocks = floor(NN/block_size);
     vector<int> switchable(potential_blocks);
     for(int i = 0  ; i < potential_blocks  ; i++) {
@@ -267,7 +267,7 @@ int main(int argc, char **argv)
 
 
     
-    int blocks_on = 10;
+    int blocks_on = 60;
 
 
     matrix<int> *pairs = b.calculatepairs_parallel(boxes, 3.5);
