@@ -24,6 +24,7 @@
 #include <execinfo.h>
 #include <signal.h>
 #include <unistd.h>
+#include <unordered_set>
 #include <algorithm>
 #include <parallel/algorithm>
 // #include <thrust/host_vector.h>
