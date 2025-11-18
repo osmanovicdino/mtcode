@@ -32,7 +32,7 @@ cp ~/Chemistry/Code/mainNanotubeBoxImportEquil.cpp /u/scratch/d/dinoo/${subdir}/
 g++ ~/Chemistry/Code/mainNanotubeBoxImportEquil.cpp -fopenmp -std=c++17 -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${subdir}/${dirwemake}
 export OMP_NUM_THREADS=6
-./angron >log
+./angron 'g.csv' >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `
