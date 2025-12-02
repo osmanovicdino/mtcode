@@ -81,15 +81,17 @@ matrix<double> harmoniccurl(matrix<double> &dat, double m)
 
 int main(int argc, char **argv)
 {
+    unsigned long seed = mix(clock(), time(NULL), getpid());
+    srand(seed);
 
     // srand(time(NULL));
 
-    uint64_t microseconds_since_epoch = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    // uint64_t microseconds_since_epoch = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-    // cout << microseconds_since_epoch << endl;
-    // cout << time(NULL) << endl;
-    int seed = microseconds_since_epoch % time(NULL);
-    srand(seed);
+    // // cout << microseconds_since_epoch << endl;
+    // // cout << time(NULL) << endl;
+    // int seed = microseconds_since_epoch % time(NULL);
+    // srand(seed);
     double var = 1.;
     // double var;
     // int num;
@@ -112,13 +114,12 @@ int main(int argc, char **argv)
     int ccc;
     int num2;
 
-
     double att_epp = 1.0;
 
     // HarmonicPotential pot(att_epp, 0.);
 
-    FENEPotential pot(30.0,1.5);
-    LJPotential pot2(att_epp,1.0);
+    FENEPotential pot(30.0, 1.5);
+    LJPotential pot2(att_epp, 1.0);
 
     // double att_epp2 = 0.1;
 
@@ -141,149 +142,14 @@ int main(int argc, char **argv)
 
     double baseline = (ll / 2.);
 
-
     matrix<double> dat(NN, dimension);
     matrix<double> moms(NN, dimension);
 
-    dat(0,0) = ll/2.;
-    dat(0,1) = ll/2.;
-    dat(0,2) = ll/2;
-
-    //place polymer, we can use the grid
-
-    vector<double> possible_pos_x;
-    vector<double> possible_pos_y;
-    vector<double> possible_pos_z;
-
-
-    int pp = 100;
-    possible_pos_x.reserve(pp);
-    possible_pos_y.reserve(pp);
-    possible_pos_z.reserve(pp);
-
-    for (int j = 0; j < pp; j++)
-    {
-        double x = 0.5 +  j;
-        // vector<double> b;
-        possible_pos_x.push_back(x);
-        possible_pos_y.push_back(x);
-        possible_pos_z.push_back(x);
-        // possible_pos.push_back(b);
-    }
-
-    struct tripletstorage {
-        int i;
-        int j;
-        int k;
-        tripletstorage(int ii,int jj,int kk) {
-            i =  ii;
-            j =  jj;
-            k =  kk;
-        }
-        tripletstorage(const tripletstorage &c) {
-            i = c.i;
-            j = c.j;
-            k = c.k;
-        }
-        tripletstorage& operator=(const tripletstorage &c) {
-            i = c.i;
-            j = c.j;
-            k = c.k;
-
-            return *this;
-        }
-
-        bool operator==(const tripletstorage &b) {
-            if (i == b.i && j == b.j && k == b.k) {
-                return true;
-            }
-            else return false;
-        }
-    };
-
-    int si = 50;// rand() % 100;
-    int sj = 50; //rand() % 100;
-    int sk = 50; //rand() % 100;
-
-    vector<tripletstorage> pos_iter;
-    matrix<double> newpos(NN,3);
-
-    newpos(0, 0) = possible_pos_x[si];
-    newpos(0, 1) = possible_pos_x[sj];
-    newpos(0, 2) = possible_pos_x[sk];
-
-    tripletstorage temp(si, sj, sk);
-    pos_iter.push_back(temp);
-
-    tripletstorage c1(-1,0,0);
-    tripletstorage c2(1, 0, 0);
-    tripletstorage c3(0, -1, 0);
-    tripletstorage c4(0, 1, 0);
-    tripletstorage c5(0, 0, -1);
-    tripletstorage c6(0, 0, 1);
-
-    vector<tripletstorage> ts;
-    ts.push_back(c1);
-    ts.push_back(c2);
-    ts.push_back(c3);
-    ts.push_back(c4);
-    ts.push_back(c5);
-    ts.push_back(c6);
-    int sxn = si;
-    int syn = sj;
-    int szn = sk;
-    for (int i = 1; i < NN; i++)
-    {
-        cout << i << endl;
-        bool overlap = true;
-        tripletstorage temp2(0, 0, 0);
-
-        while(overlap) {
-        int direction = rand() % 6;
-        tripletstorage mot = ts[direction];
-        
-
-
-        int sxnn = sxn + mot.i;
-        int synn = syn + mot.j;
-        int sznn = szn + mot.k;
-
-
-
-        if(sxnn < 0) sxnn = 99;
-        if(sxnn > 99) sxnn = 0;
-
-
-        if(synn < 0) synn = 99;
-        if(synn > 99) synn  = 0;
-
-
-        if(sznn < 0) sznn = 99;
-        if(sznn > 99) sznn  = 0;
-
-        temp2 = tripletstorage(sxnn, synn, sznn);
-
-        for(int j = 0  ; j < pos_iter.size() ; j++) {
-            if(temp2 ==  pos_iter[j] ) { overlap = true; break; }
-            
-            else {
-                overlap = false;
-
-            }
-
-            }
-        }
-
-        sxn = temp2.i;
-        syn = temp2.j;
-        szn = temp2.k;
-
-        pos_iter.push_back(temp2);
-        newpos(i, 0) = possible_pos_x[sxn];
-        newpos(i, 1) = possible_pos_x[syn];
-        newpos(i, 2) = possible_pos_x[szn];
-    }
-    cout << "done" << endl;
+    // place polymer, we can use the grid
+    string filename = "final.csv";
+    double T;
+    bool err;
+    matrix<double> newpos = importcsv(filename, T, err);
 
     //
 
@@ -294,12 +160,12 @@ int main(int argc, char **argv)
 
     b.setgeometry(bc);
 
-    num2 = (int)(100./4);
+    num2 = (int)(100. / 4);
     matrix<int> boxes = bc.generate_boxes_relationships(num2, ccc);
 
-    int runtime = 10000000;
+    int runtime = 20000000;
     // double tem[10] = {0.44753, 0.150461, 0.477014, 0.281367, -0.300378, 0.352483, -0.277297, -0.427009, 0.144324, 0.212938};
-    vector1<double> tempmod(NN,1.);
+    vector1<double> tempmod(NN, 1.);
 
     // vector1<double> createrandom(NN);
     // for (int i = 0; i < NN; i++)
@@ -313,24 +179,17 @@ int main(int argc, char **argv)
     //     createrandom[i] -= meani;
     // }
 
-    for (int i = 0; i < 100; i++)
-    {
-
-        tempmod[i] = 1.;
-    }
-
     matrix<int> bp2(NN - 2, 2);
-    for (int i = 0; i < NN/2 - 1; i++)
+    for (int i = 0; i < NN / 2 - 1; i++)
     {
         bp2(i, 0) = i;
         bp2(i, 1) = i + 1;
     }
-    for (int i = NN/2 ; i < NN  - 1; i++)
+    for (int i = NN / 2; i < NN - 1; i++)
     {
-        bp2(i-1, 0) = i;
-        bp2(i-1, 1) = i + 1;
+        bp2(i - 1, 0) = i;
+        bp2(i - 1, 1) = i + 1;
     }
-
 
     // double diff[9] = {5.52701, 9.84486, 1.11208, 2.52656, 2.06907, 2.405, 2.6374, 6.70836, 6.73533};
 
@@ -341,7 +200,7 @@ int main(int argc, char **argv)
     }
 
     matrix<double> F(NN, dimension);
-    //matrix<double> F2(NN, dimension);
+    // matrix<double> F2(NN, dimension);
     double bounding_pot = 0.0;
     int every = 1000;
 
@@ -361,19 +220,116 @@ int main(int argc, char **argv)
 
     ofstream mytemps;
     mytemps.open(temps.c_str());
-    mytemps <<= tempmod;
-    mytemps.close();
+    // mytemps <<= tempmod;
+    // mytemps.close();
 
     ofstream myfile;
     myfile.open(datas.c_str());
 
+    for (int j = 450; j < 550; j++)
+    {
 
+        tempmod[j] = 1.;
+    }
+
+    // from 0 to 600 is excitable
+    
+
+    double rate_on = 0.001 * 200.;
+    double rate_off = 0.0001 * 200;
+
+    int block_size = 1;
+    int potential_blocks = floor(NN/block_size);
+    vector<int> switchable(potential_blocks);
+    for(int i = 0  ; i < potential_blocks  ; i++) {
+        switchable[i] = i;
+    }
+
+    double proportion_switchable = 0.6;
+    int tot_monomers_switchable =  0.6*NN;
+    int block_switchable = tot_monomers_switchable/block_size;
+
+    std::vector<int> out;
+    
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::sample(switchable.begin(), switchable.end(), std::back_inserter(out), block_switchable, gen);
+
+    matrix<int> pos(block_switchable,block_size);
+
+    for(int i = 0  ; i < block_switchable ; i++) {
+        int j = out[i]*block_size;
+
+        for(int k  = 0 ; k < block_size ; k++) {
+            pos(i,k) =  j+k;
+        }
+    }
+    outfunc(pos, "can_turn_on");
+
+    
+    vector1<bool> excitation_on(block_switchable, false);
+
+
+
+    
+    int blocks_on = 120;
 
 
     matrix<int> *pairs = b.calculatepairs_parallel(boxes, 3.5);
 
     for (int i = 0; i < runtime; i++)
     {
+        if (i % 200 == 0)
+        {
+
+            double r = (double)rand() / (double)RAND_MAX;
+            // int len = rand() % 60;
+            int reg = rand() % block_switchable;
+            int alls = total_bool(excitation_on);
+            if (r < rate_on && excitation_on[reg] == false && alls <= blocks_on)
+            {
+
+                for (int pp = 0; pp < block_size; pp++)
+                {
+                    int mon_iter = pos(reg,pp);
+                    tempmod[mon_iter] = 2.5;
+                }
+                excitation_on[reg] = true;
+            }
+            r = (double)rand() / (double)RAND_MAX;
+            if (r < rate_off)
+            {
+                vector<int> pos_on;
+                for (int j = 0; j < block_switchable; j++)
+                {
+                    if (excitation_on[j] == true)
+                        pos_on.push_back(j);
+                }
+                if (pos_on.size() > 0)
+                {
+                    int reg2 = pos_on[rand() % pos_on.size()];
+                    for (int pp = 0; pp < block_size; pp++)
+                    {
+                        int mon_iter = pos(reg2, pp);
+                        tempmod[mon_iter] = 1.0;
+                    }
+                    excitation_on[reg2] = false;
+                }
+            }
+        }
+
+        // if(i%1000000 == 0 && i > 0 ) {
+
+        //         string stra = "temps";
+        //         stringstream ssx;
+        //         ssx << (i/1000000);
+        //         stra += ssx.str();
+        //         outfunc(tempmod, stra);
+
+        // }
+
         cout << "i:" << i << endl;
         if (i > 0 && i % 20 == 0)
         {
@@ -383,9 +339,7 @@ int main(int argc, char **argv)
         // cout << i << endl;
         matrix<double> F1(b.calculateforces(bp2, pot));
 
-
-
-        matrix<double> F2(b.calculateforces(*pairs,pot2));
+        matrix<double> F2(b.calculateforces(*pairs, pot2));
 
         // matrix<double> F2(b.calculateforcesDV(bp2, pot2, mags));
 
@@ -413,6 +367,8 @@ int main(int argc, char **argv)
             cout << i << endl;
             matrix<double> pos = b.getdat();
             myfile <<= pos;
+            mytemps <<= tempmod;
+            mytemps << endl;
         }
         b.advance_mom(F, R);
 

@@ -266,8 +266,9 @@ int main(int argc, char **argv)
 
 
 
-    
-    int blocks_on = 60;
+    int blocks_on = 100;
+
+    outfunc(pos,"can_turn_on");
 
 
     matrix<int> *pairs = b.calculatepairs_parallel(boxes, 3.5);
@@ -291,25 +292,35 @@ int main(int argc, char **argv)
                 }
                 excitation_on[reg] = true;
             }
+
             r = (double)rand() / (double)RAND_MAX;
             if (r < rate_off)
             {
+                cout << "switching off" << endl;
+
                 vector<int> pos_on;
                 for (int j = 0; j < block_switchable; j++)
                 {
                     if (excitation_on[j] == true)
                         pos_on.push_back(j);
                 }
+                printvector(pos_on);
+                vector1<double> temp_mod2 =  tempmod;
+
                 if (pos_on.size() > 0)
                 {
-                    int reg = pos[rand() % pos_on.size()];
+                    int choice = rand() % pos_on.size();
+                    int reg2 = pos_on[choice];
                     for (int pp = 0; pp < block_size; pp++)
                     {
-                        int mon_iter = pos(reg, pp);
+                        int mon_iter = pos(reg2, pp);
                         tempmod[mon_iter] = 1.0;
                     }
-                    excitation_on[reg] = false;
+                    excitation_on[reg2] = false;
+
+
                 }
+
             }
         }
 
