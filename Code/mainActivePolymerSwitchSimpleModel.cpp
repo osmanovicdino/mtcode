@@ -92,18 +92,22 @@ int main(int argc, char **argv)
     // // cout << time(NULL) << endl;
     // int seed = microseconds_since_epoch % time(NULL);
     // srand(seed);
-    double var = 1.;
-    // double var;
-    // int num;
-    // if (argc == 3)
-    // {
-    //     var = atof(argv[1]);
-    //     num = atof(argv[2]);
-    // }
-    // else
-    // {
-    //     error("not enough arguments");
-    // }
+    
+
+
+    double rateon,rateoff,prop;
+    if (argc == 4)
+    {
+
+        rateon = atof(argv[1]);
+        rateoff = atof(argv[2]);
+        prop =  atof(argv[3]);
+    }
+    else
+    {
+        error("no");
+    }
+    cout << "here" << endl;
 
     int dimension = 3;
 
@@ -114,11 +118,11 @@ int main(int argc, char **argv)
     int ccc;
     int num2;
 
-    double att_epp = 1.0;
+    double att_epp = 1.;
 
     // HarmonicPotential pot(att_epp, 0.);
-
-    FENEPotential pot(30.0, 1.5);
+   
+    FENEPotential pot(30.0, 3.);
     LJPotential pot2(att_epp, 1.0);
 
     // double att_epp2 = 0.1;
@@ -149,8 +153,9 @@ int main(int argc, char **argv)
     string filename = "final.csv";
     double T;
     bool err;
+    
     matrix<double> newpos = importcsv(filename, T, err);
-
+    
     //
 
     dat = newpos;
@@ -201,17 +206,24 @@ int main(int argc, char **argv)
 
     stringstream ss1;
     stringstream ss2;
+    stringstream ss3;
+    stringstream ss4;
 
-    ss1 << var;
+    ss1 << rateon;
     ss2 << NN;
+    ss4 << prop;
+    ss3 << rateoff;
 
     string vs = ss1.str();
     string ns = ss2.str();
+    string us = ss3.str();
+
+    string ps = ss4.str();
 
     string ext = ".csv";
 
-    string temps = "temps_var=" + vs + "_N=" + ns + ext;
-    string datas = "data_var=" + vs + "_N=" + ns + ext;
+    string temps = "temps_var=" + ps + "_N=" + ns + "_rateon=" + vs + "_rateoff" + us  + ext;
+    string datas = "data_var=" + ps + "_N=" + ns + "_rateon=" + vs + "_rateoff" + us + ext;
 
     ofstream mytemps;
     mytemps.open(temps.c_str());
@@ -221,17 +233,19 @@ int main(int argc, char **argv)
     ofstream myfile;
     myfile.open(datas.c_str());
 
-    for (int j = 450; j < 550; j++)
-    {
-
-        tempmod[j] = 1.;
-    }
+    // for (int j = 0; j < 1000; j++)
+    // {
+    //     if(rand() % u ==0)
+    //     tempmod[j] = 2.5;
+    //     else 
+    //     tempmod[j] = 0.5;
+    // }
 
     // from 0 to 600 is excitable
-    
 
-    double rate_on = 0.000001 * 200.;
-    double rate_off = 0.00001 * 200;
+
+    double rate_on = rateon * 200.;
+    double rate_off = rateoff * 200;
 
     int block_size = 1;
     int potential_blocks = floor(NN/block_size);
@@ -240,8 +254,8 @@ int main(int argc, char **argv)
         switchable[i] = i;
     }
 
-    double proportion_switchable = 0.6;
-    int tot_monomers_switchable =  0.6*NN;
+    double proportion_switchable = prop;
+    int tot_monomers_switchable =  proportion_switchable*NN;
     int block_switchable = tot_monomers_switchable/block_size;
 
     std::vector<int> out;
@@ -268,8 +282,7 @@ int main(int argc, char **argv)
 
     int blocks_on = 60;
 
-    outfunc(pos,"can_turn_on");
-
+    outfunc(pos, "can_turn_on_var="  + ps + "_N=" + ns + "_rateon=" + vs + "_rateoff" + us);
 
     matrix<int> *pairs = b.calculatepairs_parallel(boxes, 3.5);
 

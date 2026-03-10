@@ -139,7 +139,7 @@ int main(int argc, char **argv)
     b.setgamma(eta);
     b.setm(1.0);
 
-    int NN = 1000;
+    int NN = 10000;
 
     double baseline = (ll / 2.);
 
@@ -229,7 +229,7 @@ int main(int argc, char **argv)
     for (int j = 450; j < 550; j++)
     {
 
-        tempmod[j] = 2.5;
+        tempmod[j] = 1.0;
     }
 
     matrix<int> *pairs = b.calculatepairs_parallel(boxes, 3.5);

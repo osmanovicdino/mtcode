@@ -137,7 +137,7 @@ int main(int argc, char **argv)
     b.setgamma(eta);
     b.setm(1.0);
 
-    int NN = 2000;
+    int NN = 10000;
 
     double baseline = (ll / 2.);
 
@@ -319,16 +319,22 @@ int main(int argc, char **argv)
         tempmod[i] = 1.;
     }
 
-    matrix<int> bp2(NN - 2, 2);
-    for (int i = 0; i < NN/2 - 1; i++)
+    // matrix<int> bp2(NN - 2, 2);
+    // for (int i = 0; i < NN/2 - 1; i++)
+    // {
+    //     bp2(i, 0) = i;
+    //     bp2(i, 1) = i + 1;
+    // }
+    // for (int i = NN/2 ; i < NN  - 1; i++)
+    // {
+    //     bp2(i-1, 0) = i;
+    //     bp2(i-1, 1) = i + 1;
+    // }
+    matrix<int> bp2(NN - 1, 2);
+    for (int i = 0; i < NN-1 ; i++)
     {
         bp2(i, 0) = i;
         bp2(i, 1) = i + 1;
-    }
-    for (int i = NN/2 ; i < NN  - 1; i++)
-    {
-        bp2(i-1, 0) = i;
-        bp2(i-1, 1) = i + 1;
     }
 
 
