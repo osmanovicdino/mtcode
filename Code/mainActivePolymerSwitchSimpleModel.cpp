@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 
     LangevinNVT b(bc);
 
-    double kT = 1.0;
+    double kT = 1;
     double dt = 0.005;
     double eta = 20.;
     // gamma = eta;
@@ -278,7 +278,7 @@ int main(int argc, char **argv)
 
     vector1<bool> excitation_on(block_switchable, false);
 
-
+    double temp_to = 3.;
 
     int blocks_on = 60;
 
@@ -310,7 +310,7 @@ int main(int argc, char **argv)
                         for (int pp = 0; pp < block_size; pp++)
                         {
                             int mon_iter = pos(j, pp);
-                            tempmod[mon_iter] = 2.5;
+                            tempmod[mon_iter] = temp_to;
                         }
                     }
                 }
