@@ -168,7 +168,7 @@ int main(int argc, char **argv)
     num2 = (int)(100. / 4);
     matrix<int> boxes = bc.generate_boxes_relationships(num2, ccc);
 
-    int runtime = 20000000;
+    int runtime = 40000000;
     // double tem[10] = {0.44753, 0.150461, 0.477014, 0.281367, -0.300378, 0.352483, -0.277297, -0.427009, 0.144324, 0.212938};
     vector1<double> tempmod(NN, 1.);
 
