@@ -37,24 +37,34 @@ using namespace std;
 // ============================================================
 //  Hollow Tube Simulation
 //
-//  Particle design: 5 patches
-//    Patch 0: north (+z pole)
-//    Patch 1: south (-z pole)
-//    Patches 2,3,4: three lateral patches at polar angle theta from z,
-//                   separated 120 degrees apart in azimuth.
+//  Particle design: 4 patches
+//    Patch 0: north (+z pole)  — bonds to ring above
+//    Patch 1: south (-z pole)  — bonds to ring below
+//    Patch 2: lateral "left"   — bonds to counter-clockwise neighbour
+//    Patch 3: lateral "right"  — bonds to clockwise neighbour
 //
-//  For a ring of N_ring = 6 particles (hexagonal cross-section) with
-//  equatorial lateral patches (theta = pi/2), the geometry works out
-//  exactly: patch 3 of particle i bonds to patch 4 of its clockwise
-//  neighbour, and vice versa.  The axial patches bond particles in
-//  adjacent rings directly above / below.
+//  Patches 2 and 3 lie in the z=0 body-frame plane.  Their directions
+//  are derived exactly from N_ring so that the tube closes on itself
+//  for any ring size:
 //
-//  Initial positions place particles on a cylinder:
-//    (x, y, z) = (R cos phi_i + L/2,  R sin phi_i + L/2,  j * dz + z0)
-//  with phi_i = 2 pi i / N_ring.  Each particle's orientation matrix is
-//  set so that its body-frame x-axis points radially outward, keeping
-//  the lateral patches aligned with their intended bond partners from
-//  the very first step.
+//    patch 2 body direction = (-sin(pi/N_ring),  cos(pi/N_ring), 0)
+//    patch 3 body direction = (-sin(pi/N_ring), -cos(pi/N_ring), 0)
+//
+//  Derivation: particle i sits at lab azimuth phi_i = 2*pi*i/N_ring.
+//  Its orientation matrix rotates body-x to the outward radial direction.
+//  The unit bond vector from i to its CCW neighbour i+1 in the lab frame
+//  is (-sin(phi_i + pi/N_ring), cos(phi_i + pi/N_ring), 0).  Applying
+//  the body<-lab transform (multiply by R) cancels phi_i, leaving the
+//  phi-independent body-frame directions above.  Patch 2 of particle i
+//  therefore bonds perfectly with patch 3 of particle i+1, and vice
+//  versa, for any N_ring.
+//
+//  Tube radius is set so the chord between ring neighbours equals 1.1
+//  particle diameters (just above the WCA repulsive core):
+//    R = 1.1 / (2 * sin(pi / N_ring))
+//
+//  Change N_ring to get wider or narrower tubes (6 = hexagonal,
+//  10 = decagonal, etc.).
 // ============================================================
 
 int main(int argc, char **argv)
@@ -63,23 +73,23 @@ int main(int argc, char **argv)
     signal(SIGSEGV, handler);
 
     // ------------------------------------------------------------------
-    // Geometry parameters
+    // Geometry parameters  —  change N_ring to resize the tube
     // ------------------------------------------------------------------
-    const int    N_ring   = 6;           // particles per ring (hexagonal)
-    const int    N_z      = 5;           // number of rings along z
-    const int    N        = N_ring * N_z;// total particles
-    const double R        = 1.5;         // tube radius (particle diameters)
-    const double dz       = 1.2;         // z-spacing between rings
-    const double theta    = pid / 2.0;   // polar angle from z for lateral patches
-    const double L        = 20.0;        // cubic box side length
+    const int    N_ring   = 6;    // particles per ring (try 6, 8, 10, ...)
+    const int    N_z      = 5;    // number of rings along z
+    const int    N        = N_ring * N_z;
+    const double chord    = 1.1;  // target neighbour distance (particle diameters)
+    const double R        = chord / (2.0 * sin(pid / N_ring)); // tube radius
+    const double dz       = chord; // axial ring spacing equals lateral spacing
+    const double L        = 20.0; // cubic box side length
 
     // ------------------------------------------------------------------
     // Interaction parameters
     // ------------------------------------------------------------------
-    const double axial_strength   = 15.0; // north-south bond energy
-    const double lateral_strength = 15.0; // lateral bond energy
+    const double axial_strength   = 15.0;
+    const double lateral_strength = 15.0;
     const double range            = 1.2;  // interaction range (particle diameters)
-    const double patchsize        = 0.6;  // max patch half-angle (radians, ~34 deg)
+    const double patchsize        = 0.5;  // max patch half-angle (radians)
 
     // ------------------------------------------------------------------
     // Simulation parameters
@@ -89,61 +99,44 @@ int main(int argc, char **argv)
     const double kT       = 1.0;
     const double dt       = 0.005;
     const double viscosity= 1.0;
-    const double hdradius = 0.5;         // hydrodynamic radius
+    const double hdradius = 0.5;
 
     // ==================================================================
     // Build the GeneralPatch potential
     // ==================================================================
 
-    // One particle type with 5 patches; N particles total.
+    // One particle type, 4 patches, N particles total.
     vector1<int> vec1(1);
-    vec1[0] = 5;
+    vec1[0] = 4;
 
     vector1<int> numb(1);
     numb[0] = N;
 
-    // Patch body-frame directions (5 rows x 3 cols)
-    // Row 0: north pole  (0, 0,  1)
-    // Row 1: south pole  (0, 0, -1)
-    // Rows 2-4: lateral patches at polar angle theta, azimuth 0, 120, 240 deg
-    matrix<double> patch_orient(5, 3);
+    // Body-frame patch directions (4 rows x 3 cols).
+    // Lateral patch directions encode the tube geometry via N_ring.
+    const double lat_x = -sin(pid / N_ring);
+    const double lat_y =  cos(pid / N_ring);
 
-    patch_orient(0, 0) = 0.0;   patch_orient(0, 1) = 0.0;                   patch_orient(0, 2) =  1.0;
-    patch_orient(1, 0) = 0.0;   patch_orient(1, 1) = 0.0;                   patch_orient(1, 2) = -1.0;
+    matrix<double> patch_orient(4, 3);
+    patch_orient(0, 0) = 0.0;    patch_orient(0, 1) = 0.0;     patch_orient(0, 2) =  1.0; // north
+    patch_orient(1, 0) = 0.0;    patch_orient(1, 1) = 0.0;     patch_orient(1, 2) = -1.0; // south
+    patch_orient(2, 0) = lat_x;  patch_orient(2, 1) =  lat_y;  patch_orient(2, 2) =  0.0; // left
+    patch_orient(3, 0) = lat_x;  patch_orient(3, 1) = -lat_y;  patch_orient(3, 2) =  0.0; // right
 
-    patch_orient(2, 0) = sin(theta);
-    patch_orient(2, 1) = 0.0;
-    patch_orient(2, 2) = cos(theta);
-
-    patch_orient(3, 0) = sin(theta) * cos(2.0 * pid / 3.0);
-    patch_orient(3, 1) = sin(theta) * sin(2.0 * pid / 3.0);
-    patch_orient(3, 2) = cos(theta);
-
-    patch_orient(4, 0) = sin(theta) * cos(4.0 * pid / 3.0);
-    patch_orient(4, 1) = sin(theta) * sin(4.0 * pid / 3.0);
-    patch_orient(4, 2) = cos(theta);
-
-    // Interaction parameters: 5x5 = 25 potentials (cols: strength, range, patchsize)
-    // Indexing: potential for patch a of particle 1 with patch b of particle 2 is row a*5+b.
-    matrix<double> params(25, 3);
-    for (int i = 0; i < 25; i++) {
-        params(i, 0) = 0.0;      // default: no interaction
+    // Interaction matrix: 4x4 = 16 potentials, row index = patch_a * 4 + patch_b.
+    // Only 4 bonding pairs are active:
+    //   north(0) <-> south(1)  for axial bonding
+    //   left(2)  <-> right(3)  for lateral bonding
+    matrix<double> params(16, 3);
+    for (int i = 0; i < 16; i++) {
+        params(i, 0) = 0.0;
         params(i, 1) = range;
         params(i, 2) = patchsize;
     }
-
-    // Axial bonding: north (patch 0) with south (patch 1) and vice versa
-    params(0 * 5 + 1, 0) = axial_strength;  // north -> south
-    params(1 * 5 + 0, 0) = axial_strength;  // south -> north
-
-    // Lateral bonding: patches 2, 3, 4 interact with each other
-    // For N_ring=6, the active bonding pairs are 3<->4 and 4<->3;
-    // keeping all lateral cross-terms on lets the structure self-heal.
-    for (int a = 2; a < 5; a++) {
-        for (int b = 2; b < 5; b++) {
-            params(a * 5 + b, 0) = lateral_strength;
-        }
-    }
+    params(0 * 4 + 1, 0) = axial_strength;   // north -> south
+    params(1 * 4 + 0, 0) = axial_strength;   // south -> north
+    params(2 * 4 + 3, 0) = lateral_strength; // left  -> right
+    params(3 * 4 + 2, 0) = lateral_strength; // right -> left
 
     GeneralPatch c(vec1, numb, params, patch_orient);
 
