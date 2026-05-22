@@ -35,37 +35,35 @@ using namespace std;
 #include "MDBase/Rotational/LangevinR.h"
 
 // ==========================================================================
-//  Two hollow tubes + binding-site lattice + star polymers
+//  Two hollow tubes + binding-site lattice + bead-spring star polymers
 // ==========================================================================
 //
 //  TUBE PARTICLES (type 0) — 5 patches each
-//    patch 0:  north (+z body axis)            -> axial bond to ring above
-//    patch 1:  south (-z body axis)            -> axial bond to ring below
-//    patch 2:  lateral "left"                  -> bond to CCW neighbour
-//    patch 3:  lateral "right"                 -> bond to CW neighbour
-//    patch 4:  outward radial (body +x)        -> BINDING SITE (lattice)
+//    patch 0:  north (+z body axis)       -> axial bond to ring above
+//    patch 1:  south (-z body axis)       -> axial bond to ring below
+//    patch 2:  lateral "left"             -> bond to CCW neighbour
+//    patch 3:  lateral "right"            -> bond to CW  neighbour
+//    patch 4:  radial outward (body +x)   -> binding site for star arms
 //
-//  Two tubes of the same type are placed side by side along x.  Each has
-//  N_ring particles per ring and N_z rings, so each tube exposes a
-//  cylindrical lattice of N_ring x N_z binding sites with lateral spacing
-//  ~chord and axial spacing dz.
+//  INNER STAR BEADS (type 1) — 1 patch each (strength = 0, structurally inert)
+//    Includes the central bead and all non-terminal arm beads.
 //
-//  STAR POLYMERS (type 1) — M_arms patches each
-//    Arm-end patches are distributed approximately uniformly on a sphere
-//    using a Fibonacci spiral.  Each arm-end can bond to a tube binding
-//    site (patch 4 of type 0).
+//  ARM-END STAR BEADS (type 2) — 1 patch each (body +x, binding_strength)
+//    Terminal bead of each arm; can bind to tube binding sites (patch 4).
 //
-//    LIMITATION: this is a *rigid* M-patch sphere, not a true bead-spring
-//    star polymer.  All M arm ends rotate as one body; flexible arms
-//    would require bead-spring chains (possible in this codebase but a
-//    much larger change).  This rigid model captures multivalent binding
-//    geometry but loses the entropic flexibility of real polymer arms.
+//  STAR POLYMER TOPOLOGY
+//    Each star: 1 central bead + M_arms arms of length arm_len beads each.
+//      total beads per star = 1 + M_arms * arm_len
+//      inner beads per star = 1 + M_arms * (arm_len - 1)   (type 1)
+//      end   beads per star = M_arms                        (type 2)
+//    FENE bonds connect:
+//      central -> first bead of each arm, then sequential along each arm.
 //
-//  INTERACTIONS (only the four pairs below are non-zero):
-//    tube  patch 0  <->  tube  patch 1    (axial,   strength axial_strength)
-//    tube  patch 2  <->  tube  patch 3    (lateral, strength lateral_strength)
-//    tube  patch 4  <->  star  patch *    (binding, strength binding_strength)
-//    everything else: zero
+//  INTERACTION TABLE (only non-zero entries):
+//    tube  patch 0  <->  tube  patch 1    axial bond
+//    tube  patch 2  <->  tube  patch 3    lateral bond
+//    tube  patch 4  <->  arm-end patch 0  binding to star
+//    all inner star patches: strength 0 (no patchy interaction)
 // ==========================================================================
 
 int main(int argc, char **argv)
@@ -74,28 +72,78 @@ int main(int argc, char **argv)
     signal(SIGSEGV, handler);
 
     // ----------------------------------------------------------------------
-    // Tube geometry  (change N_ring to resize, N_z for length, N_tubes = 2)
+    // Tube geometry
     // ----------------------------------------------------------------------
-    const int    N_ring    = 6;      // particles per ring (also = binding sites per slice)
-    const int    N_z       = 6;      // number of rings per tube
-    const int    N_tubes   = 2;
+    const int    N_ring      = 6;
+    const int    N_z         = 6;
+    const int    N_tubes     = 2;
     const int    N_tube_each = N_ring * N_z;
-    const int    N_tube    = N_tubes * N_tube_each;
-    const double chord     = 1.1;    // lateral neighbour distance (particle diameters)
-    const double R_tube    = chord / (2.0 * sin(pid / N_ring));
-    const double dz        = chord;  // axial ring spacing = "distance N to another ring"
+    const int    N_tube      = N_tubes * N_tube_each;
+    const double chord       = 1.1;
+    const double R_tube      = chord / (2.0 * sin(pid / N_ring));
+    const double dz          = chord;
 
     // ----------------------------------------------------------------------
-    // Star polymer parameters
+    // Star polymer topology
     // ----------------------------------------------------------------------
-    const int    N_star    = 30;     // number of free star polymers
-    const int    M_arms    = 6;      // arms (= arm-end patches) per star
+    const int    N_star      = 20;
+    const int    M_arms      = 6;
+    const int    arm_len     = 3;   // beads per arm (includes end bead)
+    const int    beads_per_star    = 1 + M_arms * arm_len;
+    const int    inner_per_star    = 1 + M_arms * (arm_len - 1);
+    const int    end_per_star      = M_arms;
+    const int    N_inner     = N_star * inner_per_star;
+    const int    N_end       = N_star * end_per_star;
+    const int    N           = N_tube + N_inner + N_end;
+
+    // Strides for indexing into the inner-bead and end-bead blocks
+    // Central bead of star s:  idx_inner(s, 0)
+    // Inner arm bead k of arm m of star s:  idx_inner(s, 1 + m*(arm_len-1) + k)
+    // End bead of arm m of star s:  idx_end(s, m)
+    auto idx_inner = [&](int s, int local) { return N_tube + s * inner_per_star + local; };
+    auto idx_end   = [&](int s, int m)     { return N_tube + N_inner + s * end_per_star + m; };
 
     // ----------------------------------------------------------------------
-    // Box and bulk parameters
+    // FENE bond list
     // ----------------------------------------------------------------------
-    const double tube_sep  = 3.0 * R_tube + 4.0; // distance between the two tube axes
-    const double L         = 30.0;               // cubic box side length
+    const int total_fene_bonds = N_star * M_arms * arm_len;
+    matrix<int> star_bonds(total_fene_bonds, 2);
+    {
+        int bi = 0;
+        for (int s = 0; s < N_star; s++) {
+            int center = idx_inner(s, 0);
+            for (int m = 0; m < M_arms; m++) {
+                // center -> first inner bead of arm m (or directly to end if arm_len==1)
+                int first_in_arm = (arm_len > 1) ? idx_inner(s, 1 + m * (arm_len - 1))
+                                                  : idx_end(s, m);
+                star_bonds(bi, 0) = center;
+                star_bonds(bi, 1) = first_in_arm;
+                bi++;
+
+                // sequential bonds along the arm
+                for (int k = 0; k < arm_len - 1; k++) {
+                    int from = (k < arm_len - 2) ? idx_inner(s, 1 + m * (arm_len - 1) + k)
+                                                  : idx_inner(s, 1 + m * (arm_len - 1) + k);
+                    // last inner bead -> end bead
+                    int to   = (k < arm_len - 2) ? idx_inner(s, 1 + m * (arm_len - 1) + k + 1)
+                                                  : idx_end(s, m);
+                    star_bonds(bi, 0) = from;
+                    star_bonds(bi, 1) = to;
+                    bi++;
+                }
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // Box and dynamics
+    // ----------------------------------------------------------------------
+    const double tube_sep = 3.0 * R_tube + 4.0;
+    const double L        = 30.0;
+    const double kT       = 1.0;
+    const double dt       = 0.005;
+    const double viscosity= 1.0;
+    const double hdradius = 0.5;
 
     // ----------------------------------------------------------------------
     // Interaction strengths
@@ -103,80 +151,57 @@ int main(int argc, char **argv)
     const double axial_strength   = 15.0;
     const double lateral_strength = 15.0;
     const double binding_strength = 8.0;
-    const double range            = 1.2;   // interaction range (particle diameters)
-    const double patchsize        = 0.5;   // max patch half-angle (radians)
+    const double range            = 1.2;
+    const double patchsize        = 0.5;
 
-    // ----------------------------------------------------------------------
-    // Simulation parameters
-    // ----------------------------------------------------------------------
-    const int    runtime  = 10000000;
-    const int    every    = 1000;
-    const double kT       = 1.0;
-    const double dt       = 0.005;
-    const double viscosity= 1.0;
-    const double hdradius = 0.5;
-
-    const int N = N_tube + N_star;
     cout << "Setup: " << N_tubes << " tubes x " << N_tube_each
-         << " tube particles + " << N_star << " star polymers (M=" << M_arms
-         << ") = " << N << " particles total" << endl;
-    cout << "       tube radius R = " << R_tube << ", tube separation = " << tube_sep << endl;
+         << " tube particles + " << N_star << " star polymers ("
+         << M_arms << " arms x " << arm_len << " beads) = "
+         << N << " total particles" << endl;
+    cout << "       " << total_fene_bonds << " FENE bonds" << endl;
+    cout << "       tube radius R = " << R_tube << endl;
 
     // ======================================================================
-    // Build GeneralPatch with TWO types
+    // GeneralPatch — three types
+    //   type 0: tube particles     (5 patches)
+    //   type 1: inner star beads   (1 patch, strength 0)
+    //   type 2: arm-end star beads (1 patch, binding_strength)
+    //
+    // Params matrix layout (blocks in upper-triangular order):
+    //   (0,0): rows   0..24   tube-tube          5*5 = 25
+    //   (0,1): rows  25..29   tube-inner         5*1 =  5
+    //   (0,2): rows  30..34   tube-end           5*1 =  5
+    //   (1,1): row   35       inner-inner        1*1 =  1
+    //   (1,2): row   36       inner-end          1*1 =  1
+    //   (2,2): row   37       end-end            1*1 =  1
+    //   total: 38 rows
     // ======================================================================
 
-    vector1<int> vec1(2);
-    vec1[0] = 5;        // patches per tube particle
-    vec1[1] = M_arms;   // patches per star polymer
+    vector1<int> vec1(3);
+    vec1[0] = 5;  vec1[1] = 1;  vec1[2] = 1;
 
-    // num_per_type[t] is the (exclusive) upper index of type t
-    vector1<int> numb(2);
-    numb[0] = N_tube;            // tube particles: 0 .. N_tube-1
-    numb[1] = N_tube + N_star;   // star polymers: N_tube .. N_tube+N_star-1
+    vector1<int> numb(3);
+    numb[0] = N_tube;
+    numb[1] = N_tube + N_inner;
+    numb[2] = N_tube + N_inner + N_end;
 
-    // -----------------------------
     // Body-frame patch directions
-    //   rows 0..4         : tube patches (type 0)
-    //   rows 5..5+M_arms-1: star patches (type 1)
-    // -----------------------------
+    //   row 0..4: tube patches (north, south, left, right, binding)
+    //   row 5:    inner bead patch (dummy direction, strength=0)
+    //   row 6:    end bead patch (body +x, faces outward for binding)
     const double lat_x = -sin(pid / N_ring);
     const double lat_y =  cos(pid / N_ring);
 
-    matrix<double> patch_orient(5 + M_arms, 3);
+    matrix<double> patch_orient(7, 3);
+    patch_orient(0, 2) =  1.0;                                        // north
+    patch_orient(1, 2) = -1.0;                                        // south
+    patch_orient(2, 0) = lat_x;  patch_orient(2, 1) =  lat_y;        // left
+    patch_orient(3, 0) = lat_x;  patch_orient(3, 1) = -lat_y;        // right
+    patch_orient(4, 0) = 1.0;                                         // binding site
+    patch_orient(5, 0) = 1.0;                                         // inner dummy
+    patch_orient(6, 0) = 1.0;                                         // end-bead (binding)
 
-    // Tube patches
-    patch_orient(0, 0) = 0.0;    patch_orient(0, 1) = 0.0;     patch_orient(0, 2) =  1.0; // north
-    patch_orient(1, 0) = 0.0;    patch_orient(1, 1) = 0.0;     patch_orient(1, 2) = -1.0; // south
-    patch_orient(2, 0) = lat_x;  patch_orient(2, 1) =  lat_y;  patch_orient(2, 2) =  0.0; // left
-    patch_orient(3, 0) = lat_x;  patch_orient(3, 1) = -lat_y;  patch_orient(3, 2) =  0.0; // right
-    patch_orient(4, 0) = 1.0;    patch_orient(4, 1) =  0.0;    patch_orient(4, 2) =  0.0; // binding site (radial outward)
-
-    // Star polymer arm-end patches: Fibonacci spiral on the unit sphere
-    if (M_arms == 1) {
-        patch_orient(5, 0) = 1.0; patch_orient(5, 1) = 0.0; patch_orient(5, 2) = 0.0;
-    } else {
-        const double golden = pid * (3.0 - sqrt(5.0));
-        for (int a = 0; a < M_arms; a++) {
-            double y = 1.0 - (2.0 * a) / (double)(M_arms - 1);
-            double rr = sqrt(max(0.0, 1.0 - y * y));
-            double th = golden * a;
-            patch_orient(5 + a, 0) = cos(th) * rr;
-            patch_orient(5 + a, 1) = y;
-            patch_orient(5 + a, 2) = sin(th) * rr;
-        }
-    }
-
-    // -----------------------------
-    // Interaction matrix
-    //   block layout (rows):
-    //     [0 .. 24]                 type0-type0    (5*5)
-    //     [25 .. 25+5M-1]           type0-type1    (5*M)
-    //     [25+5M .. 25+5M+M^2-1]    type1-type1    (M*M)
-    //   within type0-type0:   row = a*5 + b
-    //   within type0-type1:   row = 25 + a*M + b   (a in type0, b in type1)
-    // -----------------------------
-    const int n_pots = 25 + 5 * M_arms + M_arms * M_arms;
+    const int n_pots = 38;
     matrix<double> params(n_pots, 3);
     for (int i = 0; i < n_pots; i++) {
         params(i, 0) = 0.0;
@@ -184,17 +209,17 @@ int main(int argc, char **argv)
         params(i, 2) = patchsize;
     }
 
-    // tube-tube axial & lateral bonds
+    // tube-tube axial bonds: patch 0 (north) <-> patch 1 (south)
     params(0 * 5 + 1, 0) = axial_strength;
     params(1 * 5 + 0, 0) = axial_strength;
+
+    // tube-tube lateral bonds: patch 2 (left) <-> patch 3 (right)
     params(2 * 5 + 3, 0) = lateral_strength;
     params(3 * 5 + 2, 0) = lateral_strength;
 
-    // tube binding site (patch 4 of type 0) with every arm-end patch of type 1
-    for (int b = 0; b < M_arms; b++) {
-        params(25 + 4 * M_arms + b, 0) = binding_strength;
-    }
-    // star-star: leave all zeros (no patchy interaction between stars)
+    // tube binding site (patch 4 of type 0) <-> arm-end patch (patch 0 of type 2)
+    // block (0,2) starts at row 30, patch 4 of type 0 is at offset 4*1+0 = 4
+    params(30 + 4, 0) = binding_strength;
 
     GeneralPatch c(vec1, numb, params, patch_orient);
 
@@ -211,56 +236,88 @@ int main(int argc, char **argv)
     const double y_center = L / 2.0;
     const double x_center = L / 2.0;
 
-    // Two tubes side by side along the x axis
     double tube_x[2];
     tube_x[0] = x_center - tube_sep / 2.0;
     tube_x[1] = x_center + tube_sep / 2.0;
 
+    // Tube particles: orient body-x radially outward (Rz(-phi))
     for (int t = 0; t < N_tubes; t++) {
         for (int j = 0; j < N_z; j++) {
             for (int i = 0; i < N_ring; i++) {
-                int k = t * N_tube_each + j * N_ring + i;
+                int k   = t * N_tube_each + j * N_ring + i;
                 double phi = 2.0 * pid * i / N_ring;
 
                 pos(k, 0) = tube_x[t] + R_tube * cos(phi);
-                pos(k, 1) = y_center + R_tube * sin(phi);
+                pos(k, 1) = y_center  + R_tube * sin(phi);
                 pos(k, 2) = z0 + j * dz;
 
-                // Orientation: body-x aligned with the outward radial direction
                 orients(k, 0) =  cos(phi);  orients(k, 1) = sin(phi);  orients(k, 2) = 0.0;
                 orients(k, 3) = -sin(phi);  orients(k, 4) = cos(phi);  orients(k, 5) = 0.0;
-                orients(k, 6) =  0.0;       orients(k, 7) = 0.0;        orients(k, 8) = 1.0;
+                orients(k, 6) =  0.0;       orients(k, 7) = 0.0;       orients(k, 8) = 1.0;
             }
         }
     }
 
-    // Star polymers: random positions + random orientations
-    // (random-orientation construction copied from LangevinNVTR::initialize)
+    // Star polymers: central bead placed randomly, arms along Fibonacci-spiral directions,
+    // beads spaced by bond_length so that FENE bonds start near equilibrium.
+    const double bond_length = 0.9;
+    const double golden_star = pid * (3.0 - sqrt(5.0));
+
     for (int s = 0; s < N_star; s++) {
-        int k = N_tube + s;
+        double cx = L * (double)rand() / RAND_MAX;
+        double cy = L * (double)rand() / RAND_MAX;
+        double cz = L * (double)rand() / RAND_MAX;
 
-        pos(k, 0) = L * (double)rand() / (double)RAND_MAX;
-        pos(k, 1) = L * (double)rand() / (double)RAND_MAX;
-        pos(k, 2) = L * (double)rand() / (double)RAND_MAX;
+        // Central bead (type 1, inner) — identity orientation
+        int ci = idx_inner(s, 0);
+        pos(ci, 0) = cx;  pos(ci, 1) = cy;  pos(ci, 2) = cz;
+        orients(ci, 0) = 1.0; orients(ci, 4) = 1.0; orients(ci, 8) = 1.0;
 
-        double x1 = (double)rand() / (double)RAND_MAX;
-        double x2 = (double)rand() / (double)RAND_MAX;
-        double x3 = (double)rand() / (double)RAND_MAX;
-        double v1 = cos(2.0 * pid * x2) * sqrt(x3);
-        double v2 = sin(2.0 * pid * x2) * sqrt(x3);
-        double v3 = sqrt(1.0 - x3);
-        double r1 = cos(2.0 * pid * x1);
-        double r2 = sin(2.0 * pid * x1);
+        for (int m = 0; m < M_arms; m++) {
+            // Arm direction from Fibonacci spiral
+            double yy = (M_arms > 1) ? 1.0 - (2.0 * m) / (double)(M_arms - 1) : 0.0;
+            double rr = sqrt(max(0.0, 1.0 - yy * yy));
+            double th = golden_star * m;
+            double adx = cos(th) * rr;
+            double ady = yy;
+            double adz = sin(th) * rr;
 
-        orients(k, 0) = -(r1 * (1 - 2 * SQR(v1))) - 2 * r2 * v1 * v2;
-        orients(k, 1) = -(r2 * (1 - 2 * SQR(v1))) + 2 * r1 * v1 * v2;
-        orients(k, 2) =  2 * v1 * v3;
-        orients(k, 3) =  2 * r1 * v1 * v2 + r2 * (1 - 2 * SQR(v2));
-        orients(k, 4) =  2 * r2 * v1 * v2 - r1 * (1 - 2 * SQR(v2));
-        orients(k, 5) =  2 * v2 * v3;
-        orients(k, 6) =  2 * r1 * v1 * v3 - 2 * r2 * v2 * v3;
-        orients(k, 7) =  2 * r2 * v1 * v3 + 2 * r1 * v2 * v3;
-        orients(k, 8) = -1 + 2 * SQR(v3);
+            // Inner arm beads (arm_len - 1 beads)
+            for (int k = 0; k < arm_len - 1; k++) {
+                int ii = idx_inner(s, 1 + m * (arm_len - 1) + k);
+                pos(ii, 0) = cx + (k + 1) * bond_length * adx;
+                pos(ii, 1) = cy + (k + 1) * bond_length * ady;
+                pos(ii, 2) = cz + (k + 1) * bond_length * adz;
+                orients(ii, 0) = 1.0; orients(ii, 4) = 1.0; orients(ii, 8) = 1.0;
+            }
+
+            // End bead (type 2) — orient body-x along arm direction (outward)
+            int ei = idx_end(s, m);
+            pos(ei, 0) = cx + arm_len * bond_length * adx;
+            pos(ei, 1) = cy + arm_len * bond_length * ady;
+            pos(ei, 2) = cz + arm_len * bond_length * adz;
+
+            // Build rotation matrix with body-x = arm direction
+            // Construct an orthonormal frame: e1=arm_dir, e2, e3
+            double e1x = adx, e1y = ady, e1z = adz;
+            // Pick an arbitrary perpendicular vector
+            double e2x, e2y, e2z;
+            if (fabs(e1x) < 0.9) {
+                e2x = 0.0; e2y = -e1z; e2z = e1y;
+            } else {
+                e2x = -e1z; e2y = 0.0; e2z = e1x;
+            }
+            double e2n = sqrt(e2x*e2x + e2y*e2y + e2z*e2z);
+            e2x /= e2n; e2y /= e2n; e2z /= e2n;
+            double e3x = e1y*e2z - e1z*e2y;
+            double e3y = e1z*e2x - e1x*e2z;
+            double e3z = e1x*e2y - e1y*e2x;
+
+            // R stored row-major: row0=e1, row1=e2, row2=e3
+            orients(ei, 0) = e1x; orients(ei, 1) = e1y; orients(ei, 2) = e1z;
+            orients(ei, 3) = e2x; orients(ei, 4) = e2y; orients(ei, 5) = e2z;
+            orients(ei, 6) = e3x; orients(ei, 7) = e3y; orients(ei, 8) = e3z;
+        }
     }
 
     // ======================================================================
@@ -278,21 +335,31 @@ int main(int argc, char **argv)
     obj.setkT(kT);
 
     // ======================================================================
+    // Potentials
+    // ======================================================================
+
+    WCAPotential  wca(3.0, 1.0, 0.0);
+    FENEPotential fene(30.0, 1.5);  // kbond=30, R_0=1.5
+
+    // ======================================================================
     // Run loop
     // ======================================================================
 
+    const int runtime = 10000000;
+    const int every   = 1000;
+
     int num_cells = (int)floor(L / 4.0);
     int ccc;
-    matrix<int> boxes = geo.generate_boxes_relationships(num_cells, ccc);
+    matrix<int>  boxes = geo.generate_boxes_relationships(num_cells, ccc);
     matrix<int> *pairs = obj.calculatepairs(boxes, 3.5);
-
-    WCAPotential wsa(3.0, 1.0, 0.0);
 
     matrix<double> F(N, 3);
     matrix<double> T(N, 3);
     matrix<double> RT(N, 6);
 
-    F = obj.calculateforces(*pairs, wsa);
+    // Initial force/torque evaluation
+    F  = obj.calculateforces(*pairs, wca);
+    F += obj.calculateforces(star_bonds, fene);
     obj.calculate_forces_and_torques3D(*pairs, c, F, T);
     generate_uniform_random_matrix(RT);
     obj.create_forces_and_torques_sphere(F, T, RT);
@@ -313,7 +380,8 @@ int main(int argc, char **argv)
         obj.advance_pos();
         obj.rotate();
 
-        F = obj.calculateforces(*pairs, wsa);
+        F  = obj.calculateforces(*pairs, wca);
+        F += obj.calculateforces(star_bonds, fene);
         T.reset(0.0);
         obj.calculate_forces_and_torques3D(*pairs, c, F, T);
         generate_uniform_random_matrix(RT);
