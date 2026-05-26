@@ -208,6 +208,9 @@ void reset_parallel(T);
         template <class Y>
 	friend ostream& operator<<=(ostream&, const matrix<Y>&);
 
+        template <class Y>
+        friend void print_partial(const matrix<Y>& , int nr);
+
 
         // output in gnu form
         template <class Y>

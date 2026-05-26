@@ -564,6 +564,30 @@ struct KernFrenkelOnePatch2 : potentialtheta3D
             double ny2 = nxb2 * gtemp1 + nyb2 * gtemp4 + nzb2 * gtemp7;
             double nz2 = nxb2 * gtemp2 + nyb2 * gtemp5 + nzb2 * gtemp8;
 
+
+
+            // cout << un << endl;
+
+            // cout << rij << endl;
+
+            // cout << qtemp0 << "," << qtemp1 << "," << qtemp2 << endl;
+            // cout << qtemp3 << "," << qtemp4 << "," << qtemp5 << endl;
+            // cout << qtemp6 << "," << qtemp7 << "," << qtemp8 << endl;
+            // cout << endl;
+
+            // cout << gtemp0 << "," << gtemp1 << "," << gtemp2 << endl;
+            // cout << gtemp3 << "," << gtemp4 << "," << gtemp5 << endl;
+            // cout << gtemp6 << "," << gtemp7 << "," << gtemp8 << endl;
+
+            // cout << endl;
+            // cout << nx1 << " " << ny1 << " " << nz1 << endl;
+            // cout << nx1 << " " << ny1 << " " << nz1 << endl;
+
+            // cout << nxb1 << " " << nyb1 << " " << nzb1 << endl;
+            // cout << nxb2 << " " << nyb2 << " " << nzb2 << endl;
+
+            // pausel();
+
             double argthetai = -(nx1 * un.gpcons(0) + ny1 * un.gpcons(1) + nz1 * un.gpcons(2));
             double argthetaj = (nx2 * un.gpcons(0) + ny2 * un.gpcons(1) + nz2 * un.gpcons(2));
 

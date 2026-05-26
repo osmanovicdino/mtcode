@@ -65,6 +65,18 @@ int main(int argc, char **argv)
     // A.run_with_real_surface(100000000, 10000, B, constantF, stringbase);
     // A.run(1000000, 1000);
 
+    // THE BRIEF
+
+    // Cap growth is from one side. Particles are attached at particular anchors, bound to the surface (probably).
+    //Let's start the particles at N=10. Particles should be polymers. Particles should be bound harmonically with the 
+    //surfaces. The particles at one end are less strongly bound compared to the other. This allows another particle to
+    //come in and bind, lengthening the polymer.
+
+    //We should have a restoring force on the surfaces, for now do not treat the surfaces as curved
+
+    // We therefore need at least two types of particles. Hwever we don't want to add a huge amount of seed particles.
+
+    
     
 
 
@@ -77,11 +89,15 @@ int main(int argc, char **argv)
     // s[6] = "0";
     // s[7] = "11";
     string importstring;
-    if (argc == 2)
+    string paramstring;
+    if (argc == 3)
     {
-        stringstream ss;
+        stringstream ss,ss2;
         ss << argv[1];
+        ss2 << argv[2];
+
         importstring = ss.str();
+        paramstring =  ss2.str();
     }
     else
     {
@@ -115,21 +131,33 @@ int main(int argc, char **argv)
 
     // g.rate = 0.0;
 
+    double T;
+    bool err1;
+    matrix<double> pars=importcsv(paramstring,T,err1);
 
     bool cc;
-    NanotubeAssembly A(20., (g.no_types)*5000+1,cc);
+
+    int no_anchors = pars(0,0);
+    int interaction =pars(0,1);
+    int tb = 2*SQR(no_anchors)+1;
+    NanotubeAssembly A(20., tb+ 5000,cc);
 
 
+    GeneralPatch c(CreateGeneralPatchSpecial(SQR(no_anchors), SQR(no_anchors), 100., interaction  , 1., 1.2, 0.8, g));
 
-    GeneralPatch c(CreateGeneralPatch(100., 1, 1.2, 0.6, g));
 
-
-    
     A.setpots(c);
     A.setkT(1.0);
     A.setviscosity(1.0);
-    double mass = 10.0;
-    A.run_box_equil(20000000, 1000, mass, g, "");
+    A.obj->setdt(0.0005);
+    double mass = pars(0,2);
+
+        cout << no_anchors << endl;
+        cout << interaction << endl;
+        cout << mass << endl;
+        pausel();
+
+    A.run_box_equil_anchors(20000000, 1000, mass, no_anchors,  g, "");
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;

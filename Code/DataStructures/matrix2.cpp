@@ -912,6 +912,22 @@ for (int i = 0; i < nr ; ++i) {
 }
 
 template <class T>
+void print_partial(const matrix<T> &a, int nr)
+{
+    int nc = a.ncols;
+
+    for (int i = 0; i < nr; ++i)
+    {
+
+        for (int j = 0; j < nc; ++j)
+        {
+            j == nc - 1 ? cout << a.mat[i * nc + j] << endl : cout << a.mat[i * nc + j] << ",";
+        }
+    }
+
+}
+
+template <class T>
 void gnuform(ofstream &s, const matrix<T> &x, const matrix<T> &y, matrix<T> &z) {
     // x,y are the collection of gnuplot points, z is the surface height
     int nc = z.ncols;
