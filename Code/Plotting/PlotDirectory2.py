@@ -1,8 +1,9 @@
 import numpy as np
+import os
+os.environ['VTK_DEFAULT_OPENGL_WINDOW'] = 'vtkOSOpenGLRenderWindow'
 import pyvista as pv
 import subprocess
 import glob
-import os
 import re
 import sys
 
