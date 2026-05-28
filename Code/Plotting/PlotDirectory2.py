@@ -1,6 +1,5 @@
 import numpy as np
 import pyvista as pv
-import pandas as pd
 import subprocess
 import glob
 import os
@@ -17,7 +16,8 @@ def natural_key(path):
 def read_frame(path):
     """One CSV per frame. Row 0 is the slab reference (its z sets the slab
     height); rows 1.. are particle coordinates. Returns (slab_z, coords)."""
-    arr = pd.read_csv(path, header=None, dtype=np.float32).values
+    # arr = pd.read_csv(path, header=None, dtype=np.float32).values
+    arr = np.loadtxt(path, delimiter=',', dtype=np.float32)
     return float(arr[0, 2]), arr[1:]
 
 
