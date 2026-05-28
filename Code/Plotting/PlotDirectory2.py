@@ -20,7 +20,7 @@ def read_frame(path):
     return float(arr[0, 2]), arr[1:]
 
 
-def make_video(folder, pattern='data_*.csv', fps=30,
+def make_video(folder, pattern='pos_*.csv', fps=30,
                box_size=20.0, slab_thickness=1.0, radius=0.5,
                sphere_color=(120, 120, 120), fixed_camera=True):
 
