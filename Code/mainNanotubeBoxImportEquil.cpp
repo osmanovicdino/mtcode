@@ -128,7 +128,7 @@ int main(int argc, char **argv)
     A.setpots(c);
     A.setkT(1.0);
     A.setviscosity(1.0);
-    double mass = 10.0;
+    double mass = 2.0;
     A.run_box_equil(20000000, 1000, mass, g, "");
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
