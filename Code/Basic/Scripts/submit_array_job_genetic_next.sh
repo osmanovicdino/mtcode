@@ -8,7 +8,7 @@
 #$ -l h_rt=23:59:59,h_data=512M
 ## Modify the parallel environment
 #$ -pe shared 6
-#$ -t 1-297:1
+#$ -t 1-150:1
 
 
 # echo job info on joblog:
@@ -27,12 +27,12 @@ module load gcc/11.3.0
 ##/usr/bin/time -v hostname
 
 dirwemake="den${SGE_TASK_ID}"
-subdir="GeneticTry16"
+subdir="GeneticTry17"
 cp ~/Chemistry/Code/mainNanotubeBoxImportEquil.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
 g++ ~/Chemistry/Code/mainNanotubeBoxImportEquil.cpp -fopenmp -std=c++17 -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${subdir}/${dirwemake}
 export OMP_NUM_THREADS=6
-./angron 'g.csv' >log
+./angron 'g.csv' 'p.csv' >log
 # echo job info on joblog:
 echo "Job $JOB_ID ended on:   " `hostname -s`
 echo "Job $JOB_ID ended on:   " `date `

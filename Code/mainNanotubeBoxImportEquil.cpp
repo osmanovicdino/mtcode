@@ -77,11 +77,14 @@ int main(int argc, char **argv)
     // s[6] = "0";
     // s[7] = "11";
     string importstring;
-    if (argc == 2)
+    string paramstring;
+    if (argc == 3)
     {
-        stringstream ss;
+        stringstream ss,ss2;
         ss << argv[1];
+        ss2 << argv[2];
         importstring = ss.str();
+        paramstring = ss2.str();
     }
     else
     {
@@ -114,21 +117,26 @@ int main(int argc, char **argv)
     geneticcode g(s);
 
     // g.rate = 0.0;
+    double T;
+    bool err1;
+    matrix<double> allparams = importcsv(paramstring,T,err1);
 
 
     bool cc;
     NanotubeAssembly A(20., (g.no_types)*5000+1,cc);
 
+    double interactionenergy = allparams(0,0);
 
-
-    GeneralPatch c(CreateGeneralPatch(100., 1, 1.2, 0.6, g));
+    GeneralPatch c(CreateGeneralPatch(interactionenergy, 1, 1.2, 0.6, g));
 
 
     
     A.setpots(c);
     A.setkT(1.0);
     A.setviscosity(1.0);
-    double mass = 2.0;
+    double mass = allparams(1,0);
+
+
     A.run_box_equil(20000000, 1000, mass, g, "");
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
