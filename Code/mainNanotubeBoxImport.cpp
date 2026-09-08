@@ -125,7 +125,11 @@ int main(int argc, char **argv)
     matrix<int> ind = importcsv(divfiles[divfiles.size()-1], T, err2);
     matrix<double> ori = importcsv("orient.csv", T, err3);
 
-    GeneralPatch c(CreateGeneralPatch(100., 1, 1.2, 0.6, g));
+    string paramstring = "p.csv";
+    bool err4;
+    matrix<double> allparams = importcsv(paramstring, T, err4);
+    double interactionenergy = allparams(0, 0);
+    GeneralPatch c(CreateGeneralPatch(interactionenergy, 1, 1.2, 0.6, g));
 
 
     
@@ -133,9 +137,9 @@ int main(int argc, char **argv)
     A.setkT(1.0);
     A.setviscosity(1.0);
     A.obj->setmaxdistance(2.);
+    double mass = allparams(1, 0);
 
-
-    A.run_box_equil_cont(10000000, 1000, posfiles.size(), 100., g, "",pos,ori,ind);
+    A.run_box_equil_cont(10000000, 1000, posfiles.size(), mass, g, "",pos,ori,ind);
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;
