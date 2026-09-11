@@ -139,7 +139,7 @@ int main(int argc, char **argv)
     A.obj->setmaxdistance(2.);
     double mass = allparams(1, 0);
 
-    A.run_box_equil_cont(10000000, 1000, posfiles.size(), mass, g, "",pos,ori,ind);
+    A.run_box_equil_cont(20000000, 1000, posfiles.size(), mass, g, "",pos,ori,ind);
     // cout << a.no_types << endl;
     // cout << *(a.patch_num) << endl;
     // cout << *(a.patch_pos) << endl;

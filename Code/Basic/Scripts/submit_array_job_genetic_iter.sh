@@ -9,7 +9,7 @@
 ## and the number of cores as needed:
 #$ -pe shared 8
 ## Modify the parallel environment
-#$ -t 1-150:1
+#$ -t 1-30:1
 # Email address to notify
 #$ -M $USER@mail
 # Notify when
@@ -31,7 +31,7 @@ module load gcc/11.3.0
 ##/usr/bin/time -v hostname
 
 dirwemake="den${SGE_TASK_ID}"
-subdir="GeneticTry18"
+subdir="GeneticTry19"
 cp ~/Chemistry/Code/mainNanotubeBoxImport.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
 g++ ~/Chemistry/Code/mainNanotubeBoxImport.cpp -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${subdir}/${dirwemake}
