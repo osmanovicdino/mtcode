@@ -4,7 +4,7 @@
 #$ -o joblog.$JOB_ID.$TASK_ID
 #$ -j y
 #$ -l h_rt=01:59:59,h_data=2G
-#$ -t 1-30:1
+#$ -t 1-150:1
 
 # Save this file in ~/Chemistry/Code/Basic/Scripts/.
 # The plotting script is ~/Chemistry/Code/Plotting/PlotDirectory2.py.
@@ -34,7 +34,7 @@ module load vmd/1.9.3
 module load ffmpeg/5.0.1
 set -u
 
-base_dir="/u/scratch/d/dinoo/GeneticTry19"
+base_dir="/u/scratch/d/dinoo/GeneticTry18"
 script="$HOME/Chemistry/Code/Plotting/PlotDirectory2.py"
 data_dir="${base_dir}/den${SGE_TASK_ID:?Submit as an SGE array job}"
 stride="${STRIDE:-10}"
