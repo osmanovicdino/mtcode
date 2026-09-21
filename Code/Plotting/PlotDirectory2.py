@@ -6,6 +6,13 @@ Usage:
   python3 PlotDirectory2.py DATA --limit 100 --output preview.mp4
   python3 PlotDirectory2.py DATA
   python3 PlotDirectory2.py DATA --ori-template 'ori_{frame}.csv'
+  python3 PlotDirectory2.py DATA --layout quad --stride 10 --output movie_4views.mp4
+
+--layout quad makes one synchronized 2x2 movie: ISO / XY above XZ / YZ.
+--width and --height specify the WHOLE movie, not each panel. Default 1280x720
+gives four 640x360 panels. Each labelled view is fitted independently to the
+first selected frame, then held fixed; views may have different spatial scales.
+Single-view behaviour is preserved when --layout is omitted.
 
 Position files default to pos_*.csv, sorted by their final integer. Each file
 has no header, exactly three columns: first row sets the slab z, remaining
@@ -89,16 +96,22 @@ def tcl_string(value):
     return '"' + s + '"'
 
 
-def view_point(p):
+def view_point(p, view="iso"):
     x, y, z = p
+    if view == "xy":
+        return (x, y, z)
+    if view == "xz":
+        return (x, z, -y)
+    if view == "yz":
+        return (y, z, x)
     return ((x-y)/math.sqrt(2), (-x-y+2*z)/math.sqrt(6), (x+y+z)/math.sqrt(3))
 
 
-def vertex(p):
-    return "{" + " ".join("{:.9g}".format(v) for v in view_point(p)) + "}"
+def vertex(p, view="iso"):
+    return "{" + " ".join("{:.9g}".format(v) for v in view_point(p, view)) + "}"
 
 
-def scene_text(slab_z, points, colours, args, image, first):
+def scene_text(slab_z, points, colours, args, image, first, view="iso"):
     lines = ["graphics $particles delete all", "graphics $slab delete all"]
     last = None
     for p, c in zip(points, colours):
@@ -106,7 +119,7 @@ def scene_text(slab_z, points, colours, args, image, first):
             lines.append("graphics $particles color {}".format(c))
             last = c
         lines.append("graphics $particles sphere {} radius {} resolution 12".format(
-            vertex(p), args.radius))
+            vertex(p, view), args.radius))
     b, low, high = args.box_size, slab_z-args.slab_thickness/2, slab_z+args.slab_thickness/2
     corners = [(0,0,low), (b,0,low), (b,b,low), (0,b,low),
                (0,0,high), (b,0,high), (b,b,high), (0,b,high)]
@@ -116,12 +129,53 @@ def scene_text(slab_z, points, colours, args, image, first):
     lines.append("graphics $slab color silver")
     for a, b, c, d in faces:
         for tri in ((a,b,c), (a,c,d)):
-            lines.append("graphics $slab triangle " + " ".join(vertex(corners[i]) for i in tri))
+            lines.append("graphics $slab triangle " + " ".join(vertex(corners[i], view) for i in tri))
+    matrices = "{center_matrix rotate_matrix scale_matrix global_matrix}"
     if first:
         lines.extend(["display resetview", "scale by 0.85"])
+        for molecule in ("particles", "slab"):
+            lines.append("set camera({},{}) [molinfo ${} get {}]".format(
+                view, molecule, molecule, matrices))
+    else:
+        for molecule in ("particles", "slab"):
+            lines.append("molinfo ${} set {} $camera({},{})".format(
+                molecule, matrices, view, molecule))
     # Empty post-render command prevents VMD from launching an image viewer.
     lines.append("render TachyonInternal {} {{}}".format(tcl_string(image)))
     return "\n".join(lines) + "\n"
+
+
+def label_panel(rgb, width, height, label):
+    """Small bitmap labels: no font installation or FFmpeg drawtext needed."""
+    font = {
+        "I": (31,4,4,4,4,4,31), "S": (15,16,16,14,1,1,30),
+        "O": (14,17,17,17,17,17,14), "X": (17,17,10,4,10,17,17),
+        "Y": (17,17,10,4,4,4,4), "Z": (31,1,2,4,8,16,31),
+    }
+    scale = max(1, min(width//120, height//100, 3))
+    margin = 6
+    out = bytearray(rgb)
+    bw, bh = min(width, margin*2+6*scale*len(label)), min(height, margin*2+7*scale)
+    for y in range(bh):
+        out[y*width*3:(y*width+bw)*3] = b"\xff"*(bw*3)
+    for j, char in enumerate(label):
+        for y, row in enumerate(font[char]):
+            for x in range(5):
+                if row & (1 << (4-x)):
+                    for dy in range(scale):
+                        for dx in range(scale):
+                            px, py = margin+j*6*scale+x*scale+dx, margin+y*scale+dy
+                            if px < width and py < height:
+                                offset = (py*width+px)*3
+                                out[offset:offset+3] = b"\x20\x20\x20"
+    return bytes(out)
+
+
+def combine_panels(panels, width, height):
+    """Combine ISO, XY, XZ, YZ top-down RGB panels into one RGB frame."""
+    row = width*3
+    return b"".join(panels[left][y*row:(y+1)*row] + panels[left+1][y*row:(y+1)*row]
+                    for left in (0,2) for y in range(height))
 
 
 def read_tga(path, width, height):
@@ -168,7 +222,7 @@ class VMD:
         self.folder, self.log = folder, log
         env = dict(os.environ, VMDFORCECPUCOUNT=str(args.threads))
         self.proc = subprocess.Popen(
-            ["vmd", "-dispdev", "text", "-size", str(args.width), str(args.height),
+            ["vmd", "-dispdev", "text", "-size", str(args.panel_width), str(args.panel_height),
              "-startup", os.devnull], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT, text=True, bufsize=1, env=env)
 
@@ -208,6 +262,7 @@ def main():
     parser.add_argument("folder", type=Path)
     parser.add_argument("--pattern", default="pos_*.csv")
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--layout", choices=("single", "quad"), default="single")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--stride", type=int, default=1)
     parser.add_argument("--fps", type=float, default=30)
@@ -226,6 +281,10 @@ def main():
             parser.error("{} must be positive and finite".format(name))
     if args.width % 2 or args.height % 2:
         parser.error("width and height must be even for H.264")
+    if args.layout == "quad" and (args.width % 4 or args.height % 4):
+        parser.error("quad layout requires width and height divisible by 4")
+    divisor = 2 if args.layout == "quad" else 1
+    args.panel_width, args.panel_height = args.width//divisor, args.height//divisor
     if args.limit is not None and args.limit < 1:
         parser.error("limit must be positive")
     for program in ("vmd", "ffmpeg"):
@@ -252,6 +311,9 @@ def main():
     preview = output.with_suffix(".first-frame.ppm")
     logpath = output.with_suffix(".vmd.log")
     print("Rendering {} frames -> {}".format(len(files), output), flush=True)
+    print("First: {} | Last: {} | Stride: {}".format(files[0].name,files[-1].name,args.stride), flush=True)
+    print("Layout: {} | Movie: {}x{} | Panel: {}x{}".format(
+        args.layout,args.width,args.height,args.panel_width,args.panel_height), flush=True)
     if not args.ori_template:
         print("No --ori-template: all particles will be red.", flush=True)
     start = time.monotonic()
@@ -305,10 +367,18 @@ graphics $slab material SlabMaterial
                     colours = [colour(v, types) for v in read_labels(labelpath, len(points))]
                 else:
                     colours = [1]*len(points)
-                if image.exists():
-                    image.unlink()
-                vmd.run(scene_text(slab_z, points, colours, args, image, i == 0))
-                rgb = read_tga(image, args.width, args.height)
+                views = ("iso", "xy", "xz", "yz") if args.layout == "quad" else ("iso",)
+                panels = []
+                for view in views:
+                    if image.exists():
+                        image.unlink()
+                    vmd.run(scene_text(slab_z, points, colours, args, image, i == 0, view))
+                    panel = read_tga(image, args.panel_width, args.panel_height)
+                    if args.layout == "quad":
+                        panel = label_panel(panel,args.panel_width,args.panel_height,view.upper())
+                    panels.append(panel)
+                rgb = (combine_panels(panels,args.panel_width,args.panel_height)
+                       if args.layout == "quad" else panels[0])
                 if i == 0:
                     preview.write_bytes("P6\n{} {}\n255\n".format(args.width,args.height).encode()+rgb)
                 encoder.stdin.write(rgb)
