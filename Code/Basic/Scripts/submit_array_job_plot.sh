@@ -6,7 +6,8 @@
 #$ -l h_rt=01:59:59,h_data=2G
 #$ -t 1-30:1
 
-# Save this file and PlotDirectory2.py in ~/Chemistry/Code/Basic/Scripts/.
+# Save this file in ~/Chemistry/Code/Basic/Scripts/.
+# The plotting script is ~/Chemistry/Code/Plotting/PlotDirectory2.py.
 # Submit from any directory; SGE writes job logs in the submission directory.
 # Full array: qsub ~/Chemistry/Code/Basic/Scripts/submit_job.sh
 # Preview: qsub -t 1 -v LIMIT=100 ~/Chemistry/Code/Basic/Scripts/submit_job.sh
@@ -34,7 +35,7 @@ module load ffmpeg/5.0.1
 set -u
 
 base_dir="/u/scratch/d/dinoo/GeneticTry19"
-script="$HOME/Chemistry/Code/Basic/Scripts/PlotDirectory2.py"
+script="$HOME/Chemistry/Code/Plotting/PlotDirectory2.py"
 data_dir="${base_dir}/den${SGE_TASK_ID:?Submit as an SGE array job}"
 stride="${STRIDE:-10}"
 limit="${LIMIT:-}"
