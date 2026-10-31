@@ -85,12 +85,13 @@ void run_box_equil_cont(int, int, int, double, geneticcode &, string, matrix<dou
 void run_box_anchors(int, int, double, int, geneticcode &, string);
 //AbstractBindingModel *bm;
 void run_box_equil_anchors(int, int, double, int, geneticcode &, string);
-
+void run_fan_equil(int, int, geneticcode &, string);
 
 };
 
 #include "Nanotube.cpp"
 #include "Nanotube2.cpp"
 #include "Nanotube3.cpp"
+#include "Nanotube4.cpp"
 
 #endif /* NANOTUBE_H */

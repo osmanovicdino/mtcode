@@ -27,10 +27,10 @@ module load gcc/11.3.0
 ##/usr/bin/time -v hostname
 
 dirwemake="den${SGE_TASK_ID}"
-subdir="GeneticTry11"
+subdir="GeneticFan1"
 mkdir /u/scratch/d/dinoo/${subdir}/${dirwemake}
-cp ~/Chemistry/Code/mainNanotubeBox.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
-g++ ~/Chemistry/Code/mainNanotubeBox.cpp -fopenmp -std=c++17 -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
+cp ~/Chemistry/Code/mainNanotubeFan.cpp /u/scratch/d/dinoo/${subdir}/${dirwemake}
+g++ ~/Chemistry/Code/mainNanotubeFan.cpp -fopenmp -std=c++17 -o /u/scratch/d/dinoo/${subdir}/${dirwemake}/angron
 cd /u/scratch/d/dinoo/${subdir}/${dirwemake}
 export OMP_NUM_THREADS=6
 ./angron >log
