@@ -5,7 +5,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=11:59:59,h_data=512M
+#$ -l h_rt=23:59:59,h_data=512M
 ## Modify the parallel environment
 #$ -pe shared 6
 #$ -t 1-100:1

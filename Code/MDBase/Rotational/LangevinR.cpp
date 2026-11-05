@@ -919,8 +919,6 @@ int totp =  pairs.getnrows();
         {
             int p1 = pairs(i, 0);
             int p2 = pairs(i, 1);
-
-
             
 
             if (p2 < p1)
@@ -966,7 +964,7 @@ int totp =  pairs.getnrows();
             //cout << (*q)[0] << endl;
             for (int tp = 1; tp < (*q)[0] + 1; tp++)
             {
-                // cout << tp << endl;
+                // cout << tp << " ";
 
 
                 int potn = (*q)[tp];

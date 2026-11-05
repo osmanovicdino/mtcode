@@ -89,7 +89,6 @@ GeneralPatch CreateGeneralPatch(double int1, double size, double range, double a
         }
     }
 
-
     GeneralPatch c(vec1,numb,params,orient);
     return c;
 }

@@ -50,6 +50,7 @@ import sys
 import tempfile
 import time
 import uuid
+import warnings
 
 
 def natural_key(path):
@@ -187,8 +188,13 @@ def read_tga(path, width, height):
     w, h, depth, flags = struct.unpack_from("<HHBB", data, 12)
     if cmap or kind not in (2, 10) or depth not in (24, 32):
         raise ValueError("Unsupported TGA format: type={}, depth={}".format(kind, depth))
-    if (w, h) != (width, height):
+    # Some VMD builds return a slightly larger framebuffer than requested.
+    # Allow only small excess borders; never reinterpret the actual row stride.
+    if not (0 <= w-width <= 16 and 0 <= h-height <= 16):
         raise ValueError("VMD rendered {}x{}, requested {}x{}".format(w,h,width,height))
+    if (w, h) != (width, height):
+        warnings.warn("VMD rendered {}x{}; centre-cropping to {}x{} (no stretching)".format(
+            w, h, width, height))
     step, count, offset = depth//8, w*h, 18+idlen
     size = count*step
     if kind == 2:
@@ -214,6 +220,8 @@ def read_tga(path, width, height):
         rows.reverse()
     if flags & 16:
         rows = [b"".join(row[i:i+3] for i in range(len(row)-3,-1,-3)) for row in rows]
+    left, top = (w-width)//2, (h-height)//2
+    rows = [row[left*3:(left+width)*3] for row in rows[top:top+height]]
     return b"".join(rows)
 
 
@@ -326,6 +334,7 @@ def main():
         with tempfile.TemporaryDirectory(prefix="vmd-render-") as tmp, logpath.open("w") as log:
             tmp = Path(tmp)
             vmd = VMD(args, tmp, log)
+            vmd.run("display resize {} {}\n".format(args.panel_width, args.panel_height))
             vmd.run('''
 display projection orthographic
 display depthcue off

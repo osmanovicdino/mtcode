@@ -49,6 +49,8 @@ struct GeneralPatch : ComboPatch {
 
     void get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12);
     
+    void print_all();
+
     void CreateFiles();
     GeneralPatch *clone() const
     {

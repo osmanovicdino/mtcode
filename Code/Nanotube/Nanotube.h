@@ -12,19 +12,38 @@ struct WeiM
 };
 //In order to generate the initial sphere conditions, go to "/home/dino/Documents/Nanotube/Sphere.nb"
 
+struct anchoringpointsharmonic
+{
+    double epsilon = 10.;
+    double anchorpointx, anchorpointy, anchorpointz;
+
+    vector1<double> force(double x, double y, double z)
+    {
+
+        vector1<double> force(3);
+
+        force[0] = -epsilon * (x - anchorpointx);
+        force[1] = -epsilon * (y - anchorpointy);
+        force[2] = -epsilon * (z - anchorpointz);
+        return force;
+    }
+};
+
 struct ShellProperties
 {
     matrix<int> par;
     matrix<int> quad;
     matrix<double> posi;
     matrix<double> bindingdis;
+    vector<anchoringpointsharmonic> anchors;
+    vector<int> index_anchored;
     double k;
     double rm;
     double kappa;
 
-    ShellProperties(matrix<int> parr,matrix<int> quadd,matrix<double> posii, matrix<double> bindingdiss,double kk, double rmm, double kappaa) : par(parr), quad(quadd), posi(posii),bindingdis(bindingdiss), k(kk), kappa(kappaa), rm(rmm) {
+    // ShellProperties(matrix<int> parr,matrix<int> quadd,matrix<double> posii, matrix<double> bindingdiss,double kk, double rmm, double kappaa) : par(parr), quad(quadd), posi(posii),bindingdis(bindingdiss), k(kk), kappa(kappaa), rm(rmm) {
 
-    }
+    // }
 
     void DoAnMC(double, bool);
 };
@@ -85,7 +104,7 @@ void run_box_equil_cont(int, int, int, double, geneticcode &, string, matrix<dou
 void run_box_anchors(int, int, double, int, geneticcode &, string);
 //AbstractBindingModel *bm;
 void run_box_equil_anchors(int, int, double, int, geneticcode &, string);
-void run_fan_equil(int, int, geneticcode &, string);
+void run_fan_equil(int, int, geneticcode &, ShellProperties&, string);
 
 };
 

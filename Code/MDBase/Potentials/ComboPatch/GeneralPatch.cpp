@@ -33,6 +33,16 @@ GeneralPatch::GeneralPatch(vector1<int> no_patches_per_typee, vector1<int> num_p
         start_and_end_points[i+1] =  total_no_of_orients;
     }
 
+    // checks
+
+    for(int i = 0 ; i < no_types ; i++) {
+    cout << num_per_type[i] << endl;
+    cout << no_patches_per_type[i] << endl;
+    cout << total_patches_per_type[i] << endl;
+    cout << endl;
+    }
+    pausel();
+    // end checks
 
     if(orient.getnrows() != total_no_of_orients) error("incorrect no. of orientations");
 
@@ -462,6 +472,14 @@ int GeneralPatch::get_total_patches(const int &N) {
      int patchj = (wpj - startj) % no_patches_per_type[k2];
 
      return potstart + patchi*no_patches_per_type[k2]+patchj;
+ }
+
+ void GeneralPatch::print_all() {
+    for(int k = 0; k < no_types ; k++) {
+        cout << no_patches_per_type[k] << endl;
+        cout << num_per_type[k] << endl;
+        cout << total_patches_per_type[k] << endl;
+    }
  }
 
  void GeneralPatch::get_params(const int &i, const int &j, const int &potn, double &nxb1, double &nyb1, double &nzb1, double &nxb2, double &nyb2, double &nzb2, double &d12, double &ang12) {
